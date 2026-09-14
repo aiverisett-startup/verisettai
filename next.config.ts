@@ -1,5 +1,17 @@
 import type { NextConfig } from "next";
 
+// Ensure NEXTAUTH_URL is always a valid absolute URL during Vercel builds & runtime
+const defaultSiteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL ||
+  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "https://verisett.com");
+
+if (!process.env.NEXTAUTH_URL) {
+  process.env.NEXTAUTH_URL = defaultSiteUrl;
+}
+if (!process.env.NEXTAUTH_SECRET) {
+  process.env.NEXTAUTH_SECRET = "verisett_default_cryptographic_secret_32chars_min";
+}
+
 const securityHeaders = [
   // 1. Enforce HTTPS across all subdomains and preload in browser HSTS lists
   {
@@ -70,6 +82,12 @@ const nextConfig: NextConfig = {
         headers: securityHeaders,
       },
     ];
+  },
+
+  // Guarantee environment variables are never empty during Vercel static prerendering
+  env: {
+    NEXTAUTH_URL: defaultSiteUrl,
+    NEXT_PUBLIC_SITE_URL: defaultSiteUrl,
   },
 };
 

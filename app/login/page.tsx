@@ -2,7 +2,6 @@
 
 import React, { useState, Suspense } from "react";
 import Link from "next/link";
-import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   ArrowRight,
@@ -209,17 +208,6 @@ function LoginForm() {
         localStorage.setItem("verisett_auth_provider", "email");
         dispatchAuthChange();
 
-        // Also initiate NextAuth credentials session
-        try {
-          await signIn("credentials", {
-            email: trimmedEmail,
-            password: password,
-            redirect: false,
-          });
-        } catch {
-          // Non-blocking
-        }
-
         if (data.session) {
           setFeedback({
             type: "success",
@@ -255,17 +243,6 @@ function LoginForm() {
         email: trimmedEmail,
         password: password,
       });
-
-      // Synchronize NextAuth credentials session
-      try {
-        await signIn("credentials", {
-          email: trimmedEmail,
-          password: password,
-          redirect: false,
-        });
-      } catch {
-        // Non-blocking
-      }
 
       if (error) {
         // If Supabase reports captcha requirement on project

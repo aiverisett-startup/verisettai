@@ -2,9 +2,9 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { useSession } from "next-auth/react";
 import { ArrowRight, Menu, X } from "lucide-react";
 import VellixyLogo from "./VellixyLogo";
+import { useAuthUser } from "@/lib/useAuthUser";
 
 interface NavbarProps {
   onRequestAccess: () => void;
@@ -13,7 +13,7 @@ interface NavbarProps {
 export default function Navbar({ onRequestAccess }: NavbarProps) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { data: session } = useSession();
+  const { user } = useAuthUser();
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -58,12 +58,12 @@ export default function Navbar({ onRequestAccess }: NavbarProps) {
 
         {/* Actions */}
         <div className="hidden sm:flex items-center gap-3">
-          {session ? (
+          {user ? (
             <Link
               href="/dashboard"
               className="text-xs font-medium text-[#111827] px-3.5 py-1.5 rounded-full border border-[#e5e7eb] bg-white hover:bg-[#f4f4f6] transition-colors"
             >
-              Console ({session.user?.name?.split(" ")[0] || "Operator"})
+              Console ({user.name?.split(" ")[0] || "Operator"})
             </Link>
           ) : (
             <Link

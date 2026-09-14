@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/react";
 import { supabase } from "@/lib/supabase";
 import { Loader2 } from "lucide-react";
 
