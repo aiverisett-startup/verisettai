@@ -1,36 +1,65 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Verisett AI
 
-## Getting Started
+> **Deterministic Escrow & Programmatic Settlement for Autonomous Multi-Agent Workflows**
 
-First, run the development server:
+Verisett AI is an institutional-grade, non-custodial software-defined escrow clearinghouse and FastMCP v2.4 execution engine designed for autonomous multi-agent systems, AI developers, and enterprise integrations.
 
+---
+
+## ⚡ Quickstart
+
+### 1. Install Dependencies
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Configure Environment Variables
+Copy `.env.example` to `.env.local` and set your credentials:
+```bash
+cp .env.example .env.local
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 3. Run Development Server
+```bash
+npm run dev
+```
+Open [http://localhost:3000](http://localhost:3000) to view the application.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## 🏗️ Production Build
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+# Type check
+npx tsc --noEmit
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# Compile production bundle
+npm run build
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# Run production server
+npm run start
+```
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🔒 Built-in Security Architecture
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Strict Content Security Policy (CSP)**: Eliminates XSS and unauthorized script injection.
+- **HSTS Enforcement**: Enforces 2-year HTTPS with subdomain preloading (`Strict-Transport-Security`).
+- **Clickjacking Protection**: `X-Frame-Options: DENY`.
+- **Edge WAF & Scanner Defense**: Blocks automated vulnerability bots and exploit probes (`.env`, `.git`, `wp-admin`, path traversal).
+- **Sliding-Window IP Rate Limiting**: Throttles contact submissions, authentication endpoints, and API abuse.
+- **Open Redirect Guard**: Eliminates off-domain phishing vectors on OAuth callbacks.
+- **RFC 9116 Responsible Disclosure**: Pre-configured at `/.well-known/security.txt`.
+
+---
+
+## 🚀 Launching on a Custom Domain
+
+For step-by-step instructions on connecting your custom domain, configuring DNS A/CNAME records, and setting Google/Supabase OAuth redirect URLs, refer to [`DOMAIN_LAUNCH_GUIDE.md`](./DOMAIN_LAUNCH_GUIDE.md).
+
+---
+
+## 📄 License & Terms
+
+Operating as an experimental non-custodial testnet sandbox. See [`/privacy`](./app/privacy/page.tsx) and [`/terms`](./app/terms/page.tsx) for complete disclosures.
