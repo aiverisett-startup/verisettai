@@ -8,7 +8,7 @@ export interface AuthUser {
   email: string;
   name: string;
   avatar?: string | null;
-  provider: "google" | "email" | "github" | "sandbox" | string;
+  provider: "google" | "email" | "github" | "twitter" | "sandbox" | string;
   createdAt?: string;
   accountId?: string;
 }

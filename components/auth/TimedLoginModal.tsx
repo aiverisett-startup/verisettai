@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { dispatchAuthChange } from "@/lib/useAuthUser";
 import { GoogleSignInButton, GOOGLE_CLIENT_ID } from "./GoogleSignInButton";
+import { TwitterSignInButton } from "./TwitterSignInButton";
 import { GithubSignInButton } from "./GithubSignInButton";
 import { VerisettLogo } from "@/components/VerisettLogo";
 import { supabase } from "@/lib/supabase";
@@ -179,7 +180,7 @@ export function TimedLoginModal({ delaySeconds = 15 }: TimedLoginModalProps) {
               <div className="flex items-center justify-between">
                 <VerisettLogo size={28} />
                 <span className="rounded-full bg-[#FAF6EE] px-2.5 py-0.5 text-[10px] font-montserrat font-bold text-[#9E7A45] border border-[#EAE3D2] tracking-wider uppercase">
-                  SESSION_GATEWAY // 15s TIMEOUT
+                  Session Access
                 </span>
               </div>
 
@@ -188,21 +189,29 @@ export function TimedLoginModal({ delaySeconds = 15 }: TimedLoginModalProps) {
                   id="login-modal-title"
                   className="font-montserrat text-2xl sm:text-3xl font-extrabold text-[#9E7A45] tracking-tight"
                 >
-                  LOGIN
+                  Sign In
                 </h2>
                 <p className="font-montserrat text-xs sm:text-sm font-medium text-[#6E675D] mt-1.5 leading-relaxed">
-                  Your 15-second guest preview window has completed. Please authenticate with your
-                  institutional Google account or work email to access programmatic settlement.
+                  Your guest preview window has completed. Please authenticate with Google, X, GitHub,
+                  or your work email to continue.
                 </p>
               </div>
             </div>
 
-            {/* SSO Authentication: Google & GitHub */}
+            {/* SSO Authentication: Google, X / Twitter, GitHub */}
             <div className="space-y-2 pt-1 font-montserrat">
               <GoogleSignInButton
                 theme="light"
                 buttonText="Continue with Google"
                 className="font-montserrat"
+                onSuccess={() => {
+                  setIsLoggedIn(true);
+                  setIsOpen(false);
+                }}
+              />
+              <TwitterSignInButton
+                className="font-montserrat"
+                buttonText="Continue with X"
                 onSuccess={() => {
                   setIsLoggedIn(true);
                   setIsOpen(false);
@@ -338,7 +347,7 @@ export function TimedLoginModal({ delaySeconds = 15 }: TimedLoginModalProps) {
                 <Shield className="w-3 h-3" />
                 NEUTRAL CUSTODY
               </span>
-              <span>GOOGLE CLIENT AUTHENTICATED</span>
+              <span>SECURE OAUTH ENCRYPTED</span>
             </div>
           </div>
         </div>

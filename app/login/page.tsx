@@ -19,6 +19,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { GoogleSignInButton } from "@/components/auth/GoogleSignInButton";
+import { TwitterSignInButton } from "@/components/auth/TwitterSignInButton";
 import { GithubSignInButton } from "@/components/auth/GithubSignInButton";
 import { VerisettLogo } from "@/components/VerisettLogo";
 import { GoldenBackgroundShapes } from "@/components/ui/GoldenBackgroundShapes";
@@ -350,12 +351,20 @@ function LoginForm() {
         </div>
       )}
 
-      {/* Single Sign-On: Google & GitHub */}
+      {/* Single Sign-On: Google, X / Twitter, GitHub */}
       <div className="space-y-2.5">
         <GoogleSignInButton
           theme="light"
           buttonText="Continue with Google"
           className="font-montserrat"
+          onSuccess={() => {
+            router.push("/");
+          }}
+        />
+
+        <TwitterSignInButton
+          className="font-montserrat"
+          buttonText="Continue with X"
           onSuccess={() => {
             router.push("/");
           }}
