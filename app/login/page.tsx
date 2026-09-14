@@ -351,7 +351,7 @@ function LoginForm() {
         </div>
       )}
 
-      {/* Single Sign-On: Google, X / Twitter, GitHub */}
+      {/* Single Sign-On: Google, GitHub, X (formerly Twitter) */}
       <div className="space-y-2.5">
         <GoogleSignInButton
           theme="light"
@@ -362,18 +362,18 @@ function LoginForm() {
           }}
         />
 
-        <TwitterSignInButton
+        <GithubSignInButton
+          theme="light"
+          buttonText="Continue with GitHub"
           className="font-montserrat"
-          buttonText="Continue with X"
           onSuccess={() => {
             router.push("/");
           }}
         />
 
-        <GithubSignInButton
-          theme="light"
-          buttonText="Continue with GitHub"
+        <TwitterSignInButton
           className="font-montserrat"
+          buttonText="Continue with X"
           onSuccess={() => {
             router.push("/");
           }}

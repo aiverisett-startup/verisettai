@@ -198,7 +198,7 @@ export function TimedLoginModal({ delaySeconds = 15 }: TimedLoginModalProps) {
               </div>
             </div>
 
-            {/* SSO Authentication: Google, X / Twitter, GitHub */}
+            {/* SSO Authentication: Google, GitHub, X (formerly Twitter) */}
             <div className="space-y-2 pt-1 font-montserrat">
               <GoogleSignInButton
                 theme="light"
@@ -209,18 +209,18 @@ export function TimedLoginModal({ delaySeconds = 15 }: TimedLoginModalProps) {
                   setIsOpen(false);
                 }}
               />
-              <TwitterSignInButton
+              <GithubSignInButton
+                theme="light"
+                buttonText="Continue with GitHub"
                 className="font-montserrat"
-                buttonText="Continue with X"
                 onSuccess={() => {
                   setIsLoggedIn(true);
                   setIsOpen(false);
                 }}
               />
-              <GithubSignInButton
-                theme="light"
-                buttonText="Continue with GitHub"
+              <TwitterSignInButton
                 className="font-montserrat"
+                buttonText="Continue with X"
                 onSuccess={() => {
                   setIsLoggedIn(true);
                   setIsOpen(false);

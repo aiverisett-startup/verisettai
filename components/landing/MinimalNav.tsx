@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Play, Lock } from "lucide-react";
 import { GoogleIcon } from "../ui/GoogleIcon";
@@ -8,6 +8,7 @@ import { VerisettLogo } from "../VerisettLogo";
 import { EnvironmentMode, VaultBalance } from "../dashboard/types";
 import { useAuthUser } from "@/lib/useAuthUser";
 import { ProfileSettingsModal } from "@/components/auth/ProfileSettingsModal";
+import { supabase } from "@/lib/supabase";
 
 interface MinimalNavProps {
   envMode: EnvironmentMode;
@@ -31,6 +32,48 @@ export function MinimalNav({
   const { user, isLoaded, signOut, updateProfile } = useAuthUser();
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [avatarError, setAvatarError] = useState(false);
+  const [balance, setBalance] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (!user) {
+      setBalance(null);
+      return;
+    }
+
+    const fetchBalance = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
+          const { data } = await supabase
+            .from("profiles")
+            .select("testnet_balance, accepted_terms")
+            .eq("id", session.user.id)
+            .maybeSingle();
+
+          if (data && typeof data.testnet_balance === "number") {
+            setBalance(data.testnet_balance);
+            return;
+          }
+        }
+        const termsAccepted = localStorage.getItem("verisett_accepted_terms") === "true";
+        setBalance(termsAccepted ? 10000 : 0);
+      } catch {
+        setBalance(10000);
+      }
+    };
+
+    fetchBalance();
+
+    const handleAuthEvent = () => {
+      fetchBalance();
+    };
+
+    window.addEventListener("verisett_auth_change", handleAuthEvent);
+    return () => {
+      window.removeEventListener("verisett_auth_change", handleAuthEvent);
+    };
+  }, [user]);
+
   const formatINR = (cents: number) => {
     const inrValue = (cents / 100) * 83;
     return "₹" + inrValue.toLocaleString("en-IN", { maximumFractionDigits: 0 });
@@ -131,18 +174,30 @@ export function MinimalNav({
             </button>
           </div>
 
-          {/* Vault Balance Pill */}
-          <button
-            onClick={onOpenDepositModal}
-            className="hidden lg:flex shrink-0 items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-[#EAE3D2] hover:border-[#D4AF37] transition-colors text-xs cursor-pointer whitespace-nowrap shadow-xs"
-            title="Click to deposit funds into escrow vault"
-          >
-            <Lock className="w-3 h-3 text-[#9E7A45] shrink-0" />
-            <span className="font-mono text-[#8C8275] shrink-0">Custody:</span>
-            <span className="font-mono font-medium text-[#1C1A17] shrink-0">
-              {formatINR(vaultBalance.available_cents)}
-            </span>
-          </button>
+          {/* Institutional Testnet Badge (Default/Guest vs Authenticated State) */}
+          {!user ? (
+            <div className="hidden lg:flex shrink-0 items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FAF8F5] border border-[#EAE3D2] text-xs font-mono shadow-xs">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75 motion-reduce:hidden" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+              </span>
+              <span className="text-[#8C8275] text-[11px] font-medium tracking-tight">
+                Protocol Testnet Sandbox // Active
+              </span>
+            </div>
+          ) : (
+            <button
+              onClick={onOpenDepositModal}
+              className="hidden lg:flex shrink-0 items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-[#EAE3D2] hover:border-[#D4AF37] transition-colors text-xs font-mono shadow-xs cursor-pointer"
+              title="Click to view testnet balance & vault deposit"
+            >
+              <Lock className="w-3 h-3 text-[#9E7A45] shrink-0" />
+              <span className="text-[#8C8275] text-[11px]">Vault:</span>
+              <span className="font-bold text-[#1C1A17] text-xs">
+                {balance !== null && balance !== undefined ? balance.toLocaleString() : "0.00"} VRS
+              </span>
+            </button>
+          )}
 
           {/* Primary CTA: Round Profile Button (if logged in) or Login Button */}
           {isLoaded && user ? (

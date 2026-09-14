@@ -72,13 +72,13 @@ export function HeroVisual3D() {
                   Software Escrow Vault
                 </span>
                 <span
-                  className={`text-[10px] font-mono px-2 py-0.5 rounded-full font-medium transition-colors ${
+                  className={`text-[10px] font-mono px-2.5 py-0.5 rounded-full font-semibold uppercase tracking-wider transition-colors ${
                     cycleStep === 4
                       ? "bg-emerald-50 text-emerald-800 border border-emerald-200"
                       : "bg-[#FAF6EE] text-[#9E7A45] border border-[#EAE3D2]"
                   }`}
                 >
-                  {cycleStep === 4 ? "SETTLED" : "ACTIVE ROUTING"}
+                  {cycleStep === 4 ? "SIMULATION SETTLED" : "INTERACTIVE SIMULATION"}
                 </span>
               </div>
               <p className="text-[11px] text-[#8C8275] font-mono mt-0.5">

@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { ShieldCheck, Plus, ExternalLink, Activity, ArrowRight, LogOut, User, Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { ConnectAgentModal } from "@/components/ConnectAgentModal";
+import { LegalConsentModal } from "@/components/LegalConsentModal";
 import { VerisettLogo } from "@/components/VerisettLogo";
 import { GoldenBackgroundShapes } from "@/components/ui/GoldenBackgroundShapes";
 import { supabase } from "@/lib/supabase";
@@ -12,6 +13,8 @@ interface ProfileData {
   testnet_balance?: number;
   available_balance?: number;
   frozen_balance?: number;
+  accepted_terms?: boolean;
+  accepted_terms_at?: string;
 }
 
 interface VaultData {
@@ -24,6 +27,8 @@ interface VaultData {
 export default function DashboardPage() {
   const router = useRouter();
   const [modalOpen, setModalOpen] = useState(false);
+  const [isConsentModalOpen, setIsConsentModalOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState<{ id?: string; email?: string } | null>(null);
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [userName, setUserName] = useState<string | null>(null);
   const [profile, setProfile] = useState<ProfileData | null>(null);
@@ -43,16 +48,35 @@ export default function DashboardPage() {
       try {
         const { data: { session } } = await supabase.auth.getSession();
         if (session?.user) {
+          setCurrentUser({ id: session.user.id, email: session.user.email ?? undefined });
           const { data: profileRes } = await supabase
             .from("profiles")
-            .select("testnet_balance, available_balance, frozen_balance")
+            .select("testnet_balance, available_balance, frozen_balance, accepted_terms, accepted_terms_at")
             .eq("id", session.user.id)
             .maybeSingle();
 
-          if (profileRes) {
-            setProfile(profileRes);
+          const localConsent = localStorage.getItem("verisett_accepted_terms") === "true";
+          const hasAccepted = profileRes?.accepted_terms === true || localConsent;
+
+          if (!hasAccepted) {
+            setIsConsentModalOpen(true);
+            setProfile({
+              accepted_terms: false,
+              testnet_balance: 0,
+              available_balance: 0,
+              frozen_balance: 0,
+            });
           } else {
-            setProfile({ testnet_balance: 10000 });
+            setIsConsentModalOpen(false);
+            if (profileRes) {
+              setProfile({
+                ...profileRes,
+                accepted_terms: true,
+                testnet_balance: profileRes.testnet_balance ?? 10000,
+              });
+            } else {
+              setProfile({ accepted_terms: true, testnet_balance: 10000 });
+            }
           }
 
           const { data: vaultsRes } = await supabase
@@ -65,10 +89,19 @@ export default function DashboardPage() {
             setActiveVaults(vaultsRes);
           }
         } else {
-          setProfile({ testnet_balance: 10000 });
+          const localConsent = localStorage.getItem("verisett_accepted_terms") === "true";
+          if (!localConsent) {
+            setIsConsentModalOpen(true);
+            setProfile({ accepted_terms: false, testnet_balance: 0 });
+          } else {
+            setIsConsentModalOpen(false);
+            setProfile({ accepted_terms: true, testnet_balance: 10000 });
+          }
         }
       } catch {
-        setProfile({ testnet_balance: 10000 });
+        const localConsent = localStorage.getItem("verisett_accepted_terms") === "true";
+        setIsConsentModalOpen(!localConsent);
+        setProfile({ accepted_terms: localConsent, testnet_balance: localConsent ? 10000 : 0 });
       }
     };
 
@@ -273,6 +306,39 @@ export default function DashboardPage() {
 
       {/* Connection Modal */}
       <ConnectAgentModal isOpen={modalOpen} onClose={() => setModalOpen(false)} />
+
+      {/* Mandatory Privacy & Terms Gating Rail */}
+      <LegalConsentModal
+        isOpen={isConsentModalOpen}
+        user={currentUser}
+        onConsentSuccess={async () => {
+          setIsConsentModalOpen(false);
+          try {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session?.user) {
+              const { data: profileRes } = await supabase
+                .from("profiles")
+                .select("testnet_balance, available_balance, frozen_balance, accepted_terms")
+                .eq("id", session.user.id)
+                .maybeSingle();
+
+              if (profileRes) {
+                setProfile({
+                  ...profileRes,
+                  accepted_terms: true,
+                  testnet_balance: profileRes.testnet_balance ?? 10000,
+                });
+              } else {
+                setProfile({ accepted_terms: true, testnet_balance: 10000 });
+              }
+            } else {
+              setProfile({ accepted_terms: true, testnet_balance: 10000 });
+            }
+          } catch {
+            setProfile({ accepted_terms: true, testnet_balance: 10000 });
+          }
+        }}
+      />
     </div>
   );
 }

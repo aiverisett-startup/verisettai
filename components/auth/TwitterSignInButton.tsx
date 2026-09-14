@@ -26,24 +26,34 @@ export function TwitterSignInButton({
     setIsLoading(true);
     setNotice(null);
     try {
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: "twitter",
+      // Connect to Supabase client auth with 'x' (and graceful 'twitter' fallback)
+      let res = await supabase.auth.signInWithOAuth({
+        provider: "x" as any,
         options: {
-          redirectTo: `${typeof window !== "undefined" ? window.location.origin : ""}/auth/callback?next=/`,
+          redirectTo: `${typeof window !== "undefined" ? window.location.origin : ""}/auth/callback`,
         },
       });
 
-      if (error) {
-        setNotice(error.message || "Failed to initiate X / Twitter authentication.");
+      if (res.error && res.error.message?.toLowerCase().includes("provider")) {
+        res = await supabase.auth.signInWithOAuth({
+          provider: "twitter",
+          options: {
+            redirectTo: `${typeof window !== "undefined" ? window.location.origin : ""}/auth/callback`,
+          },
+        });
+      }
+
+      if (res.error) {
+        setNotice(res.error.message || "Failed to initiate X / Twitter authentication.");
         return;
       }
 
-      if (data?.url) {
-        window.location.href = data.url;
+      if (res.data?.url) {
+        window.location.href = res.data.url;
         return;
       }
     } catch (err: any) {
-      setNotice(err?.message || "Error connecting to X / Twitter authentication service.");
+      setNotice(err?.message || "Error connecting to X authentication service.");
     } finally {
       setIsLoading(false);
     }
@@ -55,14 +65,20 @@ export function TwitterSignInButton({
         type="button"
         onClick={handleTwitterClick}
         disabled={isLoading}
-        className="w-full h-11 px-4 rounded-xl border border-[#EAE3D2] bg-white hover:bg-[#FAF8F5] active:bg-[#F5EEDB]/40 text-[#1C1A17] font-montserrat text-xs sm:text-sm font-semibold transition-colors flex items-center justify-center gap-2.5 cursor-pointer shadow-xs hover:border-[#C59B5F]/40 disabled:opacity-60"
+        className="w-full py-3 px-4 rounded-xl border border-stone-800 bg-black text-white hover:bg-stone-900 transition flex items-center justify-between gap-3 text-sm font-medium cursor-pointer shadow-xs disabled:opacity-60 font-montserrat"
       >
-        {isLoading ? (
-          <Loader2 className="w-4 h-4 animate-spin text-[#C59B5F]" />
-        ) : (
-          <XIcon className="w-4 h-4 shrink-0 text-[#1C1A17]" />
-        )}
-        <span>{isLoading ? "Signing in..." : buttonText}</span>
+        <div className="flex items-center gap-3">
+          {isLoading ? (
+            <Loader2 className="w-4 h-4 animate-spin text-[#C59B5F]" />
+          ) : (
+            <XIcon className="w-4 h-4 shrink-0 text-white fill-current" />
+          )}
+          <span>{isLoading ? "Connecting to X..." : buttonText}</span>
+        </div>
+
+        <span className="px-2 py-0.5 rounded-md bg-stone-900 border border-stone-800 text-[10px] font-mono text-stone-300 font-semibold uppercase tracking-wider shrink-0">
+          OAUTH 2.0
+        </span>
       </button>
 
       {notice && (
@@ -73,3 +89,5 @@ export function TwitterSignInButton({
     </div>
   );
 }
+
+export { TwitterSignInButton as XSignInButton };
