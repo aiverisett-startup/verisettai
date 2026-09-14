@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Verisett AI - Step-by-Step Video Generator</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #090A0F;
+      color: #E2E8F0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    #container {
+      width: 960px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+    canvas {
+      width: 960px;
+      height: 540px;
+      border-radius: 12px;
+      border: 1px solid #1E2230;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+      background: #090A0F;
+    }
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: #11131A;
+      padding: 12px 24px;
+      border-radius: 9999px;
+      border: 1px solid #1E2230;
+    }
+    button {
+      background: #10B981;
+      color: #090A0F;
+      font-weight: 600;
+      border: none;
+      padding: 8px 20px;
+      border-radius: 9999px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+    button:hover { background: #059669; }
+    #status {
+      font-family: monospace;
+      font-size: 13px;
+      color: #94A3B8;
+    }
+    .status-highlight {
+      color: #10B981;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div id="container">
+    <canvas id="stage" width="1920" height="1080"></canvas>
+    <div class="controls">
+      <button id="startBtn">Record Explainer Video</button>
+      <div id="status">Ready to generate 1080p step-by-step video</div>
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById("stage");
+    const ctx = canvas.getContext("2d");
+    const startBtn = document.getElementById("startBtn");
+    const statusEl = document.getElementById("status");
+
+    const TOTAL_DURATION = 18; // 18 seconds total (3s per chapter)
+    const CHAPTERS = [
+      {
+        id: 1,
+        timeStart: 0,
+        timeEnd: 3,
+        badge: "CHAPTER 01 / 06",
+        title: "The Vision: Autonomous Agent Settlement",
+        subtitle: "Why AI agents need cryptographic escrow and micro-clearing",
+        draw: drawScene1
+      },
+      {
+        id: 2,
+        timeStart: 3,
+        timeEnd: 6,
+        badge: "CHAPTER 02 / 06",
+        title: "Global Control & Vault Custody",
+        subtitle: "Single-line navigation, Sandbox/Mainnet switcher & $10,000 Vault",
+        draw: drawScene2
+      },
+      {
+        id: 3,
+        timeStart: 6,
+        timeEnd: 9,
+        badge: "CHAPTER 03 / 06",
+        title: "Protocol Rails: Smart Escrow Locking",
+        subtitle: "Autonomous capital commitment with 38ms settlement latency",
+        draw: drawScene3
+      },
+      {
+        id: 4,
+        timeStart: 9,
+        timeEnd: 12,
+        badge: "CHAPTER 04 / 06",
+        title: "Cryptographic Assertion Engine",
+        subtitle: "Real-time JSON Schema Draft 2020-12 validation before payment",
+        draw: drawScene4
+      },
+      {
+        id: 5,
+        timeStart: 12,
+        timeEnd: 15,
+        badge: "CHAPTER 05 / 06",
+        title: "Autonomous Worker Marketplace ($5 Free Credit)",
+        subtitle: "Hire specialized web search, code audit & summarization workers",
+        draw: drawScene5
+      },
+      {
+        id: 6,
+        timeStart: 15,
+        timeEnd: 18,
+        badge: "CHAPTER 06 / 06",
+        title: "Interactive Console & Instant Settlement",
+        subtitle: "Cryptographic release, sha256 ledger proof & zero double-spend",
+        draw: drawScene6
+      }
+    ];
+
+    let startTime = 0;
+    let isRecording = false;
+    let mediaRecorder = null;
+    let recordedChunks = [];
+
+    function formatTime(sec) {
+      const m = Math.floor(sec / 60).toString().padStart(2, "0");
+      const s = Math.floor(sec % 60).toString().padStart(2, "0");
+      return `${m}:${s}`;
+    }
+
+    // Common background & header HUD
+    function drawHUD(currentTime, chapter) {
+      // Dark gradient background
+      const bgGradient = ctx.createRadialGradient(960, 540, 200, 960, 540, 1000);
+      bgGradient.addColorStop(0, "#0F131D");
+      bgGradient.addColorStop(1, "#07080C");
+      ctx.fillStyle = bgGradient;
+      ctx.fillRect(0, 0, 1920, 1080);
+
+      // Subtle cyber grid
+      ctx.strokeStyle = "rgba(30, 41, 59, 0.25)";
+      ctx.lineWidth = 1;
+      const gridSize = 80;
+      for (let x = 0; x < 1920; x += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, 1080);
+        ctx.stroke();
+      }
+      for (let y = 0; y < 1080; y += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(1920, y);
+        ctx.stroke();
+      }
+
+      // Top Progress Bar
+      const progress = Math.min(currentTime / TOTAL_DURATION, 1);
+      ctx.fillStyle = "rgba(30, 34, 48, 0.8)";
+      ctx.fillRect(0, 0, 1920, 8);
+      const progGradient = ctx.createLinearGradient(0, 0, 1920, 0);
+      progGradient.addColorStop(0, "#10B981");
+      progGradient.addColorStop(0.5, "#06B6D4");
+      progGradient.addColorStop(1, "#10B981");
+      ctx.fillStyle = progGradient;
+      ctx.fillRect(0, 0, 1920 * progress, 8);
+
+      // Top HUD Bar
+      ctx.fillStyle = "rgba(9, 10, 15, 0.85)";
+      ctx.fillRect(80, 40, 1760, 64);
+      ctx.strokeStyle = "#1E2230";
+      ctx.lineWidth = 1;
+      ctx.strokeRect(80, 40, 1760, 64);
+
+      // Brand in HUD
+      ctx.fillStyle = "#10B981";
+      ctx.fillRect(104, 56, 32, 32);
+      ctx.fillStyle = "#090A0F";
+      ctx.font = "bold 20px monospace";
+      ctx.fillText("V", 112, 80);
+
+      ctx.fillStyle = "#FFFFFF";
+      ctx.font = "bold 22px -apple-system, BlinkMacSystemFont, sans-serif";
+      ctx.fillText("VERISETT", 150, 80);
+      ctx.fillStyle = "#10B981";
+      ctx.fillText(".AI", 260, 80);
+
+      ctx.fillStyle = "#64748B";
+      ctx.font = "14px monospace";
+      ctx.fillText("STEP-BY-STEP EXPLAINER TOUR", 310, 80);
+
+      // HUD Right: Time & Chapter Badge
+      ctx.fillStyle = "#F59E0B";
+      ctx.font = "bold 14px monospace";
+      ctx.fillText(chapter.badge, 1520, 79);
+
+      ctx.fillStyle = "#FFFFFF";
+      ctx.font = "16px monospace";
+      ctx.fillText(`${formatTime(currentTime)} / ${formatTime(TOTAL_DURATION)}`, 1720, 79);
+
+      // Bottom Subtitles Card
+      ctx.fillStyle = "rgba(13, 16, 23, 0.95)";
+      ctx.fillRect(160, 930, 1600, 100);
+      ctx.strokeStyle = "#1E2230";
+      ctx.lineWidth = 1;
+      ctx.strokeRect(160, 930, 1600, 100);
+
+      ctx.fillStyle = "#10B981";
+      ctx.font = "bold 14px monospace";
+      ctx.fillText(`CURRENT STEP: ${chapter.title.toUpperCase()}`, 190, 962);
+
+      ctx.fillStyle = "#E2E8F0";
+      ctx.font = "20px -apple-system, BlinkMacSystemFont, sans-serif";
+      ctx.fillText(chapter.subtitle, 190, 998);
+    }
+
+    // SCENE 1: THE VISION
+    function drawScene1(t) {
+      const alpha = Math.min(t / 0.5, 1);
+      ctx.save();
+      ctx.globalAlpha = alpha;
+
+      // Center title
+      ctx.fillStyle = "#FFFFFF";
+      ctx.font = "bold 56px -apple-system, BlinkMacSystemFont, sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText("The Autonomous Agent Settlement Layer", 960, 220);
+
+      ctx.fillStyle = "#94A3B8";
+      ctx.font = "24px -apple-system, BlinkMacSystemFont, sans-serif";
+      ctx.fillText("Enabling untrusted AI agents to safely trade funds and services with zero counterparty risk", 960, 270);
+
+      // Diagram: Agent A -> Verisett Gateway -> Agent B
+      const nodeY = 540;
+      const leftX = 400;
+      const midX = 960;
+      const rightX = 1520;
+
+      // Agent A Box
+      ctx.fillStyle = "#161922";
+      ctx.strokeStyle = "#38BDF8";
+      ctx.lineWidth = 2;
+      ctx.fillRect(leftX - 160, nodeY - 100, 320, 200);
+      ctx.strokeRect(leftX - 160, nodeY - 100, 320, 200);
+
+      ctx.fillStyle = "#38BDF8";
+      ctx.font = "bold 24px monospace";
+      ctx.fillText("AGENT A (BUYER)", leftX, nodeY - 40);
+      ctx.fillStyle = "#94A3B8";
+      ctx.font = "16px sans-serif";
+      ctx.fillText("Needs Web Research", leftX, nodeY);
+      ctx.fillText("Budget: $0.50 USDC", leftX, nodeY + 30);
+      ctx.fillText("Requires Strict Schema", leftX, nodeY + 60);
+
+      // Verisett Gateway Box (Center)
+      const pulse = Math.sin(t * 4) * 5;
+      ctx.fillStyle = "#11131A";
+      ctx.strokeStyle = "#10B981";
+      ctx.lineWidth = 3;
+      ctx.fillRect(midX - 200 - pulse/2, nodeY - 130 - pulse/2, 400 + pulse, 260 + pulse);
+      ctx.strokeRect(midX - 200 - pulse/2, nodeY - 130 - pulse/2, 400 + pulse, 260 + pulse);
+
+      ctx.fillStyle = "#10B981";
+      ctx.font = "bold 28px monospace";
+      ctx.fillText("VERISETT GATEWAY", midX, nodeY - 60);
+      ctx.fillStyle = "#FFFFFF";
+      ctx.font = "18px sans-serif";
+      ctx.fillText("✓ Locked Escrow Smart Vault", midX, nodeY - 10);
+      ctx.fillText("✓ Cryptographic Assertion Engine", midX, nodeY + 25);
+      ctx.fillText("✓ 38ms Micro-Settlement Rails", midX, nodeY + 60);
+      ctx.fillText("✓ Double-Spend Prevention", midX, nodeY + 95);
+
+      // Agent B Box
+      ctx.fillStyle = "#161922";
+      ctx.strokeStyle = "#A855F7";
+      ctx.lineWidth = 2;
+      ctx.fillRect(rightX - 160, nodeY - 100, 320, 200);
+      ctx.strokeRect(rightX - 160, nodeY - 100, 320, 200);
+
+      ctx.fillStyle = "#A855F7";
+      ctx.font = "bold 24px monospace";
+      ctx.fillText("AGENT B (WORKER)", rightX, nodeY - 40);
+      ctx.fillStyle = "#94A3B8";
+      ctx.font = "16px sans-serif";
+      ctx.fillText("Crawls Live Web Sources", rightX, nodeY);
+      ctx.fillText("Returns Structured JSON", rightX, nodeY + 30);
+      ctx.fillText("Guaranteed Instant Pay", rightX, nodeY + 60);
+
+      // Animated arrows
+      const arrowProgress = (t % 1.5) / 1.5;
+      ctx.fillStyle = "#10B981";
+      ctx.beginPath();
+      ctx.arc(leftX + 160 + (midX - leftX - 360) * arrowProgress, nodeY, 8, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = "#A855F7";
+      ctx.beginPath();
+      ctx.arc(midX + 200 + (rightX - midX - 360) * arrowProgress, nodeY, 8, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    // SCENE 2: NAVIGATION & VAULT CUSTODY
+    function drawScene2(t) {
+      ctx.save();
+      ctx.textAlign = "center";
+
+      ctx.fillStyle = "#FFFFFF";
+      ctx.font = "bold 44px -apple-system, BlinkMacSystemFont, sans-serif";
+      ctx.fillText("Step 1: Unified Single-Line Navigation & Vault Custody", 960, 200);
+
+      ctx.fillStyle = "#94A3B8";
+      ctx.font = "20px -apple-system, BlinkMacSystemFont, sans-serif";
+      ctx.fillText("Everything accessible on a single horizontal row across all screen sizes", 960, 245);
+
+      // Render the Top Navbar Mockup
+      const navY = 320;
+      ctx.fillStyle = "#FAFAF8";
+      ctx.fillRect(160, navY, 1600, 80);
+      ctx.strokeStyle = "#E8E8E6";
+      ctx.lineWidth = 2;
+      ctx.strokeRect(160, navY, 1600, 80);
+
+      // Logo inside mockup
+      ctx.fillStyle = "#111317";
+      ctx.fillRect(190, navY + 22, 36, 36);
+      ctx.fillStyle = "#FFFFFF";
+      ctx.font = "bold 20px monospace";
+      ctx.fillText("V", 208, navY + 47);
+
+      ctx.fillStyle = "#111317";
+      ctx.font = "bold 20px -apple-system, sans-serif";
+      ctx.textAlign = "left";
+      ctx.fillText("Verisett AI", 235, navY + 47);
+
+      // Nav Links in single line
+      const links = ["Protocol", "Assertion Engine", "Interactive Console", "Marketplace $5 Free", "Developers"];
+      let linkX = 400;
+      ctx.font = "16px sans-serif";
+      links.forEach((link, idx) => {
+        if (link.includes("$5 Free")) {
+          ctx.fillStyle = "#059669";
+          ctx.font = "bold 16px sans-serif";
+          ctx.fillText(link, linkX, navY + 47);
+        } else {
+          ctx.fillStyle = "#4B5563";
+          ctx.font = "16px sans-serif";
+          ctx.fillText(link, linkX, navY + 47);
+        }
+        linkX += 160;
+      });
+
+      // Right controls: Sandbox/Mainnet switcher
+      ctx.fillStyle = "#E5E7EB";
+      ctx.fillRect(1230, navY + 22, 160, 36);
+      ctx.fillStyle = "#111317";
+      ctx.fillRect(1232, navY + 24, 78, 32);
+      ctx.fillStyle = "#FFFFFF";
+      ctx.font = "bold 13px monospace";
+      ctx.fillText("Sandbox", 1245, navY + 45);
+      ctx.fillStyle = "#6B7280";
+      ctx.fillText("Mainnet", 1325, navY + 45);
+
+      // Vault Balance Pill
+      ctx.fillStyle = "#FFFFFF";
+      ctx.strokeStyle = "#10B981";
+      ctx.lineWidth = 2;
+      ctx.fillRect(1410, navY + 22, 170, 36);
+      ctx.strokeRect(1410, navY + 22, 170, 36);
+      ctx.fillStyle = "#10B981";
+      ctx.font = "bold 14px monospace";
+      ctx.fillText("● Vault: $10,000", 1425, navY + 45);
+
+      // Console button
+      ctx.fillStyle = "#111317";
+      ctx.fillRect(1600, navY + 22, 130, 36);
+      ctx.fillStyle = "#FFFFFF";
+      ctx.font = "bold 13px sans-serif";
+      ctx.fillText("> Console", 1630, navY + 45);
+
+      // Highlight Explanations Cards below
+      const cardY = 480;
+
+      // Card 1: Single Line Navbar Guarantee
+      ctx.fillStyle = "#161922";
+      ctx.strokeStyle = "#38BDF8";
+      ctx.lineWidth = 1.5;
+      ctx.fillRect(160, cardY, 490, 380);
+      ctx.strokeRect(160, cardY, 490, 380);
+
+      ctx.fillStyle = "#38BDF8";
+      ctx.font = "bold 20px monospace";
+      ctx.fillText("1. SINGLE-LINE ROW GUARANTEE", 190, cardY + 40);
+      ctx.fillStyle = "#94A3B8";
+      ctx.font = "16px sans-serif";
+      ctx.fillText("• flex-nowrap & whitespace-nowrap", 190, cardY + 80);
+      ctx.fillText("• No multiline text wrapping", 190, cardY + 115);
+      ctx.fillText("• Smooth horizontal overflow scrolling", 190, cardY + 150);
+      ctx.fillText("• Preserves header height (h-16)", 190, cardY + 185);
+
+      // Card 2: Dual Environment Switcher
+      ctx.fillStyle = "#161922";
+      ctx.strokeStyle = "#F59E0B";
+      ctx.lineWidth = 1.5;
+      ctx.fillRect(715, cardY, 490, 380);
+      ctx.strokeRect(715, cardY, 490, 380);
+
+      ctx.fillStyle = "#F59E0B";
+      ctx.font = "bold 20px monospace";
+      ctx.fillText("2. SANDBOX & MAINNET MODES", 745, cardY + 40);
+      ctx.fillStyle = "#94A3B8";
+      ctx.font = "16px sans-serif";
+      ctx.fillText("• Instant toggle between Test & Live", 745, cardY + 80);
+      ctx.fillText("• Sandbox uses mock USDC funds", 745, cardY + 115);
+      ctx.fillText("• Mainnet targets cryptographic enclave", 745, cardY + 150);
+      ctx.fillText("• Dedicated API keys for each mode", 745, cardY + 185);
+
+      // Card 3: Vault Custody
+      ctx.fillStyle = "#161922";
+      ctx.strokeStyle = "#10B981";
+      ctx.lineWidth = 1.5;
+      ctx.fillRect(1270, cardY, 490, 380);
+      ctx.strokeRect(1270, cardY, 490, 380);
+
+      ctx.fillStyle = "#10B981";
+      ctx.font = "bold 20px monospace";
+      ctx.fillText("3. CUSTODIAL ESCROW VAULT", 1300, cardY + 40);
+      ctx.fillStyle = "#94A3B8";
+      ctx.font = "16px sans-serif";
+      ctx.fillText("• Pre-fund agent spending budgets", 1300, cardY + 80);
+      ctx.fillText("• Instant micro-settlement without gas", 1300, cardY + 115);
+      ctx.fillText("• Real-time balance tracking", 1300, cardY + 150);
+      ctx.fillText("• Cryptographic lock on task creation", 1300, cardY + 185);
+
+      ctx.restore();
+    }
+
+    // SCENE 3: PROTOCOL RAILS & ESCROW
+    function drawScene3(t) {
+      ctx.save();
+      ctx.textAlign = "center";
+
+      ctx.fillStyle = "#FFFFFF";
+      ctx.font = "bold 44px -apple-system, BlinkMacSystemFont, sans-serif";
+      ctx.fillText("Step 2: Smart Escrow Locking & 38ms Settlement", 960, 200);
+
+      ctx.fillStyle = "#94A3B8";
+      ctx.font = "20px -apple-system, BlinkMacSystemFont, sans-serif";
+      ctx.fillText("Deterministic state machine guaranteeing complete double-spend protection", 960, 245);
+
+      // 4 Lifecycle States
+      const states = [
+        { name: "1. ESCROW_INIT", color: "#38BDF8", desc: "Agent A locks $0.50 into Vault" },
+        { name: "2. WORKER_CLAIM", color: "#F59E0B", desc: "Worker Agent claims task execution" },
+        { name: "3. ASSERT_VERIFY", color: "#A855F7", desc: "Verisett runs JSON Schema validation" },
+        { name: "4. SETTLED_RELEASE", color: "#10B981", desc: "Instant funds release to worker wallet" }
+      ];
+
+      const boxW = 340;
+      const boxH = 260;
+      const startX = 220;
+      const gap = 60;
+      const boxY = 340;
+
+      states.forEach((s, idx) => {
+        const x = startX + idx * (boxW + gap);
+        const isActive = Math.floor(t * 0.8) % 4 === idx;
+
+        ctx.fillStyle = "#161922";
+        ctx.strokeStyle = isActive ? s.color : "#334155";
+        ctx.lineWidth = isActive ? 3 : 1;
+        ctx.fillRect(x, boxY, boxW, boxH);
+        ctx.strokeRect(x, boxY, boxW, boxH);
+
+        ctx.fillStyle = s.color;
+        ctx.font = "bold 22px monospace";
+        ctx.fillText(s.name, x + boxW/2, boxY + 50);
+
+        ctx.fillStyle = "#E2E8F0";
+        ctx.font = "16px sans-serif";
+        ctx.fillText(s.desc, x + boxW/2, boxY + 110);
+
+        if (isActive) {
+          ctx.fillStyle = s.color;
+          ctx.font = "bold 14px monospace";
+          ctx.fillText("● CURRENT ACTIVE STATE", x + boxW/2, boxY + 210);
+        }
+      });
+
+      // Terminal Code representation below
+      const codeY = 660;
+      ctx.fillStyle = "#0B0F17";
+      ctx.strokeStyle = "#1E2230";
+      ctx.lineWidth = 1;
+      ctx.fillRect(220, codeY, 1480, 200);
+      ctx.strokeRect(220, codeY, 1480, 200);
+
+      ctx.textAlign = "left";
+      ctx.font = "18px monospace";
+      ctx.fillStyle = "#10B981";
+      ctx.fillText("$ verisett escrow create --amount 50 --schema ./schema.json", 260, codeY + 45);
+
+      ctx.fillStyle = "#94A3B8";
+      ctx.fillText("> Escrow ID: esc_9a82f1b4092c  |  Status: LOCKED  |  Amount: $0.50 USDC", 260, codeY + 85);
+      ctx.fillText("> Timeout: 300s  |  Assertion Engine: ACTIVE  |  Take-Rate: 1.5%", 260, codeY + 120);
+
+      ctx.fillStyle = "#F59E0B";
+      ctx.fillText("> [38ms Latency] Funds locked in non-custodial enclave. Waiting for assertion.", 260, codeY + 155);
+
+      ctx.restore();
+    }
+
+    // SCENE 4: ASSERTION ENGINE
+    function drawScene4(t) {
+      ctx.save();
+      ctx.textAlign = "center";
+
+      ctx.fillStyle = "#FFFFFF";
+      ctx.font = "bold 44px -apple-system, BlinkMacSystemFont, sans-serif";
+      ctx.fillText("Step 3: Cryptographic Assertion Engine (Draft 2020-12)", 960, 200);
+
+      ctx.fillStyle = "#94A3B8";
+      ctx.font = "20px -apple-system, BlinkMacSystemFont, sans-serif";
+      ctx.fillText("Payments are only released if the agent output strictly matches cryptographic schema", 960, 245);
+
+      // Split Screen: Left = JSON Schema, Right = Worker Payload + Live Validation
+      const panelY = 320;
+      const panelH = 540;
+
+      // Left Panel: Required Schema
+      ctx.fillStyle = "#0B0F17";
+      ctx.strokeStyle = "#38BDF8";
+      ctx.lineWidth = 2;
+      ctx.fillRect(160, panelY, 760, panelH);
+      ctx.strokeRect(160, panelY, 760, panelH);
+
+      ctx.textAlign = "left";
+      ctx.fillStyle = "#38BDF8";
+      ctx.font = "bold 20px monospace";
+      ctx.fillText("EXPECTED ASSERTION SCHEMA (JSON Schema)", 190, panelY + 45);
+
+      ctx.font = "16px monospace";
+      ctx.fillStyle = "#E2E8F0";
+      const schemaLines = [
+        '{',
+        '  "$schema": "https://json-schema.org/draft/2020-12/schema",',
+        '  "type": "object",',
+        '  "properties": {',
+        '    "query": { "type": "string" },',
+        '    "sources": { "type": "array", "minItems": 3 },',
+        '    "confidence": { "type": "number", "minimum": 0.95 },',
+        '    "summary": { "type": "string", "maxLength": 500 }',
+        '  },',
+        '  "required": ["query", "sources", "confidence", "summary"]',
+        '}'
+      ];
+      schemaLines.forEach((line, i) => {
+        ctx.fillText(line, 190, panelY + 95 + i * 32);
+      });
+
+      // Right Panel: Live Worker Submission
+      ctx.fillStyle = "#0B0F17";
+      ctx.strokeStyle = "#10B981";
+      ctx.lineWidth = 2;
+      ctx.fillRect(1000, panelY, 760, panelH);
+      ctx.strokeRect(1000, panelY, 760, panelH);
+
+      ctx.fillStyle = "#10B981";
+      ctx.font = "bold 20px monospace";
+      ctx.fillText("WORKER SUBMISSION & VERIFICATION", 1030, panelY + 45);
+
+      ctx.font = "16px monospace";
+      ctx.fillStyle = "#94A3B8";
+      const payloadLines = [
+        '{',
+        '  "query": "Autonomous Agent Payment Rails",',
+        '  "sources": ["arxiv:2603.11", "github.com/verisett", "docs.agentic"],',
+        '  "confidence": 0.98,',
+        '  "summary": "Verisett provides cryptographic micro-settlement rails."' +
+        '}',
+        '',
+        '--- VERISETT ASSERTION REPORT ---',
+        '✓ Types checked: 4/4 Passed',
+        '✓ Array minimum constraint: 3 sources (PASSED)',
+        '✓ Confidence threshold: 0.98 >= 0.95 (PASSED)',
+        '✓ SHA-256 Digest: 0x7c9a...11f4',
+        '>>> RESULT: ASSERTION VERIFIED -> RELEASE $0.50'
+      ];
+      payloadLines.forEach((line, i) => {
+        if (line.includes("PASSED") || line.includes("VERIFIED")) {
+          ctx.fillStyle = "#10B981";
+          ctx.font = "bold 16px monospace";
+        } else {
+          ctx.fillStyle = "#E2E8F0";
+          ctx.font = "16px monospace";
+        }
+        ctx.fillText(line, 1030, panelY + 95 + i * 30);
+      });
+
+      ctx.restore();
+    }
+
+    // SCENE 5: AGENT MARKETPLACE & $5 FREE CREDIT
+    function drawScene5(t) {
+      ctx.save();
+      ctx.textAlign = "center";
+
+      ctx.fillStyle = "#FFFFFF";
+      ctx.font = "bold 44px -apple-system, BlinkMacSystemFont, sans-serif";
+      ctx.fillText("Step 4: Autonomous Worker Marketplace ($5 Free Credit)", 960, 200);
+
+      ctx.fillStyle = "#94A3B8";
+      ctx.font = "20px -apple-system, BlinkMacSystemFont, sans-serif";
+      ctx.fillText("Browse vetted utility agents, claim tasks, and test with pre-funded $5 credits", 960, 245);
+
+      // 3 Worker Agent Cards
+      const workers = [
+        {
+          name: "DeepSearch Agent",
+          tag: "EXTRACTION / SEARCH",
+          rate: "$0.10 / task",
+          rating: "99.8% Success Rate",
+          desc: "Extracts real-time structured data from live URLs and returns validated JSON schemas."
+        },
+        {
+          name: "CodeAudit Pro",
+          tag: "SECURITY / LINT",
+          rate: "$0.25 / task",
+          rating: "100% Deterministic",
+          desc: "Autonomous security auditor scanning smart contracts and codebases for vulnerabilities."
+        },
+        {
+          name: "DocuDigest AI",
+          tag: "SUMMARIZATION",
+          rate: "$0.05 / task",
+          rating: "99.4% Success Rate",
+          desc: "Condenses multi-page enterprise legal contracts and APIs into compact structured digests."
+        }
+      ];
+
+      const cardW = 480;
+      const cardH = 460;
+      const cardY = 320;
+      const startX = 180;
+      const gap = 70;
+
+      workers.forEach((w, idx) => {
+        const x = startX + idx * (cardW + gap);
+        ctx.fillStyle = "#161922";
+        ctx.strokeStyle = idx === 0 ? "#10B981" : "#334155";
+        ctx.lineWidth = idx === 0 ? 3 : 1;
+        ctx.fillRect(x, cardY, cardW, cardH);
+        ctx.strokeRect(x, cardY, cardW, cardH);
+
+        // Tag badge
+        ctx.fillStyle = "#0F172A";
+        ctx.fillRect(x + 30, cardY + 30, 200, 30);
+        ctx.fillStyle = "#38BDF8";
+        ctx.font = "bold 13px monospace";
+        ctx.textAlign = "left";
+        ctx.fillText(w.tag, x + 45, cardY + 50);
+
+        // Name & Rate
+        ctx.fillStyle = "#FFFFFF";
+        ctx.font = "bold 26px -apple-system, sans-serif";
+        ctx.fillText(w.name, x + 30, cardY + 110);
+
+        ctx.fillStyle = "#10B981";
+        ctx.font = "bold 22px monospace";
+        ctx.fillText(w.rate, x + 30, cardY + 150);
+
+        ctx.fillStyle = "#94A3B8";
+        ctx.font = "16px sans-serif";
+        ctx.fillText(w.desc, x + 30, cardY + 200);
+
+        ctx.fillStyle = "#F59E0B";
+        ctx.font = "15px monospace";
+        ctx.fillText(`★ ${w.rating}`, x + 30, cardY + 320);
+
+        // Action button
+        ctx.fillStyle = idx === 0 ? "#10B981" : "#334155";
+        ctx.fillRect(x + 30, cardY + 370, cardW - 60, 50);
+        ctx.fillStyle = idx === 0 ? "#090A0F" : "#FFFFFF";
+        ctx.font = "bold 16px sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText("Deploy Worker (Uses $5 Free Credit)", x + cardW/2, cardY + 402);
+      });
+
+      ctx.restore();
+    }
+
+    // SCENE 6: INTERACTIVE CONSOLE & FINAL SETTLEMENT
+    function drawScene6(t) {
+      ctx.save();
+      ctx.textAlign = "center";
+
+      ctx.fillStyle = "#FFFFFF";
+      ctx.font = "bold 44px -apple-system, BlinkMacSystemFont, sans-serif";
+      ctx.fillText("Step 5: Interactive Console & Cryptographic Proof", 960, 200);
+
+      ctx.fillStyle = "#94A3B8";
+      ctx.font = "20px -apple-system, BlinkMacSystemFont, sans-serif";
+      ctx.fillText("Instant micro-settlement with verifiable immutable ledger receipt", 960, 245);
+
+      // Terminal Console
+      const termY = 310;
+      ctx.fillStyle = "#0B0F17";
+      ctx.strokeStyle = "#1E2230";
+      ctx.lineWidth = 2;
+      ctx.fillRect(200, termY, 1520, 540);
+      ctx.strokeRect(200, termY, 1520, 540);
+
+      // Terminal Title Bar
+      ctx.fillStyle = "#161922";
+      ctx.fillRect(200, termY, 1520, 44);
+      ctx.fillStyle = "#EF4444";
+      ctx.beginPath(); ctx.arc(225, termY + 22, 6, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = "#F59E0B";
+      ctx.beginPath(); ctx.arc(245, termY + 22, 6, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = "#10B981";
+      ctx.beginPath(); ctx.arc(265, termY + 22, 6, 0, Math.PI * 2); ctx.fill();
+
+      ctx.fillStyle = "#94A3B8";
+      ctx.font = "14px monospace";
+      ctx.fillText("verisett-console-clearinghouse.sh", 960, termY + 28);
+
+      // Terminal Output lines
+      ctx.textAlign = "left";
+      ctx.font = "17px monospace";
+
+      const termLines = [
+        { text: "[INIT] Connected to Verisett Clearinghouse Core (v1.0.4-prod)", color: "#94A3B8" },
+        { text: "[AUTH] Enclave Signature Verified (Agent 0x8F92... -> Gateway 0x01A)", color: "#38BDF8" },
+        { text: "[LOCK] Funds in Custody: $0.50 USDC locked in Escrow Contract #8912", color: "#F59E0B" },
+        { text: "[WORK] DeepSearch Worker Agent completed payload in 32ms", color: "#E2E8F0" },
+        { text: "[EVAL] Cryptographic Assertion Schema Validation: 100% Match", color: "#10B981" },
+        { text: "[SETTLE] Transferring 50 cents to Worker Agent 0x8F92... (Take-Rate: 1.5%)", color: "#10B981" },
+        { text: "[RECEIPT] Immutable Proof: 0x9f4a8b7c21e03a9d8e7b1a2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c", color: "#A855F7" },
+        { text: "[STATUS: 200 OK] SETTLEMENT COMPLETE. ZERO COUNTERPARTY RISK.", color: "#10B981" },
+        { text: "", color: "#FFFFFF" },
+        { text: "Verisett AI is ready. Launch the Interactive Console to run your first escrow!", color: "#FFFFFF" }
+      ];
+
+      termLines.forEach((line, i) => {
+        ctx.fillStyle = line.color;
+        ctx.fillText(line.text, 240, termY + 85 + i * 36);
+      });
+
+      ctx.restore();
+    }
+
+    // Main render loop
+    function renderFrame(currentTime) {
+      let activeChapter = CHAPTERS[0];
+      for (const ch of CHAPTERS) {
+        if (currentTime >= ch.timeStart && currentTime < ch.timeEnd) {
+          activeChapter = ch;
+          break;
+        }
+      }
+      if (currentTime >= TOTAL_DURATION) {
+        activeChapter = CHAPTERS[CHAPTERS.length - 1];
+      }
+
+      const chapterTime = currentTime - activeChapter.timeStart;
+      drawHUD(currentTime, activeChapter);
+      activeChapter.draw(chapterTime);
+    }
+
+    // Recording logic
+    async function startRecording() {
+      if (isRecording) return;
+      isRecording = true;
+      startBtn.disabled = true;
+      statusEl.innerHTML = '<span class="status-highlight">Recording 1080p 60FPS video in progress...</span>';
+
+      const stream = canvas.captureStream(60);
+      recordedChunks = [];
+      mediaRecorder = new MediaRecorder(stream, {
+        mimeType: "video/webm; codecs=vp9",
+        videoBitsPerSecond: 6000000 // 6 Mbps high definition
+      });
+
+      mediaRecorder.ondataavailable = (e) => {
+        if (e.data.size > 0) {
+          recordedChunks.push(e.data);
+        }
+      };
+
+      mediaRecorder.onstop = async () => {
+        const blob = new Blob(recordedChunks, { type: "video/webm" });
+        statusEl.innerHTML = `<span class="status-highlight">Uploading video to server (${(blob.size / 1024 / 1024).toFixed(2)} MB)...</span>`;
+
+        try {
+          const res = await fetch("/api/save-video", {
+            method: "POST",
+            body: blob,
+            headers: { "Content-Type": "video/webm" }
+          });
+          const data = await res.json();
+          if (data.success) {
+            statusEl.innerHTML = `<span class="status-highlight">✓ Video Generated & Saved to /how-it-works.webm (${(data.sizeBytes / 1024 / 1024).toFixed(2)} MB)</span>`;
+          } else {
+            statusEl.textContent = "Upload error: " + (data.error || "failed");
+          }
+        } catch (err) {
+          statusEl.textContent = "Failed to upload video: " + err.message;
+        }
+        startBtn.disabled = false;
+        isRecording = false;
+      };
+
+      mediaRecorder.start(500);
+      startTime = performance.now();
+      console.log("MediaRecorder started, rendering frames...");
+
+      const intervalId = setInterval(() => {
+        const elapsed = (performance.now() - startTime) / 1000;
+        renderFrame(elapsed);
+
+        if (elapsed >= TOTAL_DURATION) {
+          clearInterval(intervalId);
+          console.log("Finished 30s rendering, stopping MediaRecorder...");
+          renderFrame(TOTAL_DURATION);
+          mediaRecorder.stop();
+        }
+      }, 1000 / 30);
+    }
+
+    startBtn.addEventListener("click", startRecording);
+
+    // Initial render of first frame
+    renderFrame(0);
+
+    // Auto-start if URL has ?autostart=1
+    if (new URLSearchParams(window.location.search).get("autostart") === "1") {
+      setTimeout(startRecording, 500);
+    }
+  </script>
+</body>
+</html>

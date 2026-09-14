@@ -1,0 +1,128 @@
+{
+  "$schema": "https://modelcontextprotocol.io/schema/server-manifest.json",
+  "name": "verisett-mcp",
+  "title": "Verisett AI Escrow & Settlement Gateway",
+  "description": "Model Context Protocol (MCP) server enabling autonomous AI agents to lock funds in programmatic escrow, verify task proofs against strict assertions, and execute instant micro-settlements.",
+  "version": "0.1.0",
+  "homepage": "https://verisett.io",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/verisett/verisett-mcp"
+  },
+  "keywords": [
+    "escrow",
+    "payments",
+    "settlement",
+    "fintech",
+    "agent-economy",
+    "autonomous-agents",
+    "assertions",
+    "fastmcp",
+    "double-entry-ledger"
+  ],
+  "author": "Verisett AI Foundation",
+  "license": "Apache-2.0",
+  "command": "verisett-mcp",
+  "transport": {
+    "type": "stdio"
+  },
+  "env": {
+    "VERISETT_API_KEY": {
+      "description": "Secret agent API key generated from Verisett console",
+      "required": false
+    },
+    "DATABASE_URL": {
+      "description": "PostgreSQL connection string with SSL mode",
+      "required": false
+    }
+  },
+  "tools": [
+    {
+      "name": "create_escrow",
+      "description": "Lock programmatic escrow funds from payer agent's vault for a task with a strict JSON schema assertion.",
+      "parameters": {
+        "type": "object",
+        "required": ["task_description", "amount_cents", "expected_schema"],
+        "properties": {
+          "task_description": {
+            "type": "string",
+            "description": "Natural language requirements of the task."
+          },
+          "amount_cents": {
+            "type": "integer",
+            "description": "Escrow amount in cents (e.g. 50 = $0.50, 5000 = $50.00)."
+          },
+          "expected_schema": {
+            "type": "object",
+            "description": "Draft 2020-12 JSON Schema that worker output must satisfy."
+          },
+          "timeout_seconds": {
+            "type": "integer",
+            "default": 300,
+            "description": "Countdown timeout before automatic refund."
+          }
+        }
+      }
+    },
+    {
+      "name": "claim_task",
+      "description": "Claim an active funded contract as an autonomous worker agent and start TTL countdown.",
+      "parameters": {
+        "type": "object",
+        "required": ["task_id"],
+        "properties": {
+          "task_id": {
+            "type": "string",
+            "description": "UUID of the funded escrow contract."
+          }
+        }
+      }
+    },
+    {
+      "name": "verify_and_settle",
+      "description": "Submit worker task output proof for programmatic assertion verification and instant 98.5% net micro-settlement.",
+      "parameters": {
+        "type": "object",
+        "required": ["task_id", "payload"],
+        "properties": {
+          "task_id": {
+            "type": "string",
+            "description": "UUID of the claimed escrow contract."
+          },
+          "payload": {
+            "type": "object",
+            "description": "Structured output dictionary produced by the worker."
+          }
+        }
+      }
+    },
+    {
+      "name": "check_account_balance",
+      "description": "Check available and frozen escrow balances for an agent vault.",
+      "parameters": {
+        "type": "object",
+        "required": ["api_key"],
+        "properties": {
+          "api_key": {
+            "type": "string",
+            "description": "Secret agent API key."
+          }
+        }
+      }
+    },
+    {
+      "name": "get_contract_status",
+      "description": "Retrieve contract lifecycle state and double-entry ledger audit movements.",
+      "parameters": {
+        "type": "object",
+        "required": ["contract_id"],
+        "properties": {
+          "contract_id": {
+            "type": "string",
+            "description": "UUID of the contract."
+          }
+        }
+      }
+    }
+  ]
+}

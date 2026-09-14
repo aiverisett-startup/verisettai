@@ -1,0 +1,332 @@
+@import "tailwindcss";
+
+:root {
+  --background: #FDFCF9;
+  --surface: #FFFFFF;
+  --surface-hover: #FAF8F5;
+  --surface-card: #FFFFFF;
+  --surface-subtle: #F9F8F6;
+  --surface-sunken: #F4EFE6;
+  --text-primary: #1C1A17;
+  --text-secondary: #6E675D;
+  --text-muted: #9E9689;
+  --border: #EAE3D2;
+  --border-subtle: #F4EFE6;
+  --border-focus: #C59B5F;
+  
+  --accent: #C59B5F;
+  --accent-gold: #C59B5F;
+  --accent-gold-hover: #B38A4F;
+  --accent-gold-deep: #9E7A45;
+  --accent-gold-bright: #D4AF37;
+  --accent-gold-light: #FAF8F5;
+  --accent-emerald: #059669;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-hover: var(--surface-hover);
+  --color-surface-card: var(--surface-card);
+  --color-surface-subtle: var(--surface-subtle);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+  --color-border: var(--border);
+  --color-border-subtle: var(--border-subtle);
+  --color-accent-gold: var(--accent-gold);
+  --font-sans: "Plus Jakarta Sans", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --font-display: "Cinzel", "Playfair Display", Georgia, serif;
+  --font-outfit: "Outfit", sans-serif;
+  --font-jakarta: "Plus Jakarta Sans", sans-serif;
+  --font-michroma: "Michroma", sans-serif;
+  --font-montserrat: "Montserrat", sans-serif;
+}
+
+.font-display {
+  font-family: 'Cinzel', 'Playfair Display', Georgia, serif;
+}
+
+.font-serif-luxury {
+  font-family: 'Playfair Display', 'Cormorant Garamond', Georgia, serif;
+}
+
+.font-cinzel {
+  font-family: 'Cinzel', serif;
+}
+
+.font-outfit {
+  font-family: 'Outfit', -apple-system, sans-serif;
+}
+
+.font-jakarta {
+  font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+}
+
+.font-michroma {
+  font-family: 'Michroma', sans-serif !important;
+}
+
+.font-montserrat {
+  font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+}
+
+/* Enforce Montserrat font across every single element and letter on the login page */
+.login-page-montserrat,
+.login-page-montserrat *,
+.login-page-montserrat *::before,
+.login-page-montserrat *::after,
+.login-page-montserrat input,
+.login-page-montserrat input::placeholder,
+.login-page-montserrat button,
+.login-page-montserrat span,
+.login-page-montserrat p,
+.login-page-montserrat h1,
+.login-page-montserrat h2,
+.login-page-montserrat h3,
+.login-page-montserrat label,
+.login-page-montserrat a,
+.login-page-montserrat div {
+  font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+}
+
+/* Enforce Michroma font across every single element and letter on the login page (fallback/alternate) */
+.login-page-michroma,
+.login-page-michroma *,
+.login-page-michroma *::before,
+.login-page-michroma *::after,
+.login-page-michroma input,
+.login-page-michroma input::placeholder,
+.login-page-michroma button,
+.login-page-michroma span,
+.login-page-michroma p,
+.login-page-michroma h1,
+.login-page-michroma h2,
+.login-page-michroma h3,
+.login-page-michroma label,
+.login-page-michroma a,
+.login-page-michroma div {
+  font-family: 'Michroma', sans-serif !important;
+}
+
+html {
+  scroll-behavior: smooth;
+  color-scheme: light;
+}
+
+body {
+  background-color: #FDFCF9;
+  color: #1C1A17;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* Minimalist Gold-Tinted Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #FDFCF9;
+}
+::-webkit-scrollbar-thumb {
+  background: #E0D7C6;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #C59B5F;
+}
+
+/* Hide scrollbar utility */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Luxury Minimalist Card with subtle golden border and warm depth */
+.minimal-card, .institutional-card {
+  background: #FFFFFF;
+  border: 1px solid #EAE3D2;
+  border-radius: 20px;
+  box-shadow: 0 1px 3px rgba(197, 155, 95, 0.04), 0 4px 16px rgba(0, 0, 0, 0.02);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.minimal-card:hover, .institutional-card:hover {
+  border-color: #D4AF37;
+  box-shadow: 0 12px 36px -4px rgba(197, 155, 95, 0.12), 0 2px 8px rgba(0, 0, 0, 0.02);
+  transform: translateY(-2px);
+}
+
+/* Primary Button: Satin warm gold with smooth lift */
+.minimal-btn-primary {
+  background: #C59B5F;
+  color: #FFFFFF;
+  border-radius: 9999px;
+  padding: 0.68rem 1.5rem;
+  font-weight: 500;
+  font-size: 0.875rem;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 14px rgba(197, 155, 95, 0.3);
+  border: 1px solid #C59B5F;
+}
+.minimal-btn-primary:hover {
+  background: #B38A4F;
+  border-color: #B38A4F;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 22px rgba(197, 155, 95, 0.42);
+}
+.minimal-btn-primary:active {
+  transform: translateY(0);
+  background: #9E7A45;
+}
+
+/* Secondary Button: Crisp white with fine golden border */
+.minimal-btn-secondary {
+  background: #FFFFFF;
+  color: #2C2925;
+  border: 1px solid #EAE3D2;
+  border-radius: 9999px;
+  padding: 0.68rem 1.5rem;
+  font-weight: 500;
+  font-size: 0.875rem;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+.minimal-btn-secondary:hover {
+  background: #FAF8F5;
+  border-color: #D4AF37;
+  color: #9E7A45;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(197, 155, 95, 0.08);
+}
+.minimal-btn-secondary:active {
+  transform: translateY(0);
+}
+
+/* Golden text gradient utility */
+.text-gold-gradient {
+  background: linear-gradient(135deg, #9E7A45 0%, #C59B5F 50%, #D4AF37 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Golden border gradient utility */
+.border-gold-gradient {
+  border-image: linear-gradient(135deg, #C59B5F, #EAE3D2, #D4AF37) 1;
+}
+
+/* Cool Animations */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(1.5deg);
+  }
+}
+
+@keyframes float-reverse {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(10px) rotate(-1.5deg);
+  }
+}
+
+@keyframes spin-very-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes spin-reverse-slow {
+  from {
+    transform: rotate(360deg);
+  }
+  to {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes pulse-gold-aura {
+  0%, 100% {
+    opacity: 0.45;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.04);
+  }
+}
+
+@keyframes shimmer-sweep {
+  0% {
+    transform: translateX(-100%) rotate(35deg);
+  }
+  100% {
+    transform: translateX(200%) rotate(35deg);
+  }
+}
+
+.animate-float-slow {
+  animation: float 8s ease-in-out infinite;
+}
+
+.animate-float-reverse {
+  animation: float-reverse 10s ease-in-out infinite;
+}
+
+.animate-spin-very-slow {
+  animation: spin-very-slow 45s linear infinite;
+}
+
+.animate-spin-reverse-slow {
+  animation: spin-reverse-slow 60s linear infinite;
+}
+
+.animate-pulse-gold {
+  animation: pulse-gold-aura 6s ease-in-out infinite;
+}
+
+@keyframes gradient-flow {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes aurora-pulse {
+  0%, 100% {
+    opacity: 0.35;
+    transform: scale(0.98);
+  }
+  50% {
+    opacity: 0.75;
+    transform: scale(1.03);
+  }
+}
+
+.animate-gradient-flow {
+  background-size: 300% 300%;
+  animation: gradient-flow 6s ease infinite;
+}
+
+.animate-aurora-glow {
+  animation: aurora-pulse 4s ease-in-out infinite;
+}
+
