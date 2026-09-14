@@ -6,12 +6,28 @@ import { useRouter } from "next/navigation";
 import { ConnectAgentModal } from "@/components/ConnectAgentModal";
 import { VerisettLogo } from "@/components/VerisettLogo";
 import { GoldenBackgroundShapes } from "@/components/ui/GoldenBackgroundShapes";
+import { supabase } from "@/lib/supabase";
+
+interface ProfileData {
+  testnet_balance?: number;
+  available_balance?: number;
+  frozen_balance?: number;
+}
+
+interface VaultData {
+  id: string;
+  title?: string;
+  amount?: number;
+  status?: string;
+}
 
 export default function DashboardPage() {
   const router = useRouter();
   const [modalOpen, setModalOpen] = useState(false);
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [userName, setUserName] = useState<string | null>(null);
+  const [profile, setProfile] = useState<ProfileData | null>(null);
+  const [activeVaults, setActiveVaults] = useState<VaultData[]>([]);
 
   useEffect(() => {
     try {
@@ -22,6 +38,41 @@ export default function DashboardPage() {
     } catch {
       // Ignore
     }
+
+    const fetchLiveUserData = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
+          const { data: profileRes } = await supabase
+            .from("profiles")
+            .select("testnet_balance, available_balance, frozen_balance")
+            .eq("id", session.user.id)
+            .maybeSingle();
+
+          if (profileRes) {
+            setProfile(profileRes);
+          } else {
+            setProfile({ testnet_balance: 10000 });
+          }
+
+          const { data: vaultsRes } = await supabase
+            .from("contracts")
+            .select("id, title, amount, status")
+            .eq("user_id", session.user.id)
+            .eq("status", "active");
+
+          if (vaultsRes) {
+            setActiveVaults(vaultsRes);
+          }
+        } else {
+          setProfile({ testnet_balance: 10000 });
+        }
+      } catch {
+        setProfile({ testnet_balance: 10000 });
+      }
+    };
+
+    fetchLiveUserData();
   }, []);
 
   const handleSignOut = () => {
@@ -127,7 +178,9 @@ export default function DashboardPage() {
                 <ShieldCheck className="w-4 h-4" />
               </div>
             </div>
-            <p className="text-3xl font-bold text-[#1C1A17] mt-3">₹0.00</p>
+            <p className="text-2xl sm:text-3xl font-bold text-[#1C1A17] mt-3 font-mono">
+              {profile?.testnet_balance ? profile.testnet_balance.toLocaleString() : "0.00"} VRS
+            </p>
             <div className="mt-3 flex items-center gap-1.5 text-[11px] font-mono text-[#9E7A45]">
               <span className="w-1.5 h-1.5 rounded-full bg-[#C59B5F]" />
               Deterministic Escrow Active
@@ -141,7 +194,9 @@ export default function DashboardPage() {
                 <Activity className="w-4 h-4" />
               </div>
             </div>
-            <p className="text-3xl font-bold text-[#1C1A17] mt-3">0 Sessions</p>
+            <p className="text-2xl sm:text-3xl font-bold text-[#1C1A17] mt-3 font-mono">
+              {activeVaults.length} Vaults
+            </p>
             <div className="mt-3 flex items-center gap-1.5 text-[11px] font-mono text-[#8C8275]">
               <span className="w-1.5 h-1.5 rounded-full bg-[#8C8275]" />
               Zero active disputes
@@ -155,12 +210,64 @@ export default function DashboardPage() {
                 <span className="w-2 h-2 rounded-full bg-[#C59B5F] animate-ping" />
               </div>
             </div>
-            <p className="text-3xl font-bold text-[#9E7A45] mt-3">Standby</p>
+            <p className="text-2xl sm:text-3xl font-bold text-[#9E7A45] mt-3">Standby</p>
             <div className="mt-3 flex items-center gap-1.5 text-[11px] font-mono text-[#8C8275]">
               <span className="w-1.5 h-1.5 rounded-full bg-[#C59B5F]" />
               Waiting for gateway ping
             </div>
           </div>
+        </div>
+
+        {/* Active Escrow Vaults Section */}
+        <div className="rounded-3xl border border-[#EAE3D2] bg-white p-6 md:p-8 shadow-[0_4px_24px_rgba(197,155,95,0.06)] space-y-4">
+          <div className="flex items-center justify-between pb-4 border-b border-[#F0E9DC]">
+            <h2 className="text-base sm:text-lg font-bold text-[#1C1A17] flex items-center gap-2">
+              <span>Active Escrow Vaults</span>
+              <span className="rounded-full bg-[#FAF6EE] border border-[#EAE3D2] px-2.5 py-0.5 text-xs font-mono text-[#9E7A45]">
+                {activeVaults.length} Active
+              </span>
+            </h2>
+            <button
+              onClick={() => setModalOpen(true)}
+              className="text-xs font-semibold text-[#9E7A45] hover:text-[#C59B5F] flex items-center gap-1 cursor-pointer font-mono"
+            >
+              <Plus className="w-3.5 h-3.5" /> Deploy Vault
+            </button>
+          </div>
+
+          {activeVaults.length === 0 ? (
+            <div className="rounded-2xl border border-dashed border-[#EAE3D2] bg-[#FAF8F5]/60 p-8 text-center">
+              <p className="text-xs text-[#8C8275] font-mono">No active escrow vaults deployed.</p>
+              <button
+                onClick={() => setModalOpen(true)}
+                className="mt-3 px-4 py-2 rounded-xl bg-[#FAF6EE] border border-[#C59B5F]/30 text-[#9E7A45] hover:text-[#C59B5F] hover:bg-[#FAF6EE]/80 text-xs font-mono font-medium transition cursor-pointer"
+              >
+                + Deploy First Agent Vault
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {activeVaults.map((vault) => (
+                <div
+                  key={vault.id}
+                  className="p-4 rounded-xl border border-[#EAE3D2] bg-white hover:border-[#C59B5F]/40 transition flex items-center justify-between"
+                >
+                  <div className="space-y-1">
+                    <span className="font-mono text-xs font-semibold text-[#1C1A17]">{vault.id}</span>
+                    <p className="text-xs text-[#8C8275]">{vault.title || "Autonomous Escrow Vault"}</p>
+                  </div>
+                  <div className="text-right">
+                    <span className="font-mono text-sm font-bold text-[#9E7A45]">
+                      {vault.amount ? vault.amount.toLocaleString() : "0.00"} VRS
+                    </span>
+                    <span className="block text-[10px] font-mono text-emerald-700 font-semibold uppercase">
+                      {vault.status || "Active"}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 

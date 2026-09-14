@@ -220,13 +220,13 @@ export function ProfileSettingsModal({
                   <div className="p-2.5 rounded-xl bg-[#FAF8F5] border border-[#EAE3D2]">
                     <div className="text-[10px] text-[#8C8275]">Vault Available Balance</div>
                     <div className="text-sm font-bold font-mono text-[#1C1A17] mt-0.5">
-                      ₹20,000
+                      10,000 VRS
                     </div>
                   </div>
                   <div className="p-2.5 rounded-xl bg-[#FAF8F5] border border-[#EAE3D2]">
                     <div className="text-[10px] text-[#8C8275]">Frozen in Escrow</div>
                     <div className="text-sm font-bold font-mono text-[#C59B5F] mt-0.5">
-                      ₹5,000
+                      0.00 VRS
                     </div>
                   </div>
                 </div>
