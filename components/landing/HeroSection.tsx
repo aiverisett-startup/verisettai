@@ -95,6 +95,9 @@ export function HeroSection({
               variants={itemVariants}
               className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-[#1C1A17] leading-[1.12] will-change-transform"
             >
+              <span className="block text-sm sm:text-base font-semibold tracking-wider text-[#9E7A45] font-montserrat uppercase mb-2">
+                Verisett AI
+              </span>
               Zero-risk commercial settlement for{" "}
               <span className="text-gold-gradient">software deliverables.</span>
             </motion.h1>

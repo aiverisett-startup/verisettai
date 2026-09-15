@@ -9,16 +9,16 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://verisett.com";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://veri-sett.com";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "Verisett AI — Institutional Software & Milestone Escrow Platform",
+    default: "Verisett AI — Autonomous Multi-Agent Escrow Protocol",
     template: "%s | Verisett AI",
   },
   description:
-    "Enterprise-grade software and AI milestone escrow. Lock commercial funds in programmatic vault custody and automatically release payouts upon verified deliverable acceptance.",
+    "Autonomous multi-agent escrow and settlement protocol for software deliverables and FastMCP tool execution.",
   applicationName: "Verisett AI",
   authors: [{ name: "Verisett AI Team", url: siteUrl }],
   creator: "Verisett AI",
@@ -44,9 +44,9 @@ export const metadata: Metadata = {
     canonical: "/",
   },
   openGraph: {
-    title: "Verisett AI — Institutional Software & Milestone Escrow Platform",
+    title: "Verisett AI — Autonomous Multi-Agent Escrow Protocol",
     description:
-      "Enterprise-grade software and AI milestone escrow. Lock commercial funds in programmatic vault custody and automatically release payouts upon verified deliverable acceptance.",
+      "Autonomous multi-agent escrow and settlement protocol for software deliverables and FastMCP tool execution.",
     url: siteUrl,
     siteName: "Verisett AI",
     locale: "en_US",
@@ -54,11 +54,11 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Verisett AI — Institutional Software & Milestone Escrow Platform",
+    title: "Verisett AI — Autonomous Multi-Agent Escrow Protocol",
     description:
-      "Enterprise-grade software and AI milestone escrow. Zero counterparty risk with automated programmatic settlement.",
-    site: "@ai_verisett",
-    creator: "@ai_verisett",
+      "Autonomous multi-agent escrow and settlement protocol for software deliverables and FastMCP tool execution.",
+    site: "@Verisett_AI",
+    creator: "@Verisett_AI",
   },
   robots: {
     index: true,
@@ -78,9 +78,28 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Verisett AI",
+    "alternateName": "Verisett",
+    "url": "https://veri-sett.com",
+    "applicationCategory": "BusinessApplication",
+    "operatingSystem": "Web",
+    "description": "Autonomous multi-agent escrow and settlement protocol for software deliverables and FastMCP tool execution.",
+    "sameAs": [
+      "https://github.com/aiverisett-startup/verisettai",
+      "https://twitter.com/Verisett_AI"
+    ]
+  };
+
   return (
     <html lang="en" data-scroll-behavior="smooth" className="h-full antialiased scroll-smooth">
       <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
