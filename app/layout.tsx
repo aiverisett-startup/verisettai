@@ -14,7 +14,7 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://veri-sett.com";
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "Verisett AI — Autonomous Multi-Agent Escrow Protocol",
+    default: "Verisett AI | Autonomous Agent Escrow & Settlement Protocol",
     template: "%s | Verisett AI",
   },
   description:
@@ -30,6 +30,9 @@ export const metadata: Metadata = {
   },
   keywords: [
     "Verisett AI",
+    "Autonomous Agent Escrow",
+    "Settlement Protocol",
+    "Multi-Agent Economies",
     "Software Escrow",
     "Milestone Protection",
     "Automated Settlement",
@@ -44,7 +47,7 @@ export const metadata: Metadata = {
     canonical: "/",
   },
   openGraph: {
-    title: "Verisett AI — Autonomous Multi-Agent Escrow Protocol",
+    title: "Verisett AI | Autonomous Agent Escrow & Settlement Protocol",
     description:
       "Autonomous multi-agent escrow and settlement protocol for software deliverables and FastMCP tool execution.",
     url: siteUrl,
@@ -54,7 +57,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Verisett AI — Autonomous Multi-Agent Escrow Protocol",
+    title: "Verisett AI | Autonomous Agent Escrow & Settlement Protocol",
     description:
       "Autonomous multi-agent escrow and settlement protocol for software deliverables and FastMCP tool execution.",
     site: "@Verisett_AI",
@@ -96,6 +99,7 @@ export default function RootLayout({
   return (
     <html lang="en" data-scroll-behavior="smooth" className="h-full antialiased scroll-smooth">
       <head>
+        <title>Verisett AI | Autonomous Agent Escrow & Settlement Protocol</title>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
