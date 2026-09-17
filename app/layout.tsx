@@ -14,12 +14,21 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://veri-sett.com";
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "Verisett AI | Autonomous Agent Escrow & Settlement Protocol",
+    default: "Verisett AI — Autonomous Multi-Agent Escrow Protocol",
     template: "%s | Verisett AI",
   },
   description:
-    "Autonomous multi-agent escrow and settlement protocol for software deliverables and FastMCP tool execution.",
+    "Deterministic programmable vault escrow and FastMCP settlement protocol for autonomous AI agents.",
   applicationName: "Verisett AI",
+  icons: {
+    icon: [
+      { url: "/icon.png", sizes: "512x512", type: "image/png" },
+      { url: "/favicon.ico", sizes: "32x32", type: "image/x-icon" },
+    ],
+    apple: [
+      { url: "/icon.png", sizes: "180x180", type: "image/png" },
+    ],
+  },
   authors: [{ name: "Verisett AI Team", url: siteUrl }],
   creator: "Verisett AI",
   publisher: "Verisett AI Inc.",
@@ -33,6 +42,7 @@ export const metadata: Metadata = {
     "Autonomous Agent Escrow",
     "Settlement Protocol",
     "Multi-Agent Economies",
+    "FastMCP Settlement",
     "Software Escrow",
     "Milestone Protection",
     "Automated Settlement",
@@ -47,21 +57,30 @@ export const metadata: Metadata = {
     canonical: "/",
   },
   openGraph: {
-    title: "Verisett AI | Autonomous Agent Escrow & Settlement Protocol",
+    title: "Verisett AI — Autonomous Multi-Agent Escrow Protocol",
     description:
-      "Autonomous multi-agent escrow and settlement protocol for software deliverables and FastMCP tool execution.",
+      "Deterministic programmable vault escrow and FastMCP settlement protocol for autonomous AI agents.",
     url: siteUrl,
     siteName: "Verisett AI",
     locale: "en_US",
     type: "website",
+    images: [
+      {
+        url: "/icon.png",
+        width: 512,
+        height: 512,
+        alt: "Verisett AI Official Logo",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Verisett AI | Autonomous Agent Escrow & Settlement Protocol",
+    title: "Verisett AI — Autonomous Multi-Agent Escrow Protocol",
     description:
-      "Autonomous multi-agent escrow and settlement protocol for software deliverables and FastMCP tool execution.",
+      "Deterministic programmable vault escrow and FastMCP settlement protocol for autonomous AI agents.",
     site: "@Verisett_AI",
     creator: "@Verisett_AI",
+    images: ["/icon.png"],
   },
   robots: {
     index: true,
@@ -87,9 +106,11 @@ export default function RootLayout({
     "name": "Verisett AI",
     "alternateName": "Verisett",
     "url": "https://veri-sett.com",
+    "logo": "https://veri-sett.com/icon.png",
+    "image": "https://veri-sett.com/icon.png",
     "applicationCategory": "BusinessApplication",
     "operatingSystem": "Web",
-    "description": "Autonomous multi-agent escrow and settlement protocol for software deliverables and FastMCP tool execution.",
+    "description": "Deterministic programmable vault escrow and FastMCP settlement protocol for autonomous AI agents.",
     "sameAs": [
       "https://github.com/aiverisett-startup/verisettai",
       "https://twitter.com/Verisett_AI"
@@ -99,7 +120,10 @@ export default function RootLayout({
   return (
     <html lang="en" data-scroll-behavior="smooth" className="h-full antialiased scroll-smooth">
       <head>
-        <title>Verisett AI | Autonomous Agent Escrow & Settlement Protocol</title>
+        <title>Verisett AI — Autonomous Multi-Agent Escrow Protocol</title>
+        <link rel="icon" href="/icon.png" sizes="512x512" type="image/png" />
+        <link rel="icon" href="/favicon.ico" sizes="32x32" type="image/x-icon" />
+        <link rel="apple-touch-icon" href="/icon.png" sizes="180x180" type="image/png" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
