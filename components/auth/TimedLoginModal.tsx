@@ -18,7 +18,7 @@ import {
   AlertCircle,
   Loader2,
 } from "lucide-react";
-import { dispatchAuthChange } from "@/lib/useAuthUser";
+import { useAuthUser, dispatchAuthChange } from "@/lib/useAuthUser";
 import { GoogleSignInButton, GOOGLE_CLIENT_ID } from "./GoogleSignInButton";
 import { TwitterSignInButton } from "./TwitterSignInButton";
 import { GithubSignInButton } from "./GithubSignInButton";
@@ -31,6 +31,7 @@ interface TimedLoginModalProps {
 
 export function TimedLoginModal({ delaySeconds = 15 }: TimedLoginModalProps) {
   const router = useRouter();
+  const { user } = useAuthUser();
   const [secondsRemaining, setSecondsRemaining] = useState<number>(delaySeconds);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [hasDismissed, setHasDismissed] = useState<boolean>(false);
@@ -41,27 +42,102 @@ export function TimedLoginModal({ delaySeconds = 15 }: TimedLoginModalProps) {
   const [modalError, setModalError] = useState<string | null>(null);
   const [isEmailSubmitting, setIsEmailSubmitting] = useState<boolean>(false);
 
-  // Check login state on mount
+  // Sync state whenever user object from useAuthUser changes
   useEffect(() => {
-    try {
-      const storedEmail = localStorage.getItem("verisett_user_email");
-      if (storedEmail) {
-        setIsLoggedIn(true);
-      }
-    } catch {
-      // Ignore storage errors
+    if (user) {
+      setIsLoggedIn(true);
+      setIsOpen(false);
     }
+  }, [user]);
+
+  // Check login state immediately on mount and subscribe to live auth changes
+  useEffect(() => {
+    let isMounted = true;
+
+    const checkCurrentAuth = () => {
+      try {
+        const storedEmail = localStorage.getItem("verisett_user_email");
+        if (storedEmail) {
+          if (isMounted) {
+            setIsLoggedIn(true);
+            setIsOpen(false);
+          }
+          return true;
+        }
+      } catch {
+        // Ignore storage errors
+      }
+      return false;
+    };
+
+    checkCurrentAuth();
+
+    // Check async Supabase session
+    supabase.auth.getSession().then(({ data }) => {
+      if (isMounted && data.session?.user) {
+        setIsLoggedIn(true);
+        setIsOpen(false);
+      }
+    });
+
+    // Listen to real-time auth changes from Supabase
+    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (isMounted && session?.user) {
+        setIsLoggedIn(true);
+        setIsOpen(false);
+      }
+    });
+
+    // Listen to local custom event and cross-tab storage updates
+    const handleAuthEvent = () => {
+      checkCurrentAuth();
+    };
+
+    window.addEventListener("verisett_auth_change", handleAuthEvent);
+    window.addEventListener("storage", handleAuthEvent);
+
+    return () => {
+      isMounted = false;
+      authListener?.subscription.unsubscribe();
+      window.removeEventListener("verisett_auth_change", handleAuthEvent);
+      window.removeEventListener("storage", handleAuthEvent);
+    };
   }, []);
 
-  // 15s Countdown timer
+  // Compute live authenticated state across all sources
+  const isCurrentlyAuthenticated = Boolean(
+    user ||
+    isLoggedIn ||
+    (typeof window !== "undefined" && localStorage.getItem("verisett_user_email"))
+  );
+
+  // 15s Countdown timer - strictly only runs for unauthenticated guests
   useEffect(() => {
-    if (isLoggedIn || hasDismissed || isOpen) return;
+    if (isCurrentlyAuthenticated || hasDismissed || isOpen) {
+      if (isCurrentlyAuthenticated && isOpen) {
+        setIsOpen(false);
+      }
+      return;
+    }
 
     const interval = setInterval(() => {
+      // Check if user logged in during the countdown interval
+      const hasEmailNow = typeof window !== "undefined" && localStorage.getItem("verisett_user_email");
+      if (hasEmailNow || user) {
+        setIsLoggedIn(true);
+        setIsOpen(false);
+        clearInterval(interval);
+        return;
+      }
+
       setSecondsRemaining((prev) => {
         if (prev <= 1) {
           clearInterval(interval);
-          setIsOpen(true);
+          // Only pop up if user is strictly NOT authenticated
+          const finalCheck = typeof window !== "undefined" && localStorage.getItem("verisett_user_email");
+          if (!finalCheck && !user) {
+            setIsOpen(true);
+          }
           return 0;
         }
         return prev - 1;
@@ -69,7 +145,7 @@ export function TimedLoginModal({ delaySeconds = 15 }: TimedLoginModalProps) {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [isLoggedIn, hasDismissed, isOpen]);
+  }, [isCurrentlyAuthenticated, hasDismissed, isOpen, user]);
 
   const handleDismiss = () => {
     setIsOpen(false);
@@ -126,7 +202,7 @@ export function TimedLoginModal({ delaySeconds = 15 }: TimedLoginModalProps) {
   };
 
   // If already logged in, do not render timer or modal
-  if (isLoggedIn) return null;
+  if (isCurrentlyAuthenticated || isLoggedIn || user) return null;
 
   return (
     <>
