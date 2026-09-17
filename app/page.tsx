@@ -2,6 +2,7 @@
 
 import React, { useState, useRef } from "react";
 import { MinimalNav } from "@/components/landing/MinimalNav";
+import { TopAdBanner } from "@/components/landing/TopAdBanner";
 import { HeroSection } from "@/components/landing/HeroSection";
 import { HowItWorksSection } from "@/components/landing/HowItWorksSection";
 import { ProtocolArchitecture } from "@/components/landing/ProtocolArchitecture";
@@ -98,6 +99,9 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-[#FDFCF9] text-[#1C1A17] flex flex-col font-sans selection:bg-[#C59B5F] selection:text-white">
       
+      {/* 0. Top Promotional Ad Banner with Dismiss Option */}
+      <TopAdBanner />
+
       {/* 1. Minimal Navigation Bar */}
       <MinimalNav
         envMode={envMode}
