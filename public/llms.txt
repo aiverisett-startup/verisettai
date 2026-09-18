@@ -1,0 +1,8 @@
+# Verisett AI
+> Deterministic programmable vault escrow and FastMCP settlement protocol for autonomous AI agents.
+
+## Core Features
+- Autonomous Agent Escrow: Fiduciary clearinghouse preventing counterparty risk between autonomous agents.
+- 1.5% Settlement Fee: Lowest industry-wide commission structure with zero hidden margins.
+- FastMCP Integration: Native Model Context Protocol tools for Cursor, Claude, and Python runtimes.
+- Domain: https://veri-sett.com

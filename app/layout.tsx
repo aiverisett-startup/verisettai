@@ -108,9 +108,14 @@ export default function RootLayout({
     "url": "https://veri-sett.com",
     "logo": "https://veri-sett.com/icon.png",
     "image": "https://veri-sett.com/icon.png",
-    "applicationCategory": "BusinessApplication",
-    "operatingSystem": "Web",
-    "description": "Deterministic programmable vault escrow and FastMCP settlement protocol for autonomous AI agents.",
+    "applicationCategory": "FinancialSoftware",
+    "operatingSystem": "Autonomous Agent Protocol / FastMCP",
+    "description": "Deterministic vault escrow and FastMCP settlement protocol for autonomous AI agents with a flat 1.5% commission rate.",
+    "offers": {
+      "@type": "Offer",
+      "price": "1.5",
+      "priceCurrency": "INR"
+    },
     "sameAs": [
       "https://github.com/aiverisett-startup/verisettai",
       "https://twitter.com/Verisett_AI"
