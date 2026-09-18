@@ -1,9 +1,8 @@
 "use client";
 
 import React from "react";
-import Link from "next/link";
 import { motion } from "framer-motion";
-import { ShieldCheck, FileCheck, ArrowRight, Lock, CheckCircle2, Zap } from "lucide-react";
+import { ShieldCheck, FileCheck, Lock, CheckCircle2, Zap } from "lucide-react";
 import { GoogleIcon } from "../ui/GoogleIcon";
 
 interface HowItWorksSectionProps {
@@ -191,33 +190,6 @@ export function HowItWorksSection({ onStartOnboarding }: HowItWorksSectionProps)
             </motion.div>
           ))}
         </div>
-
-        {/* Bottom Callout Banner */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-40px" }}
-          transition={{ duration: 0.5, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-          className="mt-12 rounded-2xl bg-white border border-[#EAE3D2] p-6 sm:p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 shadow-[0_4px_20px_rgba(197,155,95,0.06)] will-change-transform"
-        >
-          <div>
-            <h4 className="text-base sm:text-lg font-bold text-[#1C1A17]">
-              Ready to secure your next software milestone?
-            </h4>
-            <p className="text-xs sm:text-sm text-[#8C8275] mt-1">
-              Start with our zero-setup sandbox environment. Sign in with Google in 5 seconds.
-            </p>
-          </div>
-
-          <Link
-            href="/login"
-            className="minimal-btn-primary flex items-center gap-2 text-xs sm:text-sm font-semibold tracking-wider shrink-0 cursor-pointer"
-          >
-            <span>LOGIN</span>
-            <ArrowRight className="w-4 h-4" />
-          </Link>
-        </motion.div>
-
       </div>
     </section>
   );
