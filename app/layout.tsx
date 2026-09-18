@@ -118,7 +118,9 @@ export default function RootLayout({
     },
     "sameAs": [
       "https://github.com/aiverisett-startup/verisettai",
-      "https://twitter.com/Verisett_AI"
+      "https://twitter.com/Verisett_AI",
+      "https://www.youtube.com/@VerisettAI",
+      "https://www.instagram.com/ai.verisett/"
     ]
   };
 

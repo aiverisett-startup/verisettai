@@ -32,6 +32,14 @@ function TwitterXIcon({ className = "w-4 h-4" }: { className?: string }) {
   );
 }
 
+function YouTubeIcon({ className = "w-4 h-4" }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+      <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+    </svg>
+  );
+}
+
 export function MinimalFooter() {
   return (
     <footer className="border-t border-[#EAE3D2] bg-[#FAF8F5] py-14 text-sm text-[#8C8275] font-montserrat">
@@ -47,6 +55,23 @@ export function MinimalFooter() {
 
           {/* Social Follow & Status Badges */}
           <div className="flex flex-wrap items-center gap-3">
+            {/* YouTube Follow Button */}
+            <a
+              href="https://www.youtube.com/@VerisettAI"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white hover:bg-[#FAF6EE] border border-[#EAE3D2] hover:border-[#FF0000]/60 shadow-xs hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 text-xs font-montserrat font-medium text-[#1C1A17]"
+            >
+              <YouTubeIcon className="w-4 h-4 shrink-0 text-[#FF0000] transition-transform duration-300 group-hover:scale-110" />
+              <span className="text-[#6E675D] group-hover:text-[#1C1A17] transition-colors">
+                YouTube:
+              </span>
+              <span className="font-bold text-[#FF0000] group-hover:text-[#CC0000] transition-colors">
+                @Verisett AI
+              </span>
+              <ExternalLink className="w-3 h-3 text-[#8C8275] group-hover:text-[#FF0000] transition-transform group-hover:translate-x-0.5" />
+            </a>
+
             {/* Instagram Follow Button */}
             <a
               href="https://www.instagram.com/ai.verisett/"
@@ -116,6 +141,15 @@ export function MinimalFooter() {
             <Link href="/terms" className="hover:text-[#C59B5F] transition-colors">
               Terms
             </Link>
+            <a
+              href="https://www.youtube.com/@VerisettAI"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-[#FF0000] hover:text-[#CC0000] font-bold transition-colors"
+            >
+              <YouTubeIcon className="w-3.5 h-3.5" />
+              <span>@Verisett AI</span>
+            </a>
             <a
               href="https://www.instagram.com/ai.verisett/"
               target="_blank"

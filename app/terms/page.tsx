@@ -396,6 +396,9 @@ export default function TermsOfServicePage() {
           <div className="flex items-center gap-6 font-medium">
             <Link href="/" className="hover:text-[#C59B5F] transition-colors">Platform Home</Link>
             <Link href="/privacy" className="hover:text-[#C59B5F] transition-colors">Privacy Policy</Link>
+            <a href="https://www.youtube.com/@VerisettAI" target="_blank" rel="noopener noreferrer" className="hover:text-[#C59B5F] transition-colors">
+              YouTube
+            </a>
             <a href="https://www.instagram.com/ai.verisett/" target="_blank" rel="noopener noreferrer" className="hover:text-[#C59B5F] transition-colors">
               Instagram
             </a>

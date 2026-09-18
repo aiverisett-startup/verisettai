@@ -589,15 +589,26 @@ export default function LoginPage() {
       {/* Footer */}
       <footer className="relative z-10 max-w-4xl mx-auto w-full pt-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-center text-[10px] sm:text-[11px] font-montserrat font-semibold tracking-[0.16em] uppercase text-[#8C8275]">
         <span>VERISETT AI · DETERMINISTIC ESCROW &amp; SETTLEMENT CORE</span>
-        <a
-          href="https://www.instagram.com/ai.verisett/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-1.5 lowercase tracking-normal text-[#9E7A45] hover:text-[#C59B5F] transition-colors font-bold"
-        >
-          <span>follow us @ai.verisett</span>
-          <ExternalLink className="w-3 h-3" />
-        </a>
+        <div className="flex items-center gap-4">
+          <a
+            href="https://www.youtube.com/@VerisettAI"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 lowercase tracking-normal text-[#FF0000] hover:text-[#CC0000] transition-colors font-bold"
+          >
+            <span>@Verisett AI</span>
+            <ExternalLink className="w-3 h-3" />
+          </a>
+          <a
+            href="https://www.instagram.com/ai.verisett/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 lowercase tracking-normal text-[#9E7A45] hover:text-[#C59B5F] transition-colors font-bold"
+          >
+            <span>follow us @ai.verisett</span>
+            <ExternalLink className="w-3 h-3" />
+          </a>
+        </div>
       </footer>
     </div>
   );
