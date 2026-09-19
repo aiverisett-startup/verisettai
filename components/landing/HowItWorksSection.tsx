@@ -125,6 +125,51 @@ export function HowItWorksSection({ onStartOnboarding, onOpenVideoModal }: HowIt
 
   return (
     <section id="how-it-works" className="relative py-20 md:py-28 bg-[#FDFCF9] overflow-hidden">
+      {/* Precision Edge Shapes flanking How It Works section */}
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden select-none -z-10">
+        {/* Left Edge: Semicircle & Golden Node Orbit */}
+        <div className="absolute top-1/4 -left-16 sm:-left-20 w-64 sm:w-80 h-64 sm:h-80 opacity-45 motion-safe:animate-float-slow">
+          <svg viewBox="0 0 320 320" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+            <path
+              d="M 20,160 A 140,140 0 0,1 160,20 L 160,160 Z"
+              fill="#FAF6EE"
+              stroke="#D4AF37"
+              strokeWidth="1.2"
+              strokeOpacity="0.5"
+            />
+            <path
+              d="M 0,180 A 180,180 0 0,1 180,0"
+              stroke="#C59B5F"
+              strokeWidth="1"
+              strokeDasharray="5 5"
+              strokeOpacity="0.4"
+            />
+            <circle cx="160" cy="20" r="3.5" fill="#D4AF37" />
+            <circle cx="20" cy="160" r="3.5" fill="#C59B5F" />
+            <line x1="0" y1="100" x2="16" y2="100" stroke="#9E7A45" strokeWidth="1.2" strokeOpacity="0.5" />
+            <line x1="0" y1="60" x2="12" y2="60" stroke="#9E7A45" strokeWidth="1.2" strokeOpacity="0.4" />
+          </svg>
+        </div>
+
+        {/* Right Edge: Corner Caliper & Precision Crosshairs */}
+        <div className="absolute top-1/3 -right-12 sm:-right-16 w-56 sm:w-72 h-72 opacity-45 motion-safe:animate-float-reverse">
+          <svg viewBox="0 0 280 280" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+            <path
+              d="M 260,30 L 80,30 L 80,190 L 260,190"
+              stroke="#C59B5F"
+              strokeWidth="1.2"
+              strokeOpacity="0.45"
+              fill="none"
+            />
+            <circle cx="80" cy="30" r="3" fill="#C59B5F" />
+            <circle cx="80" cy="190" r="3" fill="#D4AF37" />
+            <line x1="80" y1="30" x2="80" y2="10" stroke="#9E7A45" strokeWidth="1.5" strokeOpacity="0.5" />
+            <line x1="80" y1="30" x2="60" y2="30" stroke="#9E7A45" strokeWidth="1.5" strokeOpacity="0.5" />
+            <line x1="80" y1="110" x2="200" y2="110" stroke="#EAE3D2" strokeWidth="1" strokeDasharray="4 4" />
+          </svg>
+        </div>
+      </div>
+
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}

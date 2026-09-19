@@ -66,36 +66,82 @@ export function MarketplaceWorkers({ onSelectWorkerForTesting }: MarketplaceWork
 
   return (
     <section id="marketplace" className="py-24 border-t border-[#EAE3D2] bg-[#FAF8F5] relative overflow-hidden">
-      {/* Background Geometric Half-Shapes for Marketplace Section */}
+      {/* Precision Edge Shapes flanking Marketplace Section */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden select-none -z-10">
-        {/* Semicircle on right side */}
-        <div className="absolute top-1/3 -right-24 w-80 h-80 opacity-35">
-          <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
-            <path
-              d="M 100,10 A 90,90 0 0,1 100,190 Z"
-              fill="url(#market-half-grad)"
-              stroke="#D4AF37"
-              strokeWidth="1.2"
-              strokeOpacity="0.4"
-            />
+        {/* Left Edge: Concentric Compass Arcs, Vertical Rail & Nodes */}
+        <div className="absolute top-1/4 -left-14 sm:-left-20 w-64 sm:w-80 h-72 sm:h-88 opacity-50 motion-safe:animate-float-slow">
+          <svg viewBox="0 0 320 360" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
             <defs>
-              <linearGradient id="market-half-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#D4AF37" stopOpacity="0.16" />
+              <linearGradient id="market-edge-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#D4AF37" stopOpacity="0.22" />
+                <stop offset="60%" stopColor="#C59B5F" stopOpacity="0.08" />
                 <stop offset="100%" stopColor="#FAF8F5" stopOpacity="0" />
               </linearGradient>
             </defs>
+            {/* Concentric Double Arcs */}
+            <path
+              d="M 20,320 A 150,150 0 0,1 170,170 L 170,320 Z"
+              fill="url(#market-edge-grad)"
+              stroke="#D4AF37"
+              strokeWidth="1.2"
+              strokeOpacity="0.45"
+            />
+            <path
+              d="M 0,340 A 190,190 0 0,1 190,150"
+              stroke="#C59B5F"
+              strokeWidth="1"
+              strokeDasharray="5 5"
+              strokeOpacity="0.35"
+              fill="none"
+            />
+            {/* Vertical Rail with Nodes */}
+            <line x1="20" y1="40" x2="20" y2="340" stroke="#EAE3D2" strokeWidth="1.5" />
+            <circle cx="20" cy="100" r="4.5" fill="#FFFFFF" stroke="#D4AF37" strokeWidth="1.5" />
+            <circle cx="20" cy="100" r="2" fill="#9E7A45" />
+            <circle cx="170" cy="170" r="3.5" fill="#D4AF37" />
+            {/* Tick Marks */}
+            <line x1="20" y1="130" x2="30" y2="130" stroke="#9E7A45" strokeWidth="1.2" strokeOpacity="0.4" />
+            <line x1="20" y1="150" x2="26" y2="150" stroke="#9E7A45" strokeWidth="1" strokeOpacity="0.3" />
+            <line x1="20" y1="170" x2="30" y2="170" stroke="#9E7A45" strokeWidth="1.2" strokeOpacity="0.4" />
           </svg>
         </div>
 
-        {/* Concentric Half-Arch bottom-left */}
-        <div className="absolute -bottom-12 -left-12 w-64 h-64 opacity-30">
-          <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+        {/* Right Edge: Semicircular Half-Arc, Caliper & Orbital Nodes */}
+        <div className="absolute top-1/3 -right-16 sm:-right-24 w-72 sm:w-96 h-72 sm:h-96 opacity-45 motion-safe:animate-float-reverse">
+          <svg viewBox="0 0 380 380" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+            <defs>
+              <linearGradient id="market-half-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#D4AF37" stopOpacity="0.2" />
+                <stop offset="60%" stopColor="#C59B5F" stopOpacity="0.08" />
+                <stop offset="100%" stopColor="#FAF8F5" stopOpacity="0" />
+              </linearGradient>
+            </defs>
             <path
-              d="M 20,180 A 130,130 0 0,1 150,50"
-              stroke="#C59B5F"
-              strokeWidth="1.5"
-              strokeOpacity="0.35"
+              d="M 220,30 A 160,160 0 0,0 220,350 L 220,30 Z"
+              fill="url(#market-half-grad)"
+              stroke="#D4AF37"
+              strokeWidth="1.2"
+              strokeOpacity="0.45"
             />
+            <path
+              d="M 220,60 A 130,130 0 0,0 220,320"
+              stroke="#C59B5F"
+              strokeWidth="1"
+              strokeDasharray="4 6"
+              strokeOpacity="0.35"
+              fill="none"
+            />
+            {/* Caliper Bracket */}
+            <path
+              d="M 240,240 L 90,240 L 90,140"
+              stroke="#9E7A45"
+              strokeWidth="1.2"
+              strokeOpacity="0.4"
+              fill="none"
+            />
+            <circle cx="90" cy="240" r="3.5" fill="#D4AF37" />
+            <circle cx="90" cy="140" r="3" fill="#C59B5F" />
+            <circle cx="120" cy="80" r="3.5" fill="#D4AF37" />
           </svg>
         </div>
       </div>

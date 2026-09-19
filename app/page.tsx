@@ -18,6 +18,7 @@ import { DepositModal } from "@/components/dashboard/DepositModal";
 import { VideoWalkthroughModal } from "@/components/landing/VideoWalkthroughModal";
 import { TimedLoginModal } from "@/components/auth/TimedLoginModal";
 import { GoldenBackgroundShapes } from "@/components/ui/GoldenBackgroundShapes";
+import { WebsiteEdgeShapes } from "@/components/ui/WebsiteEdgeShapes";
 import {
   ContractRecord,
   EnvironmentMode,
@@ -97,8 +98,11 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FDFCF9] text-[#1C1A17] flex flex-col font-sans selection:bg-[#C59B5F] selection:text-white">
+    <div className="min-h-screen bg-[#FDFCF9] text-[#1C1A17] flex flex-col font-sans selection:bg-[#C59B5F] selection:text-white relative overflow-x-hidden">
       
+      {/* Precision Institutional Edge Shapes flanking the left and right borders of the website */}
+      <WebsiteEdgeShapes />
+
       {/* 0. Top Promotional Ad Banner with Dismiss Option */}
       <TopAdBanner />
 
@@ -138,6 +142,55 @@ export default function Home() {
       >
         {/* Subtle Background Half Shapes */}
         <GoldenBackgroundShapes variant="subtle" density="sparse" />
+
+        {/* Precision Edge Shapes flanking Sandbox Simulator & Ledger Section */}
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden select-none -z-10">
+          {/* Left Edge: Institutional Vault Lock Caliper & Concentric Quarter-Arch */}
+          <div className="absolute top-1/3 -left-12 sm:-left-16 w-56 sm:w-72 h-72 opacity-45 motion-safe:animate-float-slow">
+            <svg viewBox="0 0 280 300" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+              <path
+                d="M 0,50 L 60,50 L 100,90 L 100,190 L 60,230 L 0,230"
+                stroke="#C59B5F"
+                strokeWidth="1.2"
+                strokeOpacity="0.45"
+                fill="none"
+              />
+              <circle cx="100" cy="90" r="3.5" fill="#D4AF37" />
+              <circle cx="100" cy="190" r="3.5" fill="#9E7A45" />
+              <line x1="20" y1="140" x2="90" y2="140" stroke="#D4AF37" strokeWidth="1" strokeDasharray="3 4" strokeOpacity="0.35" />
+              <circle cx="20" cy="140" r="2.5" fill="#C59B5F" />
+              <path
+                d="M 0,280 A 120,120 0 0,1 120,160"
+                stroke="#D4AF37"
+                strokeWidth="1"
+                strokeDasharray="5 5"
+                strokeOpacity="0.3"
+                fill="none"
+              />
+            </svg>
+          </div>
+
+          {/* Right Edge: Cryptographic Ledger Caliper Frame with Dashed Data Bus */}
+          <div className="absolute top-1/4 -right-12 sm:-right-16 w-56 sm:w-72 h-72 opacity-45 motion-safe:animate-float-reverse">
+            <svg viewBox="0 0 280 300" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+              <path
+                d="M 260,40 L 80,40 L 80,220 L 260,220"
+                stroke="#D4AF37"
+                strokeWidth="1.2"
+                strokeOpacity="0.45"
+                fill="none"
+              />
+              <circle cx="80" cy="40" r="3.5" fill="#C59B5F" />
+              <circle cx="80" cy="220" r="3.5" fill="#9E7A45" />
+              <line x1="80" y1="130" x2="240" y2="130" stroke="#C59B5F" strokeWidth="1" strokeDasharray="4 6" strokeOpacity="0.35" />
+              <circle cx="160" cy="130" r="3" fill="#D4AF37" />
+              <circle cx="240" cy="130" r="2.5" fill="#C59B5F" />
+              {[60, 80, 100, 160, 180, 200].map((y) => (
+                <line key={y} x1="74" y1={y} x2="80" y2={y} stroke="#9E7A45" strokeWidth="1" strokeOpacity="0.35" />
+              ))}
+            </svg>
+          </div>
+        </div>
 
         <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-8">
           
