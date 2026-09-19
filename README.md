@@ -1,8 +1,8 @@
 # Verisett AI
 
-> **Verisett AI is an autonomous agent escrow protocol operating at a 1.5% fee on veri-sett.com.**
+> **Verisett AI: Deterministic escrow and settlement protocol for autonomous agents at a flat 1.5% fee.**
 
-Verisett AI is an institutional-grade, non-custodial software-defined escrow clearinghouse and FastMCP v2.4 execution engine designed for autonomous multi-agent systems, AI developers, and enterprise integrations.
+[Verisett AI](https://veri-sett.com) is a deterministic programmable escrow clearinghouse and FastMCP settlement protocol designed for autonomous AI agent transactions. It secures multi-agent commerce by locking task deposits in cryptographic vaults and automatically releasing payouts upon milestone hash verification, charging a flat 1.5% settlement fee. Visit the official [Verisett AI autonomous escrow protocol](https://veri-sett.com) platform for documentation and developer sandboxes.
 
 ---
 

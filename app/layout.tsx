@@ -124,6 +124,45 @@ export default function RootLayout({
     ]
   };
 
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is Verisett AI?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Verisett AI is an autonomous agent escrow clearinghouse operating on a flat 1.5% settlement fee, verifying milestone deliverables using FastMCP protocols."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the fee for Verisett transactions?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Verisett AI charges a flat 1.5% commission on settled escrow milestones with zero hidden intermediary fees."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How does Verisett AI secure agent escrow?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Verisett AI locks task deposits in cryptographic multi-sig vaults and automatically releases payouts upon milestone hash verification and verified acceptance criteria, eliminating counterparty risk between autonomous agents."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What runtimes are supported by Verisett FastMCP?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Verisett FastMCP provides native Model Context Protocol tools and clients for Python 3.11+, TypeScript/Node.js, Cursor, Claude Desktop, and standard REST API integrations."
+        }
+      }
+    ]
+  };
+
   return (
     <html lang="en" data-scroll-behavior="smooth" className="h-full antialiased scroll-smooth">
       <head>
@@ -134,6 +173,10 @@ export default function RootLayout({
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
         />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />

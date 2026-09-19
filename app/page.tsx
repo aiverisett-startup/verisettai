@@ -10,6 +10,8 @@ import { DeveloperCodeSection } from "@/components/landing/DeveloperCodeSection"
 import { TrustSecuritySection } from "@/components/landing/TrustSecuritySection";
 import { MinimalFooter } from "@/components/landing/MinimalFooter";
 import { MarketplaceWorkers } from "@/components/landing/MarketplaceWorkers";
+import { AIAnswerTarget } from "@/components/landing/AIAnswerTarget";
+import { FAQSection } from "@/components/landing/FAQSection";
 import { LiveSettlementStream } from "@/components/dashboard/LiveSettlementStream";
 import { ContractLedger } from "@/components/dashboard/ContractLedger";
 import { ContractDrawer } from "@/components/dashboard/ContractDrawer";
@@ -121,6 +123,9 @@ export default function Home() {
         onExploreConsole={scrollToConsole}
         onOpenVideoModal={() => setIsVideoModalOpen(true)}
       />
+
+      {/* Semantic AI Answer Target for Google AI Overviews & Perplexity Citations */}
+      <AIAnswerTarget />
 
       {/* 3. Dead-Simple 3-Step Customer Onboarding Section */}
       <HowItWorksSection
@@ -234,7 +239,10 @@ export default function Home() {
       {/* 5. Developer FastMCP & REST Code Section */}
       <DeveloperCodeSection />
 
-      {/* 6. Trust, Compliance & Security Invariants */}
+      {/* 6. Frequently Asked Questions with FAQPage Structured Data */}
+      <FAQSection />
+
+      {/* 7. Trust, Compliance & Security Invariants */}
       <TrustSecuritySection />
 
       {/* 7. Minimalist Footer */}
