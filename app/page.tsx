@@ -144,10 +144,6 @@ export default function Home() {
           {/* Section Heading */}
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FAF6EE] border border-[#EAE3D2] text-[11px] font-mono uppercase tracking-wider text-[#9E7A45] mb-3">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#C59B5F] animate-pulse" />
-                Interactive Environment ({envMode.toUpperCase()})
-              </div>
               <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-[#1C1A17]">
                 Institutional Escrow Simulator &amp; Vault Ledger
               </h2>
