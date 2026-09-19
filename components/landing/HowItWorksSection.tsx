@@ -2,14 +2,15 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { ShieldCheck, FileCheck, Lock, CheckCircle2, Zap } from "lucide-react";
+import { ShieldCheck, FileCheck, Lock, CheckCircle2, Zap, Play } from "lucide-react";
 import { GoogleIcon } from "../ui/GoogleIcon";
 
 interface HowItWorksSectionProps {
   onStartOnboarding?: () => void;
+  onOpenVideoModal?: () => void;
 }
 
-export function HowItWorksSection({ onStartOnboarding }: HowItWorksSectionProps) {
+export function HowItWorksSection({ onStartOnboarding, onOpenVideoModal }: HowItWorksSectionProps) {
   const steps = [
     {
       number: "01",
@@ -144,6 +145,20 @@ export function HowItWorksSection({ onStartOnboarding }: HowItWorksSectionProps)
           <p className="text-base sm:text-lg text-[#8C8275] mt-3 leading-relaxed">
             Eliminate payment disputes and deliverable uncertainty. Verisett automates the escrow lifecycle from initial proposal to verified commercial payout.
           </p>
+          {onOpenVideoModal && (
+            <div className="mt-5 flex justify-center">
+              <button
+                onClick={onOpenVideoModal}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#FAF6EE] hover:bg-[#F5EBD7] text-[#9E7A45] hover:text-[#7A5B2E] border border-[#D4AF37]/50 hover:border-[#D4AF37] font-semibold text-xs transition-all shadow-xs cursor-pointer group"
+                title="Watch 6-Step Interactive Video Walkthrough"
+              >
+                <div className="h-5 w-5 rounded-full bg-white flex items-center justify-center border border-[#D4AF37]/40 shadow-2xs">
+                  <Play className="w-2.5 h-2.5 fill-[#9E7A45] text-[#9E7A45] ml-0.5 group-hover:scale-110 transition-transform" />
+                </div>
+                <span>Watch 6-Step Video Walkthrough (30s)</span>
+              </button>
+            </div>
+          )}
         </motion.div>
 
         {/* 3 Step Cards Grid with Staggered Entrance */}

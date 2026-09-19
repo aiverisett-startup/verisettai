@@ -142,14 +142,17 @@ export function HeroSection({
                 <span>Explore Console</span>
               </button>
 
-              {/* Optional Tour Trigger */}
+              {/* Video Tour Trigger */}
               {onOpenVideoModal && (
                 <button
                   onClick={onOpenVideoModal}
-                  className="w-full sm:w-auto px-4 py-2.5 rounded-full text-xs font-medium text-[#6E675D] hover:text-[#9E7A45] transition-colors flex items-center justify-center gap-1.5 cursor-pointer bg-white/80 border border-[#EAE3D2] hover:border-[#D4AF37]"
+                  className="w-full sm:w-auto px-4 py-2.5 rounded-full text-xs font-semibold text-[#1C1A17] hover:text-[#9E7A45] transition-all flex items-center justify-center gap-2 cursor-pointer bg-white hover:bg-[#FAF6EE] border border-[#D4AF37] shadow-xs hover:shadow-md group/tour"
+                  title="Watch 30-second Interactive Video Walkthrough"
                 >
-                  <Play className="w-3 h-3 fill-current text-[#9E7A45]" />
-                  <span>30s Product Tour</span>
+                  <div className="h-5 w-5 rounded-full bg-[#FAF6EE] group-hover/tour:bg-[#D4AF37]/20 flex items-center justify-center border border-[#D4AF37]/40 shadow-2xs transition-colors">
+                    <Play className="w-2.5 h-2.5 fill-[#9E7A45] text-[#9E7A45] ml-0.5 group-hover/tour:scale-110 transition-transform" />
+                  </div>
+                  <span>Watch Video Tour (30s)</span>
                 </button>
               )}
             </motion.div>

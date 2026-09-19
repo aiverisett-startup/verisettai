@@ -119,7 +119,10 @@ export default function Home() {
       />
 
       {/* 3. Dead-Simple 3-Step Customer Onboarding Section */}
-      <HowItWorksSection onStartOnboarding={scrollToConsole} />
+      <HowItWorksSection
+        onStartOnboarding={scrollToConsole}
+        onOpenVideoModal={() => setIsVideoModalOpen(true)}
+      />
 
       {/* 4. Core Architecture & Condition Verification Engine */}
       <ProtocolArchitecture />

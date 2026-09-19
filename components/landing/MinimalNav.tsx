@@ -135,21 +135,33 @@ export function MinimalNav({
             >
               Agent Console →
             </Link>
-            {onOpenVideoModal && (
-              <button
-                onClick={onOpenVideoModal}
-                className="hidden sm:flex shrink-0 whitespace-nowrap text-[#6E675D] hover:text-[#9E7A45] font-medium transition-colors py-0.5 items-center gap-1.5 cursor-pointer bg-[#FAF8F5] hover:bg-[#F5F1E9] px-2.5 py-0.5 rounded-full border border-[#EAE3D2] text-xs"
-                title="Watch Step-by-Step Video Tour"
-              >
-                <Play className="w-3 h-3 fill-current text-[#9E7A45]" />
-                <span>Tour</span>
-              </button>
-            )}
           </nav>
         </div>
 
         {/* Right Actions */}
-        <div className="shrink-0 flex items-center gap-2 sm:gap-3 flex-nowrap ml-auto z-10">
+        <div className="shrink-0 flex items-center gap-2 sm:gap-2.5 flex-nowrap ml-auto z-10">
+          {/* Watch Video Tour Button (Always visible on mobile & desktop) */}
+          {onOpenVideoModal && (
+            <button
+              onClick={onOpenVideoModal}
+              className="shrink-0 flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full bg-[#FAF6EE] hover:bg-[#F5EBD7] text-[#9E7A45] hover:text-[#7A5B2E] border border-[#D4AF37]/50 hover:border-[#D4AF37] font-semibold text-xs tracking-tight transition-all duration-200 shadow-xs cursor-pointer group"
+              title="Watch Step-by-Step Video Walkthrough"
+              aria-label="Watch Step-by-Step Video Walkthrough"
+            >
+              <div className="relative flex h-2 w-2 shrink-0">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#D4AF37] opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#9E7A45]" />
+              </div>
+              <Play className="w-3 h-3 fill-[#9E7A45] text-[#9E7A45] group-hover:scale-110 transition-transform shrink-0" />
+              <span className="text-[#1C1A17] font-medium text-xs whitespace-nowrap hidden sm:inline">
+                Video Tour
+              </span>
+              <span className="text-[#1C1A17] font-medium text-xs whitespace-nowrap sm:hidden">
+                Tour
+              </span>
+            </button>
+          )}
+
           {/* Environment Switcher */}
           <div className="shrink-0 hidden md:flex items-center p-0.5 rounded-full bg-[#F9F8F6] border border-[#EAE3D2] text-xs font-mono">
             <button
@@ -174,9 +186,9 @@ export function MinimalNav({
             </button>
           </div>
 
-          {/* Institutional Testnet Badge (Default/Guest vs Authenticated State) */}
+          {/* Institutional Testnet Badge (Only on wide screens to prevent overflow) */}
           {!user ? (
-            <div className="hidden xl:flex shrink-0 items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FAF8F5] border border-[#EAE3D2] text-xs font-mono shadow-xs">
+            <div className="hidden 2xl:flex shrink-0 items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FAF8F5] border border-[#EAE3D2] text-xs font-mono shadow-xs">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75 motion-reduce:hidden" />
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
