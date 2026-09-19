@@ -85,55 +85,55 @@ export function ProtocolArchitecture() {
 
   return (
     <section id="milestones" className="py-24 border-t border-[#EAE3D2] bg-white relative overflow-hidden">
-      {/* Precision Edge Shapes flanking Protocol Architecture */}
+      {/* Background Half-Shapes flanking Protocol Architecture */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden select-none -z-10">
-        {/* Top-Right Edge: Semicircle & Concentric Radial Arcs */}
-        <div className="absolute top-8 -right-16 sm:-right-20 w-80 sm:w-96 h-80 sm:h-96 opacity-50 motion-safe:animate-float-slow">
-          <svg viewBox="0 0 380 380" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+        {/* Top-Right Edge: Semicircle & Concentric Radial Half-Arcs */}
+        <div className="absolute top-8 -right-16 sm:-right-20 w-72 sm:w-96 h-72 sm:h-96 opacity-35 motion-safe:animate-float-slow">
+          <svg viewBox="0 0 320 320" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
             <defs>
               <linearGradient id="arch-half-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#D4AF37" stopOpacity="0.25" />
-                <stop offset="60%" stopColor="#C59B5F" stopOpacity="0.1" />
-                <stop offset="100%" stopColor="#FAF8F5" stopOpacity="0" />
+                <stop offset="0%" stopColor="#D4AF37" stopOpacity="0.22" />
+                <stop offset="60%" stopColor="#C59B5F" stopOpacity="0.08" />
+                <stop offset="100%" stopColor="#FAF8F5" stopOpacity="0.0" />
               </linearGradient>
             </defs>
             <path
-              d="M 200,30 A 160,160 0 0,0 200,350 L 200,30 Z"
+              d="M 160,20 A 140,140 0 0,0 160,300 Z"
               fill="url(#arch-half-grad)"
               stroke="#D4AF37"
               strokeWidth="1.2"
-              strokeOpacity="0.5"
+              strokeOpacity="0.35"
             />
             <path
-              d="M 200,60 A 130,130 0 0,0 200,320"
+              d="M 160,50 A 110,110 0 0,0 160,270"
               stroke="#C59B5F"
               strokeWidth="1"
               strokeDasharray="5 5"
-              strokeOpacity="0.35"
+              strokeOpacity="0.25"
+              fill="none"
             />
-            <circle cx="90" cy="190" r="4" fill="#D4AF37" />
-            <circle cx="130" cy="100" r="3" fill="#C59B5F" />
-            <circle cx="130" cy="280" r="3" fill="#9E7A45" />
           </svg>
         </div>
 
-        {/* Bottom-Left Edge: Architectural Circuit Caliper & Vault Diamond */}
-        <div className="absolute bottom-10 -left-12 sm:-left-16 w-64 sm:w-80 h-72 opacity-50 motion-safe:animate-float-reverse">
-          <svg viewBox="0 0 300 280" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+        {/* Bottom-Left Edge: Smooth Golden Half-Circle */}
+        <div className="absolute bottom-10 -left-16 sm:-left-20 w-64 sm:w-80 h-64 sm:h-80 opacity-35 motion-safe:animate-float-reverse">
+          <svg viewBox="0 0 300 300" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
             <path
-              d="M 20,240 L 20,60 L 140,60 L 180,100 L 180,240"
+              d="M 150,20 A 130,130 0 0,1 150,280 Z"
+              fill="#FAF6EE"
+              fillOpacity="0.5"
               stroke="#C59B5F"
               strokeWidth="1.2"
-              strokeOpacity="0.45"
+              strokeOpacity="0.35"
+            />
+            <path
+              d="M 150,45 A 105,105 0 0,1 150,255"
+              stroke="#D4AF37"
+              strokeWidth="1"
+              strokeDasharray="4 6"
+              strokeOpacity="0.25"
               fill="none"
             />
-            <circle cx="20" cy="60" r="3" fill="#C59B5F" />
-            <circle cx="180" cy="100" r="3.5" fill="#D4AF37" />
-            <line x1="20" y1="150" x2="180" y2="150" stroke="#D4AF37" strokeWidth="1" strokeDasharray="4 6" strokeOpacity="0.3" />
-            <line x1="20" y1="90" x2="32" y2="90" stroke="#9E7A45" strokeWidth="1.2" strokeOpacity="0.5" />
-            <line x1="20" y1="120" x2="32" y2="120" stroke="#9E7A45" strokeWidth="1.2" strokeOpacity="0.5" />
-            <line x1="20" y1="180" x2="32" y2="180" stroke="#9E7A45" strokeWidth="1.2" strokeOpacity="0.5" />
-            <line x1="20" y1="210" x2="32" y2="210" stroke="#9E7A45" strokeWidth="1.2" strokeOpacity="0.5" />
           </svg>
         </div>
       </div>

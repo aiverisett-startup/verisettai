@@ -143,51 +143,49 @@ export default function Home() {
         {/* Subtle Background Half Shapes */}
         <GoldenBackgroundShapes variant="subtle" density="sparse" />
 
-        {/* Precision Edge Shapes flanking Sandbox Simulator & Ledger Section */}
+        {/* Background Half-Shapes flanking Sandbox Simulator & Ledger Section */}
         <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden select-none -z-10">
-          {/* Left Edge: Institutional Vault Lock Caliper & Concentric Quarter-Arch */}
-          <div className="absolute top-1/3 -left-12 sm:-left-16 w-56 sm:w-72 h-72 opacity-45 motion-safe:animate-float-slow">
-            <svg viewBox="0 0 280 300" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+          {/* Left Edge: Smooth Golden Half-Circle with Concentric Arc */}
+          <div className="absolute top-1/3 -left-16 sm:-left-24 w-64 sm:w-80 h-64 sm:h-80 opacity-35 motion-safe:animate-float-slow">
+            <svg viewBox="0 0 300 300" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
               <path
-                d="M 0,50 L 60,50 L 100,90 L 100,190 L 60,230 L 0,230"
+                d="M 150,20 A 130,130 0 0,1 150,280 Z"
+                fill="#FAF6EE"
+                fillOpacity="0.45"
                 stroke="#C59B5F"
                 strokeWidth="1.2"
-                strokeOpacity="0.45"
-                fill="none"
+                strokeOpacity="0.35"
               />
-              <circle cx="100" cy="90" r="3.5" fill="#D4AF37" />
-              <circle cx="100" cy="190" r="3.5" fill="#9E7A45" />
-              <line x1="20" y1="140" x2="90" y2="140" stroke="#D4AF37" strokeWidth="1" strokeDasharray="3 4" strokeOpacity="0.35" />
-              <circle cx="20" cy="140" r="2.5" fill="#C59B5F" />
               <path
-                d="M 0,280 A 120,120 0 0,1 120,160"
+                d="M 150,45 A 105,105 0 0,1 150,255"
                 stroke="#D4AF37"
                 strokeWidth="1"
-                strokeDasharray="5 5"
-                strokeOpacity="0.3"
+                strokeDasharray="4 6"
+                strokeOpacity="0.25"
                 fill="none"
               />
             </svg>
           </div>
 
-          {/* Right Edge: Cryptographic Ledger Caliper Frame with Dashed Data Bus */}
-          <div className="absolute top-1/4 -right-12 sm:-right-16 w-56 sm:w-72 h-72 opacity-45 motion-safe:animate-float-reverse">
-            <svg viewBox="0 0 280 300" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+          {/* Right Edge: Smooth Semicircle Disc with Concentric Orbit */}
+          <div className="absolute top-1/4 -right-16 sm:-right-24 w-64 sm:w-80 h-64 sm:h-80 opacity-35 motion-safe:animate-float-reverse">
+            <svg viewBox="0 0 300 300" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
               <path
-                d="M 260,40 L 80,40 L 80,220 L 260,220"
+                d="M 150,20 A 130,130 0 0,0 150,280 Z"
+                fill="#FAF6EE"
+                fillOpacity="0.45"
                 stroke="#D4AF37"
                 strokeWidth="1.2"
-                strokeOpacity="0.45"
+                strokeOpacity="0.35"
+              />
+              <path
+                d="M 150,50 A 100,100 0 0,0 150,250"
+                stroke="#C59B5F"
+                strokeWidth="1"
+                strokeDasharray="5 5"
+                strokeOpacity="0.25"
                 fill="none"
               />
-              <circle cx="80" cy="40" r="3.5" fill="#C59B5F" />
-              <circle cx="80" cy="220" r="3.5" fill="#9E7A45" />
-              <line x1="80" y1="130" x2="240" y2="130" stroke="#C59B5F" strokeWidth="1" strokeDasharray="4 6" strokeOpacity="0.35" />
-              <circle cx="160" cy="130" r="3" fill="#D4AF37" />
-              <circle cx="240" cy="130" r="2.5" fill="#C59B5F" />
-              {[60, 80, 100, 160, 180, 200].map((y) => (
-                <line key={y} x1="74" y1={y} x2="80" y2={y} stroke="#9E7A45" strokeWidth="1" strokeOpacity="0.35" />
-              ))}
             </svg>
           </div>
         </div>

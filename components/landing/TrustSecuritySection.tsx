@@ -37,84 +37,61 @@ export function TrustSecuritySection() {
 
   return (
     <section id="trust" className="py-24 border-t border-[#EAE3D2] bg-white relative overflow-hidden">
-      {/* Precision Edge Shapes flanking Trust & Security Section */}
+      {/* Background Half-Shapes flanking Trust & Security Section */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden select-none -z-10">
-        {/* Left Edge: Security Vault Caliper & Concentric Quarter-Arch */}
-        <div className="absolute top-1/4 -left-12 sm:-left-16 w-56 sm:w-72 h-72 sm:h-88 opacity-45 motion-safe:animate-float-slow">
-          <svg viewBox="0 0 280 340" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+        {/* Left Edge: Smooth Golden Half-Circle with Concentric Arc */}
+        <div className="absolute top-1/4 -left-16 sm:-left-20 w-64 sm:w-80 h-64 sm:h-80 opacity-35 motion-safe:animate-float-slow">
+          <svg viewBox="0 0 300 300" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
             <defs>
               <linearGradient id="trust-left-grad" x1="0%" y1="0%" x2="100%" y2="100%">
                 <stop offset="0%" stopColor="#D4AF37" stopOpacity="0.22" />
                 <stop offset="60%" stopColor="#C59B5F" stopOpacity="0.08" />
-                <stop offset="100%" stopColor="#FAF8F5" stopOpacity="0" />
+                <stop offset="100%" stopColor="#FAF8F5" stopOpacity="0.0" />
               </linearGradient>
             </defs>
-            {/* Quarter Arch */}
             <path
-              d="M 20,280 A 130,130 0 0,1 150,150 L 150,280 Z"
+              d="M 150,20 A 130,130 0 0,1 150,280 Z"
               fill="url(#trust-left-grad)"
               stroke="#D4AF37"
               strokeWidth="1.2"
-              strokeOpacity="0.45"
+              strokeOpacity="0.35"
             />
             <path
-              d="M 0,300 A 170,170 0 0,1 170,130"
+              d="M 150,50 A 100,100 0 0,1 150,250"
               stroke="#C59B5F"
               strokeWidth="1"
-              strokeDasharray="4 6"
-              strokeOpacity="0.35"
+              strokeDasharray="5 5"
+              strokeOpacity="0.25"
               fill="none"
             />
-            {/* Caliper Bracket with Nodes */}
-            <path
-              d="M 20,40 L 80,40 L 80,140"
-              stroke="#9E7A45"
-              strokeWidth="1.2"
-              strokeOpacity="0.45"
-              fill="none"
-            />
-            <circle cx="20" cy="40" r="3" fill="#C59B5F" />
-            <circle cx="80" cy="40" r="3" fill="#D4AF37" />
-            <circle cx="150" cy="150" r="3.5" fill="#D4AF37" />
-            {/* Measurement Ticks */}
-            {[60, 80, 100, 120].map((y) => (
-              <line key={y} x1="74" y1={y} x2="80" y2={y} stroke="#9E7A45" strokeWidth="1" strokeOpacity="0.4" />
-            ))}
           </svg>
         </div>
 
-        {/* Right Edge: Concentric Vault Half-Arc with Crosshairs */}
-        <div className="absolute top-1/3 -right-16 sm:-right-20 w-72 sm:w-88 h-72 sm:h-88 opacity-45 motion-safe:animate-float-reverse">
-          <svg viewBox="0 0 340 340" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+        {/* Right Edge: Smooth Concentric Vault Half-Arc */}
+        <div className="absolute top-1/3 -right-16 sm:-right-20 w-64 sm:w-80 h-64 sm:h-80 opacity-35 motion-safe:animate-float-reverse">
+          <svg viewBox="0 0 300 300" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
             <defs>
               <linearGradient id="trust-half-grad" x1="0%" y1="0%" x2="100%" y2="100%">
                 <stop offset="0%" stopColor="#D4AF37" stopOpacity="0.2" />
                 <stop offset="60%" stopColor="#C59B5F" stopOpacity="0.08" />
-                <stop offset="100%" stopColor="#FAF8F5" stopOpacity="0" />
+                <stop offset="100%" stopColor="#FAF8F5" stopOpacity="0.0" />
               </linearGradient>
             </defs>
             <path
-              d="M 200,30 A 150,150 0 0,0 200,330 L 200,30 Z"
+              d="M 150,20 A 130,130 0 0,0 150,280 Z"
               fill="url(#trust-half-grad)"
               stroke="#D4AF37"
               strokeWidth="1.2"
-              strokeOpacity="0.45"
+              strokeOpacity="0.35"
             />
             <path
-              d="M 200,60 A 120,120 0 0,0 200,300"
+              d="M 150,50 A 100,100 0 0,0 150,250"
               stroke="#C59B5F"
               strokeWidth="1"
-              strokeDasharray="5 5"
-              strokeOpacity="0.35"
+              strokeDasharray="4 6"
+              strokeOpacity="0.25"
               fill="none"
             />
-            <circle cx="80" cy="180" r="4.5" fill="#FFFFFF" stroke="#D4AF37" strokeWidth="1.5" />
-            <circle cx="80" cy="180" r="2" fill="#9E7A45" />
-            {/* Crosshairs */}
-            <line x1="80" y1="166" x2="80" y2="194" stroke="#9E7A45" strokeWidth="1.2" strokeOpacity="0.45" />
-            <line x1="66" y1="180" x2="94" y2="180" stroke="#9E7A45" strokeWidth="1.2" strokeOpacity="0.45" />
-            <circle cx="120" cy="95" r="3" fill="#C59B5F" />
-            <circle cx="120" cy="265" r="3" fill="#D4AF37" />
           </svg>
         </div>
       </div>

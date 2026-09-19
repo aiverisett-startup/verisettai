@@ -43,48 +43,31 @@ function YouTubeIcon({ className = "w-4 h-4" }: { className?: string }) {
 export function MinimalFooter() {
   return (
     <footer className="border-t border-[#EAE3D2] bg-[#FAF8F5] py-14 text-sm text-[#8C8275] font-montserrat relative overflow-hidden">
-      {/* Precision Edge Shapes flanking Footer */}
+      {/* Background Half-Shapes flanking Footer */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden select-none -z-10">
-        {/* Left Edge: Architectural Corner L-Bracket & Dual Gold Nodes */}
-        <div className="absolute bottom-4 -left-6 sm:-left-8 w-36 sm:w-48 h-36 opacity-40">
+        {/* Left Edge: Smooth Half-Circle Arc */}
+        <div className="absolute bottom-4 -left-8 sm:-left-12 w-36 sm:w-48 h-36 opacity-30">
           <svg viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
             <path
-              d="M 20,20 L 20,120 L 120,120"
+              d="M 90,10 A 80,80 0 0,1 90,170 Z"
+              fill="#FAF6EE"
               stroke="#C59B5F"
               strokeWidth="1.2"
-              strokeOpacity="0.45"
-              fill="none"
-            />
-            <path
-              d="M 4,140 A 120,120 0 0,0 140,4"
-              stroke="#D4AF37"
-              strokeWidth="1"
-              strokeDasharray="4 6"
               strokeOpacity="0.3"
-              fill="none"
             />
-            <circle cx="20" cy="20" r="3" fill="#D4AF37" />
-            <circle cx="20" cy="120" r="3.5" fill="#9E7A45" />
-            <circle cx="120" cy="120" r="3" fill="#C59B5F" />
           </svg>
         </div>
 
-        {/* Right Edge: Mirror Corner Bracket & Precision Caliper Ticks */}
-        <div className="absolute bottom-4 -right-6 sm:-right-8 w-36 sm:w-48 h-36 opacity-40">
+        {/* Right Edge: Smooth Half-Circle Arc */}
+        <div className="absolute bottom-4 -right-8 sm:-right-12 w-36 sm:w-48 h-36 opacity-30">
           <svg viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
             <path
-              d="M 160,20 L 160,120 L 60,120"
+              d="M 90,10 A 80,80 0 0,0 90,170 Z"
+              fill="#FAF6EE"
               stroke="#D4AF37"
               strokeWidth="1.2"
-              strokeOpacity="0.45"
-              fill="none"
+              strokeOpacity="0.3"
             />
-            <circle cx="160" cy="20" r="3" fill="#C59B5F" />
-            <circle cx="160" cy="120" r="3.5" fill="#9E7A45" />
-            <circle cx="60" cy="120" r="3" fill="#D4AF37" />
-            {[40, 60, 80, 100].map((y) => (
-              <line key={y} x1="154" y1={y} x2="160" y2={y} stroke="#9E7A45" strokeWidth="1" strokeOpacity="0.35" />
-            ))}
           </svg>
         </div>
       </div>

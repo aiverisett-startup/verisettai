@@ -231,12 +231,12 @@ export function TimedLoginModal({ delaySeconds = 15 }: TimedLoginModalProps) {
 
       {/* 2. Institutional Login Modal Popup (triggers at 15s) */}
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-stone-900/60 backdrop-blur-sm transition-all animate-in fade-in duration-300">
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-stone-900/60 backdrop-blur-sm p-4 sm:p-6 flex items-center justify-center transition-all animate-in fade-in duration-300">
           <div
             role="dialog"
             aria-modal="true"
             aria-labelledby="login-modal-title"
-            className="login-page-montserrat font-montserrat relative w-full max-w-lg rounded-3xl border border-[#EAE3D2] bg-white text-[#1C1A17] shadow-[0_24px_64px_rgba(197,155,95,0.18)] p-7 sm:p-9 space-y-6 overflow-hidden"
+            className="login-page-montserrat font-montserrat relative w-full max-w-lg max-h-[88vh] overflow-y-auto rounded-3xl border border-[#EAE3D2] bg-white text-[#1C1A17] shadow-[0_24px_64px_rgba(197,155,95,0.18)] p-6 sm:p-9 space-y-5 my-auto"
           >
             {/* Ambient Golden Background Glow */}
             <div className="absolute -top-24 -right-24 w-60 h-60 bg-[#FAF1E3]/80 rounded-full blur-3xl pointer-events-none" />
@@ -246,7 +246,7 @@ export function TimedLoginModal({ delaySeconds = 15 }: TimedLoginModalProps) {
             <button
               onClick={handleDismiss}
               aria-label="Close modal"
-              className="absolute top-4 right-4 p-1.5 rounded-full text-[#8C8275] hover:text-[#1C1A17] hover:bg-[#FAF6EE] transition-colors cursor-pointer"
+              className="sticky sm:absolute top-3 right-3 sm:top-4 sm:right-4 p-2 rounded-full text-[#8C8275] hover:text-[#1C1A17] hover:bg-[#FAF6EE] transition-colors cursor-pointer ml-auto float-right sm:float-none z-10"
             >
               <X className="w-4 h-4" />
             </button>

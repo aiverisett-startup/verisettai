@@ -67,38 +67,47 @@ curl -X POST https://api.verisett.io/v1/contracts/create \\
 
   return (
     <section id="developers" className="py-12 border-t border-[#EAE3D2] bg-[#FAF8F5] relative overflow-hidden">
-      {/* Precision Edge Shapes flanking Developer Code Section */}
+      {/* Background Half-Shapes flanking Developer Code Section */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden select-none -z-10">
-        {/* Left Edge: Code Bracket Caliper & Golden Bus Rail */}
-        <div className="absolute top-1/2 -translate-y-1/2 -left-10 sm:-left-14 w-48 sm:w-60 h-48 opacity-45 motion-safe:animate-float-slow">
-          <svg viewBox="0 0 240 200" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+        {/* Left Edge: Smooth Half-Circle with Concentric Arc */}
+        <div className="absolute top-1/2 -translate-y-1/2 -left-14 sm:-left-20 w-48 sm:w-60 h-48 sm:h-60 opacity-30 motion-safe:animate-float-slow">
+          <svg viewBox="0 0 240 240" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
             <path
-              d="M 20,20 L 70,20 L 110,60 L 110,140 L 70,180 L 20,180"
+              d="M 120,20 A 100,100 0 0,1 120,220 Z"
+              fill="#FAF6EE"
               stroke="#C59B5F"
               strokeWidth="1.2"
-              strokeOpacity="0.45"
+              strokeOpacity="0.35"
+            />
+            <path
+              d="M 120,45 A 75,75 0 0,1 120,195"
+              stroke="#D4AF37"
+              strokeWidth="1"
+              strokeDasharray="4 4"
+              strokeOpacity="0.25"
               fill="none"
             />
-            <circle cx="110" cy="60" r="3" fill="#D4AF37" />
-            <circle cx="110" cy="140" r="3" fill="#9E7A45" />
-            <line x1="20" y1="100" x2="100" y2="100" stroke="#D4AF37" strokeWidth="1" strokeDasharray="4 4" strokeOpacity="0.35" />
-            <circle cx="20" cy="100" r="2.5" fill="#C59B5F" />
           </svg>
         </div>
 
-        {/* Right Edge: Stepped Caliper & Verification Pin */}
-        <div className="absolute top-1/2 -translate-y-1/2 -right-10 sm:-right-14 w-48 sm:w-60 h-48 opacity-45 motion-safe:animate-float-reverse">
-          <svg viewBox="0 0 240 200" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+        {/* Right Edge: Smooth Half-Circle with Concentric Arc */}
+        <div className="absolute top-1/2 -translate-y-1/2 -right-14 sm:-right-20 w-48 sm:w-60 h-48 sm:h-60 opacity-30 motion-safe:animate-float-reverse">
+          <svg viewBox="0 0 240 240" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
             <path
-              d="M 220,20 L 170,20 L 130,60 L 130,140 L 170,180 L 220,180"
+              d="M 120,20 A 100,100 0 0,0 120,220 Z"
+              fill="#FAF6EE"
               stroke="#D4AF37"
               strokeWidth="1.2"
-              strokeOpacity="0.45"
+              strokeOpacity="0.35"
+            />
+            <path
+              d="M 120,45 A 75,75 0 0,0 120,195"
+              stroke="#C59B5F"
+              strokeWidth="1"
+              strokeDasharray="4 4"
+              strokeOpacity="0.25"
               fill="none"
             />
-            <circle cx="130" cy="60" r="3" fill="#C59B5F" />
-            <circle cx="130" cy="140" r="3" fill="#D4AF37" />
-            <line x1="140" y1="100" x2="220" y2="100" stroke="#C59B5F" strokeWidth="1" strokeDasharray="4 4" strokeOpacity="0.35" />
           </svg>
         </div>
       </div>
