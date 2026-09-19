@@ -84,17 +84,17 @@ export function MinimalNav({
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4 flex-nowrap min-w-0">
         
         {/* Brand & Navigation Links */}
-        <div className="flex items-center gap-6 lg:gap-8 flex-nowrap min-w-0 flex-1">
+        <div className="flex items-center gap-4 lg:gap-6 flex-nowrap min-w-0 flex-1">
           {/* Brand Logo */}
           <Link href="/" className="shrink-0 flex items-center group whitespace-nowrap">
             <VerisettLogo size={28} />
           </Link>
 
           {/* Navigation Links - Single Row, No Wrapping, Minimalist Gray to Gold */}
-          <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-[#6E675D] flex-nowrap whitespace-nowrap overflow-x-auto no-scrollbar py-1 min-w-0">
+          <nav className="hidden md:flex items-center gap-3 lg:gap-5 text-sm font-medium text-[#6E675D] flex-nowrap whitespace-nowrap min-w-0">
             <a
               href="#milestones"
-              className="shrink-0 whitespace-nowrap hover:text-[#9E7A45] transition-colors py-0.5"
+              className="hidden xl:inline-block shrink-0 whitespace-nowrap hover:text-[#9E7A45] transition-colors py-0.5"
             >
               Milestones
             </a>
@@ -108,23 +108,23 @@ export function MinimalNav({
               href="#sandbox"
               className="shrink-0 whitespace-nowrap hover:text-[#9E7A45] transition-colors py-0.5"
             >
-              Interactive Sandbox
+              Sandbox
             </a>
             <a
               href="#trust"
-              className="shrink-0 whitespace-nowrap hover:text-[#9E7A45] transition-colors py-0.5"
+              className="hidden xl:inline-block shrink-0 whitespace-nowrap hover:text-[#9E7A45] transition-colors py-0.5"
             >
               Security
             </a>
             <a
               href="#developers"
-              className="shrink-0 whitespace-nowrap hover:text-[#9E7A45] transition-colors py-0.5 text-[#9E9689] hover:text-[#9E7A45]"
+              className="hidden xl:inline-block shrink-0 whitespace-nowrap hover:text-[#9E7A45] transition-colors py-0.5 text-[#9E9689] hover:text-[#9E7A45]"
             >
               Docs
             </a>
             <Link
               href="/network"
-              className="shrink-0 whitespace-nowrap text-[#9E7A45] hover:text-[#C59B5F] font-semibold transition-colors py-0.5 flex items-center gap-1.5"
+              className="hidden 2xl:flex shrink-0 whitespace-nowrap text-[#9E7A45] hover:text-[#C59B5F] font-semibold transition-colors py-0.5 items-center gap-1.5"
             >
               <span className="h-1.5 w-1.5 rounded-full bg-[#C59B5F] animate-pulse" />
               <span>3D Network</span>
@@ -138,7 +138,7 @@ export function MinimalNav({
             {onOpenVideoModal && (
               <button
                 onClick={onOpenVideoModal}
-                className="shrink-0 whitespace-nowrap text-[#6E675D] hover:text-[#9E7A45] font-medium transition-colors py-0.5 flex items-center gap-1.5 cursor-pointer bg-[#FAF8F5] hover:bg-[#F5F1E9] px-2.5 py-0.5 rounded-full border border-[#EAE3D2] text-xs"
+                className="hidden sm:flex shrink-0 whitespace-nowrap text-[#6E675D] hover:text-[#9E7A45] font-medium transition-colors py-0.5 items-center gap-1.5 cursor-pointer bg-[#FAF8F5] hover:bg-[#F5F1E9] px-2.5 py-0.5 rounded-full border border-[#EAE3D2] text-xs"
                 title="Watch Step-by-Step Video Tour"
               >
                 <Play className="w-3 h-3 fill-current text-[#9E7A45]" />
@@ -149,9 +149,9 @@ export function MinimalNav({
         </div>
 
         {/* Right Actions */}
-        <div className="shrink-0 flex items-center gap-3 flex-nowrap ml-auto">
+        <div className="shrink-0 flex items-center gap-2 sm:gap-3 flex-nowrap ml-auto z-10">
           {/* Environment Switcher */}
-          <div className="shrink-0 hidden sm:flex items-center p-0.5 rounded-full bg-[#F9F8F6] border border-[#EAE3D2] text-xs font-mono">
+          <div className="shrink-0 hidden md:flex items-center p-0.5 rounded-full bg-[#F9F8F6] border border-[#EAE3D2] text-xs font-mono">
             <button
               onClick={() => onToggleEnv("sandbox")}
               className={`px-2.5 py-1 rounded-full transition-all cursor-pointer whitespace-nowrap ${
@@ -176,7 +176,7 @@ export function MinimalNav({
 
           {/* Institutional Testnet Badge (Default/Guest vs Authenticated State) */}
           {!user ? (
-            <div className="hidden lg:flex shrink-0 items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FAF8F5] border border-[#EAE3D2] text-xs font-mono shadow-xs">
+            <div className="hidden xl:flex shrink-0 items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FAF8F5] border border-[#EAE3D2] text-xs font-mono shadow-xs">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75 motion-reduce:hidden" />
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
@@ -188,7 +188,7 @@ export function MinimalNav({
           ) : (
             <button
               onClick={onOpenDepositModal}
-              className="hidden lg:flex shrink-0 items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-[#EAE3D2] hover:border-[#D4AF37] transition-colors text-xs font-mono shadow-xs cursor-pointer"
+              className="hidden sm:flex shrink-0 items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-[#EAE3D2] hover:border-[#D4AF37] transition-colors text-xs font-mono shadow-xs cursor-pointer"
               title="Click to view testnet balance & vault deposit"
             >
               <Lock className="w-3 h-3 text-[#9E7A45] shrink-0" />
@@ -203,7 +203,7 @@ export function MinimalNav({
           {isLoaded && user ? (
             <button
               onClick={() => setIsProfileModalOpen(true)}
-              className="shrink-0 flex items-center gap-2 p-1 pl-1 pr-2.5 sm:pr-3 rounded-full bg-white/90 hover:bg-white border border-[#EAE3D2] hover:border-[#D4AF37] transition-all duration-200 shadow-xs hover:shadow-[0_4px_16px_rgba(197,155,95,0.18)] group cursor-pointer"
+              className="shrink-0 flex items-center gap-2 p-1 pl-1 pr-2.5 sm:pr-3 rounded-full bg-white hover:bg-[#FAF6EE] border border-[#EAE3D2] hover:border-[#D4AF37] transition-all duration-200 shadow-xs hover:shadow-md group cursor-pointer z-10"
               title="Click to view profile & settings"
             >
               {/* Round Profile with Google Image / Avatar */}

@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   X,
@@ -38,10 +39,15 @@ export function ProfileSettingsModal({
   onUpdateProfile,
 }: ProfileSettingsModalProps) {
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
   const [copiedId, setCopiedId] = useState(false);
   const [isEditingName, setIsEditingName] = useState(false);
   const [nameInput, setNameInput] = useState(user.name);
   const [imageError, setImageError] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const accountId = user.accountId || "VAULT-2026-IN-982";
 
@@ -70,7 +76,9 @@ export function ProfileSettingsModal({
     .slice(0, 2)
     .toUpperCase();
 
-  return (
+  if (!mounted) return null;
+
+  return createPortal(
     <AnimatePresence>
       {isOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
@@ -288,6 +296,7 @@ export function ProfileSettingsModal({
           </motion.div>
         </div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 }

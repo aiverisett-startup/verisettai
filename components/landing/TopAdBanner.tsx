@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { X, Sparkles, ArrowRight } from "lucide-react";
+import { X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 export function TopAdBanner() {
@@ -55,36 +55,9 @@ export function TopAdBanner() {
           {/* Subtle Ambient Golden Glow Behind Banner */}
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-full bg-gradient-to-r from-[#D4AF37]/5 via-[#C59B5F]/10 to-[#D4AF37]/5 pointer-events-none blur-2xl" />
 
-          {/* Dismiss / Close "X" Button */}
-          <button
-            type="button"
-            onClick={handleDismiss}
-            aria-label="Close advertisement banner"
-            className="absolute top-3 right-3 sm:top-4 sm:right-6 z-50 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/75 hover:bg-black text-white/90 hover:text-white border border-white/20 hover:border-[#D4AF37]/60 backdrop-blur-md text-xs font-montserrat font-semibold shadow-lg transition-all duration-200 cursor-pointer hover:scale-105 active:scale-95"
-            title="Dismiss banner"
-          >
-            <span className="hidden sm:inline text-[11px] font-mono uppercase tracking-wider text-[#D4AF37]">
-              Dismiss
-            </span>
-            <X className="w-4 h-4 text-white shrink-0" />
-          </button>
-
-          {/* Banner Container */}
-          <div className="relative mx-auto max-w-7xl px-3 sm:px-6 lg:px-8 py-2.5 sm:py-3.5 flex flex-col items-center justify-center">
-            {/* Top Micro-Ticker Bar */}
-            <div className="w-full max-w-5xl flex items-center justify-between gap-2 px-1 mb-1.5 text-[11px] font-mono text-[#A8A29E]">
-              <div className="flex items-center gap-2">
-                <span className="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="text-[#E7E5E4] font-medium tracking-wide">
-                  SPECIAL ANNOUNCEMENT // VERISETT COMMISSION COMPARISON
-                </span>
-              </div>
-              <span className="hidden md:inline text-[#9E7A45] font-semibold">
-                Lowest Take-Rate in Autonomous Clearing (1.5% vs 8.0%)
-              </span>
-            </div>
-
-            {/* Clickable Image Billboard */}
+          {/* Banner Container - Fits cleanly on phone and wide desktop */}
+          <div className="relative mx-auto max-w-6xl px-3 sm:px-6 lg:px-8 py-2.5 sm:py-3.5">
+            {/* Clickable Image Billboard with native aspect ratio and no empty side bars */}
             <div
               onClick={handleBannerClick}
               role="button"
@@ -94,21 +67,26 @@ export function TopAdBanner() {
                   handleBannerClick();
                 }
               }}
-              className="relative w-full max-w-5xl rounded-xl sm:rounded-2xl overflow-hidden shadow-2xl border border-white/10 hover:border-[#D4AF37]/50 bg-[#F4F5F7] group cursor-pointer transition-all duration-300"
+              className="relative w-full rounded-xl sm:rounded-2xl overflow-hidden shadow-xl border border-white/15 hover:border-[#D4AF37]/60 group cursor-pointer transition-all duration-300 bg-[#0F131A]"
               title="Click to explore 1.5% programmatic vault settlements"
             >
+              {/* Full Responsive Image: fits mobile and desktop beautifully */}
               <img
                 src="/commission-banner.jpg"
                 alt="Verisett AI Programmatic Vault Settlement Dashboard - 1.5% Industry-Leading Commission Rate"
-                className="w-full h-auto max-h-[220px] sm:max-h-[280px] md:max-h-[340px] object-cover sm:object-contain object-center transition-transform duration-500 group-hover:scale-[1.01]"
+                className="w-full h-36 sm:h-48 md:h-56 lg:h-64 object-cover object-center block transition-transform duration-500 group-hover:scale-[1.008]"
               />
 
-              {/* Interactive Callout Button Overlay */}
-              <div className="absolute bottom-3 right-3 sm:bottom-4 sm:right-4 hidden sm:flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#111317]/90 hover:bg-[#111317] backdrop-blur-md border border-[#D4AF37]/60 text-white text-xs font-mono font-semibold shadow-xl group-hover:border-[#D4AF37] group-hover:scale-105 transition-all">
-                <Sparkles className="w-3.5 h-3.5 text-[#D4AF37]" />
-                <span>Simulate 1.5% Escrow</span>
-                <ArrowRight className="w-3.5 h-3.5 text-[#D4AF37] group-hover:translate-x-0.5 transition-transform" />
-              </div>
+              {/* Dismiss / Close "X" Button pinned to the top-right of the banner card */}
+              <button
+                type="button"
+                onClick={handleDismiss}
+                aria-label="Close advertisement banner"
+                className="absolute top-2.5 right-2.5 sm:top-3.5 sm:right-3.5 z-30 flex items-center justify-center w-8 h-8 rounded-full bg-black/70 hover:bg-black text-white/90 hover:text-white border border-white/20 hover:border-[#D4AF37] backdrop-blur-md shadow-md transition-all duration-200 cursor-pointer hover:scale-110 active:scale-95"
+                title="Dismiss banner"
+              >
+                <X className="w-4 h-4 text-white shrink-0" />
+              </button>
             </div>
           </div>
         </motion.div>
