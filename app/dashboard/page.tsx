@@ -9,7 +9,6 @@ import { VerisettLogo } from "@/components/VerisettLogo";
 import { GoldenBackgroundShapes } from "@/components/ui/GoldenBackgroundShapes";
 import { AgentTransactionChart } from "@/components/dashboard/AgentTransactionChart";
 import { AgentTransactionHistory } from "@/components/dashboard/AgentTransactionHistory";
-import { AgentLiveTransferConsole } from "@/components/dashboard/AgentLiveTransferConsole";
 import {
   TransactionItem,
   getStoredTransactions,
@@ -471,23 +470,7 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* 1. Live Agent-to-Agent Transfer Console (FastMCP & REST) */}
-        <AgentLiveTransferConsole
-          apiKey={activeApiKey}
-          availableBalance={profile?.testnet_balance ?? 169000}
-          connectedAgentName={connectedAgentName}
-          onTransferSuccess={(tx, newBal) => {
-            setTransactions((prev) => [tx, ...prev]);
-            setProfile((prev) => ({
-              ...prev,
-              testnet_balance: newBal,
-              available_balance: newBal,
-            }));
-            setIsAgentConnected(true);
-          }}
-        />
-
-        {/* 2. Real Working Last Month Line Graph with Volume Histogram */}
+        {/* 1. Real Working Last Month Line Graph with Volume Histogram */}
         <AgentTransactionChart
           isAgentConnected={isAgentConnected}
           transactions={transactions}
