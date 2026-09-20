@@ -24,6 +24,8 @@
 .DS_Store
 *.pem
 *.db
+*.db-shm
+*.db-wal
 *.sqlite
 .edge-temp-profile/
 __pycache__/

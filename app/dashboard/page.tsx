@@ -33,177 +33,195 @@ interface VaultData {
   status?: string;
 }
 
+const DEFAULT_API_KEY = "vrs_live_aiverisettgmailcom89f72b";
+
 export default function DashboardPage() {
   const router = useRouter();
   const [modalOpen, setModalOpen] = useState(false);
   const [isConsentModalOpen, setIsConsentModalOpen] = useState(false);
-  const [isAgentConnected, setIsAgentConnected] = useState(false);
-  const [connectedAgentName, setConnectedAgentName] = useState<string>("Autonomous Agent");
+  const [activeApiKey, setActiveApiKey] = useState<string>(DEFAULT_API_KEY);
+  const [isAgentConnected, setIsAgentConnected] = useState(true);
+  const [connectedAgentName, setConnectedAgentName] = useState<string>("Aiverisett Primary Payer Agent");
   const [transactions, setTransactions] = useState<TransactionItem[]>([]);
   const [currentUser, setCurrentUser] = useState<{ id?: string; email?: string } | null>(null);
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [userName, setUserName] = useState<string | null>(null);
-  const [profile, setProfile] = useState<ProfileData | null>(null);
+  const [profile, setProfile] = useState<ProfileData | null>({
+    testnet_balance: 169000,
+    available_balance: 169000,
+    frozen_balance: 0,
+    accepted_terms: true,
+  });
   const [activeVaults, setActiveVaults] = useState<VaultData[]>([
     {
       id: "VLT-PRIMARY-NODE",
       title: "Primary Autonomous Settlement Vault",
-      amount: 10000,
+      amount: 169000,
       status: "Active Custody",
     },
   ]);
 
   useEffect(() => {
+    let es: EventSource | null = null;
+
     try {
       const email = localStorage.getItem("verisett_user_email");
       const name = localStorage.getItem("verisett_user_name");
-      const connected = localStorage.getItem("verisett_agent_connected") === "true";
       const savedAgentName = localStorage.getItem("verisett_connected_agent_name");
+      let storedKey = localStorage.getItem("verisett_api_key");
+      if (!storedKey) {
+        storedKey = DEFAULT_API_KEY;
+        localStorage.setItem("verisett_api_key", DEFAULT_API_KEY);
+      }
+      setActiveApiKey(storedKey);
+
       if (email) setUserEmail(email);
       if (name) setUserName(name);
-      if (connected) setIsAgentConnected(true);
       if (savedAgentName) setConnectedAgentName(savedAgentName);
     } catch {
       // Ignore
     }
 
-    const fetchLiveUserData = async () => {
+    const currentKey =
+      (typeof window !== "undefined" ? localStorage.getItem("verisett_api_key") : null) ||
+      DEFAULT_API_KEY;
+
+    // 1. Initial fetch from verisett.db agent endpoint
+    const fetchLiveAgentData = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session?.user) {
-          setCurrentUser({ id: session.user.id, email: session.user.email ?? undefined });
-          const { data: profileRes } = await supabase
-            .from("profiles")
-            .select("testnet_balance, available_balance, frozen_balance, accepted_terms, accepted_terms_at")
-            .eq("id", session.user.id)
-            .maybeSingle();
-
-          const localConsent = localStorage.getItem("verisett_accepted_terms") === "true";
-          const hasAccepted = profileRes?.accepted_terms === true || localConsent;
-
-          if (!hasAccepted) {
-            setIsConsentModalOpen(true);
-            setProfile({
-              accepted_terms: false,
-              testnet_balance: 0,
-              available_balance: 0,
-              frozen_balance: 0,
-            });
-          } else {
-            setIsConsentModalOpen(false);
-            if (profileRes) {
-              setProfile({
-                ...profileRes,
-                accepted_terms: true,
-                testnet_balance: profileRes.testnet_balance ?? 10000,
-              });
-            } else {
-              setProfile({ accepted_terms: true, testnet_balance: 10000 });
+        const res = await fetch(`/api/verisett/agent?key=${encodeURIComponent(currentKey)}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success && data.agent) {
+            const bal = Number(data.agent.balance_cents);
+            setProfile((prev) => ({
+              ...prev,
+              testnet_balance: bal,
+              available_balance: bal,
+              frozen_balance: Number(data.agent.frozen_cents || 0),
+              accepted_terms: true,
+            }));
+            setConnectedAgentName(data.agent.name);
+            setIsAgentConnected(true);
+            setActiveVaults([
+              {
+                id: "VLT-PRIMARY-NODE",
+                title: "Primary Autonomous Settlement Vault",
+                amount: bal,
+                status: "Active Custody",
+              },
+            ]);
+            try {
+              localStorage.setItem("verisett_agent_connected", "true");
+              localStorage.setItem("verisett_connected_agent_name", data.agent.name);
+            } catch {
+              // Ignore
             }
           }
-        } else {
-          const localConsent = localStorage.getItem("verisett_accepted_terms") === "true";
-          if (!localConsent) {
-            setIsConsentModalOpen(true);
-            setProfile({ accepted_terms: false, testnet_balance: 0 });
-          } else {
-            setIsConsentModalOpen(false);
-            setProfile({ accepted_terms: true, testnet_balance: 10000 });
-          }
         }
-      } catch {
-        const localConsent = localStorage.getItem("verisett_accepted_terms") === "true";
-        setIsConsentModalOpen(!localConsent);
-        setProfile({ accepted_terms: localConsent, testnet_balance: localConsent ? 10000 : 0 });
+      } catch (err) {
+        console.warn("Could not fetch live agent data:", err);
       }
     };
 
-    // Real-time server sync polling every 1.5s
-    const syncServerState = async () => {
+    // 2. Initial fetch from verisett.db transactions endpoint
+    const fetchLiveTransactions = async () => {
       try {
-        const res = await fetch("/api/transfer");
+        const res = await fetch("/api/verisett/transactions?limit=50");
         if (res.ok) {
           const data = await res.json();
-          if (data.success) {
-            if (data.transactions && Array.isArray(data.transactions)) {
-              setTransactions(data.transactions);
-            }
-            if (data.vaultBalance && data.vaultBalance.available_balance !== undefined) {
+          if (data.success && Array.isArray(data.transactions)) {
+            setTransactions(data.transactions);
+          }
+        }
+      } catch (err) {
+        console.warn("Could not fetch live transactions:", err);
+      }
+    };
+
+    // 3. Connect to Server-Sent Events stream (/api/verisett/stream)
+    const connectSseStream = () => {
+      try {
+        es = new EventSource(`/api/verisett/stream?key=${encodeURIComponent(currentKey)}`);
+
+        es.addEventListener("update", (event) => {
+          try {
+            const data = JSON.parse(event.data);
+            if (data.agent) {
+              const bal = Number(data.agent.balance_cents);
               setProfile((prev) => ({
                 ...prev,
-                testnet_balance: data.vaultBalance.available_balance,
-                available_balance: data.vaultBalance.available_balance,
+                testnet_balance: bal,
+                available_balance: bal,
+                frozen_balance: Number(data.agent.frozen_cents || 0),
+                accepted_terms: true,
               }));
-            }
-            if (data.isAgentConnected) {
+              setConnectedAgentName(data.agent.name);
               setIsAgentConnected(true);
-              try {
-                localStorage.setItem("verisett_agent_connected", "true");
-              } catch {
-                // Ignore
-              }
-            }
-            if (data.connectedAgentName) {
-              setConnectedAgentName(data.connectedAgentName);
-              try {
-                localStorage.setItem("verisett_connected_agent_name", data.connectedAgentName);
-              } catch {
-                // Ignore
-              }
-            }
-            if (data.activeVaults && Array.isArray(data.activeVaults) && data.activeVaults.length > 0) {
-              setActiveVaults(data.activeVaults);
-            } else {
               setActiveVaults([
                 {
                   id: "VLT-PRIMARY-NODE",
                   title: "Primary Autonomous Settlement Vault",
-                  amount: data.vaultBalance?.available_balance || 10000,
+                  amount: bal,
                   status: "Active Custody",
                 },
               ]);
             }
+            if (data.transactions && Array.isArray(data.transactions)) {
+              setTransactions(data.transactions);
+            }
+          } catch (e) {
+            console.error("Error parsing verisett SSE frame:", e);
           }
-        }
-      } catch {
-        // Ignore network hiccups
+        });
+
+        es.onerror = (e) => {
+          console.warn("Verisett SSE reconnecting...", e);
+        };
+      } catch (err) {
+        console.warn("Failed to initialize SSE stream:", err);
       }
     };
 
-    syncServerState();
-    const pollInterval = setInterval(syncServerState, 1500);
+    fetchLiveAgentData();
+    fetchLiveTransactions();
+    connectSseStream();
 
     const handleTxUpdate = () => {
-      syncServerState();
+      fetchLiveAgentData();
+      fetchLiveTransactions();
     };
 
     window.addEventListener(TX_UPDATE_EVENT, handleTxUpdate);
     window.addEventListener("storage", handleTxUpdate);
+
     return () => {
-      clearInterval(pollInterval);
+      if (es) {
+        es.close();
+      }
       window.removeEventListener(TX_UPDATE_EVENT, handleTxUpdate);
       window.removeEventListener("storage", handleTxUpdate);
     };
   }, []);
 
   const handleExecuteTestSettlement = async (isSuccess: boolean = true) => {
-    const sender =
-      connectedAgentName && connectedAgentName !== "Autonomous Agent"
-        ? connectedAgentName
-        : userName
-        ? `${userName}'s Agent`
-        : "Autonomous Agent A";
-    const receiver = "Counterparty Agent Node";
+    const sender = connectedAgentName || "Aiverisett Primary Payer Agent";
+    const receiver = "Gemini-Flash-Extractor (Worker)";
 
     try {
       const res = await fetch("/api/transfer", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${activeApiKey}`,
+          "x-api-key": activeApiKey,
+        },
         body: JSON.stringify({
           fromAgent: sender,
           toAgent: receiver,
           amount: 2500,
           status: isSuccess ? "SUCCESSFUL" : "FAILED",
+          apiKey: activeApiKey,
           milestone: "Autonomous Milestone Escrow Verification",
         }),
       });
@@ -244,7 +262,6 @@ export default function DashboardPage() {
           testnet_balance: data.vaultBalance.available_balance,
           available_balance: data.vaultBalance.available_balance,
         }));
-        setTransactions([]);
       }
     } catch {
       // Ignore
@@ -373,11 +390,11 @@ export default function DashboardPage() {
             </div>
             <div className="flex items-baseline justify-between mt-3">
               <p className="text-2xl sm:text-3xl font-bold text-[#1C1A17] font-mono">
-                {profile?.testnet_balance !== undefined ? profile.testnet_balance.toLocaleString() : "10,000"} VRS
+                {profile?.testnet_balance !== undefined ? profile.testnet_balance.toLocaleString() : "169,000"} VRS
               </p>
               <button
                 onClick={handleResetVault}
-                title="Reset vault balance to 10,000 VRS"
+                title="Reset vault balance to 169,000 VRS"
                 className="text-[10px] font-mono text-[#8C8275] hover:text-[#9E7A45] underline cursor-pointer"
               >
                 Reset Balance
@@ -456,7 +473,8 @@ export default function DashboardPage() {
 
         {/* 1. Live Agent-to-Agent Transfer Console (FastMCP & REST) */}
         <AgentLiveTransferConsole
-          availableBalance={profile?.testnet_balance ?? 10000}
+          apiKey={activeApiKey}
+          availableBalance={profile?.testnet_balance ?? 169000}
           connectedAgentName={connectedAgentName}
           onTransferSuccess={(tx, newBal) => {
             setTransactions((prev) => [tx, ...prev]);
@@ -528,7 +546,7 @@ export default function DashboardPage() {
                 </div>
                 <div className="text-left sm:text-right">
                   <span className="font-mono text-base sm:text-lg font-bold text-[#9E7A45]">
-                    ₹{(vault.amount ?? profile?.testnet_balance ?? 10000).toLocaleString("en-IN")} VRS
+                    ₹{(vault.amount ?? profile?.testnet_balance ?? 169000).toLocaleString("en-IN")} VRS
                   </span>
                   <span className="block text-[10px] font-mono text-[#8C8275]">
                     Deterministic Invariant Active

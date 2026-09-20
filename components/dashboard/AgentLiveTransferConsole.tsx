@@ -20,21 +20,40 @@ interface AgentLiveTransferConsoleProps {
   onTransferSuccess?: (tx: TransactionItem, newBalance: number) => void;
   availableBalance: number;
   connectedAgentName?: string;
+  apiKey?: string;
 }
 
 export function AgentLiveTransferConsole({
   onTransferSuccess,
   availableBalance,
-  connectedAgentName = "My Autonomous Agent",
+  connectedAgentName = "Aiverisett Primary Payer Agent",
+  apiKey,
 }: AgentLiveTransferConsoleProps) {
   const [mode, setMode] = useState<"TRANSFER" | "DEPOSIT">("TRANSFER");
   const [fromAgent, setFromAgent] = useState(connectedAgentName);
-  const [toAgent, setToAgent] = useState("Beneficiary Worker Node");
+  const [toAgent, setToAgent] = useState("Gemini-Flash-Extractor (Worker)");
   const [amount, setAmount] = useState<number>(2500);
   const [outcome, setOutcome] = useState<"SUCCESSFUL" | "FAILED">("SUCCESSFUL");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [logs, setLogs] = useState<string[]>([]);
   const [copiedCurl, setCopiedCurl] = useState(false);
+  const [copiedKey, setCopiedKey] = useState(false);
+
+  const [activeApiKey, setActiveApiKey] = useState<string>(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("verisett_api_key") || apiKey || "vrs_live_aiverisettgmailcom89f72b";
+    }
+    return apiKey || "vrs_live_aiverisettgmailcom89f72b";
+  });
+
+  React.useEffect(() => {
+    if (apiKey) {
+      setActiveApiKey(apiKey);
+    } else if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("verisett_api_key");
+      if (stored) setActiveApiKey(stored);
+    }
+  }, [apiKey]);
 
   React.useEffect(() => {
     if (connectedAgentName && connectedAgentName !== "My Autonomous Agent") {
@@ -46,6 +65,7 @@ export function AgentLiveTransferConsole({
 
   const curlTransfer = `curl -X POST ${originUrl}/api/transfer \\
   -H "Content-Type: application/json" \\
+  -H "Authorization: Bearer ${activeApiKey}" \\
   -d '{
     "fromAgent": "${fromAgent}",
     "toAgent": "${toAgent}",
@@ -55,6 +75,7 @@ export function AgentLiveTransferConsole({
 
   const curlDeposit = `curl -X POST ${originUrl}/api/vault/deposit \\
   -H "Content-Type: application/json" \\
+  -H "Authorization: Bearer ${activeApiKey}" \\
   -d '{
     "agent_name": "${fromAgent}",
     "amount": ${amount}
@@ -68,6 +89,12 @@ export function AgentLiveTransferConsole({
     setTimeout(() => setCopiedCurl(false), 2000);
   };
 
+  const handleCopyKey = () => {
+    navigator.clipboard.writeText(activeApiKey);
+    setCopiedKey(true);
+    setTimeout(() => setCopiedKey(false), 2000);
+  };
+
   const handleExecute = async () => {
     if (amount <= 0) return;
     setIsSubmitting(true);
@@ -77,10 +104,15 @@ export function AgentLiveTransferConsole({
         // 1. Agent Adds Money To Vault
         const res = await fetch("/api/vault/deposit", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${activeApiKey}`,
+            "x-api-key": activeApiKey,
+          },
           body: JSON.stringify({
             agent_name: fromAgent,
             amount,
+            apiKey: activeApiKey,
             milestone: `Vault Liquidity Deposit by ${fromAgent}`,
           }),
         });
@@ -101,12 +133,17 @@ export function AgentLiveTransferConsole({
         // 2. Transfer Between Agents
         const res = await fetch("/api/transfer", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${activeApiKey}`,
+            "x-api-key": activeApiKey,
+          },
           body: JSON.stringify({
             fromAgent,
             toAgent,
             amount,
             status: outcome,
+            apiKey: activeApiKey,
             milestone: `Autonomous Task: ${fromAgent} -> ${toAgent}`,
           }),
         });
@@ -182,7 +219,7 @@ export function AgentLiveTransferConsole({
             {copiedCurl ? (
               <>
                 <Check className="w-3.5 h-3.5 text-emerald-600" />
-                <span className="text-emerald-700 font-semibold">Copied</span>
+                <span className="text-emerald-700 font-semibold">Copied cURL</span>
               </>
             ) : (
               <>
@@ -192,6 +229,31 @@ export function AgentLiveTransferConsole({
             )}
           </button>
         </div>
+      </div>
+
+      {/* Active API Key Indicator */}
+      <div className="flex items-center justify-between flex-wrap gap-2 px-4 py-2.5 rounded-xl bg-[#FAF8F5] border border-[#EAE3D2] text-xs font-mono">
+        <div className="flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+          <span className="text-[#8C8275]">Active Database API Key:</span>
+          <span className="text-[#1C1A17] font-semibold">{activeApiKey}</span>
+        </div>
+        <button
+          onClick={handleCopyKey}
+          className="inline-flex items-center gap-1 text-[11px] text-[#9E7A45] hover:text-[#C59B5F] font-semibold cursor-pointer transition"
+        >
+          {copiedKey ? (
+            <>
+              <Check className="w-3 h-3 text-emerald-600" />
+              <span className="text-emerald-700">Copied Key</span>
+            </>
+          ) : (
+            <>
+              <Copy className="w-3 h-3" />
+              <span>Copy API Key</span>
+            </>
+          )}
+        </button>
       </div>
 
       {/* Dynamic Form based on Mode */}

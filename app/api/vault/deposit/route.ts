@@ -56,6 +56,18 @@ export async function POST(req: NextRequest) {
       milestoneTitle,
     });
 
+    // Also record in local SQLite verisett.db
+    try {
+      const { recordDepositInDb } = await import("@/lib/verisettDb");
+      recordDepositInDb({
+        agentName,
+        amountCredits: amount,
+        milestone: milestoneTitle,
+      });
+    } catch (dbErr) {
+      console.warn("Could not sync deposit to verisett.db:", dbErr);
+    }
+
     return NextResponse.json({
       success: true,
       message: `Successfully deposited ₹${amount.toLocaleString("en-IN")} to Vault by ${agentName}`,

@@ -65,14 +65,27 @@ export async function POST(req: NextRequest) {
         body.agent_name ||
         body.agentName ||
         (detected.hasAgentSignals ? detected.name : state.connected_agent_name) ||
-        "Autonomous Agent";
+        "Aiverisett Primary Payer Agent";
 
+      // 1. Record in local server state
       const depositResult = recordVaultDeposit({
         amountINR: amount,
         agentName,
         agentModel: body.agentModel || body.model || detected.model || "FastMCP Client v2.4",
         milestoneTitle: body.milestone || `Vault Liquidity Deposit by ${agentName}`,
       });
+
+      // 2. Also record in local SQLite verisett.db
+      try {
+        const { recordDepositInDb } = await import("@/lib/verisettDb");
+        recordDepositInDb({
+          agentName,
+          amountCredits: amount,
+          milestone: body.milestone || `Vault Liquidity Deposit by ${agentName}`,
+        });
+      } catch (dbErr) {
+        console.warn("Could not sync deposit to verisett.db:", dbErr);
+      }
 
       return NextResponse.json({
         success: true,
@@ -98,7 +111,7 @@ export async function POST(req: NextRequest) {
       body.payer ||
       body.payer_name ||
       (detected.hasAgentSignals ? detected.name : state.connected_agent_name) ||
-      "Autonomous Agent A";
+      "Aiverisett Primary Payer Agent";
 
     const toAgentName =
       body.toAgent ||
@@ -108,7 +121,7 @@ export async function POST(req: NextRequest) {
       body.worker_name ||
       body.beneficiary ||
       body.beneficiary_id ||
-      "Autonomous Agent B";
+      "Gemini-Flash-Extractor (Worker)";
 
     const milestoneTitle =
       body.milestone ||
@@ -124,7 +137,7 @@ export async function POST(req: NextRequest) {
         ? "FAILED"
         : "SUCCESSFUL";
 
-    // Record the transaction and update the vault money
+    // 1. Record the transaction in serverStore
     const result = recordAgentTransfer({
       amountINR: amount,
       fromAgentName,
@@ -135,6 +148,20 @@ export async function POST(req: NextRequest) {
       status,
       failureReason: body.failureReason || body.failure_reason,
     });
+
+    // 2. Also record in local SQLite verisett.db
+    try {
+      const { recordTransferInDb } = await import("@/lib/verisettDb");
+      recordTransferInDb({
+        fromAgentName,
+        toAgentName,
+        amountCredits: amount,
+        status,
+        milestone: milestoneTitle,
+      });
+    } catch (dbErr) {
+      console.warn("Could not sync transfer to verisett.db:", dbErr);
+    }
 
     return NextResponse.json({
       success: true,
