@@ -4,9 +4,14 @@ import {
   recordAgentTransfer,
   recordVaultDeposit,
   setServerAgentConnected,
+  autoDetectAgentIdentity,
 } from "@/lib/serverStore";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const detected = autoDetectAgentIdentity(req.headers);
+  if (detected.hasAgentSignals) {
+    setServerAgentConnected(true, undefined, detected.name, detected.model);
+  }
   const state = getVaultState();
   return NextResponse.json({
     success: true,
@@ -20,7 +25,9 @@ export async function GET() {
     isAgentConnected: state.is_agent_connected,
     connectedAgentId: state.connected_agent_id,
     connectedAgentName: state.connected_agent_name,
+    connectedAgentModel: state.connected_agent_model,
     transactions: state.transactions,
+    activeVaults: state.vault_deployments || [],
     lastUpdated: state.last_updated,
   });
 }
@@ -28,6 +35,7 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json().catch(() => ({}));
+    const detected = autoDetectAgentIdentity(req.headers, body);
     const state = getVaultState();
 
     // Resolve amount in INR
@@ -56,13 +64,13 @@ export async function POST(req: NextRequest) {
         body.from ||
         body.agent_name ||
         body.agentName ||
-        state.connected_agent_name ||
+        (detected.hasAgentSignals ? detected.name : state.connected_agent_name) ||
         "Autonomous Agent";
 
       const depositResult = recordVaultDeposit({
         amountINR: amount,
         agentName,
-        agentModel: body.agentModel || body.model || "FastMCP Client v2.4",
+        agentModel: body.agentModel || body.model || detected.model || "FastMCP Client v2.4",
         milestoneTitle: body.milestone || `Vault Liquidity Deposit by ${agentName}`,
       });
 
@@ -78,17 +86,18 @@ export async function POST(req: NextRequest) {
         },
         isAgentConnected: true,
         connectedAgentName: depositResult.state.connected_agent_name,
+        activeVaults: depositResult.state.vault_deployments || [],
       });
     }
 
-    // Resolve Dynamic Agent Names (No hardcoded strings)
+    // Resolve Dynamic Agent Names (Auto-detected if not given)
     const fromAgentName =
       body.fromAgent ||
       body.from_agent ||
       body.from ||
       body.payer ||
       body.payer_name ||
-      state.connected_agent_name ||
+      (detected.hasAgentSignals ? detected.name : state.connected_agent_name) ||
       "Autonomous Agent A";
 
     const toAgentName =
@@ -119,7 +128,7 @@ export async function POST(req: NextRequest) {
     const result = recordAgentTransfer({
       amountINR: amount,
       fromAgentName,
-      fromAgentModel: body.fromAgentModel || body.from_model || "FastMCP v2.4 Node",
+      fromAgentModel: body.fromAgentModel || body.from_model || detected.model || "FastMCP v2.4 Node",
       toAgentName,
       toAgentModel: body.toAgentModel || body.to_model || "Autonomous Worker Node",
       milestoneTitle,
@@ -141,6 +150,7 @@ export async function POST(req: NextRequest) {
       },
       isAgentConnected: true,
       connectedAgentName: result.state.connected_agent_name,
+      activeVaults: result.state.vault_deployments || [],
     });
   } catch (error: any) {
     console.error("Error processing agent transfer:", error);

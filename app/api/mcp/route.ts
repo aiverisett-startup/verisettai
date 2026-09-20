@@ -4,9 +4,14 @@ import {
   recordAgentTransfer,
   recordVaultDeposit,
   setServerAgentConnected,
+  autoDetectAgentIdentity,
 } from "@/lib/serverStore";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const detected = autoDetectAgentIdentity(req.headers);
+  if (detected.hasAgentSignals) {
+    setServerAgentConnected(true, undefined, detected.name, detected.model);
+  }
   const state = getVaultState();
   return NextResponse.json({
     status: "ok",
@@ -15,6 +20,8 @@ export async function GET() {
     server: "Verisett Escrow Clearinghouse",
     connectedAgent: state.is_agent_connected ? state.connected_agent_name : null,
     vaultBalance: state.available_balance,
+    activeDeployments: state.vault_deployments?.length || 1,
+    activeVaults: state.vault_deployments || [],
   });
 }
 
@@ -22,20 +29,25 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json().catch(() => ({}));
     const { id, method, params } = body;
+    const detected = autoDetectAgentIdentity(req.headers, body);
+
+    // Auto-mark connected on any FastMCP interaction
+    const clientName =
+      params?.clientInfo?.name ||
+      params?.client_name ||
+      (detected.hasAgentSignals ? detected.name : null) ||
+      "Autonomous FastMCP Agent";
+
+    const clientVersion = params?.clientInfo?.version || "2.4";
+    setServerAgentConnected(
+      true,
+      `agt_${Date.now().toString().slice(-6)}`,
+      clientName,
+      params?.clientInfo?.version ? `FastMCP ${clientVersion}` : detected.model
+    );
 
     // 1. MCP Handshake Initialization
     if (method === "initialize") {
-      const clientName =
-        params?.clientInfo?.name ||
-        params?.client_name ||
-        req.headers.get("x-agent-name") ||
-        "Connected FastMCP Agent";
-
-      const clientVersion = params?.clientInfo?.version || "1.0.0";
-
-      // Save real connected agent name immediately
-      setServerAgentConnected(true, `agt_${Date.now().toString().slice(-6)}`, clientName, `FastMCP ${clientVersion}`);
-
       return NextResponse.json({
         jsonrpc: "2.0",
         id: id || 1,

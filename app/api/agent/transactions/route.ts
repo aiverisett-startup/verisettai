@@ -1,7 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getVaultState, recordAgentTransfer, setServerAgentConnected } from "@/lib/serverStore";
+import {
+  getVaultState,
+  recordAgentTransfer,
+  setServerAgentConnected,
+  autoDetectAgentIdentity,
+} from "@/lib/serverStore";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const detected = autoDetectAgentIdentity(req.headers);
+  if (detected.hasAgentSignals) {
+    setServerAgentConnected(true, undefined, detected.name, detected.model);
+  }
   const state = getVaultState();
   return NextResponse.json({
     success: true,
@@ -16,6 +25,7 @@ export async function GET() {
     connectedAgentId: state.connected_agent_id,
     connectedAgentName: state.connected_agent_name,
     transactions: state.transactions,
+    activeVaults: state.vault_deployments || [],
     lastUpdated: state.last_updated,
   });
 }
@@ -23,19 +33,27 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json().catch(() => ({}));
+    const detected = autoDetectAgentIdentity(req.headers, body);
     const action = body.action;
 
     if (action === "connect") {
+      const resolvedName =
+        body.agentName ||
+        body.agent_name ||
+        (detected.hasAgentSignals ? detected.name : null) ||
+        "Autonomous Agent";
+
       const state = setServerAgentConnected(
         true,
         body.agentId,
-        body.agentName || body.agent_name,
-        body.agentModel || body.agent_model
+        resolvedName,
+        body.agentModel || body.agent_model || detected.model
       );
       return NextResponse.json({
         success: true,
         isAgentConnected: true,
         connectedAgentName: state.connected_agent_name,
+        activeVaults: state.vault_deployments || [],
         state,
       });
     }

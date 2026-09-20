@@ -1,9 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
-import { recordAgentTransfer, recordVaultDeposit, getVaultState } from "@/lib/serverStore";
+import {
+  recordAgentTransfer,
+  recordVaultDeposit,
+  getVaultState,
+  autoDetectAgentIdentity,
+  setServerAgentConnected,
+} from "@/lib/serverStore";
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json().catch(() => ({}));
+    const detected = autoDetectAgentIdentity(req.headers, body);
     const state = getVaultState();
 
     let amount = 25000;
@@ -22,8 +29,11 @@ export async function POST(req: NextRequest) {
       body.payer_id ||
       body.from_agent ||
       body.fromAgent ||
-      state.connected_agent_name ||
+      (detected.hasAgentSignals ? detected.name : state.connected_agent_name) ||
       "Autonomous Agent A";
+
+    // Mark agent connected
+    setServerAgentConnected(true, undefined, agentName, detected.model);
 
     const isDeposit =
       body.type === "deposit" ||
@@ -49,6 +59,9 @@ export async function POST(req: NextRequest) {
           testnet_balance: depositResult.state.testnet_balance,
           available_balance: depositResult.state.available_balance,
         },
+        isAgentConnected: true,
+        connectedAgentName: depositResult.state.connected_agent_name,
+        activeVaults: depositResult.state.vault_deployments || [],
       });
     }
 
@@ -81,6 +94,9 @@ export async function POST(req: NextRequest) {
         testnet_balance: result.state.testnet_balance,
         available_balance: result.state.available_balance,
       },
+      isAgentConnected: true,
+      connectedAgentName: result.state.connected_agent_name,
+      activeVaults: result.state.vault_deployments || [],
     });
   } catch (err: any) {
     return NextResponse.json({ success: false, error: err?.message }, { status: 500 });

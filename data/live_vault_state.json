@@ -6,8 +6,20 @@
   "total_commission": 0,
   "is_agent_connected": false,
   "connected_agent_id": "agt_live_node",
-  "connected_agent_name": "FastMCP Autonomous Agent",
-  "connected_agent_model": "MCP Client v2.4",
+  "connected_agent_name": "Autonomous Settlement Agent",
+  "connected_agent_model": "FastMCP Protocol v2.4",
   "transactions": [],
-  "last_updated": "2026-09-20T08:48:26.595Z"
+  "vault_deployments": [
+    {
+      "id": "VLT-PRIMARY-NODE",
+      "title": "Primary Autonomous Settlement Vault",
+      "amount": 10000,
+      "currency": "VRS",
+      "status": "Active Custody",
+      "allocatedAgent": "Autonomous Settlement Agent",
+      "createdAt": "2026-09-20T09:24:00.000Z",
+      "rail": "FastMCP Escrow Protocol v2.4"
+    }
+  ],
+  "last_updated": "2026-09-20T09:24:00.000Z"
 }

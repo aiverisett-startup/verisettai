@@ -245,20 +245,19 @@ export function ConnectAgentModal({ isOpen, onClose, onConnected }: ConnectAgent
             </div>
           )}
 
-          {/* Real Agent Name Input */}
-          <div className="mt-4 p-3 rounded-2xl bg-[#FAF8F5] border border-[#EAE3D2] space-y-1.5">
-            <label className="block text-[11px] font-mono text-[#8C8275] uppercase font-semibold">
-              Agent Name (Exact Real Name to Display)
-            </label>
-            <input
-              type="text"
-              value={customAgentName}
-              onChange={(e) => setCustomAgentName(e.target.value)}
-              placeholder="e.g. Claude Desktop, FastMCP Agent, My Trading Bot"
-              className="w-full rounded-xl border border-[#EAE3D2] bg-white px-3 py-2 text-xs font-semibold text-[#1C1A17] font-mono focus:border-[#D4AF37] focus:outline-none transition shadow-2xs"
-            />
-            <p className="text-[10px] text-[#8C8275]">
-              This exact name will be saved and displayed on your live settlement dashboard and clearing receipts.
+          {/* Automatic Agent Identity Detection */}
+          <div className="mt-4 p-3.5 rounded-2xl bg-[#FAF8F5] border border-[#EAE3D2] space-y-1.5">
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-mono text-[#8C8275] uppercase font-semibold">
+                Autonomous Agent Identity
+              </span>
+              <span className="inline-flex items-center gap-1.5 text-[10px] font-mono text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200 font-semibold">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                System Auto-Detection Active
+              </span>
+            </div>
+            <p className="text-xs text-[#1C1A17] font-medium leading-relaxed">
+              Zero manual naming required. The settlement clearinghouse automatically inspects and identifies your agent on its first API handshake, Python daemon run, or FastMCP tool call.
             </p>
           </div>
 

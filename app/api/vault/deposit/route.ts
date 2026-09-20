@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { recordVaultDeposit, getVaultState } from "@/lib/serverStore";
+import { recordVaultDeposit, getVaultState, autoDetectAgentIdentity } from "@/lib/serverStore";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const detected = autoDetectAgentIdentity(req.headers);
   const state = getVaultState();
   return NextResponse.json({
     success: true,
@@ -13,6 +14,7 @@ export async function GET() {
     },
     isAgentConnected: state.is_agent_connected,
     connectedAgentName: state.connected_agent_name,
+    activeVaults: state.vault_deployments || [],
   });
 }
 
@@ -31,13 +33,15 @@ export async function POST(req: NextRequest) {
     }
 
     const state = getVaultState();
+    const detected = autoDetectAgentIdentity(req.headers, body);
+
     const agentName =
       body.agent_name ||
       body.agentName ||
       body.fromAgent ||
       body.from ||
       body.name ||
-      state.connected_agent_name ||
+      (detected.hasAgentSignals ? detected.name : state.connected_agent_name) ||
       "Autonomous Connected Agent";
 
     const milestoneTitle =
@@ -48,7 +52,7 @@ export async function POST(req: NextRequest) {
     const result = recordVaultDeposit({
       amountINR: amount,
       agentName,
-      agentModel: body.agentModel || body.model || "FastMCP Client v2.4",
+      agentModel: body.agentModel || body.model || detected.model || "FastMCP Client v2.4",
       milestoneTitle,
     });
 
@@ -61,9 +65,10 @@ export async function POST(req: NextRequest) {
         available_balance: result.state.available_balance,
         total_volume: result.state.total_volume,
       },
-      transaction: result.transaction,
       isAgentConnected: true,
       connectedAgentName: result.state.connected_agent_name,
+      activeVaults: result.state.vault_deployments || [],
+      transaction: result.transaction,
     });
   } catch (err: any) {
     return NextResponse.json({ success: false, error: err?.message }, { status: 500 });
