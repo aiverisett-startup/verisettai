@@ -9,6 +9,7 @@ import { VerisettLogo } from "@/components/VerisettLogo";
 import { GoldenBackgroundShapes } from "@/components/ui/GoldenBackgroundShapes";
 import { AgentTransactionChart } from "@/components/dashboard/AgentTransactionChart";
 import { AgentTransactionHistory } from "@/components/dashboard/AgentTransactionHistory";
+import { AgentLiveTransferConsole } from "@/components/dashboard/AgentLiveTransferConsole";
 import {
   TransactionItem,
   getStoredTransactions,
@@ -117,42 +118,116 @@ export default function DashboardPage() {
       }
     };
 
-    fetchLiveUserData();
-
-    // Load real transactions
-    const loadTx = () => {
-      setTransactions(getStoredTransactions());
+    // Real-time server sync polling every 1.5s
+    const syncServerState = async () => {
+      try {
+        const res = await fetch("/api/transfer");
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success) {
+            if (data.transactions && Array.isArray(data.transactions) && data.transactions.length > 0) {
+              setTransactions(data.transactions);
+            }
+            if (data.vaultBalance && data.vaultBalance.available_balance !== undefined) {
+              setProfile((prev) => ({
+                ...prev,
+                testnet_balance: data.vaultBalance.available_balance,
+                available_balance: data.vaultBalance.available_balance,
+              }));
+            }
+            if (data.isAgentConnected) {
+              setIsAgentConnected(true);
+            }
+          }
+        }
+      } catch {
+        // Ignore network hiccups
+      }
     };
-    loadTx();
+
+    syncServerState();
+    const pollInterval = setInterval(syncServerState, 1500);
 
     const handleTxUpdate = () => {
-      loadTx();
+      syncServerState();
     };
 
     window.addEventListener(TX_UPDATE_EVENT, handleTxUpdate);
     window.addEventListener("storage", handleTxUpdate);
     return () => {
+      clearInterval(pollInterval);
       window.removeEventListener(TX_UPDATE_EVENT, handleTxUpdate);
       window.removeEventListener("storage", handleTxUpdate);
     };
   }, []);
 
-  const handleExecuteTestSettlement = (isSuccess: boolean = true) => {
-    const newTx = createAgentEscrowTransaction({
-      amountINR: 25000,
-      isSuccess,
-      payerName: userName ? `${userName}'s Client Agent` : "Apex Autonomous Node",
-      workerName: "Nexus-Crawler Worker LLM",
-      milestone: "Deterministic SEC 10-K Hash Parsing & Audit",
-    });
-    setTransactions((prev) => [newTx, ...prev]);
+  const handleExecuteTestSettlement = async (isSuccess: boolean = true) => {
+    try {
+      const res = await fetch("/api/transfer", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          fromAgent: userName ? `${userName}'s Client Agent` : "Google Antigravity Agent #1",
+          toAgent: "Google Antigravity Agent #2",
+          amount: 2500,
+          status: isSuccess ? "SUCCESSFUL" : "FAILED",
+          milestone: "Autonomous Milestone Escrow Verification",
+        }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.transaction) {
+          setTransactions((prev) => [data.transaction, ...prev]);
+        }
+        if (data.vaultBalance) {
+          setProfile((prev) => ({
+            ...prev,
+            testnet_balance: data.vaultBalance.available_balance,
+            available_balance: data.vaultBalance.available_balance,
+          }));
+        }
+        setIsAgentConnected(true);
+      }
+    } catch {
+      // Fallback
+      const newTx = createAgentEscrowTransaction({
+        amountINR: 2500,
+        isSuccess,
+        payerName: userName ? `${userName}'s Client Agent` : "Google Antigravity Agent #1",
+        workerName: "Google Antigravity Agent #2",
+        milestone: "Autonomous Milestone Escrow Verification",
+      });
+      setTransactions((prev) => [newTx, ...prev]);
+    }
   };
 
-  const handleDisconnectAgent = () => {
+  const handleResetVault = async () => {
+    try {
+      const res = await fetch("/api/vault/reset", { method: "POST" });
+      if (res.ok) {
+        const data = await res.json();
+        setProfile((prev) => ({
+          ...prev,
+          testnet_balance: data.vaultBalance.available_balance,
+          available_balance: data.vaultBalance.available_balance,
+        }));
+        setTransactions([]);
+      }
+    } catch {
+      // Ignore
+    }
+  };
+
+  const handleDisconnectAgent = async () => {
     try {
       localStorage.removeItem("verisett_agent_connected");
       localStorage.removeItem("verisett_connected_agent_id");
       setIsAgentConnected(false);
+      await fetch("/api/agent/transactions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "disconnect" }),
+      });
     } catch {
       // Ignore
     }
@@ -261,9 +336,18 @@ export default function DashboardPage() {
                 <ShieldCheck className="w-4 h-4" />
               </div>
             </div>
-            <p className="text-2xl sm:text-3xl font-bold text-[#1C1A17] mt-3 font-mono">
-              {profile?.testnet_balance ? profile.testnet_balance.toLocaleString() : "0.00"} VRS
-            </p>
+            <div className="flex items-baseline justify-between mt-3">
+              <p className="text-2xl sm:text-3xl font-bold text-[#1C1A17] font-mono">
+                {profile?.testnet_balance !== undefined ? profile.testnet_balance.toLocaleString() : "10,000"} VRS
+              </p>
+              <button
+                onClick={handleResetVault}
+                title="Reset vault balance to 10,000 VRS"
+                className="text-[10px] font-mono text-[#8C8275] hover:text-[#9E7A45] underline cursor-pointer"
+              >
+                Reset Balance
+              </button>
+            </div>
             <div className="mt-3 flex items-center gap-1.5 text-[11px] font-mono text-[#9E7A45]">
               <span className="w-1.5 h-1.5 rounded-full bg-[#C59B5F]" />
               Deterministic Escrow Active
@@ -328,7 +412,21 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* 1. Real Working Last Month Line Graph with Volume Histogram */}
+        {/* 1. Live Agent-to-Agent Transfer Console (Google Antigravity & FastMCP) */}
+        <AgentLiveTransferConsole
+          availableBalance={profile?.testnet_balance ?? 10000}
+          onTransferSuccess={(tx, newBal) => {
+            setTransactions((prev) => [tx, ...prev]);
+            setProfile((prev) => ({
+              ...prev,
+              testnet_balance: newBal,
+              available_balance: newBal,
+            }));
+            setIsAgentConnected(true);
+          }}
+        />
+
+        {/* 2. Real Working Last Month Line Graph with Volume Histogram */}
         <AgentTransactionChart
           isAgentConnected={isAgentConnected}
           transactions={transactions}
@@ -336,7 +434,7 @@ export default function DashboardPage() {
           onExecuteTestSettlement={handleExecuteTestSettlement}
         />
 
-        {/* 2. PhonePe-Style Detailed Transaction History Ledger */}
+        {/* 3. PhonePe-Style Detailed Transaction History Ledger */}
         <AgentTransactionHistory
           isAgentConnected={isAgentConnected}
           transactions={transactions}

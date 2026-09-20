@@ -1,0 +1,11 @@
+{
+  "testnet_balance": 10000,
+  "available_balance": 10000,
+  "frozen_balance": 0,
+  "total_volume": 0,
+  "total_commission": 0,
+  "is_agent_connected": false,
+  "connected_agent_id": "agt_live_982b",
+  "transactions": [],
+  "last_updated": "2026-09-20T08:33:51.880Z"
+}
