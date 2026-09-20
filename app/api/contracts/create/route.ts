@@ -1,20 +1,71 @@
 import { NextRequest, NextResponse } from "next/server";
-import { recordAgentTransfer } from "@/lib/serverStore";
+import { recordAgentTransfer, recordVaultDeposit, getVaultState } from "@/lib/serverStore";
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json().catch(() => ({}));
+    const state = getVaultState();
 
     let amount = 25000;
     if (body.amount_cents) amount = Math.round(Number(body.amount_cents) / 100);
     else if (body.amount_inr) amount = Number(body.amount_inr);
     else if (body.amount) amount = Number(body.amount);
 
+    if (isNaN(amount) || amount <= 0) amount = 2500;
+
+    const headerAgentName = req.headers.get("x-agent-name");
+    const agentName =
+      headerAgentName ||
+      body.agent_name ||
+      body.agentName ||
+      body.payer_name ||
+      body.payer_id ||
+      body.from_agent ||
+      body.fromAgent ||
+      state.connected_agent_name ||
+      "Autonomous Agent A";
+
+    const isDeposit =
+      body.type === "deposit" ||
+      body.action === "deposit" ||
+      body.isDeposit === true ||
+      body.is_deposit === true;
+
+    if (isDeposit) {
+      const depositResult = recordVaultDeposit({
+        amountINR: amount,
+        agentName,
+        milestoneTitle: body.milestone_title || body.milestone || `Vault Liquidity Deposit by ${agentName}`,
+      });
+
+      return NextResponse.json({
+        success: true,
+        type: "DEPOSIT",
+        contract_id: depositResult.transaction.id,
+        amount_inr: amount,
+        status: "SETTLED",
+        transaction: depositResult.transaction,
+        vaultBalance: {
+          testnet_balance: depositResult.state.testnet_balance,
+          available_balance: depositResult.state.available_balance,
+        },
+      });
+    }
+
+    const toAgentName =
+      body.beneficiary_id ||
+      body.beneficiary_name ||
+      body.worker_id ||
+      body.worker_name ||
+      body.to_agent ||
+      body.toAgent ||
+      "Autonomous Counterparty Agent";
+
     const result = recordAgentTransfer({
       amountINR: amount,
-      fromAgentName: body.payer_id || body.payer_name || "Autonomous Payer Agent",
-      toAgentName: body.beneficiary_id || body.worker_id || "Autonomous Worker Agent",
-      milestoneTitle: body.milestone_id || body.milestone_title || "Programmatic Escrow Milestone",
+      fromAgentName: agentName,
+      toAgentName,
+      milestoneTitle: body.milestone_id || body.milestone_title || `Programmatic Escrow: ${agentName} -> ${toAgentName}`,
       status: "SUCCESSFUL",
     });
 

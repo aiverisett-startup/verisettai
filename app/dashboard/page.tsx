@@ -128,7 +128,7 @@ export default function DashboardPage() {
         if (res.ok) {
           const data = await res.json();
           if (data.success) {
-            if (data.transactions && Array.isArray(data.transactions) && data.transactions.length > 0) {
+            if (data.transactions && Array.isArray(data.transactions)) {
               setTransactions(data.transactions);
             }
             if (data.vaultBalance && data.vaultBalance.available_balance !== undefined) {
@@ -138,8 +138,8 @@ export default function DashboardPage() {
                 available_balance: data.vaultBalance.available_balance,
               }));
             }
-            if (data.isAgentConnected) {
-              setIsAgentConnected(true);
+            if (data.isAgentConnected !== undefined) {
+              setIsAgentConnected(Boolean(data.isAgentConnected));
             }
             if (data.connectedAgentName) {
               setConnectedAgentName(data.connectedAgentName);
