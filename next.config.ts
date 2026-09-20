@@ -48,7 +48,17 @@ const securityHeaders = [
     key: "X-XSS-Protection",
     value: "1; mode=block",
   },
-  // 8. Content Security Policy (CSP) tailored for Next.js, Supabase, Google SSO, and Fonts
+  // 8. Prevent cross-domain Flash and PDF policy injection
+  {
+    key: "X-Permitted-Cross-Domain-Policies",
+    value: "none",
+  },
+  // 9. Optimize DNS prefetching security
+  {
+    key: "X-DNS-Prefetch-Control",
+    value: "on",
+  },
+  // 10. Content Security Policy (CSP) tailored for Next.js, Supabase, Google SSO, and Fonts
   {
     key: "Content-Security-Policy",
     value: [

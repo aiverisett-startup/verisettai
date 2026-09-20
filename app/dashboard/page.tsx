@@ -1,12 +1,14 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { ShieldCheck, Plus, ExternalLink, Activity, ArrowRight, LogOut, User, Sparkles } from "lucide-react";
+import { ShieldCheck, Plus, ExternalLink, Activity, ArrowRight, LogOut, User, Sparkles, CheckCircle2, Zap, Cpu } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { ConnectAgentModal } from "@/components/ConnectAgentModal";
 import { LegalConsentModal } from "@/components/LegalConsentModal";
 import { VerisettLogo } from "@/components/VerisettLogo";
 import { GoldenBackgroundShapes } from "@/components/ui/GoldenBackgroundShapes";
+import { AgentTransactionChart } from "@/components/dashboard/AgentTransactionChart";
+import { AgentTransactionHistory } from "@/components/dashboard/AgentTransactionHistory";
 import { supabase } from "@/lib/supabase";
 
 interface ProfileData {
@@ -28,6 +30,7 @@ export default function DashboardPage() {
   const router = useRouter();
   const [modalOpen, setModalOpen] = useState(false);
   const [isConsentModalOpen, setIsConsentModalOpen] = useState(false);
+  const [isAgentConnected, setIsAgentConnected] = useState(false);
   const [currentUser, setCurrentUser] = useState<{ id?: string; email?: string } | null>(null);
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [userName, setUserName] = useState<string | null>(null);
@@ -38,8 +41,10 @@ export default function DashboardPage() {
     try {
       const email = localStorage.getItem("verisett_user_email");
       const name = localStorage.getItem("verisett_user_name");
+      const connected = localStorage.getItem("verisett_agent_connected") === "true";
       if (email) setUserEmail(email);
       if (name) setUserName(name);
+      if (connected) setIsAgentConnected(true);
     } catch {
       // Ignore
     }
@@ -239,19 +244,35 @@ export default function DashboardPage() {
           <div className="group relative rounded-2xl border border-[#EAE3D2] bg-white p-6 shadow-[0_4px_20px_rgba(197,155,95,0.06)] hover:border-[#C59B5F]/40 transition-all">
             <div className="flex items-center justify-between">
               <span className="text-xs font-medium text-[#8C8275] uppercase tracking-wider font-mono">Agent Handshake Status</span>
-              <div className="w-7 h-7 rounded-lg bg-[#FAF6EE] border border-[#EAE3D2] flex items-center justify-center text-[#C59B5F]">
-                <span className="w-2 h-2 rounded-full bg-[#C59B5F] animate-ping" />
+              <div className={`w-7 h-7 rounded-lg border flex items-center justify-center ${
+                isAgentConnected
+                  ? "bg-emerald-50 border-emerald-200 text-emerald-600"
+                  : "bg-[#FAF6EE] border-[#EAE3D2] text-[#C59B5F]"
+              }`}>
+                {isAgentConnected ? (
+                  <CheckCircle2 className="w-4 h-4" />
+                ) : (
+                  <span className="w-2 h-2 rounded-full bg-[#C59B5F] animate-ping" />
+                )}
               </div>
             </div>
-            <p className="text-2xl sm:text-3xl font-bold text-[#9E7A45] mt-3">Standby</p>
+            <p className={`text-2xl sm:text-3xl font-bold mt-3 ${isAgentConnected ? "text-emerald-700" : "text-[#9E7A45]"}`}>
+              {isAgentConnected ? "Connected" : "Standby"}
+            </p>
             <div className="mt-3 flex items-center gap-1.5 text-[11px] font-mono text-[#8C8275]">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#C59B5F]" />
-              Waiting for gateway ping
+              <span className={`w-1.5 h-1.5 rounded-full ${isAgentConnected ? "bg-emerald-500" : "bg-[#C59B5F]"}`} />
+              {isAgentConnected ? "FastMCP v2.4 Node: agt_live_982b" : "Waiting for gateway ping"}
             </div>
           </div>
         </div>
 
-        {/* Active Escrow Vaults Section */}
+        {/* 1. Real Working Stock-Market-Style Line Graph with Volume Histogram */}
+        <AgentTransactionChart />
+
+        {/* 2. PhonePe-Style Detailed Transaction History Ledger */}
+        <AgentTransactionHistory />
+
+        {/* 3. Active Escrow Vaults Section */}
         <div className="rounded-3xl border border-[#EAE3D2] bg-white p-6 md:p-8 shadow-[0_4px_24px_rgba(197,155,95,0.06)] space-y-4">
           <div className="flex items-center justify-between pb-4 border-b border-[#F0E9DC]">
             <h2 className="text-base sm:text-lg font-bold text-[#1C1A17] flex items-center gap-2">
@@ -305,7 +326,14 @@ export default function DashboardPage() {
       </div>
 
       {/* Connection Modal */}
-      <ConnectAgentModal isOpen={modalOpen} onClose={() => setModalOpen(false)} />
+      <ConnectAgentModal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onConnected={() => {
+          setIsAgentConnected(true);
+          localStorage.setItem("verisett_agent_connected", "true");
+        }}
+      />
 
       {/* Mandatory Privacy & Terms Gating Rail */}
       <LegalConsentModal

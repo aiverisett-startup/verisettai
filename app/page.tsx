@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { MinimalNav } from "@/components/landing/MinimalNav";
 import { TopAdBanner } from "@/components/landing/TopAdBanner";
 import { HeroSection } from "@/components/landing/HeroSection";
@@ -19,8 +19,10 @@ import { DeveloperPlayground, WorkerConfig } from "@/components/dashboard/Develo
 import { DepositModal } from "@/components/dashboard/DepositModal";
 import { VideoWalkthroughModal } from "@/components/landing/VideoWalkthroughModal";
 import { TimedLoginModal } from "@/components/auth/TimedLoginModal";
+import { LegalConsentModal } from "@/components/LegalConsentModal";
 import { GoldenBackgroundShapes } from "@/components/ui/GoldenBackgroundShapes";
 import { WebsiteEdgeShapes } from "@/components/ui/WebsiteEdgeShapes";
+import { supabase } from "@/lib/supabase";
 import {
   ContractRecord,
   EnvironmentMode,
@@ -42,6 +44,54 @@ export default function Home() {
   const [isDepositModalOpen, setIsDepositModalOpen] = useState<boolean>(false);
   const [isVideoModalOpen, setIsVideoModalOpen] = useState<boolean>(false);
   const [activeWorkerConfig, setActiveWorkerConfig] = useState<WorkerConfig | null>(null);
+  const [isConsentOpen, setIsConsentOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState<{ id?: string; email?: string } | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    const checkLegalConsent = async () => {
+      try {
+        const storedEmail = localStorage.getItem("verisett_user_email");
+        const acceptedLocally = localStorage.getItem("verisett_accepted_terms") === "true";
+
+        if (storedEmail && !acceptedLocally) {
+          if (isMounted) setIsConsentOpen(true);
+        }
+
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
+          if (isMounted) {
+            setCurrentUser({ id: session.user.id, email: session.user.email ?? undefined });
+          }
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("accepted_terms")
+            .eq("id", session.user.id)
+            .maybeSingle();
+
+          if (profile && !profile.accepted_terms && !acceptedLocally) {
+            if (isMounted) setIsConsentOpen(true);
+          }
+        }
+      } catch {
+        // Ignore errors
+      }
+    };
+
+    checkLegalConsent();
+
+    const handleAuthEvent = () => {
+      checkLegalConsent();
+    };
+
+    window.addEventListener("verisett_auth_change", handleAuthEvent);
+    window.addEventListener("storage", handleAuthEvent);
+    return () => {
+      isMounted = false;
+      window.removeEventListener("verisett_auth_change", handleAuthEvent);
+      window.removeEventListener("storage", handleAuthEvent);
+    };
+  }, []);
 
   const consoleSectionRef = useRef<HTMLDivElement>(null);
 
@@ -273,6 +323,13 @@ export default function Home() {
 
       {/* 15-Second Institutional Timed Login Gateway */}
       <TimedLoginModal delaySeconds={15} />
+
+      {/* Mandatory Privacy Policy & Terms Legal Consent Gate */}
+      <LegalConsentModal
+        isOpen={isConsentOpen}
+        user={currentUser}
+        onConsentSuccess={() => setIsConsentOpen(false)}
+      />
 
     </div>
   );
