@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getVaultState, recordAgentTransfer, setServerAgentConnected } from "@/lib/serverStore";
+import {
+  getVaultState,
+  recordAgentTransfer,
+  recordVaultDeposit,
+  setServerAgentConnected,
+} from "@/lib/serverStore";
 
 export async function GET() {
   const state = getVaultState();
@@ -14,6 +19,7 @@ export async function GET() {
     },
     isAgentConnected: state.is_agent_connected,
     connectedAgentId: state.connected_agent_id,
+    connectedAgentName: state.connected_agent_name,
     transactions: state.transactions,
     lastUpdated: state.last_updated,
   });
@@ -22,10 +28,7 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json().catch(() => ({}));
-
-    // Extract authorization key if present
-    const authHeader = req.headers.get("authorization") || "";
-    const apiKey = body.apiKey || body.api_key || authHeader.replace(/^Bearer\s+/i, "");
+    const state = getVaultState();
 
     // Resolve amount in INR
     let amount = 1000;
@@ -38,14 +41,55 @@ export async function POST(req: NextRequest) {
       amount = 2500;
     }
 
-    // Resolve Agent Names
+    // Check if this is an Agent Vault DEPOSIT request (adding money to vault!)
+    const isDeposit =
+      body.type === "deposit" ||
+      body.action === "deposit" ||
+      body.isDeposit === true ||
+      body.toAgent === "vault" ||
+      body.to === "vault";
+
+    if (isDeposit) {
+      const agentName =
+        body.fromAgent ||
+        body.from_agent ||
+        body.from ||
+        body.agent_name ||
+        body.agentName ||
+        state.connected_agent_name ||
+        "Autonomous Agent";
+
+      const depositResult = recordVaultDeposit({
+        amountINR: amount,
+        agentName,
+        agentModel: body.agentModel || body.model || "FastMCP Client v2.4",
+        milestoneTitle: body.milestone || `Vault Liquidity Deposit by ${agentName}`,
+      });
+
+      return NextResponse.json({
+        success: true,
+        type: "DEPOSIT",
+        message: `Successfully deposited ₹${amount.toLocaleString("en-IN")} into Vault by ${agentName}`,
+        transaction: depositResult.transaction,
+        vaultBalance: {
+          testnet_balance: depositResult.state.testnet_balance,
+          available_balance: depositResult.state.available_balance,
+          total_volume: depositResult.state.total_volume,
+        },
+        isAgentConnected: true,
+        connectedAgentName: depositResult.state.connected_agent_name,
+      });
+    }
+
+    // Resolve Dynamic Agent Names (No hardcoded strings)
     const fromAgentName =
       body.fromAgent ||
       body.from_agent ||
       body.from ||
       body.payer ||
       body.payer_name ||
-      "Google Antigravity Agent #1";
+      state.connected_agent_name ||
+      "Autonomous Agent A";
 
     const toAgentName =
       body.toAgent ||
@@ -55,7 +99,7 @@ export async function POST(req: NextRequest) {
       body.worker_name ||
       body.beneficiary ||
       body.beneficiary_id ||
-      "Google Antigravity Agent #2";
+      "Autonomous Agent B";
 
     const milestoneTitle =
       body.milestone ||
@@ -64,7 +108,7 @@ export async function POST(req: NextRequest) {
       body.task ||
       body.task_description ||
       body.description ||
-      "Autonomous Agent-to-Agent Transfer & Settlement";
+      `Autonomous Settlement: ${fromAgentName} -> ${toAgentName}`;
 
     const status =
       String(body.status || "SUCCESSFUL").toUpperCase() === "FAILED"
@@ -85,6 +129,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
+      type: "TRANSFER",
       message: `Transaction settled successfully for ₹${amount.toLocaleString("en-IN")}`,
       transaction: result.transaction,
       vaultBalance: {
@@ -95,6 +140,7 @@ export async function POST(req: NextRequest) {
         total_commission: result.state.total_commission,
       },
       isAgentConnected: true,
+      connectedAgentName: result.state.connected_agent_name,
     });
   } catch (error: any) {
     console.error("Error processing agent transfer:", error);

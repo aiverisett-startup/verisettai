@@ -14,6 +14,7 @@ export async function GET() {
     },
     isAgentConnected: state.is_agent_connected,
     connectedAgentId: state.connected_agent_id,
+    connectedAgentName: state.connected_agent_name,
     transactions: state.transactions,
     lastUpdated: state.last_updated,
   });
@@ -25,8 +26,18 @@ export async function POST(req: NextRequest) {
     const action = body.action;
 
     if (action === "connect") {
-      const state = setServerAgentConnected(true, body.agentId);
-      return NextResponse.json({ success: true, isAgentConnected: true, state });
+      const state = setServerAgentConnected(
+        true,
+        body.agentId,
+        body.agentName || body.agent_name,
+        body.agentModel || body.agent_model
+      );
+      return NextResponse.json({
+        success: true,
+        isAgentConnected: true,
+        connectedAgentName: state.connected_agent_name,
+        state,
+      });
     }
 
     if (action === "disconnect") {
@@ -35,12 +46,26 @@ export async function POST(req: NextRequest) {
     }
 
     // Default: record transaction
+    const currentState = getVaultState();
     const amount = Number(body.amountINR || body.amount || 2500);
+    const fromAgentName =
+      body.fromAgentName ||
+      body.fromAgent ||
+      body.payer ||
+      currentState.connected_agent_name ||
+      "Autonomous Agent A";
+
+    const toAgentName =
+      body.toAgentName ||
+      body.toAgent ||
+      body.worker ||
+      "Autonomous Agent B";
+
     const result = recordAgentTransfer({
       amountINR: amount,
-      fromAgentName: body.fromAgentName || body.fromAgent || "Google Antigravity Agent #1",
-      toAgentName: body.toAgentName || body.toAgent || "Google Antigravity Agent #2",
-      milestoneTitle: body.milestoneTitle || "Autonomous Real-Time Milestone Settlement",
+      fromAgentName,
+      toAgentName,
+      milestoneTitle: body.milestoneTitle || `Autonomous Milestone: ${fromAgentName} -> ${toAgentName}`,
       status: body.status || "SUCCESSFUL",
       failureReason: body.failureReason,
     });

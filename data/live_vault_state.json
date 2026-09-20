@@ -5,7 +5,9 @@
   "total_volume": 0,
   "total_commission": 0,
   "is_agent_connected": false,
-  "connected_agent_id": "agt_live_982b",
+  "connected_agent_id": "agt_live_node",
+  "connected_agent_name": "FastMCP Autonomous Agent",
+  "connected_agent_model": "MCP Client v2.4",
   "transactions": [],
-  "last_updated": "2026-09-20T08:33:51.880Z"
+  "last_updated": "2026-09-20T08:48:26.595Z"
 }

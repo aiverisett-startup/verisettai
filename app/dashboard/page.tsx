@@ -38,6 +38,7 @@ export default function DashboardPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [isConsentModalOpen, setIsConsentModalOpen] = useState(false);
   const [isAgentConnected, setIsAgentConnected] = useState(false);
+  const [connectedAgentName, setConnectedAgentName] = useState<string>("Autonomous Agent");
   const [transactions, setTransactions] = useState<TransactionItem[]>([]);
   const [currentUser, setCurrentUser] = useState<{ id?: string; email?: string } | null>(null);
   const [userEmail, setUserEmail] = useState<string | null>(null);
@@ -50,9 +51,11 @@ export default function DashboardPage() {
       const email = localStorage.getItem("verisett_user_email");
       const name = localStorage.getItem("verisett_user_name");
       const connected = localStorage.getItem("verisett_agent_connected") === "true";
+      const savedAgentName = localStorage.getItem("verisett_connected_agent_name");
       if (email) setUserEmail(email);
       if (name) setUserName(name);
       if (connected) setIsAgentConnected(true);
+      if (savedAgentName) setConnectedAgentName(savedAgentName);
     } catch {
       // Ignore
     }
@@ -138,6 +141,14 @@ export default function DashboardPage() {
             if (data.isAgentConnected) {
               setIsAgentConnected(true);
             }
+            if (data.connectedAgentName) {
+              setConnectedAgentName(data.connectedAgentName);
+              try {
+                localStorage.setItem("verisett_connected_agent_name", data.connectedAgentName);
+              } catch {
+                // Ignore
+              }
+            }
           }
         }
       } catch {
@@ -162,13 +173,21 @@ export default function DashboardPage() {
   }, []);
 
   const handleExecuteTestSettlement = async (isSuccess: boolean = true) => {
+    const sender =
+      connectedAgentName && connectedAgentName !== "Autonomous Agent"
+        ? connectedAgentName
+        : userName
+        ? `${userName}'s Agent`
+        : "Autonomous Agent A";
+    const receiver = "Counterparty Agent Node";
+
     try {
       const res = await fetch("/api/transfer", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          fromAgent: userName ? `${userName}'s Client Agent` : "Google Antigravity Agent #1",
-          toAgent: "Google Antigravity Agent #2",
+          fromAgent: sender,
+          toAgent: receiver,
           amount: 2500,
           status: isSuccess ? "SUCCESSFUL" : "FAILED",
           milestone: "Autonomous Milestone Escrow Verification",
@@ -193,8 +212,8 @@ export default function DashboardPage() {
       const newTx = createAgentEscrowTransaction({
         amountINR: 2500,
         isSuccess,
-        payerName: userName ? `${userName}'s Client Agent` : "Google Antigravity Agent #1",
-        workerName: "Google Antigravity Agent #2",
+        payerName: sender,
+        workerName: receiver,
         milestone: "Autonomous Milestone Escrow Verification",
       });
       setTransactions((prev) => [newTx, ...prev]);
@@ -222,7 +241,9 @@ export default function DashboardPage() {
     try {
       localStorage.removeItem("verisett_agent_connected");
       localStorage.removeItem("verisett_connected_agent_id");
+      localStorage.removeItem("verisett_connected_agent_name");
       setIsAgentConnected(false);
+      setConnectedAgentName("Autonomous Agent");
       await fetch("/api/agent/transactions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -386,15 +407,22 @@ export default function DashboardPage() {
               </div>
             </div>
             <div className="flex items-center justify-between mt-3">
-              <p className={`text-2xl sm:text-3xl font-bold ${isAgentConnected ? "text-emerald-700" : "text-[#9E7A45]"}`}>
-                {isAgentConnected ? "Connected" : "Standby"}
-              </p>
+              <div>
+                <p className={`text-2xl sm:text-3xl font-bold ${isAgentConnected ? "text-emerald-700" : "text-[#9E7A45]"}`}>
+                  {isAgentConnected ? "Connected" : "Standby"}
+                </p>
+                {isAgentConnected && (
+                  <p className="text-xs font-semibold text-[#1C1A17] mt-0.5 font-mono truncate max-w-[210px]" title={connectedAgentName}>
+                    {connectedAgentName}
+                  </p>
+                )}
+              </div>
               {isAgentConnected ? (
                 <button
                   onClick={handleDisconnectAgent}
                   className="text-[10px] font-mono text-[#8C8275] hover:text-rose-600 underline cursor-pointer"
                 >
-                  Disconnect Agent
+                  Disconnect
                 </button>
               ) : (
                 <button
@@ -407,14 +435,15 @@ export default function DashboardPage() {
             </div>
             <div className="mt-2 flex items-center gap-1.5 text-[11px] font-mono text-[#8C8275]">
               <span className={`w-1.5 h-1.5 rounded-full ${isAgentConnected ? "bg-emerald-500" : "bg-[#C59B5F]"}`} />
-              {isAgentConnected ? "FastMCP v2.4 Node: agt_live_active" : "Waiting for gateway handshake"}
+              {isAgentConnected ? `FastMCP Active` : "Waiting for gateway handshake"}
             </div>
           </div>
         </div>
 
-        {/* 1. Live Agent-to-Agent Transfer Console (Google Antigravity & FastMCP) */}
+        {/* 1. Live Agent-to-Agent Transfer Console (FastMCP & REST) */}
         <AgentLiveTransferConsole
           availableBalance={profile?.testnet_balance ?? 10000}
+          connectedAgentName={connectedAgentName}
           onTransferSuccess={(tx, newBal) => {
             setTransactions((prev) => [tx, ...prev]);
             setProfile((prev) => ({
@@ -499,8 +528,16 @@ export default function DashboardPage() {
       <ConnectAgentModal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
-        onConnected={() => {
+        onConnected={(name) => {
           setIsAgentConnected(true);
+          if (name) {
+            setConnectedAgentName(name);
+            try {
+              localStorage.setItem("verisett_connected_agent_name", name);
+            } catch {
+              // Ignore
+            }
+          }
           localStorage.setItem("verisett_agent_connected", "true");
         }}
       />

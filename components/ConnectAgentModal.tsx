@@ -8,7 +8,7 @@ import { useAuthUser } from "@/lib/useAuthUser";
 interface ConnectAgentModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onConnected?: () => void;
+  onConnected?: (agentName?: string) => void;
 }
 
 type ConnectionType = "gateway" | "mcp" | "apikey";
@@ -20,6 +20,7 @@ export function ConnectAgentModal({ isOpen, onClose, onConnected }: ConnectAgent
   const [revealed, setRevealed] = useState(false);
   const [copied, setCopied] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
+  const [customAgentName, setCustomAgentName] = useState<string>("");
 
   // Live runtime credentials derived from authenticated session
   const userKeySeed = user
@@ -244,13 +245,30 @@ export function ConnectAgentModal({ isOpen, onClose, onConnected }: ConnectAgent
             </div>
           )}
 
+          {/* Real Agent Name Input */}
+          <div className="mt-4 p-3 rounded-2xl bg-[#FAF8F5] border border-[#EAE3D2] space-y-1.5">
+            <label className="block text-[11px] font-mono text-[#8C8275] uppercase font-semibold">
+              Agent Name (Exact Real Name to Display)
+            </label>
+            <input
+              type="text"
+              value={customAgentName}
+              onChange={(e) => setCustomAgentName(e.target.value)}
+              placeholder="e.g. Claude Desktop, FastMCP Agent, My Trading Bot"
+              className="w-full rounded-xl border border-[#EAE3D2] bg-white px-3 py-2 text-xs font-semibold text-[#1C1A17] font-mono focus:border-[#D4AF37] focus:outline-none transition shadow-2xs"
+            />
+            <p className="text-[10px] text-[#8C8275]">
+              This exact name will be saved and displayed on your live settlement dashboard and clearing receipts.
+            </p>
+          </div>
+
           {/* Live Handshake Status Indicator */}
           <div className="mt-3 flex items-center justify-between text-[11px] text-[#8C8275]">
             <span className="flex items-center gap-1.5 text-[#8C8275] font-mono">
               <span className="w-2 h-2 rounded-full bg-[#C59B5F] animate-pulse"></span>
               Listening for initial agent handshake...
             </span>
-            <span className="text-[#8C8275]">Never share credentials publicly</span>
+            <span className="text-[#8C8275]">FastMCP Protocol v2.4</span>
           </div>
         </div>
 
@@ -283,12 +301,30 @@ export function ConnectAgentModal({ isOpen, onClose, onConnected }: ConnectAgent
                 <span>{copied ? "Copied" : "Copy Config"}</span>
               </button>
               <button
-                onClick={() => {
+                onClick={async () => {
+                  const resolvedName =
+                    customAgentName.trim() ||
+                    (user?.name ? `${user.name}'s Agent` : "FastMCP Autonomous Agent");
+
                   if (typeof window !== "undefined") {
                     localStorage.setItem("verisett_agent_connected", "true");
                     localStorage.setItem("verisett_connected_agent_id", agentId);
+                    localStorage.setItem("verisett_connected_agent_name", resolvedName);
                   }
-                  if (onConnected) onConnected();
+                  try {
+                    await fetch("/api/agent/transactions", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({
+                        action: "connect",
+                        agentId,
+                        agentName: resolvedName,
+                      }),
+                    });
+                  } catch {
+                    // Ignore
+                  }
+                  if (onConnected) onConnected(resolvedName);
                   onClose();
                 }}
                 className="flex items-center gap-2 rounded-xl bg-[#C59B5F] hover:bg-[#B38A4F] px-4 py-2 text-xs font-semibold text-white transition cursor-pointer shadow-md shadow-[#C59B5F]/20 hover:scale-[1.02] active:scale-[0.98]"
