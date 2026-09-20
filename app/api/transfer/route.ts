@@ -137,10 +137,28 @@ export async function POST(req: NextRequest) {
         ? "FAILED"
         : "SUCCESSFUL";
 
+    const rawApiKey =
+      req.headers.get("authorization")?.replace(/^Bearer\s+/i, "").trim() ||
+      req.headers.get("x-api-key") ||
+      body.apiKey ||
+      body.api_key ||
+      "vrs_live_aiverisettgmailcom89f72b";
+
+    let resolvedFrom = fromAgentName;
+    try {
+      const { getAgentAccount } = await import("@/lib/verisettDb");
+      const authAcc = getAgentAccount(rawApiKey);
+      if (authAcc) {
+        resolvedFrom = authAcc.name;
+      }
+    } catch {
+      // fallback
+    }
+
     // 1. Record the transaction in serverStore
     const result = recordAgentTransfer({
       amountINR: amount,
-      fromAgentName,
+      fromAgentName: resolvedFrom,
       fromAgentModel: body.fromAgentModel || body.from_model || detected.model || "FastMCP v2.4 Node",
       toAgentName,
       toAgentModel: body.toAgentModel || body.to_model || "Autonomous Worker Node",
@@ -153,11 +171,12 @@ export async function POST(req: NextRequest) {
     try {
       const { recordTransferInDb } = await import("@/lib/verisettDb");
       recordTransferInDb({
-        fromAgentName,
+        fromAgentName: resolvedFrom,
         toAgentName,
         amountCredits: amount,
         status,
         milestone: milestoneTitle,
+        apiKey: rawApiKey,
       });
     } catch (dbErr) {
       console.warn("Could not sync transfer to verisett.db:", dbErr);

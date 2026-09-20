@@ -325,6 +325,7 @@ export function recordTransferInDb(params: {
   amountCredits: number;
   status?: "SUCCESSFUL" | "FAILED";
   milestone?: string;
+  apiKey?: string;
 }): {
   contractId: string;
   newPayerBalance: number;
@@ -335,33 +336,57 @@ export function recordTransferInDb(params: {
   const fee = Math.max(1, Math.round(amount * 0.015));
   const workerPayment = amount - fee;
   const isSuccess = params.status !== "FAILED";
+  const now = new Date().toISOString().replace("T", " ").slice(0, 26);
 
-  // Resolve payer account
-  const payerStmt = db.prepare(`
-    SELECT id, name, balance_cents FROM accounts
-    WHERE name = ? OR name LIKE '%Aiverisett%' OR id = '827fe271-637a-414c-8fbc-5ba6b99f3bed'
-    LIMIT 1
-  `);
-  let payer = payerStmt.get(params.fromAgentName || "") as any;
+  // 1. Resolve payer account (via apiKey if available, then by name / ID fallback)
+  let payer: any = null;
+  if (params.apiKey) {
+    const acc = getAgentAccount(params.apiKey);
+    if (acc) {
+      payer = db.prepare("SELECT id, name, balance_cents FROM accounts WHERE id = ?").get(acc.id);
+    }
+  }
+
+  if (!payer) {
+    const payerStmt = db.prepare(`
+      SELECT id, name, balance_cents FROM accounts
+      WHERE name = ? OR name LIKE '%Aiverisett%' OR id = '827fe271-637a-414c-8fbc-5ba6b99f3bed'
+      LIMIT 1
+    `);
+    payer = payerStmt.get(params.fromAgentName || "") as any;
+  }
+
   if (!payer) {
     payer = db.prepare("SELECT id, name, balance_cents FROM accounts WHERE role = 'PAYER' LIMIT 1").get() as any;
   }
 
-  // Resolve worker account
-  const workerStmt = db.prepare(`
-    SELECT id, name, balance_cents FROM accounts
-    WHERE name = ? OR role = 'WORKER'
-    ORDER BY updated_at DESC
-    LIMIT 1
-  `);
-  let worker = workerStmt.get(params.toAgentName || "") as any;
+  // 2. Resolve worker account (dynamically register if new agent name)
+  let worker: any = null;
+  if (params.toAgentName) {
+    worker = db.prepare("SELECT id, name, balance_cents FROM accounts WHERE name = ? LIMIT 1").get(params.toAgentName) as any;
+    if (!worker) {
+      const workerId = crypto.randomUUID();
+      const dummyHash = crypto.createHash("sha256").update(workerId).digest("hex");
+      try {
+        db.prepare(`
+          INSERT INTO accounts (id, api_key_hash, name, role, balance_cents, frozen_cents, currency, created_at, updated_at)
+          VALUES (?, ?, ?, 'WORKER', 0, 0, 'USD', ?, ?)
+        `).run(workerId, dummyHash, params.toAgentName, now, now);
+        worker = { id: workerId, name: params.toAgentName, balance_cents: 0 };
+      } catch {
+        worker = db.prepare("SELECT id, name, balance_cents FROM accounts WHERE role = 'WORKER' ORDER BY updated_at DESC LIMIT 1").get() as any;
+      }
+    }
+  }
 
-  // Resolve treasury account
+  if (!worker) {
+    worker = db.prepare("SELECT id, name, balance_cents FROM accounts WHERE role = 'WORKER' ORDER BY updated_at DESC LIMIT 1").get() as any;
+  }
+
+  // 3. Resolve treasury account
   const treasuryStmt = db.prepare("SELECT id, balance_cents FROM accounts WHERE id = '00000000-0000-0000-0000-000000000001'");
   let treasury = treasuryStmt.get() as any;
-
   const contractId = crypto.randomUUID();
-  const now = new Date().toISOString().replace("T", " ").slice(0, 26);
   const contractStatus = isSuccess ? "SETTLED" : "DISPUTED";
 
   // Insert contract
@@ -515,4 +540,23 @@ export function recordDepositInDb(params: {
   };
 
   return { newBalance, transaction };
+}
+
+/**
+ * Reset an agent's balance back to the starting testnet balance (169,000 Credits).
+ */
+export function resetAgentBalanceInDb(agentName?: string, defaultBalance = 169000): number {
+  const db = getDb();
+  const now = new Date().toISOString().replace("T", " ").slice(0, 26);
+  const stmt = db.prepare(`
+    SELECT id, name FROM accounts
+    WHERE name = ? OR name LIKE '%Aiverisett%' OR id = '827fe271-637a-414c-8fbc-5ba6b99f3bed'
+    LIMIT 1
+  `);
+  const payer = stmt.get(agentName || "") as any;
+  if (payer) {
+    db.prepare("UPDATE accounts SET balance_cents = ?, updated_at = ? WHERE id = ?").run(defaultBalance, now, payer.id);
+    return defaultBalance;
+  }
+  return defaultBalance;
 }

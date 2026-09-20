@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
         if (isClosed) return;
         try {
           const agent = getAgentAccount(activeKey);
-          const { contracts, ledger_entries, transactions } = getTransactions(30);
+          const { contracts, ledger_entries, transactions } = getTransactions(50);
 
           const payload = JSON.stringify({
             agent,

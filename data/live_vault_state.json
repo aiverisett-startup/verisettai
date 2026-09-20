@@ -1,25 +1,287 @@
 {
-  "testnet_balance": 10000,
-  "available_balance": 10000,
+  "testnet_balance": 18000,
+  "available_balance": 18000,
   "frozen_balance": 0,
-  "total_volume": 0,
-  "total_commission": 0,
-  "is_agent_connected": false,
+  "total_volume": 32000,
+  "total_commission": 182,
+  "is_agent_connected": true,
   "connected_agent_id": "agt_live_node",
-  "connected_agent_name": "Autonomous Settlement Agent",
-  "connected_agent_model": "FastMCP Protocol v2.4",
-  "transactions": [],
+  "connected_agent_name": "Aiverisett Primary Payer Agent",
+  "connected_agent_model": "Header-Defined Agent",
+  "transactions": [
+    {
+      "id": "TXN-VRS-2026-344065",
+      "fromAgent": {
+        "name": "Aiverisett Primary Payer Agent",
+        "model": "FastMCP Institutional Payer Agent v2.4",
+        "avatarBg": "bg-amber-600",
+        "agentId": "agt_src_3440"
+      },
+      "toAgent": {
+        "name": "Gemini-Flash-Extractor (Worker)",
+        "model": "Autonomous Deliverable Specialist",
+        "avatarBg": "bg-emerald-600",
+        "agentId": "agt_dest_3440"
+      },
+      "amountINR": 1500,
+      "commissionRate": 0.015,
+      "status": "SUCCESSFUL",
+      "timestamp": "Today at 09:50 PM • Sep 20, 2026",
+      "dateStr": "2026-09-20",
+      "timeStr": "09:50 PM",
+      "milestoneTitle": "Cross-Agent FastMCP Protocol Latency & Diagnostics Benchmark",
+      "sha256Proof": "0x22ca8e66cee368d0df0345605379c37ceb40dbd96e15f96dee3e78a24977dccc",
+      "clearingRail": "FastMCP Escrow Protocol v2.4",
+      "direction": "SENT"
+    },
+    {
+      "id": "TXN-VRS-2026-609635",
+      "fromAgent": {
+        "name": "Aiverisett Primary Payer Agent",
+        "model": "FastMCP Institutional Payer Agent v2.4",
+        "avatarBg": "bg-amber-600",
+        "agentId": "agt_src_6096"
+      },
+      "toAgent": {
+        "name": "Gemini-Flash-Extractor (Worker)",
+        "model": "Autonomous Deliverable Specialist",
+        "avatarBg": "bg-emerald-600",
+        "agentId": "agt_dest_6096"
+      },
+      "amountINR": 4000,
+      "commissionRate": 0.015,
+      "status": "SUCCESSFUL",
+      "timestamp": "Today at 09:50 PM • Sep 20, 2026",
+      "dateStr": "2026-09-20",
+      "timeStr": "09:50 PM",
+      "milestoneTitle": "Smart Escrow Reentrancy & Double-Spend Security Audit",
+      "sha256Proof": "0x9154f343850b9eb727e294ba03ef271963ca3af9c711736cd67e8090b2bc448d",
+      "clearingRail": "FastMCP Escrow Protocol v2.4",
+      "direction": "SENT"
+    },
+    {
+      "id": "TXN-VRS-2026-212522",
+      "fromAgent": {
+        "name": "Aiverisett Primary Payer Agent",
+        "model": "FastMCP Institutional Payer Agent v2.4",
+        "avatarBg": "bg-amber-600",
+        "agentId": "agt_src_2125"
+      },
+      "toAgent": {
+        "name": "Gemini-Flash-Extractor (Worker)",
+        "model": "Autonomous Deliverable Specialist",
+        "avatarBg": "bg-emerald-600",
+        "agentId": "agt_dest_2125"
+      },
+      "amountINR": 2500,
+      "commissionRate": 0.015,
+      "status": "SUCCESSFUL",
+      "timestamp": "Today at 09:50 PM • Sep 20, 2026",
+      "dateStr": "2026-09-20",
+      "timeStr": "09:50 PM",
+      "milestoneTitle": "Autonomous Financial Data Synthesis: NVDA Q3 Enterprise Metrics",
+      "sha256Proof": "0x1f0f2cab24c58347065f6fab54386ebbc69f1047f51be7c4b8e7eef0e5a45e1b",
+      "clearingRail": "FastMCP Escrow Protocol v2.4",
+      "direction": "SENT"
+    },
+    {
+      "id": "TXN-VRS-2026-353390",
+      "fromAgent": {
+        "name": "Alpha Capital Orchestrator",
+        "model": "FastMCP v2.4 Autonomous Client",
+        "avatarBg": "bg-amber-600",
+        "agentId": "agt_src_3533"
+      },
+      "toAgent": {
+        "name": "Apex Intelligence Worker",
+        "model": "FastMCP v2.4 Autonomous Worker",
+        "avatarBg": "bg-emerald-600",
+        "agentId": "agt_dest_3533"
+      },
+      "amountINR": 2000,
+      "commissionRate": 0.015,
+      "status": "FAILED",
+      "timestamp": "Today at 03:07 PM • Sep 20, 2026",
+      "dateStr": "2026-09-20",
+      "timeStr": "03:07 PM",
+      "milestoneTitle": "Digital Lock Escrow: MALFORMED_DELIVERABLE_TEST (ORD-072864)",
+      "sha256Proof": "0x739740e6640757d2c0ecefc7e651ddd56457bc5c5113a063de88db3785bceb98",
+      "clearingRail": "FastMCP Escrow Protocol v2.4",
+      "direction": "SENT",
+      "failureReason": "Deliverable reported status 'FAILED' instead of 'COMPLETED'."
+    },
+    {
+      "id": "TXN-VRS-2026-598101",
+      "fromAgent": {
+        "name": "Alpha Capital Orchestrator",
+        "model": "FastMCP v2.4 Autonomous Client",
+        "avatarBg": "bg-amber-600",
+        "agentId": "agt_src_5981"
+      },
+      "toAgent": {
+        "name": "Apex Intelligence Worker",
+        "model": "FastMCP v2.4 Autonomous Worker",
+        "avatarBg": "bg-emerald-600",
+        "agentId": "agt_dest_5981"
+      },
+      "amountINR": 1500,
+      "commissionRate": 0.015,
+      "status": "SUCCESSFUL",
+      "timestamp": "Today at 03:07 PM • Sep 20, 2026",
+      "dateStr": "2026-09-20",
+      "timeStr": "03:07 PM",
+      "milestoneTitle": "Digital Lock Escrow: SMART_CONTRACT_SECURITY_AUDIT (ORD-072809)",
+      "sha256Proof": "0xd1dfd1cd72f737d5f382b2ff9a1ebcb05ddccb2f13f2e2270497e112fef343e8",
+      "clearingRail": "FastMCP Escrow Protocol v2.4",
+      "direction": "SENT"
+    },
+    {
+      "id": "TXN-VRS-2026-104659",
+      "fromAgent": {
+        "name": "Alpha Capital Orchestrator",
+        "model": "FastMCP v2.4 Autonomous Client",
+        "avatarBg": "bg-amber-600",
+        "agentId": "agt_src_1046"
+      },
+      "toAgent": {
+        "name": "Apex Intelligence Worker",
+        "model": "FastMCP v2.4 Autonomous Worker",
+        "avatarBg": "bg-emerald-600",
+        "agentId": "agt_dest_1046"
+      },
+      "amountINR": 2500,
+      "commissionRate": 0.015,
+      "status": "SUCCESSFUL",
+      "timestamp": "Today at 03:07 PM • Sep 20, 2026",
+      "dateStr": "2026-09-20",
+      "timeStr": "03:07 PM",
+      "milestoneTitle": "Digital Lock Escrow: FINANCIAL_DATA_ANALYSIS (ORD-072743)",
+      "sha256Proof": "0x601ddaae78c1b7de74f5a1c685039a31527633afa7792d8d0c904dc3235a0617",
+      "clearingRail": "FastMCP Escrow Protocol v2.4",
+      "direction": "SENT"
+    },
+    {
+      "id": "TXN-VRS-2026-583789",
+      "fromAgent": {
+        "name": "Alpha Capital Orchestrator",
+        "model": "FastMCP v2.4 Autonomous Client",
+        "avatarBg": "bg-emerald-600",
+        "agentId": "agt_dep_5837"
+      },
+      "toAgent": {
+        "name": "Verisett Vault Custody",
+        "model": "Autonomous Clearinghouse Vault",
+        "avatarBg": "bg-[#9E7A45]",
+        "agentId": "vault_custody_01"
+      },
+      "amountINR": 10000,
+      "commissionRate": 0,
+      "status": "SUCCESSFUL",
+      "timestamp": "Today at 03:07 PM • Sep 20, 2026",
+      "dateStr": "2026-09-20",
+      "timeStr": "03:07 PM",
+      "milestoneTitle": "Digital Lock Liquidity Inflow by Alpha Capital Orchestrator",
+      "sha256Proof": "0x1a3bb8a666630a8bbd5d689d40bd246ee2d6570e56fc19f1d632b3990f862b9e",
+      "clearingRail": "FastMCP Escrow Protocol v2.4",
+      "direction": "RECEIVED"
+    },
+    {
+      "id": "TXN-VRS-2026-555233",
+      "fromAgent": {
+        "name": "Alpha Capital Orchestrator",
+        "model": "FastMCP v2.4 Autonomous Client",
+        "avatarBg": "bg-emerald-600",
+        "agentId": "agt_dep_5552"
+      },
+      "toAgent": {
+        "name": "Verisett Vault Custody",
+        "model": "Autonomous Clearinghouse Vault",
+        "avatarBg": "bg-[#9E7A45]",
+        "agentId": "vault_custody_01"
+      },
+      "amountINR": 10000,
+      "commissionRate": 0,
+      "status": "SUCCESSFUL",
+      "timestamp": "Today at 03:07 PM • Sep 20, 2026",
+      "dateStr": "2026-09-20",
+      "timeStr": "03:07 PM",
+      "milestoneTitle": "Digital Lock Liquidity Inflow by Alpha Capital Orchestrator",
+      "sha256Proof": "0x4bd1933e08fe664f762d09a74a221d19cf6ee2bf5f80649de929851b83c1ac41",
+      "clearingRail": "FastMCP Escrow Protocol v2.4",
+      "direction": "RECEIVED"
+    }
+  ],
   "vault_deployments": [
+    {
+      "id": "VLT-ESC-344065",
+      "title": "Escrow: Aiverisett Primary Payer Agent -> Gemini-Flash-Extractor (Worker)",
+      "amount": 1500,
+      "currency": "VRS",
+      "status": "Settled",
+      "allocatedAgent": "Aiverisett Primary Payer Agent",
+      "createdAt": "2026-09-20T16:20:39.551Z",
+      "rail": "FastMCP Escrow Protocol v2.4"
+    },
+    {
+      "id": "VLT-ESC-609635",
+      "title": "Escrow: Aiverisett Primary Payer Agent -> Gemini-Flash-Extractor (Worker)",
+      "amount": 18000,
+      "currency": "VRS",
+      "status": "Settled",
+      "allocatedAgent": "Aiverisett Primary Payer Agent",
+      "createdAt": "2026-09-20T16:20:37.709Z",
+      "rail": "FastMCP Escrow Protocol v2.4"
+    },
+    {
+      "id": "VLT-ESC-212522",
+      "title": "Escrow: Aiverisett Primary Payer Agent -> Gemini-Flash-Extractor (Worker)",
+      "amount": 19500,
+      "currency": "VRS",
+      "status": "Settled",
+      "allocatedAgent": "Aiverisett Primary Payer Agent",
+      "createdAt": "2026-09-20T16:20:35.665Z",
+      "rail": "FastMCP Escrow Protocol v2.4"
+    },
+    {
+      "id": "VLT-ESC-353390",
+      "title": "Escrow: Alpha Capital Orchestrator -> Apex Intelligence Worker",
+      "amount": 23500,
+      "currency": "VRS",
+      "status": "Active",
+      "allocatedAgent": "Aiverisett Primary Payer Agent",
+      "createdAt": "2026-09-20T09:37:52.894Z",
+      "rail": "FastMCP Escrow Protocol v2.4"
+    },
+    {
+      "id": "VLT-ESC-598101",
+      "title": "Escrow: Alpha Capital Orchestrator -> Apex Intelligence Worker",
+      "amount": 26000,
+      "currency": "VRS",
+      "status": "Settled",
+      "allocatedAgent": "Alpha Capital Orchestrator",
+      "createdAt": "2026-09-20T09:37:52.841Z",
+      "rail": "FastMCP Escrow Protocol v2.4"
+    },
+    {
+      "id": "VLT-ESC-104659",
+      "title": "Escrow: Alpha Capital Orchestrator -> Apex Intelligence Worker",
+      "amount": 26000,
+      "currency": "VRS",
+      "status": "Settled",
+      "allocatedAgent": "Alpha Capital Orchestrator",
+      "createdAt": "2026-09-20T09:37:52.784Z",
+      "rail": "FastMCP Escrow Protocol v2.4"
+    },
     {
       "id": "VLT-PRIMARY-NODE",
       "title": "Primary Autonomous Settlement Vault",
-      "amount": 10000,
+      "amount": 27500,
       "currency": "VRS",
-      "status": "Active Custody",
-      "allocatedAgent": "Autonomous Settlement Agent",
+      "status": "Active",
+      "allocatedAgent": "Alpha Capital Orchestrator",
       "createdAt": "2026-09-20T09:24:00.000Z",
       "rail": "FastMCP Escrow Protocol v2.4"
     }
   ],
-  "last_updated": "2026-09-20T09:24:00.000Z"
+  "last_updated": "2026-09-20T16:20:39.553Z"
 }
