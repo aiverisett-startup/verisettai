@@ -271,16 +271,32 @@ export function ConnectAgentModal({ isOpen, onClose, onConnected }: ConnectAgent
               className="flex items-center gap-2 rounded-xl bg-[#C59B5F] hover:bg-[#B38A4F] px-4 py-2 text-xs font-semibold text-white transition cursor-pointer shadow-md shadow-[#C59B5F]/20 hover:scale-[1.02] active:scale-[0.98]"
             >
               <Lock className="w-3.5 h-3.5"/>
-              <span>Sign In to Copy Credentials</span>
+              <span>Sign In to Connect Agent</span>
             </button>
           ) : (
-            <button
-              onClick={() => handleCopy(selectedType === "gateway" ? liveCreds.gatewayUrl : selectedType === "mcp" ? liveCreds.mcpConfig : liveCreds.apiKey)}
-              className="flex items-center gap-2 rounded-xl bg-[#C59B5F] hover:bg-[#B38A4F] px-4 py-2 text-xs font-semibold text-white transition cursor-pointer shadow-md shadow-[#C59B5F]/20 hover:scale-[1.02] active:scale-[0.98]"
-            >
-              {copied ? <Check className="w-3.5 h-3.5"/> : <Copy className="w-3.5 h-3.5"/>}
-              {copied ? "Copied to Clipboard" : "Copy Connection Credentials"}
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => handleCopy(selectedType === "gateway" ? liveCreds.gatewayUrl : selectedType === "mcp" ? liveCreds.mcpConfig : liveCreds.apiKey)}
+                className="flex items-center gap-1.5 rounded-xl border border-[#EAE3D2] bg-[#FAF8F5] hover:bg-white px-3 py-2 text-xs font-semibold text-[#8C8275] hover:text-[#1C1A17] transition cursor-pointer"
+              >
+                {copied ? <Check className="w-3.5 h-3.5 text-emerald-600"/> : <Copy className="w-3.5 h-3.5"/>}
+                <span>{copied ? "Copied" : "Copy Config"}</span>
+              </button>
+              <button
+                onClick={() => {
+                  if (typeof window !== "undefined") {
+                    localStorage.setItem("verisett_agent_connected", "true");
+                    localStorage.setItem("verisett_connected_agent_id", agentId);
+                  }
+                  if (onConnected) onConnected();
+                  onClose();
+                }}
+                className="flex items-center gap-2 rounded-xl bg-[#C59B5F] hover:bg-[#B38A4F] px-4 py-2 text-xs font-semibold text-white transition cursor-pointer shadow-md shadow-[#C59B5F]/20 hover:scale-[1.02] active:scale-[0.98]"
+              >
+                <ShieldCheck className="w-3.5 h-3.5"/>
+                <span>Authorize &amp; Connect Agent</span>
+              </button>
+            </div>
           )}
         </div>
       </div>

@@ -18,30 +18,9 @@ import {
 } from "lucide-react";
 import { VerisettLogo } from "@/components/VerisettLogo";
 
-export interface TransactionReceiptData {
-  id: string;
-  fromAgent: {
-    name: string;
-    model: string;
-    avatarBg: string;
-    agentId: string;
-  };
-  toAgent: {
-    name: string;
-    model: string;
-    avatarBg: string;
-    agentId: string;
-  };
-  amountINR: number;
-  commissionRate: number; // e.g. 0.015 (1.5%)
-  status: "SUCCESSFUL" | "FAILED" | "PENDING";
-  timestamp: string; // formatted ISO or display date
-  milestoneTitle: string;
-  sha256Proof: string;
-  clearingRail: string;
-  direction?: "SENT" | "RECEIVED";
-  failureReason?: string;
-}
+import { TransactionItem } from "@/lib/agentTransactionStorage";
+
+export type TransactionReceiptData = TransactionItem;
 
 interface TransactionReceiptModalProps {
   isOpen: boolean;

@@ -1,521 +1,489 @@
 "use client";
 
-import React, { useState, useMemo, useRef } from "react";
+import React, { useState, useMemo } from "react";
 import {
   TrendingUp,
   TrendingDown,
   Activity,
-  ArrowUpRight,
-  ArrowDownRight,
   Calendar,
   Sparkles,
   Zap,
-  RotateCcw,
   CheckCircle2,
   XCircle,
   BarChart2,
   DollarSign,
   ShieldCheck,
+  Cpu,
+  ArrowRight,
+  Plus,
 } from "lucide-react";
-
-export type TimeRange = "1D" | "1W" | "1M" | "ALL";
-
-export interface DataPoint {
-  id: string;
-  timeLabel: string;
-  dateLabel: string;
-  outcome: "SUCCESS" | "FAILED";
-  amountINR: number;
-  fromAgent: string;
-  toAgent: string;
-  txId: string;
-  // Dynamic calculated coordinates
-  scoreDelta: number; // +1 for success, -1 for failure
-  cumulativeScore: number;
-  cumulativeVolume: number;
-}
+import { TransactionItem } from "@/lib/agentTransactionStorage";
 
 interface AgentTransactionChartProps {
-  onSelectTx?: (txId: string) => void;
+  isAgentConnected: boolean;
+  transactions: TransactionItem[];
+  onConnectAgent: () => void;
+  onExecuteTestSettlement?: (isSuccess: boolean) => void;
 }
 
-// Initial realistic dataset across Day, Week, Month
-const BASELINE_1D: Omit<DataPoint, "scoreDelta" | "cumulativeScore" | "cumulativeVolume">[] = [
-  { id: "d1", timeLabel: "02:00 AM", dateLabel: "Today", outcome: "SUCCESS", amountINR: 12000, fromAgent: "Nexus-Payer", toAgent: "DataScraper-Worker", txId: "TXN-VRS-1001" },
-  { id: "d2", timeLabel: "05:30 AM", dateLabel: "Today", outcome: "SUCCESS", amountINR: 18500, fromAgent: "Apex-FinBot", toAgent: "CodeReview-Worker", txId: "TXN-VRS-1002" },
-  { id: "d3", timeLabel: "08:15 AM", dateLabel: "Today", outcome: "SUCCESS", amountINR: 24000, fromAgent: "QuantAgent-4", toAgent: "MacroAudit-Worker", txId: "TXN-VRS-1003" },
-  { id: "d4", timeLabel: "10:00 AM", dateLabel: "Today", outcome: "FAILED",  amountINR: 9500,  fromAgent: "DocuSign-Bot", toAgent: "OcrParser-Worker", txId: "TXN-VRS-1004" },
-  { id: "d5", timeLabel: "11:45 AM", dateLabel: "Today", outcome: "SUCCESS", amountINR: 32000, fromAgent: "Nexus-Payer", toAgent: "FastMCP-Compiler", txId: "TXN-VRS-1005" },
-  { id: "d6", timeLabel: "01:20 PM", dateLabel: "Today", outcome: "SUCCESS", amountINR: 28000, fromAgent: "Synthetix-AI", toAgent: "DataScraper-Worker", txId: "TXN-VRS-1006" },
-  { id: "d7", timeLabel: "02:50 PM", dateLabel: "Today", outcome: "SUCCESS", amountINR: 15000, fromAgent: "Apex-FinBot", toAgent: "CodeReview-Worker", txId: "TXN-VRS-1007" },
-  { id: "d8", timeLabel: "04:10 PM", dateLabel: "Today", outcome: "SUCCESS", amountINR: 41000, fromAgent: "Krypton-Treasury", toAgent: "ZeroKnowledge-Worker", txId: "TXN-VRS-1008" },
-  { id: "d9", timeLabel: "05:45 PM", dateLabel: "Today", outcome: "FAILED",  amountINR: 14000, fromAgent: "DocuSign-Bot", toAgent: "OcrParser-Worker", txId: "TXN-VRS-1009" },
-  { id: "d10", timeLabel: "07:30 PM", dateLabel: "Today", outcome: "SUCCESS", amountINR: 35000, fromAgent: "Nexus-Payer", toAgent: "FastMCP-Compiler", txId: "TXN-VRS-1010" },
-  { id: "d11", timeLabel: "09:15 PM", dateLabel: "Today", outcome: "SUCCESS", amountINR: 22500, fromAgent: "Apex-FinBot", toAgent: "MacroAudit-Worker", txId: "TXN-VRS-1011" },
-  { id: "d12", timeLabel: "11:00 PM", dateLabel: "Today", outcome: "SUCCESS", amountINR: 19000, fromAgent: "QuantAgent-4", toAgent: "CodeReview-Worker", txId: "TXN-VRS-1012" },
-];
-
-const BASELINE_1W: Omit<DataPoint, "scoreDelta" | "cumulativeScore" | "cumulativeVolume">[] = [
-  { id: "w1", timeLabel: "Mon", dateLabel: "Sep 14", outcome: "SUCCESS", amountINR: 45000, fromAgent: "Nexus-Payer", toAgent: "DataScraper-Worker", txId: "TXN-VRS-2001" },
-  { id: "w2", timeLabel: "Tue", dateLabel: "Sep 15", outcome: "SUCCESS", amountINR: 62000, fromAgent: "Apex-FinBot", toAgent: "CodeReview-Worker", txId: "TXN-VRS-2002" },
-  { id: "w3", timeLabel: "Wed", dateLabel: "Sep 16", outcome: "FAILED",  amountINR: 18000, fromAgent: "DocuSign-Bot", toAgent: "OcrParser-Worker", txId: "TXN-VRS-2003" },
-  { id: "w4", timeLabel: "Thu", dateLabel: "Sep 17", outcome: "SUCCESS", amountINR: 78000, fromAgent: "Krypton-Treasury", toAgent: "ZeroKnowledge-Worker", txId: "TXN-VRS-2004" },
-  { id: "w5", timeLabel: "Fri", dateLabel: "Sep 18", outcome: "SUCCESS", amountINR: 91000, fromAgent: "Synthetix-AI", toAgent: "FastMCP-Compiler", txId: "TXN-VRS-2005" },
-  { id: "w6", timeLabel: "Sat", dateLabel: "Sep 19", outcome: "SUCCESS", amountINR: 54000, fromAgent: "QuantAgent-4", toAgent: "MacroAudit-Worker", txId: "TXN-VRS-2006" },
-  { id: "w7", timeLabel: "Sun", dateLabel: "Sep 20", outcome: "SUCCESS", amountINR: 88500, fromAgent: "Nexus-Payer", toAgent: "CodeReview-Worker", txId: "TXN-VRS-2007" },
-];
-
-const BASELINE_1M: Omit<DataPoint, "scoreDelta" | "cumulativeScore" | "cumulativeVolume">[] = [
-  { id: "m1", timeLabel: "Week 1", dateLabel: "Sep 01 - 07", outcome: "SUCCESS", amountINR: 180000, fromAgent: "Nexus-Payer", toAgent: "DataScraper-Worker", txId: "TXN-VRS-3001" },
-  { id: "m2", timeLabel: "Week 2", dateLabel: "Sep 08 - 14", outcome: "SUCCESS", amountINR: 245000, fromAgent: "Apex-FinBot", toAgent: "CodeReview-Worker", txId: "TXN-VRS-3002" },
-  { id: "m3", timeLabel: "Week 3", dateLabel: "Sep 15 - 21", outcome: "FAILED",  amountINR: 42000,  fromAgent: "DocuSign-Bot", toAgent: "OcrParser-Worker", txId: "TXN-VRS-3003" },
-  { id: "m4", timeLabel: "Week 4", dateLabel: "Sep 22 - 28", outcome: "SUCCESS", amountINR: 310000, fromAgent: "Krypton-Treasury", toAgent: "FastMCP-Compiler", txId: "TXN-VRS-3004" },
-];
-
-// Helper to compute cumulative scores for trajectory
-function computeCumulative(rawPoints: Omit<DataPoint, "scoreDelta" | "cumulativeScore" | "cumulativeVolume">[]): DataPoint[] {
-  let score = 10; // start baseline
-  let volume = 0;
-
-  return rawPoints.map((pt) => {
-    const delta = pt.outcome === "SUCCESS" ? 1 : -1;
-    score = Math.max(1, score + delta);
-    volume += pt.amountINR;
-
-    return {
-      ...pt,
-      scoreDelta: delta,
-      cumulativeScore: score,
-      cumulativeVolume: volume,
-    };
-  });
+interface ChartDataPoint {
+  index: number;
+  tx: TransactionItem;
+  scoreDelta: number; // +1 on success, -1 on failure
+  cumulativeScore: number;
+  x: number;
+  y: number;
 }
 
-export function AgentTransactionChart({ onSelectTx }: AgentTransactionChartProps) {
-  const [timeRange, setTimeRange] = useState<TimeRange>("1D");
-  const [livePoints, setLivePoints] = useState<{ [K in TimeRange]?: Omit<DataPoint, "scoreDelta" | "cumulativeScore" | "cumulativeVolume">[] }>({});
+export function AgentTransactionChart({
+  isAgentConnected,
+  transactions,
+  onConnectAgent,
+  onExecuteTestSettlement,
+}: AgentTransactionChartProps) {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
-  // Active dataset
-  const activeRawList = useMemo(() => {
-    if (livePoints[timeRange]) return livePoints[timeRange]!;
-    if (timeRange === "1D") return BASELINE_1D;
-    if (timeRange === "1W") return BASELINE_1W;
-    if (timeRange === "1M") return BASELINE_1M;
-    return [...BASELINE_1W, ...BASELINE_1D];
-  }, [timeRange, livePoints]);
-
-  const chartData = useMemo(() => computeCumulative(activeRawList), [activeRawList]);
-
-  // Aggregate Metrics
-  const totalVolumeINR = useMemo(() => chartData.reduce((acc, p) => acc + p.amountINR, 0), [chartData]);
-  const successCount = useMemo(() => chartData.filter((p) => p.outcome === "SUCCESS").length, [chartData]);
-  const failureCount = useMemo(() => chartData.filter((p) => p.outcome === "FAILED").length, [chartData]);
-  const totalCount = chartData.length;
-  const successRate = totalCount > 0 ? ((successCount / totalCount) * 100).toFixed(1) : "100.0";
-  const commissionINR = Math.round(totalVolumeINR * 0.015); // 1.5% flat take rate
-
   // SVG Dimension Math
-  const SVG_WIDTH = 800;
-  const SVG_HEIGHT = 260;
-  const PADDING_TOP = 20;
-  const PADDING_BOTTOM = 60; // Space for volume bars
-  const PADDING_LEFT = 35;
-  const PADDING_RIGHT = 35;
+  const SVG_WIDTH = 840;
+  const SVG_HEIGHT = 280;
+  const PADDING = { top: 35, right: 35, bottom: 55, left: 45 };
+  const CHART_W = SVG_WIDTH - PADDING.left - PADDING.right;
+  const CHART_H = SVG_HEIGHT - PADDING.top - PADDING.bottom;
 
-  const GRAPH_WIDTH = SVG_WIDTH - PADDING_LEFT - PADDING_RIGHT;
-  const GRAPH_HEIGHT = SVG_HEIGHT - PADDING_TOP - PADDING_BOTTOM;
+  // Compute metrics for the last month
+  const totalCount = transactions.length;
+  const successCount = useMemo(
+    () => transactions.filter((t) => t.status === "SUCCESSFUL").length,
+    [transactions]
+  );
+  const failureCount = useMemo(
+    () => transactions.filter((t) => t.status === "FAILED").length,
+    [transactions]
+  );
+  const totalVolumeINR = useMemo(
+    () => transactions.reduce((acc, t) => acc + t.amountINR, 0),
+    [transactions]
+  );
+  const totalCommissionINR = Math.round(totalVolumeINR * 0.015);
+  const successRate = totalCount > 0 ? ((successCount / totalCount) * 100).toFixed(1) : "100.0";
 
-  const maxScore = useMemo(() => Math.max(...chartData.map((d) => d.cumulativeScore), 12), [chartData]);
-  const minScore = useMemo(() => Math.min(...chartData.map((d) => d.cumulativeScore), 0), [chartData]);
-  const scoreRange = Math.max(maxScore - minScore, 1);
+  // Compute trajectory data points across the chronological transaction stream
+  // Chronological order: oldest to newest for the line graph
+  const chronologicalList = useMemo(() => {
+    return [...transactions].reverse();
+  }, [transactions]);
 
-  const maxVolume = useMemo(() => Math.max(...chartData.map((d) => d.amountINR), 1000), [chartData]);
+  const { points, minScore, maxScore, maxAmount } = useMemo(() => {
+    if (chronologicalList.length === 0) {
+      return { points: [], minScore: 0, maxScore: 10, maxAmount: 10000 };
+    }
 
-  // Point coordinates
-  const points = useMemo(() => {
-    return chartData.map((d, i) => {
-      const x = PADDING_LEFT + (i / Math.max(chartData.length - 1, 1)) * GRAPH_WIDTH;
-      const normalizedScore = (d.cumulativeScore - minScore) / scoreRange;
-      const y = PADDING_TOP + GRAPH_HEIGHT - normalizedScore * GRAPH_HEIGHT;
-      
-      // Volume bar height (max 45px at bottom)
-      const barHeight = Math.max(6, (d.amountINR / maxVolume) * 45);
-      const barY = SVG_HEIGHT - barHeight - 10;
+    let runningScore = 5; // Starting neutral baseline
+    let min = 5;
+    let max = 5;
+    let highestAmount = 1000;
 
-      return { ...d, x, y, barHeight, barY };
+    const calculated = chronologicalList.map((tx, idx) => {
+      const delta = tx.status === "SUCCESSFUL" ? 1 : -1;
+      runningScore = Math.max(0, runningScore + delta);
+      if (runningScore < min) min = runningScore;
+      if (runningScore > max) max = runningScore;
+      if (tx.amountINR > highestAmount) highestAmount = tx.amountINR;
+
+      return {
+        index: idx,
+        tx,
+        scoreDelta: delta,
+        cumulativeScore: runningScore,
+        x: 0,
+        y: 0,
+      };
     });
-  }, [chartData, minScore, scoreRange, GRAPH_WIDTH, GRAPH_HEIGHT, SVG_HEIGHT, maxVolume]);
 
-  // Smooth SVG Path String (Bezier cubic smoothing)
+    const scoreRange = Math.max(2, max - min);
+    const n = calculated.length;
+
+    calculated.forEach((pt, idx) => {
+      const normX = n > 1 ? idx / (n - 1) : 0.5;
+      const normY = (pt.cumulativeScore - min) / scoreRange;
+      pt.x = PADDING.left + normX * CHART_W;
+      pt.y = PADDING.top + (1 - normY) * CHART_H;
+    });
+
+    return { points: calculated, minScore: min, maxScore: max, maxAmount: highestAmount };
+  }, [chronologicalList, CHART_W, CHART_H, PADDING.left, PADDING.top]);
+
+  // Generate smooth cubic bezier SVG path
   const linePath = useMemo(() => {
     if (points.length === 0) return "";
-    let path = `M ${points[0].x} ${points[0].y}`;
+    if (points.length === 1) {
+      return `M ${points[0].x} ${points[0].y} L ${points[0].x + 1} ${points[0].y}`;
+    }
+
+    let d = `M ${points[0].x} ${points[0].y}`;
     for (let i = 0; i < points.length - 1; i++) {
       const p0 = points[i];
       const p1 = points[i + 1];
-      const cpX1 = p0.x + (p1.x - p0.x) * 0.5;
-      const cpY1 = p0.y;
-      const cpX2 = p0.x + (p1.x - p0.x) * 0.5;
-      const cpY2 = p1.y;
-      path += ` C ${cpX1} ${cpY1}, ${cpX2} ${cpY2}, ${p1.x} ${p1.y}`;
+      const cpX = (p0.x + p1.x) / 2;
+      d += ` C ${cpX} ${p0.y}, ${cpX} ${p1.y}, ${p1.x} ${p1.y}`;
     }
-    return path;
+    return d;
   }, [points]);
 
-  // Filled gradient area path
+  // Area under the line for translucent gold/emerald glow
   const areaPath = useMemo(() => {
-    if (points.length === 0) return "";
-    const first = points[0];
-    const last = points[points.length - 1];
-    return `${linePath} L ${last.x} ${PADDING_TOP + GRAPH_HEIGHT} L ${first.x} ${PADDING_TOP + GRAPH_HEIGHT} Z`;
-  }, [linePath, points, GRAPH_HEIGHT]);
+    if (!linePath || points.length === 0) return "";
+    const bottomY = PADDING.top + CHART_H;
+    const firstX = points[0].x;
+    const lastX = points[points.length - 1].x;
+    return `${linePath} L ${lastX} ${bottomY} L ${firstX} ${bottomY} Z`;
+  }, [linePath, points, PADDING.top, CHART_H]);
 
-  // Live Simulator: User clicks "Simulate Success" or "Simulate Failure"
-  const handleSimulateTransaction = (outcome: "SUCCESS" | "FAILED") => {
-    const randomAmount = Math.floor(Math.random() * 25000) + 10000;
-    const dateNow = new Date();
-    const timeStr = dateNow.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-    const newId = `live_${Date.now()}`;
-    const newTx: Omit<DataPoint, "scoreDelta" | "cumulativeScore" | "cumulativeVolume"> = {
-      id: newId,
-      timeLabel: timeStr,
-      dateLabel: "Just now",
-      outcome,
-      amountINR: randomAmount,
-      fromAgent: "Apex-FinBot",
-      toAgent: outcome === "SUCCESS" ? "FastMCP-Compiler" : "Untrusted-Worker",
-      txId: `TXN-VRS-${Math.floor(Math.random() * 9000) + 1000}`,
-    };
+  const activePoint = hoveredIndex !== null && points[hoveredIndex] ? points[hoveredIndex] : null;
 
-    setLivePoints((prev) => {
-      const currentList = prev[timeRange] || activeRawList;
-      return {
-        ...prev,
-        [timeRange]: [...currentList, newTx],
-      };
-    });
-  };
+  // 1. STATE: Agent Not Connected -> Render Disconnected State (NO FAKE/MOCK DATA)
+  if (!isAgentConnected) {
+    return (
+      <div className="rounded-3xl border border-[#EAE3D2] bg-white p-6 sm:p-8 shadow-[0_4px_24px_rgba(197,155,95,0.06)] relative overflow-hidden font-sans">
+        {/* Subtle grid background */}
+        <div
+          className="absolute inset-0 opacity-[0.03] pointer-events-none"
+          style={{
+            backgroundImage:
+              "linear-gradient(#C59B5F 1px, transparent 1px), linear-gradient(to right, #C59B5F 1px, transparent 1px)",
+            backgroundSize: "24px 24px",
+          }}
+        />
 
-  const handleReset = () => {
-    setLivePoints((prev) => ({ ...prev, [timeRange]: undefined }));
-    setHoveredIndex(null);
-  };
+        <div className="relative z-10 flex flex-col items-center justify-center text-center py-10 px-4 max-w-xl mx-auto space-y-4">
+          <div className="w-14 h-14 rounded-2xl bg-[#FAF6EE] border border-[#EAE3D2] flex items-center justify-center text-[#9E7A45] shadow-[0_4px_16px_rgba(197,155,95,0.1)]">
+            <Cpu className="w-7 h-7 stroke-[1.8] animate-pulse" />
+          </div>
 
-  const hoveredPoint = hoveredIndex !== null && points[hoveredIndex] ? points[hoveredIndex] : points[points.length - 1];
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FAF6EE] border border-[#EAE3D2] text-[11px] font-mono text-[#9E7A45]">
+            <span className="w-2 h-2 rounded-full bg-[#C59B5F] animate-ping" />
+            <span>AGENT GATEWAY DISCONNECTED</span>
+          </div>
 
+          <div>
+            <h2 className="text-xl sm:text-2xl font-bold text-[#1C1A17] tracking-tight">
+              Connect Your Agent to View Transaction Trajectory
+            </h2>
+            <p className="text-xs sm:text-sm text-[#8C8275] mt-2 leading-relaxed">
+              No active agent is connected to this vault. Connect your autonomous agent via FastMCP or REST Gateway to stream live settlement telemetry, view the last month’s transaction line graph, and inspect PhonePe-style clearing records.
+            </p>
+          </div>
+
+          <button
+            onClick={onConnectAgent}
+            className="mt-2 inline-flex items-center gap-2 rounded-xl bg-[#C59B5F] hover:bg-[#B38A4F] px-6 py-3 text-xs font-semibold text-white transition shadow-md shadow-[#C59B5F]/20 cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
+          >
+            <span>Connect Agent Gateway</span>
+            <ArrowRight className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // 2. STATE: Agent Connected -> Render Real Last Month Line Graph
   return (
-    <div className="rounded-3xl border border-[#EAE3D2] bg-white p-6 sm:p-8 shadow-[0_4px_24px_rgba(197,155,95,0.06)] space-y-6 overflow-hidden font-sans">
+    <div className="rounded-3xl border border-[#EAE3D2] bg-white p-6 sm:p-8 shadow-[0_4px_24px_rgba(197,155,95,0.06)] space-y-6 font-sans relative">
       
-      {/* Top Header & Range Switcher */}
+      {/* Header & Date Badge */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-[#F0E9DC]">
         <div>
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#FAF6EE] border border-[#EAE3D2] text-[10px] font-mono text-[#9E7A45] mb-1">
-            <Sparkles className="w-3 h-3 text-[#C59B5F]" />
-            <span>Agent Transaction Telemetry</span>
+          <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-[10px] font-mono text-emerald-800 mb-1.5 font-semibold">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span>AGENT ONLINE • FASTMCP NODE LINKED</span>
           </div>
           <h2 className="text-xl sm:text-2xl font-bold text-[#1C1A17] tracking-tight flex items-center gap-2">
-            <span>Autonomous Clearing Velocity</span>
-            <span className="text-xs font-normal font-mono px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
-              Live Trajectory
-            </span>
+            <span>Last Month Transaction Trajectory</span>
           </h2>
           <p className="text-xs text-[#8C8275] mt-0.5">
-            Real-time stock-market-style trendline. Successful payouts tick the trajectory <strong className="text-emerald-700">UP (+1)</strong>; rejected deliveries dip <strong className="text-rose-700">DOWN (-1)</strong>.
+            Real settlement slope across the past 30 days: each successful milestone advances the line (<strong className="text-emerald-700">+1</strong>), and any failed milestone decrements the line (<strong className="text-rose-700">-1</strong>).
           </p>
         </div>
 
-        {/* Timeframe Filter Buttons */}
-        <div className="flex items-center gap-1.5 p-1 rounded-full bg-[#FAF8F5] border border-[#EAE3D2] self-start md:self-center text-xs font-mono">
-          {(["1D", "1W", "1M", "ALL"] as TimeRange[]).map((range) => (
-            <button
-              key={range}
-              onClick={() => {
-                setTimeRange(range);
-                setHoveredIndex(null);
-              }}
-              className={`px-3 py-1 rounded-full transition-all cursor-pointer font-medium ${
-                timeRange === range
-                  ? "bg-[#C59B5F] text-white shadow-xs font-bold"
-                  : "text-[#8C8275] hover:text-[#1C1A17]"
-              }`}
-            >
-              {range}
-            </button>
-          ))}
+        {/* 30 Days Badge */}
+        <div className="flex items-center gap-2">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#FAF8F5] border border-[#EAE3D2] text-xs font-mono text-[#8C8275]">
+            <Calendar className="w-3.5 h-3.5 text-[#9E7A45]" />
+            <span>Past 30 Days Range</span>
+          </div>
         </div>
       </div>
 
-      {/* KPI Stats Strip */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-        {/* Gross Volume */}
-        <div className="p-4 rounded-2xl bg-[#FAF8F5] border border-[#EAE3D2]">
-          <span className="text-[10px] uppercase font-mono font-medium text-[#8C8275] block">Settled Volume</span>
-          <div className="text-lg sm:text-2xl font-bold font-mono text-[#1C1A17] mt-1">
-            ₹{totalVolumeINR.toLocaleString("en-IN")}
-          </div>
-          <span className="text-[10px] font-mono text-[#9E7A45] mt-0.5 block">
-            Fee: ₹{commissionINR.toLocaleString("en-IN")} (1.5%)
+      {/* KPI Metrics Strip */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="p-3.5 rounded-2xl bg-[#FAF8F5] border border-[#EAE3D2]">
+          <span className="block text-[11px] font-mono text-[#8C8275] uppercase">Total Transactions</span>
+          <span className="text-lg sm:text-xl font-bold text-[#1C1A17] font-mono mt-1 block">
+            {totalCount}
           </span>
+          <span className="text-[10px] font-mono text-[#8C8275]">Last 30 Days</span>
         </div>
 
-        {/* Success Rate */}
-        <div className="p-4 rounded-2xl bg-[#FAF8F5] border border-[#EAE3D2]">
-          <span className="text-[10px] uppercase font-mono font-medium text-[#8C8275] block">Success Ratio</span>
-          <div className="text-lg sm:text-2xl font-bold font-mono text-emerald-700 mt-1 flex items-center gap-1">
-            <span>{successRate}%</span>
-            <ArrowUpRight className="w-4 h-4 text-emerald-600" />
+        <div className="p-3.5 rounded-2xl bg-[#FAF8F5] border border-[#EAE3D2]">
+          <span className="block text-[11px] font-mono text-[#8C8275] uppercase">Settlement Success</span>
+          <div className="flex items-baseline gap-1.5 mt-1">
+            <span className="text-lg sm:text-xl font-bold text-emerald-700 font-mono">
+              {successCount}
+            </span>
+            <span className="text-xs font-mono text-emerald-600 font-semibold">({successRate}%)</span>
           </div>
-          <span className="text-[10px] font-mono text-[#8C8275] mt-0.5 block">
-            {successCount} / {totalCount} passing
-          </span>
+          <span className="text-[10px] font-mono text-emerald-700 font-medium">+{successCount} Upward steps</span>
         </div>
 
-        {/* Up-ticks vs Down-dips */}
-        <div className="p-4 rounded-2xl bg-[#FAF8F5] border border-[#EAE3D2]">
-          <span className="text-[10px] uppercase font-mono font-medium text-[#8C8275] block">Trajectory Delta</span>
-          <div className="text-lg sm:text-2xl font-bold font-mono text-[#1C1A17] mt-1 flex items-center gap-2">
-            <span className="text-emerald-700">+{successCount}</span>
-            <span className="text-[#8C8275] text-sm font-normal">/</span>
-            <span className="text-rose-600">-{failureCount}</span>
-          </div>
-          <span className="text-[10px] font-mono text-[#8C8275] mt-0.5 block">
-            Net: +{successCount - failureCount} Ticks
+        <div className="p-3.5 rounded-2xl bg-[#FAF8F5] border border-[#EAE3D2]">
+          <span className="block text-[11px] font-mono text-[#8C8275] uppercase">Settlements Failed</span>
+          <span className="text-lg sm:text-xl font-bold text-rose-700 font-mono mt-1 block">
+            {failureCount}
           </span>
+          <span className="text-[10px] font-mono text-rose-600">-{failureCount} Downward steps</span>
         </div>
 
-        {/* Real-time Hover Readout */}
-        <div className="p-4 rounded-2xl bg-white border border-[#D4AF37]/50 shadow-xs">
-          <span className="text-[10px] uppercase font-mono font-medium text-[#9E7A45] block">
-            Point Details ({hoveredPoint?.timeLabel})
+        <div className="p-3.5 rounded-2xl bg-[#FAF8F5] border border-[#EAE3D2]">
+          <span className="block text-[11px] font-mono text-[#8C8275] uppercase">1.5% Protocol Fee</span>
+          <span className="text-lg sm:text-xl font-bold text-[#9E7A45] font-mono mt-1 block">
+            ₹{totalCommissionINR.toLocaleString("en-IN")}
           </span>
-          <div className="text-sm sm:text-base font-bold text-[#1C1A17] font-mono mt-1 truncate">
-            {hoveredPoint?.outcome === "SUCCESS" ? (
-              <span className="text-emerald-700 flex items-center gap-1">
-                <CheckCircle2 className="w-3.5 h-3.5" /> +1 UP TICK (₹{hoveredPoint.amountINR.toLocaleString("en-IN")})
-              </span>
-            ) : (
-              <span className="text-rose-700 flex items-center gap-1">
-                <XCircle className="w-3.5 h-3.5" /> -1 DOWN DIP (Refunded)
-              </span>
+          <span className="text-[10px] font-mono text-[#8C8275]">From ₹{totalVolumeINR.toLocaleString("en-IN")} vol</span>
+        </div>
+      </div>
+
+      {/* 3. Empty State if Connected but 0 Transactions */}
+      {totalCount === 0 ? (
+        <div className="rounded-2xl border border-dashed border-[#EAE3D2] bg-[#FAF8F5]/60 p-8 sm:p-12 text-center space-y-3">
+          <div className="w-12 h-12 rounded-full bg-[#FAF6EE] border border-[#EAE3D2] mx-auto flex items-center justify-center text-[#9E7A45]">
+            <Activity className="w-6 h-6" />
+          </div>
+          <div>
+            <h3 className="text-base font-bold text-[#1C1A17]">No Transactions in the Past 30 Days</h3>
+            <p className="text-xs text-[#8C8275] mt-1 max-w-md mx-auto leading-relaxed">
+              Your agent is linked and in standby mode. When tasks are dispatched or milestone hashes settle, each transaction will dynamically plot on this line graph in real time.
+            </p>
+          </div>
+          {onExecuteTestSettlement && (
+            <div className="pt-2 flex justify-center gap-3">
+              <button
+                onClick={() => onExecuteTestSettlement(true)}
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#C59B5F] hover:bg-[#B38A4F] text-white text-xs font-semibold shadow-xs transition cursor-pointer"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>Execute Agent Test Settlement (₹25,000)</span>
+              </button>
+            </div>
+          )}
+        </div>
+      ) : (
+        /* 4. Real SVG Line Graph & Volume Histogram */
+        <div className="space-y-4">
+          <div className="relative rounded-2xl border border-[#EAE3D2] bg-[#FDFCF9] p-4 sm:p-6 overflow-hidden">
+            
+            {/* SVG Visual Canvas */}
+            <div className="w-full overflow-x-auto no-scrollbar">
+              <svg
+                viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`}
+                className="w-full h-auto min-w-[650px] select-none"
+                style={{ overflow: "visible" }}
+              >
+                <defs>
+                  {/* Glowing Area Fill Gradient */}
+                  <linearGradient id="lineAreaGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#C59B5F" stopOpacity="0.25" />
+                    <stop offset="70%" stopColor="#C59B5F" stopOpacity="0.05" />
+                    <stop offset="100%" stopColor="#C59B5F" stopOpacity="0.00" />
+                  </linearGradient>
+
+                  {/* Line Gradient */}
+                  <linearGradient id="strokeGrad" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stopColor="#D4AF37" />
+                    <stop offset="50%" stopColor="#C59B5F" />
+                    <stop offset="100%" stopColor="#9E7A45" />
+                  </linearGradient>
+                </defs>
+
+                {/* Horizontal Gridlines */}
+                {[0, 0.25, 0.5, 0.75, 1].map((pct, i) => {
+                  const y = PADDING.top + pct * CHART_H;
+                  return (
+                    <g key={i}>
+                      <line
+                        x1={PADDING.left}
+                        y1={y}
+                        x2={SVG_WIDTH - PADDING.right}
+                        y2={y}
+                        stroke="#EAE3D2"
+                        strokeDasharray="4 4"
+                        strokeWidth="1"
+                      />
+                    </g>
+                  );
+                })}
+
+                {/* Volume Histogram Bars at bottom */}
+                {points.map((pt) => {
+                  const barH = Math.max(8, (pt.tx.amountINR / maxAmount) * 35);
+                  const barY = PADDING.top + CHART_H - barH;
+                  const isSuccess = pt.tx.status === "SUCCESSFUL";
+                  const isHovered = hoveredIndex === pt.index;
+
+                  return (
+                    <rect
+                      key={`bar-${pt.index}`}
+                      x={pt.x - 7}
+                      y={barY}
+                      width={14}
+                      height={barH}
+                      rx={3}
+                      className="transition-all duration-150 cursor-pointer"
+                      fill={
+                        isHovered
+                          ? isSuccess
+                            ? "#10B981"
+                            : "#EF4444"
+                          : isSuccess
+                          ? "rgba(16, 185, 129, 0.25)"
+                          : "rgba(239, 68, 68, 0.25)"
+                      }
+                      stroke={isSuccess ? "#10B981" : "#EF4444"}
+                      strokeWidth={isHovered ? 1.5 : 0.5}
+                      onMouseEnter={() => setHoveredIndex(pt.index)}
+                      onMouseLeave={() => setHoveredIndex(null)}
+                    />
+                  );
+                })}
+
+                {/* Area Gradient */}
+                {areaPath && (
+                  <path d={areaPath} fill="url(#lineAreaGrad)" className="transition-all duration-300" />
+                )}
+
+                {/* Main Trajectory Line */}
+                {linePath && (
+                  <path
+                    d={linePath}
+                    fill="none"
+                    stroke="url(#strokeGrad)"
+                    strokeWidth="3.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="transition-all duration-300 drop-shadow-[0_2px_8px_rgba(197,155,95,0.3)]"
+                  />
+                )}
+
+                {/* Interactive Points on Line */}
+                {points.map((pt) => {
+                  const isSuccess = pt.tx.status === "SUCCESSFUL";
+                  const isHovered = hoveredIndex === pt.index;
+
+                  return (
+                    <g
+                      key={`pt-${pt.index}`}
+                      className="cursor-pointer"
+                      onMouseEnter={() => setHoveredIndex(pt.index)}
+                      onMouseLeave={() => setHoveredIndex(null)}
+                    >
+                      {/* Invisible hover target */}
+                      <circle cx={pt.x} cy={pt.y} r={16} fill="transparent" />
+
+                      {/* Pulse halo on hover */}
+                      {isHovered && (
+                        <circle
+                          cx={pt.x}
+                          cy={pt.y}
+                          r={10}
+                          fill={isSuccess ? "rgba(16, 185, 129, 0.2)" : "rgba(239, 68, 68, 0.2)"}
+                          className="animate-ping"
+                        />
+                      )}
+
+                      {/* Visible node point */}
+                      <circle
+                        cx={pt.x}
+                        cy={pt.y}
+                        r={isHovered ? 6 : 4}
+                        fill={isSuccess ? "#10B981" : "#EF4444"}
+                        stroke="#FFFFFF"
+                        strokeWidth="2.5"
+                        className="transition-all duration-150"
+                      />
+
+                      {/* Time Label on X-axis */}
+                      <text
+                        x={pt.x}
+                        y={PADDING.top + CHART_H + 20}
+                        textAnchor="middle"
+                        className="text-[10px] font-mono fill-[#8C8275] select-none"
+                      >
+                        {pt.tx.dateStr.slice(5)}
+                      </text>
+                    </g>
+                  );
+                })}
+
+                {/* Vertical Scrub Crosshair */}
+                {activePoint && (
+                  <line
+                    x1={activePoint.x}
+                    y1={PADDING.top}
+                    x2={activePoint.x}
+                    y2={PADDING.top + CHART_H}
+                    stroke="#9E7A45"
+                    strokeDasharray="3 3"
+                    strokeWidth="1.5"
+                  />
+                )}
+              </svg>
+            </div>
+
+            {/* Hover Tooltip Overlay */}
+            {activePoint && (
+              <div
+                className="pointer-events-none absolute z-20 top-4 right-4 rounded-xl border border-[#EAE3D2] bg-white/95 backdrop-blur-md p-3 shadow-xl text-xs font-mono space-y-1 max-w-xs animate-in fade-in zoom-in-95 duration-150"
+              >
+                <div className="flex items-center justify-between gap-3 border-b border-[#F0E9DC] pb-1.5">
+                  <span className="font-bold text-[#1C1A17]">{activePoint.tx.id}</span>
+                  <span
+                    className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
+                      activePoint.tx.status === "SUCCESSFUL"
+                        ? "bg-emerald-50 text-emerald-800 border border-emerald-200"
+                        : "bg-rose-50 text-rose-800 border border-rose-200"
+                    }`}
+                  >
+                    {activePoint.tx.status === "SUCCESSFUL" ? "+1 STEP UP" : "-1 STEP DOWN"}
+                  </span>
+                </div>
+                <div className="text-[#8C8275] text-[11px]">
+                  {activePoint.tx.timestamp}
+                </div>
+                <div className="text-[#1C1A17] font-semibold text-xs pt-0.5">
+                  ₹{activePoint.tx.amountINR.toLocaleString("en-IN")}{" "}
+                  <span className="text-[#8C8275] font-normal font-mono text-[10px]">
+                    (Fee: ₹{Math.round(activePoint.tx.amountINR * 0.015).toLocaleString("en-IN")})
+                  </span>
+                </div>
+                <div className="text-[10px] text-[#6E675D] truncate">
+                  {activePoint.tx.fromAgent.name} → {activePoint.tx.toAgent.name}
+                </div>
+              </div>
             )}
           </div>
-          <span className="text-[10px] font-mono text-[#8C8275] truncate block mt-0.5">
-            {hoveredPoint?.fromAgent} → {hoveredPoint?.toAgent}
-          </span>
-        </div>
-      </div>
 
-      {/* SVG Interactive Stock Line & Volume Chart */}
-      <div className="relative w-full bg-[#FAF8F5]/80 rounded-2xl border border-[#EAE3D2] p-2 sm:p-4 overflow-hidden select-none">
-        
-        {/* Background Grid Lines */}
-        <div className="absolute inset-0 pointer-events-none opacity-30">
-          <div className="w-full h-full" style={{ backgroundImage: "linear-gradient(to right, #EAE3D2 1px, transparent 1px), linear-gradient(to bottom, #EAE3D2 1px, transparent 1px)", backgroundSize: "60px 45px" }} />
-        </div>
-
-        <svg
-          viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`}
-          className="w-full h-auto overflow-visible cursor-crosshair relative z-10"
-        >
-          <defs>
-            {/* Smooth Golden Gradient Area Fill */}
-            <linearGradient id="chartAreaGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#D4AF37" stopOpacity="0.28" />
-              <stop offset="60%" stopColor="#C59B5F" stopOpacity="0.08" />
-              <stop offset="100%" stopColor="#FAF8F5" stopOpacity="0.0" />
-            </linearGradient>
-
-            {/* Glowing Golden Stroke Gradient */}
-            <linearGradient id="chartStrokeGrad" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0%" stopColor="#C59B5F" />
-              <stop offset="50%" stopColor="#D4AF37" />
-              <stop offset="100%" stopColor="#10B981" />
-            </linearGradient>
-
-            {/* Filter for glowing drop shadow */}
-            <filter id="goldGlow" x="-20%" y="-20%" width="140%" height="140%">
-              <feDropShadow dx="0" dy="2" stdDeviation="3" floodColor="#C59B5F" floodOpacity="0.35" />
-            </filter>
-          </defs>
-
-          {/* Area Fill */}
-          <path d={areaPath} fill="url(#chartAreaGrad)" />
-
-          {/* Baseline Reference Line */}
-          <line
-            x1={PADDING_LEFT}
-            y1={PADDING_TOP + GRAPH_HEIGHT}
-            x2={SVG_WIDTH - PADDING_RIGHT}
-            y2={PADDING_TOP + GRAPH_HEIGHT}
-            stroke="#EAE3D2"
-            strokeWidth="1"
-            strokeDasharray="4 4"
-          />
-
-          {/* Volume Bar Graph at Bottom (Stock Volume Histogram) */}
-          {points.map((pt, i) => {
-            const isHovered = hoveredIndex === i;
-            const barColor = pt.outcome === "SUCCESS" ? "#C59B5F" : "#EF4444";
-
-            return (
-              <g key={`bar_${pt.id}`}>
-                <rect
-                  x={pt.x - 7}
-                  y={pt.barY}
-                  width="14"
-                  height={pt.barHeight}
-                  rx="3"
-                  fill={barColor}
-                  opacity={isHovered ? 0.95 : 0.45}
-                  className="transition-all duration-150 hover:opacity-100"
-                  onMouseEnter={() => setHoveredIndex(i)}
-                />
-              </g>
-            );
-          })}
-
-          {/* Main Trajectory Line Path */}
-          <path
-            d={linePath}
-            fill="none"
-            stroke="url(#chartStrokeGrad)"
-            strokeWidth="3"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            filter="url(#goldGlow)"
-          />
-
-          {/* Interactive Data Points */}
-          {points.map((pt, i) => {
-            const isHovered = hoveredIndex === i;
-            const isUp = pt.outcome === "SUCCESS";
-            const pointFill = isUp ? "#10B981" : "#EF4444";
-
-            return (
-              <g
-                key={pt.id}
-                onMouseEnter={() => setHoveredIndex(i)}
-                className="cursor-pointer group"
-                onClick={() => onSelectTx && onSelectTx(pt.txId)}
-              >
-                {/* Outer Ring on Hover */}
-                {isHovered && (
-                  <>
-                    {/* Vertical Crosshair Line */}
-                    <line
-                      x1={pt.x}
-                      y1={PADDING_TOP}
-                      x2={pt.x}
-                      y2={SVG_HEIGHT - 10}
-                      stroke="#9E7A45"
-                      strokeWidth="1.2"
-                      strokeDasharray="3 3"
-                      strokeOpacity="0.7"
-                    />
-                    <circle
-                      cx={pt.x}
-                      cy={pt.y}
-                      r="9"
-                      fill={isUp ? "#10B981" : "#EF4444"}
-                      opacity="0.25"
-                      className="animate-ping"
-                    />
-                  </>
-                )}
-
-                {/* Main Node Point */}
-                <circle
-                  cx={pt.x}
-                  cy={pt.y}
-                  r={isHovered ? 6 : 4}
-                  fill="white"
-                  stroke={pointFill}
-                  strokeWidth={isHovered ? 3 : 2}
-                  className="transition-all duration-150 group-hover:scale-125"
-                />
-
-                {/* X-Axis Label */}
-                {(i === 0 || i === Math.floor(points.length / 2) || i === points.length - 1 || isHovered) && (
-                  <text
-                    x={pt.x}
-                    y={SVG_HEIGHT - 1}
-                    textAnchor="middle"
-                    fill="#8C8275"
-                    fontSize="10"
-                    fontFamily="monospace"
-                    className="select-none"
-                  >
-                    {pt.timeLabel}
-                  </text>
-                )}
-              </g>
-            );
-          })}
-        </svg>
-
-        {/* Volume Histogram Label */}
-        <div className="flex items-center justify-between text-[10px] font-mono text-[#8C8275] pt-2 px-3 border-t border-[#EAE3D2]/60">
-          <span className="flex items-center gap-1.5">
-            <BarChart2 className="w-3 h-3 text-[#9E7A45]" />
-            <span>Dual-State Volume Histogram (₹ INR Gross)</span>
-          </span>
-          <div className="flex items-center gap-3">
-            <span className="flex items-center gap-1">
-              <span className="w-2 h-2 rounded-xs bg-[#C59B5F]" />
-              <span>Verified Settlement</span>
+          {/* Trajectory Guide Note */}
+          <div className="flex items-center justify-between text-xs text-[#8C8275] font-mono px-1">
+            <span className="flex items-center gap-1.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block" />
+              <span>Green nodes: Successful verification (+1 upward slope)</span>
             </span>
-            <span className="flex items-center gap-1">
-              <span className="w-2 h-2 rounded-xs bg-rose-500" />
-              <span>Failed / Auto-Refund</span>
+            <span className="flex items-center gap-1.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block" />
+              <span>Red nodes: Constraint / hash rejection (-1 downward dip)</span>
             </span>
           </div>
         </div>
-      </div>
-
-      {/* Simulator Action Controls */}
-      <div className="p-4 rounded-2xl bg-[#FAF8F5] border border-[#EAE3D2] flex flex-wrap items-center justify-between gap-3">
-        <div className="space-y-0.5">
-          <span className="text-xs font-bold text-[#1C1A17] flex items-center gap-1.5">
-            <Zap className="w-3.5 h-3.5 text-[#C59B5F]" />
-            <span>Interactive Simulator</span>
-          </span>
-          <p className="text-[11px] text-[#8C8275]">
-            Trigger mock transactions to test the trajectory reaction in real time.
-          </p>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2">
-          {/* + Simulate Success */}
-          <button
-            onClick={() => handleSimulateTransaction("SUCCESS")}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer"
-            title="Simulate a passing milestone (+1 Up Tick)"
-          >
-            <TrendingUp className="w-3.5 h-3.5" />
-            <span>+ Simulate Success (+1 UP)</span>
-          </button>
-
-          {/* - Simulate Failure */}
-          <button
-            onClick={() => handleSimulateTransaction("FAILED")}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer"
-            title="Simulate a rejected milestone (-1 Down Dip)"
-          >
-            <TrendingDown className="w-3.5 h-3.5" />
-            <span>- Simulate Failure (-1 DIP)</span>
-          </button>
-
-          {/* Reset */}
-          <button
-            onClick={handleReset}
-            className="p-1.5 rounded-xl border border-[#EAE3D2] bg-white hover:bg-[#FAF6EE] text-[#8C8275] hover:text-[#1C1A17] transition-colors cursor-pointer"
-            title="Reset to default baseline"
-          >
-            <RotateCcw className="w-4 h-4" />
-          </button>
-        </div>
-      </div>
+      )}
 
     </div>
   );

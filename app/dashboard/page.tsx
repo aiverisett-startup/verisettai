@@ -9,6 +9,12 @@ import { VerisettLogo } from "@/components/VerisettLogo";
 import { GoldenBackgroundShapes } from "@/components/ui/GoldenBackgroundShapes";
 import { AgentTransactionChart } from "@/components/dashboard/AgentTransactionChart";
 import { AgentTransactionHistory } from "@/components/dashboard/AgentTransactionHistory";
+import {
+  TransactionItem,
+  getStoredTransactions,
+  createAgentEscrowTransaction,
+  TX_UPDATE_EVENT,
+} from "@/lib/agentTransactionStorage";
 import { supabase } from "@/lib/supabase";
 
 interface ProfileData {
@@ -31,6 +37,7 @@ export default function DashboardPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [isConsentModalOpen, setIsConsentModalOpen] = useState(false);
   const [isAgentConnected, setIsAgentConnected] = useState(false);
+  const [transactions, setTransactions] = useState<TransactionItem[]>([]);
   const [currentUser, setCurrentUser] = useState<{ id?: string; email?: string } | null>(null);
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [userName, setUserName] = useState<string | null>(null);
@@ -111,7 +118,45 @@ export default function DashboardPage() {
     };
 
     fetchLiveUserData();
+
+    // Load real transactions
+    const loadTx = () => {
+      setTransactions(getStoredTransactions());
+    };
+    loadTx();
+
+    const handleTxUpdate = () => {
+      loadTx();
+    };
+
+    window.addEventListener(TX_UPDATE_EVENT, handleTxUpdate);
+    window.addEventListener("storage", handleTxUpdate);
+    return () => {
+      window.removeEventListener(TX_UPDATE_EVENT, handleTxUpdate);
+      window.removeEventListener("storage", handleTxUpdate);
+    };
   }, []);
+
+  const handleExecuteTestSettlement = (isSuccess: boolean = true) => {
+    const newTx = createAgentEscrowTransaction({
+      amountINR: 25000,
+      isSuccess,
+      payerName: userName ? `${userName}'s Client Agent` : "Apex Autonomous Node",
+      workerName: "Nexus-Crawler Worker LLM",
+      milestone: "Deterministic SEC 10-K Hash Parsing & Audit",
+    });
+    setTransactions((prev) => [newTx, ...prev]);
+  };
+
+  const handleDisconnectAgent = () => {
+    try {
+      localStorage.removeItem("verisett_agent_connected");
+      localStorage.removeItem("verisett_connected_agent_id");
+      setIsAgentConnected(false);
+    } catch {
+      // Ignore
+    }
+  };
 
   const handleSignOut = () => {
     try {
@@ -256,21 +301,48 @@ export default function DashboardPage() {
                 )}
               </div>
             </div>
-            <p className={`text-2xl sm:text-3xl font-bold mt-3 ${isAgentConnected ? "text-emerald-700" : "text-[#9E7A45]"}`}>
-              {isAgentConnected ? "Connected" : "Standby"}
-            </p>
-            <div className="mt-3 flex items-center gap-1.5 text-[11px] font-mono text-[#8C8275]">
+            <div className="flex items-center justify-between mt-3">
+              <p className={`text-2xl sm:text-3xl font-bold ${isAgentConnected ? "text-emerald-700" : "text-[#9E7A45]"}`}>
+                {isAgentConnected ? "Connected" : "Standby"}
+              </p>
+              {isAgentConnected ? (
+                <button
+                  onClick={handleDisconnectAgent}
+                  className="text-[10px] font-mono text-[#8C8275] hover:text-rose-600 underline cursor-pointer"
+                >
+                  Disconnect Agent
+                </button>
+              ) : (
+                <button
+                  onClick={() => setModalOpen(true)}
+                  className="text-[10px] font-mono text-[#9E7A45] hover:text-[#C59B5F] font-semibold underline cursor-pointer"
+                >
+                  Connect Agent
+                </button>
+              )}
+            </div>
+            <div className="mt-2 flex items-center gap-1.5 text-[11px] font-mono text-[#8C8275]">
               <span className={`w-1.5 h-1.5 rounded-full ${isAgentConnected ? "bg-emerald-500" : "bg-[#C59B5F]"}`} />
-              {isAgentConnected ? "FastMCP v2.4 Node: agt_live_982b" : "Waiting for gateway ping"}
+              {isAgentConnected ? "FastMCP v2.4 Node: agt_live_active" : "Waiting for gateway handshake"}
             </div>
           </div>
         </div>
 
-        {/* 1. Real Working Stock-Market-Style Line Graph with Volume Histogram */}
-        <AgentTransactionChart />
+        {/* 1. Real Working Last Month Line Graph with Volume Histogram */}
+        <AgentTransactionChart
+          isAgentConnected={isAgentConnected}
+          transactions={transactions}
+          onConnectAgent={() => setModalOpen(true)}
+          onExecuteTestSettlement={handleExecuteTestSettlement}
+        />
 
         {/* 2. PhonePe-Style Detailed Transaction History Ledger */}
-        <AgentTransactionHistory />
+        <AgentTransactionHistory
+          isAgentConnected={isAgentConnected}
+          transactions={transactions}
+          onConnectAgent={() => setModalOpen(true)}
+          onExecuteTestSettlement={handleExecuteTestSettlement}
+        />
 
         {/* 3. Active Escrow Vaults Section */}
         <div className="rounded-3xl border border-[#EAE3D2] bg-white p-6 md:p-8 shadow-[0_4px_24px_rgba(197,155,95,0.06)] space-y-4">
