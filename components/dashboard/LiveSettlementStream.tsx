@@ -39,7 +39,7 @@ export const LiveSettlementStream: React.FC<LiveSettlementStreamProps> = ({
       {/* Real-Time Settlement Ticker Ribbon */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 rounded-2xl border border-[#EAE3D2] bg-white px-4 py-3 shadow-[0_2px_12px_rgba(197,155,95,0.03)] relative overflow-hidden">
         
-        <div className="flex items-center gap-3 overflow-hidden">
+        <div className="flex items-center gap-3 overflow-hidden min-w-0 flex-1">
           <div className="flex items-center gap-2 shrink-0">
             <span className="flex h-2 w-2 rounded-full bg-[#D4AF37] animate-pulse" />
             <span className="text-[11px] font-semibold tracking-wider text-[#1C1A17] uppercase font-mono">
@@ -49,16 +49,16 @@ export const LiveSettlementStream: React.FC<LiveSettlementStreamProps> = ({
 
           <div className="h-4 w-px bg-[#EAE3D2] hidden sm:block shrink-0" />
 
-          {/* Cycling State Item */}
-          <div className="flex items-center gap-2 text-xs font-mono truncate text-[#8C8275]">
-            <span className="text-[#9E7A45]/70">Contract:</span>
-            <span className="text-[#1C1A17] font-semibold">{currentItem.contractId}</span>
-            <span className="text-[#EAE3D2]">|</span>
-            <span className="text-[#1C1A17] font-medium">{currentItem.payer}</span>
+          {/* Cycling State Item with strict truncation */}
+          <div className="flex items-center gap-1.5 sm:gap-2 text-xs font-mono min-w-0 text-[#8C8275] overflow-hidden">
+            <span className="text-[#9E7A45]/70 shrink-0">Contract:</span>
+            <span className="text-[#1C1A17] font-semibold shrink-0">{currentItem.contractId}</span>
+            <span className="text-[#EAE3D2] shrink-0">|</span>
+            <span className="text-[#1C1A17] font-medium truncate max-w-[80px] sm:max-w-[140px]">{currentItem.payer}</span>
             <ArrowRight className="h-3 w-3 text-[#9E7A45] shrink-0" />
-            <span className="text-[#1C1A17] font-medium">{currentItem.worker}</span>
-            <span className="text-[#EAE3D2]">|</span>
-            <span className="text-[#9E7A45] font-semibold">{currentItem.amount}</span>
+            <span className="text-[#1C1A17] font-medium truncate max-w-[80px] sm:max-w-[140px]">{currentItem.worker}</span>
+            <span className="text-[#EAE3D2] shrink-0">|</span>
+            <span className="text-[#9E7A45] font-semibold shrink-0">{currentItem.amount}</span>
           </div>
         </div>
 

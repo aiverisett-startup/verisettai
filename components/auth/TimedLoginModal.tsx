@@ -231,7 +231,7 @@ export function TimedLoginModal({ delaySeconds = 15 }: TimedLoginModalProps) {
 
       {/* 2. Institutional Login Modal Popup (triggers at 15s) */}
       {isOpen && (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-stone-900/60 backdrop-blur-sm p-4 sm:p-6 flex items-center justify-center transition-all animate-in fade-in duration-300">
+        <div className="fixed inset-0 z-[100] overflow-y-auto bg-stone-900/60 backdrop-blur-sm p-4 sm:p-6 flex items-center justify-center transition-all animate-in fade-in duration-300">
           <div
             role="dialog"
             aria-modal="true"

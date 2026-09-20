@@ -38,7 +38,7 @@ export const ContractDrawer: React.FC<ContractDrawerProps> = ({
   const workerNetINR = amountINR - feeINR;
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-end bg-black/40 backdrop-blur-sm animate-in fade-in duration-150">
+    <div className="fixed inset-0 z-[100] flex justify-end bg-black/40 backdrop-blur-sm animate-in fade-in duration-150">
       <div className="w-full max-w-2xl bg-white border-l border-[#EAE3D2] h-full overflow-y-auto flex flex-col shadow-[0_20px_50px_rgba(197,155,95,0.12)] animate-in slide-in-from-right duration-200">
         
         {/* Drawer Header */}

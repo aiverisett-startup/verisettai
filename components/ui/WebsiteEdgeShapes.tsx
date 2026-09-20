@@ -6,7 +6,7 @@ export function WebsiteEdgeShapes() {
   return (
     <div
       aria-hidden="true"
-      className="pointer-events-none absolute inset-0 overflow-hidden select-none -z-10"
+      className="pointer-events-none absolute inset-0 overflow-hidden select-none -z-10 hidden sm:block"
     >
       {/* =========================================================================
           LEFT FLANK BACKGROUND HALF-SHAPES (Strictly in the background, behind dashboards)
@@ -125,27 +125,7 @@ export function WebsiteEdgeShapes() {
         </svg>
       </div>
 
-      {/* 5. Sandbox / Ledger Left: Smooth Architectural Half-Circle */}
-      <div className="absolute top-[3420px] sm:top-[3560px] -left-16 sm:-left-24 w-64 sm:w-80 h-64 sm:h-80 opacity-35">
-        <svg viewBox="0 0 280 280" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
-          <path
-            d="M 140,20 A 120,120 0 0,1 140,260 Z"
-            fill="#FAF6EE"
-            fillOpacity="0.5"
-            stroke="#D4AF37"
-            strokeWidth="1.2"
-            strokeOpacity="0.35"
-          />
-          <path
-            d="M 140,50 A 90,90 0 0,1 140,230"
-            stroke="#C59B5F"
-            strokeWidth="1"
-            strokeDasharray="4 5"
-            strokeOpacity="0.25"
-            fill="none"
-          />
-        </svg>
-      </div>
+
 
       {/* 6. Developer Code Left: Smooth Half-Capsule (Half-Pill) */}
       <div className="absolute top-[4250px] sm:top-[4380px] -left-12 sm:-left-16 w-52 sm:w-68 h-52 sm:h-68 opacity-30 motion-safe:animate-float-reverse">
@@ -318,27 +298,7 @@ export function WebsiteEdgeShapes() {
         </svg>
       </div>
 
-      {/* 13. Sandbox / Ledger Right: Golden Half-Circle Disc */}
-      <div className="absolute top-[3450px] sm:top-[3600px] -right-16 sm:-right-24 w-64 sm:w-80 h-64 sm:h-80 opacity-35">
-        <svg viewBox="0 0 280 280" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
-          <path
-            d="M 140,20 A 120,120 0 0,0 140,260 Z"
-            fill="#FAF6EE"
-            fillOpacity="0.5"
-            stroke="#D4AF37"
-            strokeWidth="1.2"
-            strokeOpacity="0.35"
-          />
-          <path
-            d="M 140,50 A 90,90 0 0,0 140,230"
-            stroke="#C59B5F"
-            strokeWidth="1"
-            strokeDasharray="4 5"
-            strokeOpacity="0.25"
-            fill="none"
-          />
-        </svg>
-      </div>
+
 
       {/* 14. Developer Code Right: Smooth Half-Capsule */}
       <div className="absolute top-[4300px] sm:top-[4450px] -right-12 sm:-right-16 w-52 sm:w-68 h-52 sm:h-68 opacity-30 motion-safe:animate-float-slow">

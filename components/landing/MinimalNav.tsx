@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { Play, Lock } from "lucide-react";
+import { Play, Lock, Menu, X, ShieldCheck, HelpCircle, Terminal, Cpu, ArrowRight } from "lucide-react";
 import { GoogleIcon } from "../ui/GoogleIcon";
 import { VerisettLogo } from "../VerisettLogo";
 import { EnvironmentMode, VaultBalance } from "../dashboard/types";
@@ -23,7 +23,7 @@ interface MinimalNavProps {
 export function MinimalNav({
   envMode,
   onToggleEnv,
-  vaultBalance,
+  vaultBalance: _vaultBalance,
   onOpenDepositModal,
   onOpenConsole,
   onOpenVideoModal,
@@ -31,6 +31,7 @@ export function MinimalNav({
 }: MinimalNavProps) {
   const { user, isLoaded, signOut, updateProfile } = useAuthUser();
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [avatarError, setAvatarError] = useState(false);
   const [balance, setBalance] = useState<number | null>(null);
 
@@ -74,30 +75,21 @@ export function MinimalNav({
     };
   }, [user]);
 
-  const formatINR = (cents: number) => {
-    const inrValue = (cents / 100) * 83;
-    return "₹" + inrValue.toLocaleString("en-IN", { maximumFractionDigits: 0 });
-  };
+  const closeMobileMenu = () => setIsMobileMenuOpen(false);
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-white/85 backdrop-blur-md border-b border-[#EAE3D2] transition-all">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4 flex-nowrap min-w-0">
+    <header className="sticky top-0 z-50 w-full bg-white/90 backdrop-blur-md border-b border-[#EAE3D2] transition-all">
+      <div className="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2 sm:gap-4 flex-nowrap min-w-0">
         
-        {/* Brand & Navigation Links */}
-        <div className="flex items-center gap-4 lg:gap-6 flex-nowrap min-w-0 flex-1">
+        {/* Brand & Desktop Navigation Links */}
+        <div className="flex items-center gap-4 lg:gap-6 flex-nowrap min-w-0">
           {/* Brand Logo */}
           <Link href="/" className="shrink-0 flex items-center group whitespace-nowrap">
             <VerisettLogo size={28} />
           </Link>
 
-          {/* Navigation Links - Single Row, No Wrapping, Minimalist Gray to Gold */}
-          <nav className="hidden md:flex items-center gap-3 lg:gap-5 text-sm font-medium text-[#6E675D] flex-nowrap whitespace-nowrap min-w-0">
-            <a
-              href="#milestones"
-              className="hidden xl:inline-block shrink-0 whitespace-nowrap hover:text-[#9E7A45] transition-colors py-0.5"
-            >
-              Milestones
-            </a>
+          {/* Desktop Navigation Links - Shown on large screens (xl+) to prevent any overlap */}
+          <nav className="hidden xl:flex items-center gap-4 2xl:gap-5 text-sm font-medium text-[#6E675D] flex-nowrap whitespace-nowrap min-w-0">
             <a
               href="#how-it-works"
               className="shrink-0 whitespace-nowrap hover:text-[#9E7A45] transition-colors py-0.5"
@@ -111,14 +103,20 @@ export function MinimalNav({
               Sandbox
             </a>
             <a
+              href="#milestones"
+              className="shrink-0 whitespace-nowrap hover:text-[#9E7A45] transition-colors py-0.5"
+            >
+              Milestones
+            </a>
+            <a
               href="#trust"
-              className="hidden xl:inline-block shrink-0 whitespace-nowrap hover:text-[#9E7A45] transition-colors py-0.5"
+              className="shrink-0 whitespace-nowrap hover:text-[#9E7A45] transition-colors py-0.5"
             >
               Security
             </a>
             <a
               href="#developers"
-              className="hidden xl:inline-block shrink-0 whitespace-nowrap hover:text-[#9E7A45] transition-colors py-0.5 text-[#9E9689] hover:text-[#9E7A45]"
+              className="shrink-0 whitespace-nowrap hover:text-[#9E7A45] transition-colors py-0.5 text-[#9E9689] hover:text-[#9E7A45]"
             >
               Docs
             </a>
@@ -138,9 +136,10 @@ export function MinimalNav({
           </nav>
         </div>
 
-        {/* Right Actions */}
-        <div className="shrink-0 flex items-center gap-2 sm:gap-2.5 flex-nowrap ml-auto z-10">
-          {/* Watch Video Tour Button (Always visible on mobile & desktop) */}
+        {/* Right Actions - Carefully bounded & sized to eliminate any collisions */}
+        <div className="shrink-0 flex items-center gap-1.5 sm:gap-2.5 flex-nowrap ml-auto z-10">
+          
+          {/* Watch Video Tour Button (Always visible without pushing other items) */}
           {onOpenVideoModal && (
             <button
               onClick={onOpenVideoModal}
@@ -162,7 +161,7 @@ export function MinimalNav({
             </button>
           )}
 
-          {/* Environment Switcher */}
+          {/* Environment Switcher (Visible on md+ so it never crowds mobile) */}
           <div className="shrink-0 hidden md:flex items-center p-0.5 rounded-full bg-[#F9F8F6] border border-[#EAE3D2] text-xs font-mono">
             <button
               onClick={() => onToggleEnv("sandbox")}
@@ -186,21 +185,11 @@ export function MinimalNav({
             </button>
           </div>
 
-          {/* Institutional Testnet Badge (Only on wide screens to prevent overflow) */}
-          {!user ? (
-            <div className="hidden 2xl:flex shrink-0 items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FAF8F5] border border-[#EAE3D2] text-xs font-mono shadow-xs">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75 motion-reduce:hidden" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
-              </span>
-              <span className="text-[#8C8275] text-[11px] font-medium tracking-tight">
-                Protocol Testnet Sandbox // Active
-              </span>
-            </div>
-          ) : (
+          {/* Vault Balance (Protected to wide screens so it never squeezes the profile button) */}
+          {user && (
             <button
               onClick={onOpenDepositModal}
-              className="hidden sm:flex shrink-0 items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-[#EAE3D2] hover:border-[#D4AF37] transition-colors text-xs font-mono shadow-xs cursor-pointer"
+              className="hidden 2xl:flex shrink-0 items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-[#EAE3D2] hover:border-[#D4AF37] transition-colors text-xs font-mono shadow-xs cursor-pointer"
               title="Click to view testnet balance & vault deposit"
             >
               <Lock className="w-3 h-3 text-[#9E7A45] shrink-0" />
@@ -211,14 +200,15 @@ export function MinimalNav({
             </button>
           )}
 
-          {/* Primary CTA: Round Profile Button (if logged in) or Login Button */}
+          {/* Primary CTA: Clean Round Profile Button or Login Button */}
           {isLoaded && user ? (
             <button
               onClick={() => setIsProfileModalOpen(true)}
-              className="shrink-0 flex items-center gap-2 p-1 pl-1 pr-2.5 sm:pr-3 rounded-full bg-white hover:bg-[#FAF6EE] border border-[#EAE3D2] hover:border-[#D4AF37] transition-all duration-200 shadow-xs hover:shadow-md group cursor-pointer z-10"
+              className="shrink-0 flex items-center gap-2 p-1 pl-1 pr-1.5 sm:pr-2.5 rounded-full bg-white hover:bg-[#FAF6EE] border border-[#EAE3D2] hover:border-[#D4AF37] transition-all duration-200 shadow-xs hover:shadow-md group cursor-pointer"
               title="Click to view profile & settings"
+              aria-label="Profile and Settings"
             >
-              {/* Round Profile with Google Image / Avatar */}
+              {/* Round Profile Avatar with Gold Border */}
               <div className="relative w-8 h-8 rounded-full overflow-hidden ring-2 ring-[#D4AF37] bg-gradient-to-tr from-[#FAF1E3] to-[#F5E8D0] flex items-center justify-center shrink-0 shadow-2xs">
                 {user.avatar && !avatarError ? (
                   <img
@@ -237,9 +227,9 @@ export function MinimalNav({
                 <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full bg-emerald-500 ring-2 ring-white" />
               </div>
 
-              {/* User Name & Status Label */}
-              <div className="hidden sm:flex flex-col text-left pr-0.5 min-w-0">
-                <span className="text-[11px] font-bold text-[#1C1A17] group-hover:text-[#9E7A45] transition-colors leading-tight truncate max-w-[90px]">
+              {/* User Name & Status Label (Shown on lg+ to prevent any cramped wrapping) */}
+              <div className="hidden lg:flex flex-col text-left pr-0.5 min-w-0">
+                <span className="text-[11px] font-bold text-[#1C1A17] group-hover:text-[#9E7A45] transition-colors leading-tight truncate max-w-[75px]">
                   {user.name.split(" ")[0]}
                 </span>
                 <span className="text-[9px] text-[#8C8275] font-mono leading-none">
@@ -250,14 +240,113 @@ export function MinimalNav({
           ) : (
             <Link
               href="/login"
-              className="shrink-0 whitespace-nowrap flex items-center justify-center px-5 py-2 rounded-full bg-[#C59B5F] hover:bg-[#B38A4F] text-white text-xs sm:text-sm font-semibold tracking-wider transition-all shadow-[0_4px_14px_rgba(197,155,95,0.35)] hover:shadow-[0_6px_20px_rgba(197,155,95,0.45)] hover:translate-y-[-1px] active:translate-y-[0px] cursor-pointer"
+              className="shrink-0 whitespace-nowrap flex items-center justify-center px-3.5 sm:px-5 py-1.5 sm:py-2 rounded-full bg-[#C59B5F] hover:bg-[#B38A4F] text-white text-xs sm:text-sm font-semibold tracking-wider transition-all shadow-[0_4px_14px_rgba(197,155,95,0.35)] hover:shadow-[0_6px_20px_rgba(197,155,95,0.45)] cursor-pointer"
             >
               LOGIN
             </Link>
           )}
+
+          {/* Mobile & Tablet Navigation Menu Toggle Button (Visible below xl) */}
+          <button
+            type="button"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            aria-expanded={isMobileMenuOpen}
+            aria-label="Toggle navigation menu"
+            className="xl:hidden p-2 rounded-full bg-[#FAF6EE] hover:bg-[#F5EBD7] text-[#1C1A17] hover:text-[#9E7A45] border border-[#EAE3D2] transition-colors cursor-pointer shrink-0 ml-1"
+          >
+            {isMobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+          </button>
         </div>
 
       </div>
+
+      {/* Mobile & Tablet Dropdown Drawer (Zero overlap with top navbar) */}
+      {isMobileMenuOpen && (
+        <div className="xl:hidden border-t border-[#EAE3D2] bg-white/95 backdrop-blur-xl shadow-lg animate-in fade-in slide-in-from-top-2 duration-200">
+          <div className="max-w-7xl mx-auto px-4 py-4 space-y-3">
+            
+            {/* Navigation links grid */}
+            <div className="grid grid-cols-2 gap-2 text-xs font-medium">
+              <a
+                href="#how-it-works"
+                onClick={closeMobileMenu}
+                className="flex items-center gap-2 p-2.5 rounded-xl bg-[#FAF8F5] border border-[#EAE3D2] hover:border-[#D4AF37] text-[#1C1A17] transition-all"
+              >
+                <HelpCircle className="w-3.5 h-3.5 text-[#C59B5F]" />
+                <span>How It Works</span>
+              </a>
+
+              <a
+                href="#sandbox"
+                onClick={closeMobileMenu}
+                className="flex items-center gap-2 p-2.5 rounded-xl bg-[#FAF8F5] border border-[#EAE3D2] hover:border-[#D4AF37] text-[#1C1A17] transition-all"
+              >
+                <Terminal className="w-3.5 h-3.5 text-[#C59B5F]" />
+                <span>Sandbox</span>
+              </a>
+
+              <a
+                href="#milestones"
+                onClick={closeMobileMenu}
+                className="flex items-center gap-2 p-2.5 rounded-xl bg-[#FAF8F5] border border-[#EAE3D2] hover:border-[#D4AF37] text-[#1C1A17] transition-all"
+              >
+                <Cpu className="w-3.5 h-3.5 text-[#C59B5F]" />
+                <span>Milestones</span>
+              </a>
+
+              <a
+                href="#trust"
+                onClick={closeMobileMenu}
+                className="flex items-center gap-2 p-2.5 rounded-xl bg-[#FAF8F5] border border-[#EAE3D2] hover:border-[#D4AF37] text-[#1C1A17] transition-all"
+              >
+                <ShieldCheck className="w-3.5 h-3.5 text-[#C59B5F]" />
+                <span>Security</span>
+              </a>
+            </div>
+
+            {/* Mobile Environment & Additional Links */}
+            <div className="flex items-center justify-between pt-2 border-t border-[#F0E9DC] text-xs">
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] text-[#8C8275] font-mono">Env:</span>
+                <div className="flex items-center p-0.5 rounded-full bg-[#F9F8F6] border border-[#EAE3D2] text-[11px] font-mono">
+                  <button
+                    onClick={() => {
+                      onToggleEnv("sandbox");
+                      closeMobileMenu();
+                    }}
+                    className={`px-2 py-0.5 rounded-full ${
+                      envMode === "sandbox" ? "bg-white text-[#9E7A45] font-medium shadow-2xs" : "text-[#8C8275]"
+                    }`}
+                  >
+                    Sandbox
+                  </button>
+                  <button
+                    onClick={() => {
+                      onToggleEnv("mainnet");
+                      closeMobileMenu();
+                    }}
+                    className={`px-2 py-0.5 rounded-full ${
+                      envMode === "mainnet" ? "bg-white text-[#9E7A45] font-medium shadow-2xs" : "text-[#8C8275]"
+                    }`}
+                  >
+                    Live
+                  </button>
+                </div>
+              </div>
+
+              <Link
+                href="/dashboard"
+                onClick={closeMobileMenu}
+                className="inline-flex items-center gap-1 font-semibold text-[#C59B5F] hover:text-[#9E7A45] transition-colors"
+              >
+                <span>Agent Console</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+
+          </div>
+        </div>
+      )}
 
       {/* Profile & Account Settings Modal */}
       {user && (

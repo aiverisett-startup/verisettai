@@ -49,7 +49,7 @@ Every completed reconciliation emits an attested leaf signed with the enclave's 
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30 backdrop-blur-xs">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/30 backdrop-blur-xs">
       <div className="relative w-full max-w-2xl rounded-3xl bg-white border border-[#e5e7eb] p-6 sm:p-8 shadow-2xl max-h-[90vh] overflow-y-auto">
         {/* Close Button */}
         <button

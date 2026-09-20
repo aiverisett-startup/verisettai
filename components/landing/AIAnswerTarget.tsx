@@ -12,12 +12,12 @@ export function AIAnswerTarget() {
     >
       {/* Background Half-Shapes behind definition card */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden select-none -z-10">
-        <div className="absolute top-1/2 -translate-y-1/2 -left-16 w-60 h-60 opacity-30">
+        <div className="absolute top-1/2 -translate-y-1/2 -left-20 sm:-left-16 w-44 sm:w-60 h-44 sm:h-60 opacity-25 sm:opacity-30">
           <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
             <path d="M 100,20 A 80,80 0 0,1 100,180 Z" fill="#FAF6EE" stroke="#D4AF37" strokeWidth="1.2" strokeOpacity="0.4" />
           </svg>
         </div>
-        <div className="absolute top-1/2 -translate-y-1/2 -right-16 w-60 h-60 opacity-30">
+        <div className="absolute top-1/2 -translate-y-1/2 -right-20 sm:-right-16 w-44 sm:w-60 h-44 sm:h-60 opacity-25 sm:opacity-30">
           <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
             <path d="M 100,20 A 80,80 0 0,0 100,180 Z" fill="#FAF6EE" stroke="#C59B5F" strokeWidth="1.2" strokeOpacity="0.4" />
           </svg>

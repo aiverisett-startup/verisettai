@@ -67,7 +67,7 @@ export function LegalConsentModal({
       role="dialog"
       aria-modal="true"
       aria-labelledby="legal-consent-title"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-stone-900/80 backdrop-blur-md transition-all animate-in fade-in duration-300 select-none"
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-stone-900/80 backdrop-blur-md transition-all animate-in fade-in duration-300 select-none"
     >
       <div className="relative w-full max-w-lg rounded-3xl bg-white border border-[#EAE3D2] shadow-2xl p-6 sm:p-8 space-y-6 text-[#1C1A17] font-sans">
         

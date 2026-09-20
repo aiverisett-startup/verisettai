@@ -330,7 +330,7 @@ export function VideoWalkthroughModal({
   const activeChapter = CHAPTERS[activeChapterIndex] || CHAPTERS[0];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#111317]/60 backdrop-blur-md p-2 sm:p-4 md:p-6 overflow-y-auto animate-fadeIn">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#111317]/60 backdrop-blur-md p-2 sm:p-4 md:p-6 overflow-y-auto animate-fadeIn">
       <div className="relative w-full max-w-5xl rounded-2xl bg-white border border-[#E8E8E6] shadow-[0_25px_60px_rgba(0,0,0,0.25)] overflow-hidden flex flex-col max-h-[95vh]">
         
         {/* Modal Header */}

@@ -52,12 +52,12 @@ export function FAQSection() {
     <section id="faq" className="py-24 border-t border-[#EAE3D2] bg-[#FAF8F5] relative overflow-hidden">
       {/* Subtle Background Half-Shapes behind FAQ */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden select-none -z-10">
-        <div className="absolute top-1/4 -left-16 w-64 h-64 opacity-30">
+        <div className="absolute top-1/4 -left-20 sm:-left-16 w-44 sm:w-64 h-44 sm:h-64 opacity-25 sm:opacity-30">
           <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
             <path d="M 100,20 A 80,80 0 0,1 100,180 Z" fill="#FAF6EE" stroke="#D4AF37" strokeWidth="1.2" strokeOpacity="0.35" />
           </svg>
         </div>
-        <div className="absolute bottom-1/4 -right-16 w-64 h-64 opacity-30">
+        <div className="absolute bottom-1/4 -right-20 sm:-right-16 w-44 sm:w-64 h-44 sm:h-64 opacity-25 sm:opacity-30">
           <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
             <path d="M 100,20 A 80,80 0 0,0 100,180 Z" fill="#FAF6EE" stroke="#C59B5F" strokeWidth="1.2" strokeOpacity="0.35" />
           </svg>

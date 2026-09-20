@@ -87,7 +87,7 @@ export function ConnectAgentModal({ isOpen, onClose, onConnected }: ConnectAgent
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4 animate-in fade-in duration-200">
       <div className="relative w-full max-w-2xl rounded-3xl border border-[#EAE3D2] bg-white p-6 sm:p-7 shadow-[0_20px_60px_rgba(197,155,95,0.15)]">
         
         {/* Modal Header */}

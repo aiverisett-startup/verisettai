@@ -49,7 +49,7 @@ export const DepositModal: React.FC<DepositModalProps> = ({
   ];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4 animate-in fade-in duration-150">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4 animate-in fade-in duration-150">
       <div className="w-full max-w-md rounded-3xl border border-[#EAE3D2] bg-white p-6 md:p-8 shadow-[0_16px_48px_rgba(197,155,95,0.12)] relative overflow-hidden">
         
         {/* Modal Header */}
