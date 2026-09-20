@@ -113,7 +113,7 @@ export function HeroSection({
             {/* 4. Action Buttons: Satin Gold Primary + White Secondary */}
             <motion.div
               variants={itemVariants}
-              className="flex flex-wrap items-center gap-3 pt-2 w-full sm:w-auto will-change-transform"
+              className="flex flex-wrap items-center gap-3 pt-2 pb-2 sm:pb-0 w-full sm:w-auto relative z-10 will-change-transform"
             >
               {/* Primary CTA Button: ENTER CONSOLE (if logged in) or LOGIN */}
               {isLoaded && user ? (

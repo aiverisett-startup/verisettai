@@ -334,17 +334,17 @@ export function VideoWalkthroughModal({
       <div className="relative w-full max-w-5xl rounded-2xl bg-white border border-[#E8E8E6] shadow-[0_25px_60px_rgba(0,0,0,0.25)] overflow-hidden flex flex-col max-h-[95vh]">
         
         {/* Modal Header */}
-        <div className="flex items-center justify-between px-4 sm:px-6 py-3.5 border-b border-[#E8E8E6] bg-white shrink-0">
-          <div className="flex items-center gap-2.5 sm:gap-3">
-            <div className="h-8 w-8 rounded-xl bg-[#FAF8F5] border border-[#EAE3D2] flex items-center justify-center text-[#9E7A45] shadow-2xs">
+        <div className="flex items-center justify-between px-4 sm:px-6 py-3.5 border-b border-[#E8E8E6] bg-white shrink-0 gap-3">
+          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+            <div className="h-8 w-8 rounded-xl bg-[#FAF8F5] border border-[#EAE3D2] flex items-center justify-center text-[#9E7A45] shadow-2xs shrink-0">
               <Play className="w-3.5 h-3.5 fill-current ml-0.5" />
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-semibold tracking-tight text-[#1C1A17]">
+            <div className="min-w-0">
+              <div className="flex items-center gap-2.5 flex-nowrap">
+                <span className="text-xs sm:text-sm font-semibold tracking-tight text-[#1C1A17] whitespace-nowrap shrink-0">
                   Verisett Protocol Walkthrough
                 </span>
-                <span className="hidden sm:inline-block text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                <span className="hidden md:inline-flex items-center text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 shrink-0 whitespace-nowrap">
                   Interactive Video Tour
                 </span>
               </div>
@@ -543,10 +543,11 @@ export function VideoWalkthroughModal({
             {/* Dynamic Active Step Explainer Card below video */}
             <div className="p-4 bg-white border-t border-[#E8E8E6] flex items-center justify-between gap-4 shrink-0">
               <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2">
-                  <span className="text-[11px] font-mono font-bold text-emerald-700">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-[11px] font-mono font-bold text-emerald-700 shrink-0">
                     {activeChapter.badge}
                   </span>
+                  <span className="text-[#8C8275] text-xs hidden sm:inline">•</span>
                   <span className="text-xs font-semibold text-[#1C1A17] truncate">
                     {activeChapter.title}
                   </span>

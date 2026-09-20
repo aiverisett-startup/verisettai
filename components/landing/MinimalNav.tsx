@@ -89,7 +89,7 @@ export function MinimalNav({
           </Link>
 
           {/* Desktop Navigation Links - Shown on large screens (xl+) to prevent any overlap */}
-          <nav className="hidden xl:flex items-center gap-4 2xl:gap-5 text-sm font-medium text-[#6E675D] flex-nowrap whitespace-nowrap min-w-0">
+          <nav className="hidden xl:flex items-center gap-5 2xl:gap-7 text-sm font-medium text-[#6E675D] flex-nowrap whitespace-nowrap min-w-0">
             <a
               href="#how-it-works"
               className="shrink-0 whitespace-nowrap hover:text-[#9E7A45] transition-colors py-0.5"
@@ -127,23 +127,17 @@ export function MinimalNav({
               <span className="h-1.5 w-1.5 rounded-full bg-[#C59B5F] animate-pulse" />
               <span>3D Network</span>
             </Link>
-            <Link
-              href="/dashboard"
-              className="shrink-0 whitespace-nowrap text-[#1C1A17] hover:text-[#C59B5F] font-semibold transition-colors py-0.5"
-            >
-              Agent Console →
-            </Link>
           </nav>
         </div>
 
         {/* Right Actions - Carefully bounded & sized to eliminate any collisions */}
         <div className="shrink-0 flex items-center gap-1.5 sm:gap-2.5 flex-nowrap ml-auto z-10">
           
-          {/* Watch Video Tour Button (Always visible without pushing other items) */}
+          {/* Watch Video Tour Button (Shown cleanly on sm+ to prevent cramming mobile topbar) */}
           {onOpenVideoModal && (
             <button
               onClick={onOpenVideoModal}
-              className="shrink-0 flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full bg-[#FAF6EE] hover:bg-[#F5EBD7] text-[#9E7A45] hover:text-[#7A5B2E] border border-[#D4AF37]/50 hover:border-[#D4AF37] font-semibold text-xs tracking-tight transition-all duration-200 shadow-xs cursor-pointer group"
+              className="shrink-0 hidden sm:flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full bg-[#FAF6EE] hover:bg-[#F5EBD7] text-[#9E7A45] hover:text-[#7A5B2E] border border-[#D4AF37]/50 hover:border-[#D4AF37] font-semibold text-xs tracking-tight transition-all duration-200 shadow-xs cursor-pointer group"
               title="Watch Step-by-Step Video Walkthrough"
               aria-label="Watch Step-by-Step Video Walkthrough"
             >
@@ -152,11 +146,8 @@ export function MinimalNav({
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-[#9E7A45]" />
               </div>
               <Play className="w-3 h-3 fill-[#9E7A45] text-[#9E7A45] group-hover:scale-110 transition-transform shrink-0" />
-              <span className="text-[#1C1A17] font-medium text-xs whitespace-nowrap hidden sm:inline">
+              <span className="text-[#1C1A17] font-medium text-xs whitespace-nowrap">
                 Video Tour
-              </span>
-              <span className="text-[#1C1A17] font-medium text-xs whitespace-nowrap sm:hidden">
-                Tour
               </span>
             </button>
           )}
@@ -265,6 +256,27 @@ export function MinimalNav({
         <div className="xl:hidden border-t border-[#EAE3D2] bg-white/95 backdrop-blur-xl shadow-lg animate-in fade-in slide-in-from-top-2 duration-200">
           <div className="max-w-7xl mx-auto px-4 py-4 space-y-3">
             
+            {/* Mobile Video Tour Card */}
+            {onOpenVideoModal && (
+              <button
+                onClick={() => {
+                  closeMobileMenu();
+                  onOpenVideoModal();
+                }}
+                className="w-full flex items-center justify-between p-3 rounded-xl bg-gradient-to-r from-[#FAF6EE] to-[#F5EBD7] border border-[#D4AF37]/50 text-[#1C1A17] text-xs transition-all shadow-xs cursor-pointer group"
+              >
+                <div className="flex items-center gap-2.5">
+                  <div className="h-6 w-6 rounded-full bg-[#C59B5F] text-white flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform shrink-0">
+                    <Play className="w-3 h-3 fill-current ml-0.5" />
+                  </div>
+                  <span className="font-semibold text-[#1C1A17]">Watch Video Tour (30s)</span>
+                </div>
+                <span className="text-[10px] font-mono text-[#9E7A45] bg-white px-2 py-0.5 rounded-full border border-[#D4AF37]/30 shrink-0 font-medium">
+                  Interactive
+                </span>
+              </button>
+            )}
+
             {/* Navigation links grid */}
             <div className="grid grid-cols-2 gap-2 text-xs font-medium">
               <a
