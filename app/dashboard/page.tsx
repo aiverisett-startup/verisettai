@@ -12,7 +12,6 @@ import { AgentTransactionHistory } from "@/components/dashboard/AgentTransaction
 import {
   TransactionItem,
   getStoredTransactions,
-  createAgentEscrowTransaction,
   TX_UPDATE_EVENT,
 } from "@/lib/agentTransactionStorage";
 import { supabase } from "@/lib/supabase";
@@ -39,8 +38,8 @@ export default function DashboardPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [isConsentModalOpen, setIsConsentModalOpen] = useState(false);
   const [activeApiKey, setActiveApiKey] = useState<string>(DEFAULT_API_KEY);
-  const [isAgentConnected, setIsAgentConnected] = useState(true);
-  const [connectedAgentName, setConnectedAgentName] = useState<string>("Aiverisett Primary Payer Agent");
+  const [isAgentConnected, setIsAgentConnected] = useState(false);
+  const [connectedAgentName, setConnectedAgentName] = useState<string | null>(null);
   const [transactions, setTransactions] = useState<TransactionItem[]>([]);
   const [currentUser, setCurrentUser] = useState<{ id?: string; email?: string } | null>(null);
   const [userEmail, setUserEmail] = useState<string | null>(null);
@@ -76,7 +75,10 @@ export default function DashboardPage() {
 
       if (email) setUserEmail(email);
       if (name) setUserName(name);
-      if (savedAgentName) setConnectedAgentName(savedAgentName);
+      if (savedAgentName) {
+        setConnectedAgentName(savedAgentName);
+        setIsAgentConnected(true);
+      }
     } catch {
       // Ignore
     }
@@ -202,54 +204,6 @@ export default function DashboardPage() {
       window.removeEventListener("storage", handleTxUpdate);
     };
   }, []);
-
-  const handleExecuteTestSettlement = async (isSuccess: boolean = true) => {
-    const sender = connectedAgentName || "Aiverisett Primary Payer Agent";
-    const receiver = "Gemini-Flash-Extractor (Worker)";
-
-    try {
-      const res = await fetch("/api/transfer", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${activeApiKey}`,
-          "x-api-key": activeApiKey,
-        },
-        body: JSON.stringify({
-          fromAgent: sender,
-          toAgent: receiver,
-          amount: 2500,
-          status: isSuccess ? "SUCCESSFUL" : "FAILED",
-          apiKey: activeApiKey,
-          milestone: "Autonomous Milestone Escrow Verification",
-        }),
-      });
-      if (res.ok) {
-        const data = await res.json();
-        if (data.transaction) {
-          setTransactions((prev) => [data.transaction, ...prev]);
-        }
-        if (data.vaultBalance) {
-          setProfile((prev) => ({
-            ...prev,
-            testnet_balance: data.vaultBalance.available_balance,
-            available_balance: data.vaultBalance.available_balance,
-          }));
-        }
-        setIsAgentConnected(true);
-      }
-    } catch {
-      // Fallback
-      const newTx = createAgentEscrowTransaction({
-        amountINR: 2500,
-        isSuccess,
-        payerName: sender,
-        workerName: receiver,
-        milestone: "Autonomous Milestone Escrow Verification",
-      });
-      setTransactions((prev) => [newTx, ...prev]);
-    }
-  };
 
   const handleResetVault = async () => {
     try {
@@ -442,7 +396,7 @@ export default function DashboardPage() {
                   {isAgentConnected ? "Connected" : "Standby"}
                 </p>
                 {isAgentConnected && (
-                  <p className="text-xs font-semibold text-[#1C1A17] mt-0.5 font-mono truncate max-w-[210px]" title={connectedAgentName}>
+                  <p className="text-xs font-semibold text-[#1C1A17] mt-0.5 font-mono truncate max-w-[210px]" title={connectedAgentName || undefined}>
                     {connectedAgentName}
                   </p>
                 )}
@@ -475,7 +429,6 @@ export default function DashboardPage() {
           isAgentConnected={isAgentConnected}
           transactions={transactions}
           onConnectAgent={() => setModalOpen(true)}
-          onExecuteTestSettlement={handleExecuteTestSettlement}
         />
 
         {/* 3. PhonePe-Style Detailed Transaction History Ledger */}
@@ -483,7 +436,6 @@ export default function DashboardPage() {
           isAgentConnected={isAgentConnected}
           transactions={transactions}
           onConnectAgent={() => setModalOpen(true)}
-          onExecuteTestSettlement={handleExecuteTestSettlement}
         />
 
         {/* 3. Active Escrow Vaults Section */}
@@ -524,7 +476,7 @@ export default function DashboardPage() {
                     {vault.title || "Primary Autonomous Settlement Vault"}
                   </p>
                   <p className="text-[11px] font-mono text-[#8C8275]">
-                    Agent: <strong className="text-[#9E7A45] font-medium">{connectedAgentName}</strong> • FastMCP Protocol v2.4 • 1.5% Protocol Fee Rail
+                    Agent: <strong className="text-[#9E7A45] font-medium">{connectedAgentName || "Autonomous Clearinghouse Node"}</strong> • FastMCP Protocol v2.4 • 1.5% Protocol Fee Rail
                   </p>
                 </div>
                 <div className="text-left sm:text-right">

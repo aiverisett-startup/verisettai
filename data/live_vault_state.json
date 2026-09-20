@@ -1,14 +1,64 @@
 {
-  "testnet_balance": 18000,
-  "available_balance": 18000,
+  "testnet_balance": 11500,
+  "available_balance": 11500,
   "frozen_balance": 0,
-  "total_volume": 32000,
-  "total_commission": 182,
+  "total_volume": 38500,
+  "total_commission": 280,
   "is_agent_connected": true,
   "connected_agent_id": "agt_live_node",
   "connected_agent_name": "Aiverisett Primary Payer Agent",
   "connected_agent_model": "Header-Defined Agent",
   "transactions": [
+    {
+      "id": "TXN-VRS-2026-174422",
+      "fromAgent": {
+        "name": "Aiverisett Primary Payer Agent",
+        "model": "FastMCP Institutional Payer Agent v2.4",
+        "avatarBg": "bg-amber-600",
+        "agentId": "agt_src_1744"
+      },
+      "toAgent": {
+        "name": "Gemini-Flash-Extractor (Worker)",
+        "model": "Autonomous Deliverable Specialist",
+        "avatarBg": "bg-emerald-600",
+        "agentId": "agt_dest_1744"
+      },
+      "amountINR": 4000,
+      "commissionRate": 0.015,
+      "status": "SUCCESSFUL",
+      "timestamp": "Today at 10:00 PM • Sep 20, 2026",
+      "dateStr": "2026-09-20",
+      "timeStr": "10:00 PM",
+      "milestoneTitle": "Smart Escrow Reentrancy & Double-Spend Security Audit",
+      "sha256Proof": "0xe3c8d1fa0bffcc48e35fd36ab3579fd8499c0e403ca88fb2a6d75651786b2741",
+      "clearingRail": "FastMCP Escrow Protocol v2.4",
+      "direction": "SENT"
+    },
+    {
+      "id": "TXN-VRS-2026-761914",
+      "fromAgent": {
+        "name": "Aiverisett Primary Payer Agent",
+        "model": "FastMCP Institutional Payer Agent v2.4",
+        "avatarBg": "bg-amber-600",
+        "agentId": "agt_src_7619"
+      },
+      "toAgent": {
+        "name": "Gemini-Flash-Extractor (Worker)",
+        "model": "Autonomous Deliverable Specialist",
+        "avatarBg": "bg-emerald-600",
+        "agentId": "agt_dest_7619"
+      },
+      "amountINR": 2500,
+      "commissionRate": 0.015,
+      "status": "SUCCESSFUL",
+      "timestamp": "Today at 10:00 PM • Sep 20, 2026",
+      "dateStr": "2026-09-20",
+      "timeStr": "10:00 PM",
+      "milestoneTitle": "Autonomous Financial Data Synthesis: NVDA Q3 Enterprise Metrics",
+      "sha256Proof": "0x70b31e2c54851823140b8c500ade01cfa58e10b50f2efcd6138c747ace2aef7b",
+      "clearingRail": "FastMCP Escrow Protocol v2.4",
+      "direction": "SENT"
+    },
     {
       "id": "TXN-VRS-2026-344065",
       "fromAgent": {
@@ -213,9 +263,29 @@
   ],
   "vault_deployments": [
     {
+      "id": "VLT-ESC-174422",
+      "title": "Escrow: Aiverisett Primary Payer Agent -> Gemini-Flash-Extractor (Worker)",
+      "amount": 4000,
+      "currency": "VRS",
+      "status": "Settled",
+      "allocatedAgent": "Aiverisett Primary Payer Agent",
+      "createdAt": "2026-09-20T16:30:05.679Z",
+      "rail": "FastMCP Escrow Protocol v2.4"
+    },
+    {
+      "id": "VLT-ESC-761914",
+      "title": "Escrow: Aiverisett Primary Payer Agent -> Gemini-Flash-Extractor (Worker)",
+      "amount": 11500,
+      "currency": "VRS",
+      "status": "Settled",
+      "allocatedAgent": "Aiverisett Primary Payer Agent",
+      "createdAt": "2026-09-20T16:30:03.769Z",
+      "rail": "FastMCP Escrow Protocol v2.4"
+    },
+    {
       "id": "VLT-ESC-344065",
       "title": "Escrow: Aiverisett Primary Payer Agent -> Gemini-Flash-Extractor (Worker)",
-      "amount": 1500,
+      "amount": 15500,
       "currency": "VRS",
       "status": "Settled",
       "allocatedAgent": "Aiverisett Primary Payer Agent",
@@ -283,5 +353,5 @@
       "rail": "FastMCP Escrow Protocol v2.4"
     }
   ],
-  "last_updated": "2026-09-20T16:20:39.553Z"
+  "last_updated": "2026-09-20T16:30:05.683Z"
 }

@@ -23,14 +23,12 @@ interface AgentTransactionHistoryProps {
   isAgentConnected: boolean;
   transactions: TransactionItem[];
   onConnectAgent: () => void;
-  onExecuteTestSettlement?: (isSuccess: boolean) => void;
 }
 
 export function AgentTransactionHistory({
   isAgentConnected,
   transactions,
   onConnectAgent,
-  onExecuteTestSettlement,
 }: AgentTransactionHistoryProps) {
   const [selectedTx, setSelectedTx] = useState<TransactionItem | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -164,17 +162,6 @@ export function AgentTransactionHistory({
               No transactions have been recorded for your connected agent in the last month. When an agent deposits or releases funds through FastMCP or REST API, the full PhonePe ledger will appear here.
             </p>
           </div>
-          {onExecuteTestSettlement && (
-            <div className="pt-2">
-              <button
-                onClick={() => onExecuteTestSettlement(true)}
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#FAF6EE] border border-[#C59B5F]/40 text-[#9E7A45] hover:text-[#C59B5F] text-xs font-semibold shadow-xs transition cursor-pointer"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                <span>Trigger Test Escrow Settlement</span>
-              </button>
-            </div>
-          )}
         </div>
       ) : filteredList.length === 0 ? (
         <div className="p-8 rounded-2xl border border-dashed border-[#EAE3D2] bg-[#FAF8F5]/60 text-center space-y-2">

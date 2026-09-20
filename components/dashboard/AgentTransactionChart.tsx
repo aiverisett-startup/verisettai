@@ -23,7 +23,6 @@ interface AgentTransactionChartProps {
   isAgentConnected: boolean;
   transactions: TransactionItem[];
   onConnectAgent: () => void;
-  onExecuteTestSettlement?: (isSuccess: boolean) => void;
 }
 
 interface ChartDataPoint {
@@ -39,7 +38,6 @@ export function AgentTransactionChart({
   isAgentConnected,
   transactions,
   onConnectAgent,
-  onExecuteTestSettlement,
 }: AgentTransactionChartProps) {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
@@ -261,20 +259,9 @@ export function AgentTransactionChart({
           <div>
             <h3 className="text-base font-bold text-[#1C1A17]">No Transactions in the Past 30 Days</h3>
             <p className="text-xs text-[#8C8275] mt-1 max-w-md mx-auto leading-relaxed">
-              Your agent is linked and in standby mode. When tasks are dispatched or milestone hashes settle, each transaction will dynamically plot on this line graph in real time.
+              Your agent is linked and in standby mode. When tasks are dispatched or milestone hashes settle via your API key or FastMCP, each transaction will dynamically plot on this line graph in real time.
             </p>
           </div>
-          {onExecuteTestSettlement && (
-            <div className="pt-2 flex justify-center gap-3">
-              <button
-                onClick={() => onExecuteTestSettlement(true)}
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#C59B5F] hover:bg-[#B38A4F] text-white text-xs font-semibold shadow-xs transition cursor-pointer"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                <span>Execute Agent Test Settlement (₹25,000)</span>
-              </button>
-            </div>
-          )}
         </div>
       ) : (
         /* 4. Real SVG Line Graph & Volume Histogram */
