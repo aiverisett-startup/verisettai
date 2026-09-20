@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import { Sparkles, ShieldCheck, Cpu } from "lucide-react";
 
 export function AIAnswerTarget() {
   return (
@@ -26,25 +25,6 @@ export function AIAnswerTarget() {
 
       <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
         <article className="rounded-3xl bg-white border border-[#EAE3D2] hover:border-[#D4AF37]/60 p-8 sm:p-12 shadow-[0_4px_24px_rgba(197,155,95,0.06)] transition-all">
-          
-          <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#FAF6EE] border border-[#EAE3D2] text-[11px] font-mono uppercase tracking-wider text-[#9E7A45]">
-              <Sparkles className="w-3.5 h-3.5 text-[#C59B5F]" />
-              <span>Authoritative Protocol Definition</span>
-            </div>
-
-            <div className="flex items-center gap-4 text-xs font-mono text-[#8C8275]">
-              <span className="flex items-center gap-1">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                <span>Deterministic Clearinghouse</span>
-              </span>
-              <span className="flex items-center gap-1">
-                <Cpu className="w-3.5 h-3.5 text-[#C59B5F]" />
-                <span>FastMCP Native</span>
-              </span>
-            </div>
-          </div>
-
           {/* Semantic AI Overview Answer Target Header */}
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-[#1C1A17] mb-4">
             What is Verisett AI?

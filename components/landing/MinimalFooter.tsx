@@ -134,11 +134,6 @@ export function MinimalFooter() {
               </span>
               <ExternalLink className="w-3 h-3 text-[#8C8275] group-hover:text-[#C59B5F] transition-transform group-hover:translate-x-0.5" />
             </a>
-
-            <div className="flex items-center gap-2 text-xs font-montserrat text-[#1C1A17] bg-white border border-[#EAE3D2] px-3.5 py-1.5 rounded-full shadow-2xs">
-              <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="text-[#8C8275] font-medium">Custody Active</span>
-            </div>
           </div>
 
         </div>

@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { Check, ShieldCheck, Cpu, Lock, CheckCircle2, ArrowRight, FileCheck, Layers, Sparkles, ExternalLink } from "lucide-react";
+import { Check, ShieldCheck, Cpu, CheckCircle2, ArrowRight, FileCheck, Layers, Sparkles, ExternalLink } from "lucide-react";
 import { AutonomousVerificationNetwork } from "@/components/3d/AutonomousVerificationNetwork";
 
 export function ProtocolArchitecture() {
@@ -10,7 +10,6 @@ export function ProtocolArchitecture() {
 
   const engines = {
     test: {
-      tag: "AUTOMATED DELIVERABLE VERIFICATION",
       title: "Automated Acceptance & Quality Test Suite",
       description:
         "Define software deliverable acceptance criteria without writing complex code. Verisett automatically evaluates test pass rates, AST lint standards, and security checks before releasing milestone funds.",
@@ -142,9 +141,6 @@ export function ProtocolArchitecture() {
         
         {/* Section Header */}
         <div className="max-w-2xl mb-14">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#FAF6EE] border border-[#EAE3D2] text-[11px] font-mono uppercase tracking-wider text-[#9E7A45] mb-3">
-            Milestone Verification
-          </div>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-[#1C1A17]">
             Pre-programmed acceptance. Zero payment anxiety.
           </h2>
@@ -189,9 +185,6 @@ export function ProtocolArchitecture() {
           {/* Left Column: Commercial Description & Payout Rules */}
           <div className="lg:col-span-6 flex flex-col justify-between rounded-2xl bg-[#FAF6EE]/45 border border-[#EAE3D2] p-6 sm:p-8">
             <div>
-              <div className="text-[11px] font-mono font-semibold uppercase tracking-wider text-[#9E7A45] mb-2">
-                {current.tag}
-              </div>
               <h3 className="text-2xl sm:text-3xl font-bold text-[#1C1A17] mb-3 tracking-tight">
                 {current.title}
               </h3>
@@ -283,15 +276,6 @@ export function ProtocolArchitecture() {
                     </div>
                   ))}
                 </div>
-              </div>
-
-              {/* Bottom Assertion Invariant */}
-              <div className="mt-6 pt-4 border-t border-[#F0E9DC] flex items-center justify-between text-xs text-[#8C8275]">
-                <span className="flex items-center gap-1.5">
-                  <Lock className="w-3.5 h-3.5 text-[#9E7A45]" />
-                  <span>Deterministic escrow invariant: Funds cannot disburse until checks clear.</span>
-                </span>
-                <span className="font-mono text-[11px] text-[#9E7A45] font-semibold">100% ENFORCED</span>
               </div>
 
             </div>

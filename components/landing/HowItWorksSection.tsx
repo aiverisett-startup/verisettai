@@ -181,10 +181,6 @@ export function HowItWorksSection({ onStartOnboarding, onOpenVideoModal }: HowIt
           transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
           className="text-center max-w-2xl mx-auto mb-16 md:mb-20"
         >
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FAF6EE] border border-[#EAE3D2] text-[#9E7A45] text-xs font-medium mb-4">
-            <ShieldCheck className="w-3.5 h-3.5 text-[#C59B5F]" />
-            <span>INSTITUTIONAL PROTOCOL FLOW</span>
-          </div>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-[#1C1A17]">
             How it works in three simple steps.
           </h2>

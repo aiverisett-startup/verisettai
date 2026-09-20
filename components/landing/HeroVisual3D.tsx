@@ -339,7 +339,7 @@ export function HeroVisual3D() {
             </div>
             <div>
               <div className="text-xs font-semibold text-[#1C1A17]">
-                {cycleStep === 4 ? "Atomic Release Complete" : "Deterministic Clearinghouse"}
+                {cycleStep === 4 ? "Atomic Release Complete" : "Settlement Protocol"}
               </div>
               <div className="text-[10px] text-[#8C8275] font-mono">
                 Latency: 38ms • SHA-256 Receipt Generated
