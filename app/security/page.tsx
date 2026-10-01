@@ -206,16 +206,19 @@ export default function SecurityArchitecturePage() {
         <section className="rounded-3xl border border-[#C59B5F]/40 bg-gradient-to-r from-[#142442]/90 via-[#0E1B33]/90 to-[#142442]/90 p-6 sm:p-8 shadow-xl space-y-4">
           <div className="flex items-center gap-2.5 text-xs font-mono font-semibold uppercase text-[#C59B5F]">
             <ShieldCheck className="h-4 w-4 text-[#C59B5F]" />
-            <span>Developer Sandbox Security Architecture</span>
+            <span>Developer Sandbox Security Architecture &amp; Stack Alignment</span>
           </div>
           <p className="text-sm sm:text-base text-white leading-relaxed font-medium">
             <strong>Deterministic code-level enforcement:</strong> Non-custodial programmatic vaults, SHA-256 deliverable payload hashing, execution timeouts, and TLS 1.3 encrypted FastMCP RPC transports.
+          </p>
+          <p className="text-xs sm:text-sm text-[#94A3B8] leading-relaxed">
+            The active sandbox runs an in-process <strong className="text-white">native TypeScript Model Context Protocol (MCP) settlement engine</strong> (JSON-RPC 2.0 endpoint at <code className="text-[#C59B5F] bg-[#070E1B] px-1.5 py-0.5 rounded">/api/mcp</code>). Planned Python FastMCP client bindings (<code className="text-[#C59B5F] bg-[#070E1B] px-1.5 py-0.5 rounded">pip install verisett</code>) are currently in active development on the public roadmap.
           </p>
           <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs font-mono text-[#CBD5E1]">
             <div className="flex items-center gap-2.5">
               <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse shrink-0" />
               <span>
-                <strong className="text-amber-300">Public Roadmap Disclosure:</strong> Independent third-party cryptographic audits and production fiat gateways are currently planned on the public roadmap.
+                <strong className="text-amber-300">Public Roadmap Commitment:</strong> Independent third-party cryptographic audits and production fiat gateways are scheduled across upcoming roadmap phases.
               </span>
             </div>
             <span className="text-[#C59B5F] shrink-0 font-bold">Active Simulation Sandbox</span>
@@ -448,6 +451,80 @@ export default function SecurityArchitecturePage() {
                 <span>X / Twitter: @ai_verisett</span>
                 <ExternalLink className="w-3 h-3 text-[#64748B]" />
               </a>
+            </div>
+          </div>
+        </section>
+
+        {/* Public Protocol Roadmap Accuracy Section */}
+        <section className="rounded-3xl border border-[#1E345E] bg-[#0E1B33]/80 p-6 sm:p-8 space-y-6">
+          <div className="border-b border-[#1E345E] pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <span className="text-xs font-mono uppercase text-[#C59B5F] tracking-wider">Public Protocol Roadmap</span>
+              <h3 className="text-xl sm:text-2xl font-bold text-white tracking-tight mt-0.5">
+                Technical Milestones &amp; Implementation Roadmap
+              </h3>
+            </div>
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#142442] border border-[#1E345E] text-xs font-mono text-[#C59B5F]">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              Milestone 1 Active
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Milestone 1 */}
+            <div className="rounded-2xl border border-emerald-500/40 bg-emerald-500/5 p-5 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-mono font-bold text-emerald-400">MILESTONE 1</span>
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-semibold">
+                  CURRENT / LIVE
+                </span>
+              </div>
+              <h4 className="text-sm font-bold text-white">Live Public TypeScript Testnet Sandbox (Current)</h4>
+              <p className="text-xs text-[#94A3B8] leading-relaxed">
+                Native TypeScript Next.js MCP JSON-RPC 2.0 endpoint (<code className="text-[#C59B5F]">/api/mcp</code>), non-custodial programmatic vaults, SHA-256 payload assertion verification (&lt;50ms), and simulated testnet VRS accounting units with zero monetary fiat liability.
+              </p>
+            </div>
+
+            {/* Milestone 2 */}
+            <div className="rounded-2xl border border-[#1E345E] bg-[#142442]/60 p-5 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-mono font-bold text-[#C59B5F]">MILESTONE 2</span>
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#1E345E] text-[#94A3B8]">
+                  IN DEVELOPMENT
+                </span>
+              </div>
+              <h4 className="text-sm font-bold text-white">Python FastMCP SDK / pip package</h4>
+              <p className="text-xs text-[#94A3B8] leading-relaxed">
+                Official <code className="text-[#C59B5F]">pip install verisett</code> package providing idiomatic Python FastMCP client bindings, decorators, and middleware for autonomous frameworks (Claude Desktop, Cursor, CrewAI, AutoGen, and LangGraph).
+              </p>
+            </div>
+
+            {/* Milestone 3 */}
+            <div className="rounded-2xl border border-[#1E345E] bg-[#142442]/60 p-5 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-mono font-bold text-[#38BDF8]">MILESTONE 3</span>
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#1E345E] text-[#94A3B8]">
+                  SCHEDULED
+                </span>
+              </div>
+              <h4 className="text-sm font-bold text-white">Third-Party Independent Smart Contract &amp; Cryptographic Audit</h4>
+              <p className="text-xs text-[#94A3B8] leading-relaxed">
+                Comprehensive third-party security audit of double-entry ledger invariants, assertion cryptographic soundness, and MCP transport penetration testing, with full public audit report release.
+              </p>
+            </div>
+
+            {/* Milestone 4 */}
+            <div className="rounded-2xl border border-[#1E345E] bg-[#142442]/60 p-5 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-mono font-bold text-[#A855F7]">MILESTONE 4</span>
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#1E345E] text-[#94A3B8]">
+                  ROADMAP
+                </span>
+              </div>
+              <h4 className="text-sm font-bold text-white">Production Fiat Escrow Rails &amp; Corporate Licensing</h4>
+              <p className="text-xs text-[#94A3B8] leading-relaxed">
+                Integration of licensed banking partners and fiat on/off-ramp gateways, production multi-sig custody, enterprise compliance certifications, and legal corporate escrow backing.
+              </p>
             </div>
           </div>
         </section>

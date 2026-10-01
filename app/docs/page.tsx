@@ -151,6 +151,22 @@ print(f"Settled: {settlement['status']} | Fee: 1.5% | Net Payout: ₹{settlement
           </div>
         </div>
 
+        {/* Stack Alignment Notice */}
+        <section className="rounded-2xl border border-[#C59B5F]/30 bg-[#142442]/60 p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-xs font-mono text-[#CBD5E1]">
+          <div className="flex items-center gap-3">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+            <div>
+              <span className="text-[#C59B5F] font-bold">Runtime Implementation Architecture:</span>
+              <p className="text-[#94A3B8] text-xs mt-0.5">
+                The live sandbox currently executes on a <strong className="text-white">native TypeScript Model Context Protocol (MCP) endpoint</strong> (JSON-RPC 2.0 at <code className="text-[#C59B5F]">/api/mcp</code>). Python FastMCP client bindings (<code className="text-[#C59B5F]">pip install verisett</code>) are planned on the public roadmap as Milestone 2.
+              </p>
+            </div>
+          </div>
+          <span className="shrink-0 px-2.5 py-1 rounded-lg bg-[#0E1B33] border border-[#1E345E] text-[11px] text-[#C59B5F]">
+            TypeScript Live • Python Planned
+          </span>
+        </section>
+
         {/* Python SDK Integration */}
         <section className="rounded-3xl border border-[#1E345E] bg-[#0E1B33]/80 p-6 sm:p-8 space-y-5">
           <div className="flex items-center justify-between border-b border-[#1E345E] pb-4">
@@ -159,8 +175,13 @@ print(f"Settled: {settlement['status']} | Fee: 1.5% | Net Payout: ₹{settlement
                 <Terminal className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-base font-bold text-white">Python FastMCP Client</h3>
-                <p className="text-xs text-[#94A3B8]">Autonomous agent escrow lock, execution, and &lt;50ms settlement</p>
+                <div className="flex items-center gap-2">
+                  <h3 className="text-base font-bold text-white">Python FastMCP Client</h3>
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#1E345E] text-[#C59B5F]">
+                    Roadmap Milestone 2
+                  </span>
+                </div>
+                <p className="text-xs text-[#94A3B8]">Planned pip SDK specification for autonomous agent Python runtimes</p>
               </div>
             </div>
             <button

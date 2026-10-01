@@ -156,10 +156,10 @@ export default function AboutPage() {
         <section className="rounded-3xl border border-[#1E345E] bg-[#0E1B33]/80 p-7 sm:p-10 space-y-6">
           <div className="space-y-2">
             <span className="text-xs font-mono uppercase text-[#C59B5F] tracking-wider">
-              Technology Stack &amp; Framing
+              Technology Stack &amp; Implementation Architecture
             </span>
             <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
-              Verisett Settlement Engine — Built on Model Context Protocol (MCP) using FastMCP
+              Verisett Settlement Engine — Native TypeScript MCP with Python FastMCP Roadmap
             </h2>
           </div>
 
@@ -167,20 +167,20 @@ export default function AboutPage() {
             <div className="rounded-2xl border border-[#1E345E] bg-[#142442]/70 p-6 space-y-3">
               <div className="flex items-center gap-2 text-white font-bold text-sm">
                 <Cpu className="w-4 h-4 text-[#C59B5F]" />
-                <span>FastMCP: Underlying Tool Framework</span>
+                <span>Native TypeScript MCP Settlement Engine (Live Sandbox)</span>
               </div>
               <p className="text-xs sm:text-sm text-[#94A3B8] leading-relaxed">
-                FastMCP serves as the underlying developer runtime tool framework. It provides fast, type-safe Python and TypeScript abstractions to expose Model Context Protocol (MCP) server endpoints to LLM runtimes such as Claude Desktop, Cursor, and autonomous daemons.
+                The live simulation sandbox executes directly on a native TypeScript Model Context Protocol (MCP) engine embedded inside Next.js (JSON-RPC 2.0 endpoint at <code className="text-[#C59B5F]">/api/mcp</code>). It handles real-time vault locks, programmatic deliverable proofs, and SQLite double-entry state transitions with zero external runtime dependencies.
               </p>
             </div>
 
             <div className="rounded-2xl border border-[#1E345E] bg-[#142442]/70 p-6 space-y-3">
               <div className="flex items-center gap-2 text-white font-bold text-sm">
                 <Scale className="w-4 h-4 text-emerald-400" />
-                <span>Verisett: Deterministic Settlement Layer</span>
+                <span>Python FastMCP Client Bindings (Roadmap Milestone 2)</span>
               </div>
               <p className="text-xs sm:text-sm text-[#94A3B8] leading-relaxed">
-                Verisett is the fiduciary and algorithmic settlement protocol layer built on top. It orchestrates non-custodial milestone vaults, enforces SHA-256 payload assertions, manages programmatic timeout refunds, and logs immutable ledger receipts.
+                FastMCP serves as the target framework for our upcoming Python SDK (<code className="text-[#C59B5F]">pip install verisett</code>). This will provide native Python decorators and MCP server tools to hook multi-agent Python frameworks (Claude Desktop, Cursor, CrewAI, AutoGen, and LangGraph) directly into the Verisett settlement clearinghouse.
               </p>
             </div>
           </div>

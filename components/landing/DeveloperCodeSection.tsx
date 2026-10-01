@@ -43,7 +43,7 @@ async with VerisettClient(api_key="${user ? "vrs_live_89f72b1049c81a29e4d0812b" 
     print(f"Vault Status: {escrow.status} | Locked: ₹{escrow.amount_inr}")`,
 
     curl: `# REST API: Create Milestone Escrow Contract
-curl -X POST https://api.verisett.io/v1/contracts/create \\
+curl -X POST https://veri-sett.com/api/transfer \\
   -H "Authorization: Bearer ${user ? "vs_live_8f9a2b1c4e92a81b" : "[LOGIN_REQUIRED_TO_COPY_KEY]"}" \\
   -H "Content-Type: application/json" \\
   -d '{

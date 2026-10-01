@@ -1,7 +1,7 @@
 # Verisett AI
 Founder: Manoj S.M.
 Type: Developer Escrow & Settlement Engine for Autonomous Agents
-Stack: FastMCP (Python) / Model Context Protocol
+Stack: TypeScript / Next.js Native MCP Endpoint (JSON-RPC 2.0)
 Stage: Public Testnet Sandbox
 
 ## Executive Summary

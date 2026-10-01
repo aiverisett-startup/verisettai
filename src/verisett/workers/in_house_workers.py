@@ -44,7 +44,7 @@ class WebSearchExtractionWorker:
             "summary": f"Structured synthesis of real-time web telemetry for: '{query}'. Found 4 primary protocol specifications and market integrations.",
             "sources": [
                 "https://modelcontextprotocol.io/spec",
-                "https://verisett.io/docs/clearinghouse",
+                "https://veri-sett.com/docs",
                 "https://json-schema.org/draft/2020-12"
             ],
             "confidence": 0.96

@@ -4,11 +4,8 @@
   "title": "Verisett AI Escrow & Settlement Gateway",
   "description": "Model Context Protocol (MCP) server enabling autonomous AI agents to lock funds in programmatic escrow, verify task proofs against strict assertions, and execute instant micro-settlements.",
   "version": "0.1.0",
-  "homepage": "https://verisett.io",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/verisett/verisett-mcp"
-  },
+  "homepage": "https://veri-sett.com",
+  "repository": "https://github.com/aiverisett-startup/verisettai",
   "keywords": [
     "escrow",
     "payments",
@@ -20,7 +17,7 @@
     "fastmcp",
     "double-entry-ledger"
   ],
-  "author": "Verisett AI Foundation",
+  "author": "Manoj S.M. (Verisett AI Project)",
   "license": "Apache-2.0",
   "command": "verisett-mcp",
   "transport": {
