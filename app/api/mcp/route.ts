@@ -5,6 +5,9 @@ import {
   recordVaultDeposit,
   setServerAgentConnected,
   autoDetectAgentIdentity,
+  createProgrammaticVault,
+  settleProgrammaticVault,
+  getProgrammaticVault,
 } from "@/lib/serverStore";
 import { verifyApiKeyConstantTime } from "@/lib/verisettDb";
 
@@ -100,6 +103,45 @@ export async function POST(req: NextRequest) {
         result: {
           tools: [
             {
+              name: "create_vault",
+              description: "Create and fund a deterministic programmatic escrow vault between payer and payee.",
+              inputSchema: {
+                type: "object",
+                properties: {
+                  vault_id: { type: "string", description: "Unique identifier for the escrow vault" },
+                  payer: { type: "string", description: "Payer agent identifier or name" },
+                  payee: { type: "string", description: "Payee / worker agent identifier or name" },
+                  amount: { type: "number", description: "Amount in VRS to lock into the vault" },
+                  ttl: { type: "number", description: "Time-to-live expiration in seconds (default: 300)" },
+                },
+                required: ["vault_id", "payer", "payee", "amount"],
+              },
+            },
+            {
+              name: "settle_vault",
+              description: "Settle an escrow vault by verifying deliverable output against expected SHA-256 hash.",
+              inputSchema: {
+                type: "object",
+                properties: {
+                  vault_id: { type: "string", description: "Vault ID to settle" },
+                  assertion_payload: { description: "The deliverable output or assertion payload to verify" },
+                  expected_sha256: { type: "string", description: "Expected SHA-256 hash proof" },
+                },
+                required: ["vault_id", "assertion_payload", "expected_sha256"],
+              },
+            },
+            {
+              name: "get_vault_status",
+              description: "Retrieve current state, balances, and audit proof of an escrow vault.",
+              inputSchema: {
+                type: "object",
+                properties: {
+                  vault_id: { type: "string", description: "Vault ID to inspect" },
+                },
+                required: ["vault_id"],
+              },
+            },
+            {
               name: "deposit_funds",
               description: "Deposit real-time testnet funds directly into the Verisett vault.",
               inputSchema: {
@@ -136,11 +178,201 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    // Direct JSON-RPC: create_vault
+    if (method === "create_vault") {
+      const args = params || {};
+      const vId = args.vault_id || args.vaultId || `vlt_${Date.now()}`;
+      const payer = args.payer || args.payer_name || state.connected_agent_name || "Agent A";
+      const payee = args.payee || args.payee_name || "Agent B";
+      const amount = Number(args.amount ?? args.amount_vrs ?? 100);
+      const ttl = Number(args.ttl || 300);
+
+      const res = createProgrammaticVault({ vault_id: vId, payer, payee, amount, ttl });
+      return NextResponse.json({
+        jsonrpc: "2.0",
+        id: id || 1,
+        result: {
+          vault_id: res.vault.id,
+          status: res.vault.status,
+          payer: res.vault.payer,
+          payee: res.vault.payee,
+          amount: res.vault.amount,
+          currency: res.vault.currency,
+          ttl: res.vault.ttl,
+          expires_at: res.vault.expiresAt,
+          created_at: res.vault.createdAt,
+          message: `Vault '${res.vault.id}' successfully locked with ${amount} VRS.`,
+        },
+      });
+    }
+
+    // Direct JSON-RPC: settle_vault
+    if (method === "settle_vault") {
+      const args = params || {};
+      const vId = args.vault_id || args.vaultId;
+      const assertion = args.assertion_payload ?? args.assertion;
+      const expected = args.expected_sha256 || args.expectedSha256 || "";
+
+      const res = settleProgrammaticVault({
+        vault_id: vId,
+        assertion_payload: assertion,
+        expected_sha256: expected,
+      });
+
+      if (!res.success) {
+        return NextResponse.json(
+          {
+            jsonrpc: "2.0",
+            id: id || 1,
+            error: { code: -32002, message: res.error || "Settlement verification failed" },
+          },
+          { status: 400 }
+        );
+      }
+
+      return NextResponse.json({
+        jsonrpc: "2.0",
+        id: id || 1,
+        result: {
+          vault_id: res.vault?.id,
+          status: res.vault?.status,
+          settled_at: res.vault?.settledAt,
+          payer: res.vault?.payer,
+          payee: res.vault?.payee,
+          gross_amount: res.vault?.amount,
+          protocol_commission: Math.round((res.vault?.amount || 0) * 0.015),
+          verified_sha256: res.vault?.sha256Proof,
+          transaction_id: res.transaction?.id,
+          message: "Cryptographic assertion verified. Funds cleared to payee.",
+        },
+      });
+    }
+
+    // Direct JSON-RPC: get_vault_status
+    if (method === "get_vault_status") {
+      const args = params || {};
+      const vId = args.vault_id || args.vaultId;
+      const vault = getProgrammaticVault(vId);
+      if (!vault) {
+        return NextResponse.json({
+          jsonrpc: "2.0",
+          id: id || 1,
+          result: { vault_id: vId, status: "NOT_FOUND", exists: false },
+        });
+      }
+      return NextResponse.json({
+        jsonrpc: "2.0",
+        id: id || 1,
+        result: {
+          vault_id: vault.id,
+          status: vault.status,
+          amount: vault.amount,
+          currency: vault.currency,
+          payer: vault.payer,
+          payee: vault.payee,
+          created_at: vault.createdAt,
+          expires_at: vault.expiresAt,
+          settled_at: vault.settledAt,
+          sha256_proof: vault.sha256Proof,
+          transaction_id: vault.transactionId,
+          exists: true,
+        },
+      });
+    }
+
     // 3. Tool Execution
     if (method === "tools/call") {
       const toolName = params?.name;
       const args = params?.arguments || {};
       const state = getVaultState();
+
+      if (toolName === "create_vault" || toolName === "create_escrow_vault") {
+        const vId = args.vault_id || args.vaultId || `vlt_${Date.now()}`;
+        const payer = args.payer || args.payer_name || state.connected_agent_name || "Agent A";
+        const payee = args.payee || args.payee_name || "Agent B";
+        const amount = Number(args.amount ?? args.amount_vrs ?? 100);
+        const ttl = Number(args.ttl || 300);
+
+        const res = createProgrammaticVault({ vault_id: vId, payer, payee, amount, ttl });
+        return NextResponse.json({
+          jsonrpc: "2.0",
+          id: id || 1,
+          result: {
+            content: [
+              {
+                type: "text",
+                text: `SUCCESS: Programmatic Vault '${res.vault.id}' created. Locked: ${amount} VRS between '${payer}' -> '${payee}'. TTL: ${ttl}s. Status: ${res.vault.status}`,
+              },
+            ],
+            data: res.vault,
+            isError: false,
+          },
+        });
+      }
+
+      if (toolName === "settle_vault") {
+        const vId = args.vault_id || args.vaultId;
+        const assertion = args.assertion_payload ?? args.assertion;
+        const expected = args.expected_sha256 || args.expectedSha256 || "";
+
+        const res = settleProgrammaticVault({
+          vault_id: vId,
+          assertion_payload: assertion,
+          expected_sha256: expected,
+        });
+
+        if (!res.success) {
+          return NextResponse.json({
+            jsonrpc: "2.0",
+            id: id || 1,
+            result: {
+              content: [
+                {
+                  type: "text",
+                  text: `VERIFICATION FAILED: ${res.error}`,
+                },
+              ],
+              isError: true,
+            },
+          });
+        }
+
+        return NextResponse.json({
+          jsonrpc: "2.0",
+          id: id || 1,
+          result: {
+            content: [
+              {
+                type: "text",
+                text: `SUCCESS: Vault '${vId}' settled! Funds released to '${res.vault?.payee}'. Verified SHA-256: ${res.vault?.sha256Proof}. Tx: ${res.transaction?.id}`,
+              },
+            ],
+            data: res.vault,
+            isError: false,
+          },
+        });
+      }
+
+      if (toolName === "get_vault_status") {
+        const vId = args.vault_id || args.vaultId;
+        const vault = getProgrammaticVault(vId);
+        return NextResponse.json({
+          jsonrpc: "2.0",
+          id: id || 1,
+          result: {
+            content: [
+              {
+                type: "text",
+                text: vault
+                  ? `Vault '${vault.id}': Status=${vault.status}, Amount=${vault.amount} VRS, Payer='${vault.payer}', Payee='${vault.payee}'`
+                  : `Vault '${vId}' not found.`,
+              },
+            ],
+            data: vault || null,
+            isError: !vault,
+          },
+        });
+      }
 
       if (toolName === "deposit_funds" || toolName === "deposit") {
         const amount = Number(args.amount_inr || args.amount || 5000);
@@ -168,7 +400,7 @@ export async function POST(req: NextRequest) {
       }
 
       if (toolName === "transfer_funds" || toolName === "create_escrow" || toolName === "create_contract_escrow") {
-        let amount = Number(args.amount_inr || args.amount || args.amount_cents ? Math.round(Number(args.amount_cents) / 100) : 2500);
+        const amount = Number(args.amount_inr ?? args.amount ?? (args.amount_cents ? Math.round(Number(args.amount_cents) / 100) : 2500));
         const fromName = args.from_agent || args.payer_name || state.connected_agent_name || "Client Agent";
         const toName = args.to_agent || args.worker_name || args.beneficiary_id || "Worker Agent";
         const status = args.status === "FAILED" ? "FAILED" : "SUCCESSFUL";

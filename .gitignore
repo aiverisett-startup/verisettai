@@ -30,6 +30,9 @@
 .edge-temp-profile/
 __pycache__/
 *.pyc
+*.egg-info/
+dist/
+build/
 
 # debug
 npm-debug.log*

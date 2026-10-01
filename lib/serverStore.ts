@@ -38,6 +38,13 @@ export interface VaultDeployment {
   allocatedAgent: string;
   createdAt: string;
   rail: string;
+  payer?: string;
+  payee?: string;
+  ttl?: number;
+  expiresAt?: string;
+  settledAt?: string;
+  sha256Proof?: string;
+  transactionId?: string;
 }
 
 export interface VaultState {
@@ -494,3 +501,106 @@ export function resetServerVault(): VaultState {
   saveVaultState(resetState);
   return resetState;
 }
+
+export function createProgrammaticVault(params: {
+  vault_id: string;
+  payer: string;
+  payee: string;
+  amount: number;
+  ttl?: number;
+}): { vault: VaultDeployment; state: VaultState } {
+  const state = getVaultState();
+  const now = new Date();
+  const ttl = params.ttl || 300;
+  const expiresAt = new Date(now.getTime() + ttl * 1000).toISOString();
+
+  if (!state.vault_deployments) state.vault_deployments = [];
+  const existingIdx = state.vault_deployments.findIndex((v) => v.id === params.vault_id);
+
+  const deployment: VaultDeployment = {
+    id: params.vault_id,
+    title: `Autonomous Escrow: ${params.payer} -> ${params.payee}`,
+    amount: params.amount,
+    currency: "VRS",
+    status: "Active",
+    allocatedAgent: params.payer,
+    payer: params.payer,
+    payee: params.payee,
+    ttl,
+    expiresAt,
+    createdAt: now.toISOString(),
+    rail: "Verisett Settlement Engine — Built on Model Context Protocol (MCP) using FastMCP",
+  };
+
+  if (existingIdx >= 0) {
+    state.vault_deployments[existingIdx] = deployment;
+  } else {
+    state.vault_deployments.unshift(deployment);
+  }
+
+  state.is_agent_connected = true;
+  state.connected_agent_name = params.payer;
+  saveVaultState(state);
+  return { vault: deployment, state };
+}
+
+export function settleProgrammaticVault(params: {
+  vault_id: string;
+  assertion_payload: any;
+  expected_sha256: string;
+}): { success: boolean; vault?: VaultDeployment; transaction?: ServerTransactionItem; error?: string } {
+  const state = getVaultState();
+  if (!state.vault_deployments) state.vault_deployments = [];
+  const vault = state.vault_deployments.find((v) => v.id === params.vault_id);
+
+  if (!vault) {
+    return { success: false, error: `Vault '${params.vault_id}' not found.` };
+  }
+  if (vault.status === "Settled") {
+    return { success: false, error: `Vault '${params.vault_id}' is already settled.` };
+  }
+
+  let payloadStr: string;
+  if (typeof params.assertion_payload === "string") {
+    payloadStr = params.assertion_payload;
+  } else {
+    try {
+      payloadStr = JSON.stringify(params.assertion_payload);
+    } catch {
+      payloadStr = String(params.assertion_payload);
+    }
+  }
+
+  const computedHash = crypto.createHash("sha256").update(payloadStr).digest("hex");
+  const normalizedExpected = (params.expected_sha256 || "").toLowerCase().replace(/^0x/, "");
+
+  if (computedHash.toLowerCase() !== normalizedExpected) {
+    return {
+      success: false,
+      error: `Cryptographic assertion mismatch. Expected: ${normalizedExpected}, Computed: ${computedHash}`,
+    };
+  }
+
+  const res = recordAgentTransfer({
+    amountINR: vault.amount,
+    fromAgentName: vault.payer || vault.allocatedAgent || "Agent A",
+    toAgentName: vault.payee || "Agent B",
+    milestoneTitle: `Milestone Settled: ${vault.id} (SHA256:${computedHash.slice(0, 8)})`,
+    status: "SUCCESSFUL",
+  });
+
+  vault.status = "Settled";
+  vault.settledAt = new Date().toISOString();
+  vault.sha256Proof = "0x" + computedHash;
+  vault.transactionId = res.transaction.id;
+  saveVaultState(res.state);
+
+  return { success: true, vault, transaction: res.transaction };
+}
+
+export function getProgrammaticVault(vault_id: string): VaultDeployment | null {
+  const state = getVaultState();
+  const vault = (state.vault_deployments || []).find((v) => v.id === vault_id);
+  return vault || null;
+}
+
