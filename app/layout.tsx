@@ -29,8 +29,11 @@ export const metadata: Metadata = {
       { url: "/icon.png", sizes: "180x180", type: "image/png" },
     ],
   },
-  authors: [{ name: "Verisett AI Team", url: siteUrl }],
-  creator: "Verisett AI",
+  authors: [
+    { name: "Manoj S.M.", url: "https://github.com/aiverisett-startup" },
+    { name: "Verisett AI", url: siteUrl }
+  ],
+  creator: "Manoj S.M.",
   publisher: "Verisett AI Inc.",
   formatDetection: {
     email: false,
@@ -79,7 +82,7 @@ export const metadata: Metadata = {
     description:
       "Deterministic programmable vault escrow and FastMCP settlement protocol for autonomous AI agents.",
     site: "@Verisett_AI",
-    creator: "@Verisett_AI",
+    creator: "@ai_verisett",
     images: ["/icon.png"],
   },
   robots: {
@@ -102,25 +105,98 @@ export default function RootLayout({
 }>) {
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    "name": "Verisett AI",
-    "alternateName": "Verisett",
-    "url": "https://veri-sett.com",
-    "logo": "https://veri-sett.com/icon.png",
-    "image": "https://veri-sett.com/icon.png",
-    "applicationCategory": "FinancialSoftware",
-    "operatingSystem": "Autonomous Agent Protocol / FastMCP",
-    "description": "Deterministic vault escrow and FastMCP settlement protocol for autonomous AI agents with a flat 1.5% commission rate.",
-    "offers": {
-      "@type": "Offer",
-      "price": "1.5",
-      "priceCurrency": "INR"
-    },
-    "sameAs": [
-      "https://github.com/aiverisett-startup/verisettai",
-      "https://twitter.com/Verisett_AI",
-      "https://www.youtube.com/@VerisettAI",
-      "https://www.instagram.com/ai.verisett/"
+    "@graph": [
+      {
+        "@type": ["FinancialApplication", "SoftwareApplication"],
+        "@id": "https://veri-sett.com/#protocol",
+        "name": "Verisett AI",
+        "alternateName": "Verisett Protocol",
+        "url": "https://veri-sett.com",
+        "logo": "https://veri-sett.com/icon.png",
+        "image": "https://veri-sett.com/icon.png",
+        "applicationCategory": "FinancialApplication",
+        "operatingSystem": "Autonomous Agent Protocol / FastMCP / REST",
+        "description": "Deterministic programmable vault escrow and FastMCP settlement protocol for autonomous AI agents with a flat 1.5% commission rate.",
+        "softwareVersion": "2.4.0",
+        "offers": {
+          "@type": "Offer",
+          "price": "1.5",
+          "priceCurrency": "USD",
+          "description": "1.5% flat take rate per settled escrow milestone"
+        },
+        "creator": {
+          "@id": "https://veri-sett.com/#founder"
+        },
+        "author": {
+          "@id": "https://veri-sett.com/#founder"
+        },
+        "termsOfService": "https://veri-sett.com/terms",
+        "publishingPrinciples": "https://veri-sett.com/security",
+        "hasPart": [
+          {
+            "@type": "WebPage",
+            "name": "Security Architecture & FastMCP Escrow",
+            "url": "https://veri-sett.com/security",
+            "description": "Non-custodial deterministic escrow vault architecture with <50ms mathematical verification, SHA-256 assertions, and timeout refund guarantees."
+          },
+          {
+            "@type": "WebPage",
+            "name": "Terms of Service",
+            "url": "https://veri-sett.com/terms",
+            "description": "Institutional terms of service governing Verisett AI multi-agent settlement protocol."
+          },
+          {
+            "@type": "WebPage",
+            "name": "Privacy Policy",
+            "url": "https://veri-sett.com/privacy",
+            "description": "Enterprise data protection and telemetry privacy policies for autonomous agent operators."
+          },
+          {
+            "@type": "WebPage",
+            "name": "Protocol Documentation",
+            "url": "https://veri-sett.com/docs",
+            "description": "FastMCP Python SDK, Model Context Protocol configurations, and REST gateway specifications."
+          }
+        ],
+        "sameAs": [
+          "https://github.com/aiverisett-startup/verisettai",
+          "https://github.com/aiverisett-startup",
+          "https://x.com/ai_verisett",
+          "https://www.youtube.com/@VerisettAI",
+          "https://www.instagram.com/ai.verisett/"
+        ]
+      },
+      {
+        "@type": "Person",
+        "@id": "https://veri-sett.com/#founder",
+        "name": "Manoj S.M.",
+        "jobTitle": "Founder & Lead Architect",
+        "worksFor": {
+          "@type": "Organization",
+          "name": "Verisett AI",
+          "url": "https://veri-sett.com"
+        },
+        "sameAs": [
+          "https://github.com/aiverisett-startup",
+          "https://x.com/ai_verisett"
+        ]
+      },
+      {
+        "@type": "Organization",
+        "@id": "https://veri-sett.com/#organization",
+        "name": "Verisett AI",
+        "url": "https://veri-sett.com",
+        "logo": "https://veri-sett.com/icon.png",
+        "founder": {
+          "@id": "https://veri-sett.com/#founder"
+        },
+        "sameAs": [
+          "https://github.com/aiverisett-startup/verisettai",
+          "https://x.com/ai_verisett",
+          "https://www.youtube.com/@VerisettAI",
+          "https://www.instagram.com/ai.verisett/"
+        ]
+      }
     ]
   };
 

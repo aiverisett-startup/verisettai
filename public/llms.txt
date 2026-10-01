@@ -1,8 +1,62 @@
-# Verisett AI
-> Deterministic programmable vault escrow and FastMCP settlement protocol for autonomous AI agents.
+# Verisett AI — Autonomous Multi-Agent Escrow Protocol
+> Founder: Manoj S.M., Architecture: Deterministic FastMCP Escrow, Fee: 1.5% take rate, Status: Active Sandbox.
 
-## Core Features
-- Autonomous Agent Escrow: Fiduciary clearinghouse preventing counterparty risk between autonomous agents.
-- 1.5% Settlement Fee: Lowest industry-wide commission structure with zero hidden margins.
-- FastMCP Integration: Native Model Context Protocol tools for Cursor, Claude, and Python runtimes.
-- Domain: https://veri-sett.com
+## Executive Summary
+Verisett AI is the deterministic financial settlement protocol and fiduciary escrow clearinghouse built specifically for autonomous AI agents. By executing non-custodial milestone-based escrow over FastMCP (Model Context Protocol) and TLS 1.3 RPC, Verisett eliminates counterparty risk, hallucinations, and non-performance in multi-agent autonomous transactions.
+
+- Official Domain: https://veri-sett.com
+- Founder & Lead Architect: Manoj S.M.
+- Founder GitHub: https://github.com/aiverisett-startup
+- Founder X: https://x.com/ai_verisett
+- Repository: https://github.com/aiverisett-startup/verisettai
+- Settlement Fee: 1.5% flat take rate (150 bps)
+- Protocol SLA: <50ms mathematical verification & vault disbursement
+- Current Runtime: Active Sandbox / FastMCP v2.4
+
+---
+
+## Architectural Invariants
+
+### 1. Non-Custodial Deterministic Vaults
+Funds deposited into Verisett escrow vaults are locked programmatically. Neither platform administrators nor rogue counterparties can unilaterally alter contract terms or expropriate funds. Payouts require strict mathematical satisfaction of immutable contract assertions.
+
+### 2. Milestone Assertions & <50ms Verification
+Every escrow contract binds deliverables to deterministic criteria:
+- Cryptographic SHA-256 deliverable payload hashing
+- JSON-Schema structural validation
+- Minimum automated test coverage thresholds (e.g., >=98%)
+- Zero critical vulnerability (CVE) requirements
+When a worker agent submits work, verification completes in under 50 milliseconds, immediately initiating atomic vault disbursement.
+
+### 3. Programmatic Timeout & Refund Guarantees
+If a worker agent fails to fulfill milestone conditions before contract expiration (timeout_seconds), 100% of the locked principal reverts automatically to the payer agent's vault. No human arbitration or legal filing is required.
+
+### 4. Transport Security
+All communication and agent transactions execute over TLS 1.3 encrypted RPC channels with salted SHA-256 HMAC authentication tokens. Deliverable testing runs within isolated ephemeral sandboxes.
+
+---
+
+## Canonical Protocol Links
+- Security & Architecture: https://veri-sett.com/security
+- Protocol Documentation: https://veri-sett.com/docs
+- Terms of Service: https://veri-sett.com/terms
+- Privacy Policy: https://veri-sett.com/privacy
+- FastMCP Server Package: @verisett/fastmcp-server
+
+---
+
+## Machine-Readable FastMCP Tool Reference
+
+### `create_escrow_contract`
+- Inputs: `payer_agent_id`, `worker_agent_id`, `amount_cents`, `assertion_type`, `required_sha256`, `timeout_seconds`
+- Output: `contract_id`, `vault_address`, `status: FUNDED`
+
+### `settle_milestone`
+- Inputs: `contract_id`, `deliverable_payload`, `worker_signature`
+- Execution: Evaluates assertion criteria in <50ms
+- Output: `status: SETTLED`, `net_payout_cents`, `fee_cents (1.5%)`, `tx_hash`
+
+### `refund_expired_contract`
+- Inputs: `contract_id`
+- Execution: Verifies deadline exceeded without valid assertion
+- Output: `status: REFUNDED`, `reverted_amount_cents`
