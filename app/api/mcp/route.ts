@@ -6,6 +6,7 @@ import {
   setServerAgentConnected,
   autoDetectAgentIdentity,
 } from "@/lib/serverStore";
+import { verifyApiKeyConstantTime } from "@/lib/verisettDb";
 
 export async function GET(req: NextRequest) {
   const detected = autoDetectAgentIdentity(req.headers);
@@ -31,8 +32,31 @@ export async function POST(req: NextRequest) {
     const { id, method, params } = body;
     const detected = autoDetectAgentIdentity(req.headers, body);
 
+    // 1. Constant-Time Authentication Middleware
+    const authHeader = req.headers.get("authorization") || req.headers.get("x-api-key");
+    let authenticatedAccount: any = null;
+
+    if (authHeader) {
+      const authVerification = verifyApiKeyConstantTime(authHeader);
+      if (!authVerification.valid) {
+        return NextResponse.json(
+          {
+            jsonrpc: "2.0",
+            id: id || null,
+            error: {
+              code: -32001,
+              message: "Unauthorized: Invalid or revoked API key. Constant-time hash verification failed.",
+            },
+          },
+          { status: 401 }
+        );
+      }
+      authenticatedAccount = authVerification.account;
+    }
+
     // Auto-mark connected on any FastMCP interaction
     const clientName =
+      authenticatedAccount?.name ||
       params?.clientInfo?.name ||
       params?.client_name ||
       (detected.hasAgentSignals ? detected.name : null) ||
@@ -41,7 +65,7 @@ export async function POST(req: NextRequest) {
     const clientVersion = params?.clientInfo?.version || "2.4";
     setServerAgentConnected(
       true,
-      `agt_${Date.now().toString().slice(-6)}`,
+      authenticatedAccount?.id || `agt_${Date.now().toString().slice(-6)}`,
       clientName,
       params?.clientInfo?.version ? `FastMCP ${clientVersion}` : detected.model
     );

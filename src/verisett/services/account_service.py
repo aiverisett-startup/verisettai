@@ -3,6 +3,7 @@ Account management and authentication service for Verisett AI Gateway.
 """
 
 import hashlib
+import hmac
 import secrets
 from typing import Optional, Tuple
 from sqlalchemy import select
@@ -18,14 +19,13 @@ FREE_TESTNET_CREDIT_CENTS = 500
 
 
 def hash_api_key(api_key: str) -> str:
-    """Computes salted SHA-256 hash of agent API key."""
-    salted = f"{settings.API_KEY_SALT}:{api_key}".encode("utf-8")
-    return hashlib.sha256(salted).hexdigest()
+    """Computes SHA-256 hash of agent API key."""
+    return hashlib.sha256(api_key.encode("utf-8")).hexdigest()
 
 
-def generate_api_key(prefix: str = "vst_live_") -> str:
-    """Generates a high-entropy secret API key for an agent."""
-    token = secrets.token_urlsafe(32)
+def generate_api_key(prefix: str = "vrs_live_") -> str:
+    """Generates an unguessable 256-bit entropy secret API key using CSPRNG."""
+    token = secrets.token_hex(32)  # 32 bytes = 256 bits of entropy
     return f"{prefix}{token}"
 
 
@@ -118,7 +118,7 @@ class AccountService:
         stmt = select(Account).where(Account.api_key_hash == key_hash)
         result = await session.execute(stmt)
         account = result.scalar_one_or_none()
-        if not account:
+        if not account or not hmac.compare_digest(account.api_key_hash, key_hash):
             raise AccountNotFoundError("Invalid API key or account not found.")
         return account
 

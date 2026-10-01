@@ -94,16 +94,343 @@ export function getDb(): DatabaseSync {
   try {
     dbInstance.exec("PRAGMA journal_mode = WAL;");
     dbInstance.exec("PRAGMA busy_timeout = 5000;");
+
+    // Initialize cryptographic API keys table with hash-at-rest storage
+    dbInstance.exec(`
+      CREATE TABLE IF NOT EXISTS api_keys (
+        id VARCHAR(36) PRIMARY KEY,
+        account_id VARCHAR(36) NOT NULL,
+        key_hash VARCHAR(64) NOT NULL UNIQUE,
+        key_hint VARCHAR(32) NOT NULL,
+        prefix VARCHAR(16) NOT NULL,
+        status VARCHAR(16) NOT NULL DEFAULT 'ACTIVE',
+        created_at DATETIME NOT NULL,
+        revoked_at DATETIME,
+        last_used_at DATETIME,
+        FOREIGN KEY (account_id) REFERENCES accounts(id)
+      );
+      CREATE INDEX IF NOT EXISTS idx_api_keys_hash ON api_keys(key_hash);
+      CREATE INDEX IF NOT EXISTS idx_api_keys_account ON api_keys(account_id);
+    `);
   } catch (err) {
-    console.warn("Could not set PRAGMA journal_mode:", err);
+    console.warn("Could not configure PRAGMA or api_keys schema:", err);
   }
 
   return dbInstance;
 }
 
+export interface GeneratedApiKey {
+  rawKey: string;
+  keyHash: string;
+  keyHint: string;
+  prefix: string;
+  createdAt: string;
+}
+
+export interface StoredApiKeyRecord {
+  id: string;
+  accountId: string;
+  keyHint: string;
+  prefix: string;
+  status: "ACTIVE" | "REVOKED";
+  createdAt: string;
+  revokedAt?: string | null;
+  lastUsedAt?: string | null;
+}
+
 /**
- * Computes salted SHA-256 hash of agent API key.
- * Exactly matches FastAPI backend implementation in account_service.py.
+ * Generates an unguessable 256-bit entropy API key using Node's native CSPRNG (crypto.randomBytes).
+ * Format: vrs_live_[64_hex_chars] or vrs_test_[64_hex_chars] (256 bits entropy).
+ */
+export function generateCryptographicApiKey(type: "live" | "test" = "live"): GeneratedApiKey {
+  const prefix = type === "live" ? "vrs_live_" : "vrs_test_";
+  // 32 random bytes = 256 bits of true cryptographic entropy
+  const entropyHex = crypto.randomBytes(32).toString("hex");
+  const rawKey = `${prefix}${entropyHex}`;
+
+  // One-way SHA-256 hash (never store rawKey in database)
+  const keyHash = crypto.createHash("sha256").update(rawKey).digest("hex");
+
+  // Truncated hint for UI: prefix + ... + last 4 characters (e.g. vrs_live_...8f2a)
+  const keyHint = `${prefix}...${rawKey.slice(-4)}`;
+  const createdAt = new Date().toISOString();
+
+  return {
+    rawKey,
+    keyHash,
+    keyHint,
+    prefix,
+    createdAt,
+  };
+}
+
+/**
+ * Creates and stores a new hashed API key for an account.
+ * Stores only key_hash, hint, and timestamp.
+ * Returns rawKey ONCE with security warning.
+ */
+export function createAgentApiKey(
+  accountId: string,
+  type: "live" | "test" = "live"
+): {
+  id: string;
+  key: string;
+  keyHint: string;
+  prefix: string;
+  createdAt: string;
+  warning: string;
+} {
+  const db = getDb();
+  const generated = generateCryptographicApiKey(type);
+  const id = crypto.randomUUID();
+
+  const insertStmt = db.prepare(`
+    INSERT INTO api_keys (id, account_id, key_hash, key_hint, prefix, status, created_at)
+    VALUES (?, ?, ?, ?, ?, 'ACTIVE', ?)
+  `);
+  insertStmt.run(
+    id,
+    accountId,
+    generated.keyHash,
+    generated.keyHint,
+    generated.prefix,
+    generated.createdAt
+  );
+
+  // Update account's active api_key_hash and timestamp
+  try {
+    db.prepare(`
+      UPDATE accounts
+      SET api_key_hash = ?, updated_at = ?
+      WHERE id = ?
+    `).run(generated.keyHash, generated.createdAt, accountId);
+  } catch (err) {
+    console.warn("Could not update account api_key_hash:", err);
+  }
+
+  return {
+    id,
+    key: generated.rawKey,
+    keyHint: generated.keyHint,
+    prefix: generated.prefix,
+    createdAt: generated.createdAt,
+    warning: "Copy this key now. It will never be displayed again.",
+  };
+}
+
+/**
+ * Instantly revokes an API key by ID or hash.
+ */
+export function revokeApiKey(keyId: string, accountId?: string): boolean {
+  const db = getDb();
+  const now = new Date().toISOString();
+
+  // Retrieve key_hash for this keyId
+  const keyRow = db
+    .prepare("SELECT key_hash, account_id FROM api_keys WHERE id = ?")
+    .get(keyId) as { key_hash: string; account_id: string } | undefined;
+
+  let changes = 0;
+  if (accountId) {
+    const stmt = db.prepare(`
+      UPDATE api_keys
+      SET status = 'REVOKED', revoked_at = ?
+      WHERE id = ? AND account_id = ?
+    `);
+    const res = stmt.run(now, keyId, accountId);
+    changes = res.changes;
+  } else {
+    const stmt = db.prepare(`
+      UPDATE api_keys
+      SET status = 'REVOKED', revoked_at = ?
+      WHERE id = ?
+    `);
+    const res = stmt.run(now, keyId);
+    changes = res.changes;
+  }
+
+  // Instantly invalidate corresponding hash in accounts table to ensure fallback never authenticates revoked key
+  if (keyRow?.key_hash) {
+    try {
+      db.prepare(`
+        UPDATE accounts
+        SET api_key_hash = 'REVOKED_' || ?, updated_at = ?
+        WHERE api_key_hash = ?
+      `).run(keyId, now, keyRow.key_hash);
+    } catch (err) {
+      console.warn("Could not invalidate accounts.api_key_hash on revoke:", err);
+    }
+  }
+
+  return changes > 0;
+}
+
+/**
+ * List API keys for an account, showing only masked hints (first 8 and last 4 characters).
+ * Raw key and key_hash are never returned.
+ */
+export function listApiKeys(accountId?: string): StoredApiKeyRecord[] {
+  const db = getDb();
+  let rows: any[];
+
+  if (accountId) {
+    rows = db.prepare(`
+      SELECT id, account_id, key_hint, prefix, status, created_at, revoked_at, last_used_at
+      FROM api_keys
+      WHERE account_id = ?
+      ORDER BY created_at DESC
+    `).all(accountId) as any[];
+  } else {
+    rows = db.prepare(`
+      SELECT id, account_id, key_hint, prefix, status, created_at, revoked_at, last_used_at
+      FROM api_keys
+      ORDER BY created_at DESC
+      LIMIT 20
+    `).all() as any[];
+  }
+
+  return rows.map((r) => ({
+    id: r.id,
+    accountId: r.account_id,
+    keyHint: r.key_hint,
+    prefix: r.prefix,
+    status: r.status,
+    createdAt: r.created_at,
+    revokedAt: r.revoked_at,
+    lastUsedAt: r.last_used_at,
+  }));
+}
+
+/**
+ * Constant-time API key verification using crypto.timingSafeEqual().
+ * Prevents timing side-channel attacks by comparing 32-byte sha256 hash buffers.
+ */
+export function verifyApiKeyConstantTime(providedKey: string): {
+  valid: boolean;
+  account: DbAccount | null;
+  keyId?: string;
+} {
+  if (!providedKey || typeof providedKey !== "string") {
+    return { valid: false, account: null };
+  }
+
+  const cleanKey = providedKey.replace(/^Bearer\s+/i, "").trim();
+  if (!cleanKey) {
+    return { valid: false, account: null };
+  }
+
+  // 1. Compute 32-byte SHA-256 buffer of incoming key
+  const incomingHashBuffer = crypto.createHash("sha256").update(cleanKey).digest(); // 32 bytes
+  const saltedIncomingHashBuffer = crypto
+    .createHash("sha256")
+    .update(`${API_KEY_SALT}:${cleanKey}`)
+    .digest(); // 32 bytes
+
+  const db = getDb();
+  let matchedAccountId: string | null = null;
+  let matchedKeyId: string | undefined = undefined;
+
+  // 2. Compare against active keys in api_keys table in constant time
+  const activeKeys = db.prepare(`
+    SELECT id, account_id, key_hash, status FROM api_keys WHERE status = 'ACTIVE'
+  `).all() as Array<{ id: string; account_id: string; key_hash: string; status: string }>;
+
+  for (const k of activeKeys) {
+    if (k.key_hash && k.key_hash.length === 64) {
+      const storedBuffer = Buffer.from(k.key_hash, "hex");
+      if (storedBuffer.length === incomingHashBuffer.length) {
+        if (crypto.timingSafeEqual(incomingHashBuffer, storedBuffer)) {
+          matchedAccountId = k.account_id;
+          matchedKeyId = k.id;
+          try {
+            db.prepare("UPDATE api_keys SET last_used_at = ? WHERE id = ?").run(
+              new Date().toISOString(),
+              k.id
+            );
+          } catch {}
+          break;
+        }
+      }
+    }
+  }
+
+  // 2b. Reject immediately if key is explicitly marked REVOKED in api_keys
+  if (!matchedAccountId) {
+    const revokedKeys = db.prepare(`
+      SELECT key_hash FROM api_keys WHERE status = 'REVOKED'
+    `).all() as Array<{ key_hash: string }>;
+
+    for (const r of revokedKeys) {
+      if (r.key_hash && r.key_hash.length === 64) {
+        const storedBuffer = Buffer.from(r.key_hash, "hex");
+        if (storedBuffer.length === 32 && crypto.timingSafeEqual(incomingHashBuffer, storedBuffer)) {
+          const dummyBuffer = Buffer.alloc(32, 0);
+          crypto.timingSafeEqual(incomingHashBuffer, dummyBuffer);
+          return { valid: false, account: null };
+        }
+      }
+    }
+  }
+
+  // 3. Fallback: check accounts table directly (both un-salted SHA-256 and legacy salted hash)
+  if (!matchedAccountId) {
+    const allAccounts = db.prepare(`
+      SELECT id, api_key_hash FROM accounts WHERE api_key_hash IS NOT NULL AND api_key_hash NOT LIKE 'REVOKED%'
+    `).all() as Array<{ id: string; api_key_hash: string }>;
+
+    for (const acc of allAccounts) {
+      if (acc.api_key_hash && acc.api_key_hash.length === 64) {
+        const storedBuffer = Buffer.from(acc.api_key_hash, "hex");
+        if (storedBuffer.length === 32) {
+          const matchPlain = crypto.timingSafeEqual(incomingHashBuffer, storedBuffer);
+          const matchSalted = crypto.timingSafeEqual(saltedIncomingHashBuffer, storedBuffer);
+          if (matchPlain || matchSalted) {
+            matchedAccountId = acc.id;
+            break;
+          }
+        }
+      }
+    }
+  }
+
+  if (!matchedAccountId) {
+    // Execute a constant-time dummy comparison to neutralize timing differences when key is invalid
+    const dummyBuffer = Buffer.alloc(32, 0);
+    crypto.timingSafeEqual(incomingHashBuffer, dummyBuffer);
+    return { valid: false, account: null };
+  }
+
+  const account = getAgentAccountById(matchedAccountId);
+  return { valid: !!account, account, keyId: matchedKeyId };
+}
+
+export function getAgentAccountById(accountId: string): DbAccount | null {
+  const db = getDb();
+  const stmt = db.prepare(`
+    SELECT id, name, role, balance_cents, frozen_cents, currency, created_at, updated_at, api_key_hash
+    FROM accounts
+    WHERE id = ?
+    LIMIT 1
+  `);
+  const row = stmt.get(accountId) as any;
+  if (!row) return null;
+
+  return {
+    id: row.id,
+    name: row.name,
+    role: row.role,
+    balance_cents: Number(row.balance_cents),
+    balance_credits: Number(row.balance_cents),
+    frozen_cents: Number(row.frozen_cents),
+    currency: row.currency || "USD",
+    status: row.frozen_cents > 0 ? "SETTLING" : "ACTIVE",
+    created_at: row.created_at,
+    updated_at: row.updated_at,
+  };
+}
+
+/**
+ * Computes salted SHA-256 hash of agent API key (legacy support).
  */
 export function hashApiKey(apiKey: string): string {
   const salted = `${API_KEY_SALT}:${apiKey}`;
@@ -112,7 +439,7 @@ export function hashApiKey(apiKey: string): string {
 
 /**
  * Query the accounts table in verisett.db for the authenticated agent.
- * Handles salted hash, raw key, agent ID, and fallback for Aiverisett Primary Payer Agent.
+ * Authenticates using constant-time hash comparison (timingSafeEqual).
  */
 export function getAgentAccount(keyOrId?: string): DbAccount | null {
   const db = getDb();
@@ -120,22 +447,23 @@ export function getAgentAccount(keyOrId?: string): DbAccount | null {
 
   if (keyOrId && keyOrId.trim()) {
     const cleanKey = keyOrId.trim();
-    const saltedHash = hashApiKey(cleanKey);
-    const plainHash = crypto.createHash("sha256").update(cleanKey).digest("hex");
 
-    // Check salted hash, plain hash, exact ID, or Aiverisett pattern
-    const stmt = db.prepare(`
+    // Constant-time check first
+    const authResult = verifyApiKeyConstantTime(cleanKey);
+    if (authResult.valid && authResult.account) {
+      return authResult.account;
+    }
+
+    // Direct account ID lookup
+    const stmtId = db.prepare(`
       SELECT id, name, role, balance_cents, frozen_cents, currency, created_at, updated_at, api_key_hash
       FROM accounts
-      WHERE api_key_hash = ?
-         OR api_key_hash = ?
-         OR id = ?
-         OR (name LIKE '%Aiverisett%' AND (? LIKE '%aiverisett%' OR ? = 'vrs_live_aiverisettgmailcom89f72b'))
+      WHERE id = ?
       LIMIT 1
     `);
-    row = stmt.get(saltedHash, plainHash, cleanKey, cleanKey, cleanKey);
+    row = stmtId.get(cleanKey);
 
-    // If no row exists for this live API key, automatically provision an account
+    // If no row exists for this live API key, automatically provision a secure account with hashed key
     if (!row && (cleanKey.startsWith("vrs_live_") || cleanKey.startsWith("vrs_test_") || cleanKey.startsWith("vst_"))) {
       let agentName = "Autonomous Settlement Agent";
       const keySuffix = cleanKey.replace(/^vrs_(live|test)_/, "");
@@ -150,12 +478,23 @@ export function getAgentAccount(keyOrId?: string): DbAccount | null {
 
       const newId = crypto.randomUUID();
       const now = new Date().toISOString();
+      const oneWayHash = crypto.createHash("sha256").update(cleanKey).digest("hex");
+      const keyHint = `${cleanKey.slice(0, 9)}...${cleanKey.slice(-4)}`;
+
       try {
         const insertStmt = db.prepare(`
           INSERT INTO accounts (id, api_key_hash, name, role, balance_cents, frozen_cents, currency, created_at, updated_at)
           VALUES (?, ?, ?, 'PAYER', 169000, 0, 'USD', ?, ?)
         `);
-        insertStmt.run(newId, saltedHash, agentName, now, now);
+        insertStmt.run(newId, oneWayHash, agentName, now, now);
+
+        // Also record in api_keys table
+        try {
+          db.prepare(`
+            INSERT INTO api_keys (id, account_id, key_hash, key_hint, prefix, status, created_at)
+            VALUES (?, ?, ?, ?, ?, 'ACTIVE', ?)
+          `).run(crypto.randomUUID(), newId, oneWayHash, keyHint, cleanKey.slice(0, 9), now);
+        } catch {}
 
         row = {
           id: newId,
@@ -166,7 +505,7 @@ export function getAgentAccount(keyOrId?: string): DbAccount | null {
           currency: "USD",
           created_at: now,
           updated_at: now,
-          api_key_hash: saltedHash,
+          api_key_hash: oneWayHash,
         };
       } catch (insertErr) {
         console.warn("Could not auto-provision account for key:", insertErr);

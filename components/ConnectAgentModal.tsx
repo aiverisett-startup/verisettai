@@ -1,9 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Check, Copy, Eye, EyeOff, ShieldCheck, Terminal, Globe, Key, X, AlertTriangle, Lock } from "lucide-react";
 import { useAuthUser } from "@/lib/useAuthUser";
+
+import { ApiKeyManager } from "@/components/ApiKeyManager";
 
 interface ConnectAgentModalProps {
   isOpen: boolean;
@@ -21,53 +23,44 @@ export function ConnectAgentModal({ isOpen, onClose, onConnected }: ConnectAgent
   const [copied, setCopied] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
   const [customAgentName, setCustomAgentName] = useState<string>("");
+  const [currentKey, setCurrentKey] = useState<string>("");
 
-  // Live runtime credentials derived from authenticated session
-  const userKeySeed = user
-    ? (user.id || user.email || "live").replace(/[^a-zA-Z0-9]/g, "").slice(0, 24)
-    : "";
-  const liveApiKey = user
-    ? `vrs_live_${userKeySeed.padEnd(24, "89f72b1049c81a29e4d0812b")}`
-    : "vrs_live_••••••••••••••••••••••••";
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("verisett_api_key") || "";
+      setCurrentKey(stored);
+    }
+  }, [isOpen]);
+
+  // Masked key showing strictly first 8 and last 4 characters
+  const maskedKeyHint = currentKey && currentKey.length >= 12
+    ? `${currentKey.slice(0, 8)}...${currentKey.slice(-4)}`
+    : "vrs_live_••••••••";
+
   const agentId = user
-    ? `agt_${userKeySeed.slice(0, 12).padEnd(12, "89f72b1049c8")}`
+    ? `agt_${(user.id || "agent").replace(/[^a-zA-Z0-9]/g, "").slice(0, 12)}`
     : "agt_••••••••••••";
   const liveGatewayUrl = user
     ? `https://gateway.verisett.com/v1/${agentId}`
     : "https://gateway.verisett.com/v1/agt_••••••••••••";
 
-  const liveMcpConfig = user
-    ? JSON.stringify(
-        {
-          mcpServers: {
-            verisett: {
-              url: "https://gateway.verisett.com/mcp",
-              headers: {
-                Authorization: `Bearer ${liveApiKey}`,
-              },
-            },
+  const liveMcpConfig = JSON.stringify(
+    {
+      mcpServers: {
+        verisett: {
+          url: "https://gateway.verisett.com/mcp",
+          headers: {
+            Authorization: `Bearer ${currentKey ? (revealed ? currentKey : maskedKeyHint) : "vrs_live_••••••••"}`,
           },
         },
-        null,
-        2
-      )
-    : JSON.stringify(
-        {
-          mcpServers: {
-            verisett: {
-              url: "https://gateway.verisett.com/mcp",
-              headers: {
-                Authorization: "Bearer vrs_live_••••••••••••••••••••••••",
-              },
-            },
-          },
-        },
-        null,
-        2
-      );
+      },
+    },
+    null,
+    2
+  );
 
   const liveCreds = {
-    apiKey: liveApiKey,
+    apiKey: currentKey || maskedKeyHint,
     gatewayUrl: liveGatewayUrl,
     mcpConfig: liveMcpConfig,
   };
@@ -82,7 +75,9 @@ export function ConnectAgentModal({ isOpen, onClose, onConnected }: ConnectAgent
     navigator.clipboard.writeText(text);
     setCopied(true);
     if (typeof window !== "undefined") {
-      localStorage.setItem("verisett_api_key", liveApiKey);
+      if (currentKey) {
+        localStorage.setItem("verisett_api_key", currentKey);
+      }
       localStorage.setItem("verisett_agent_connected", "true");
       localStorage.setItem("verisett_connected_agent_id", agentId);
       const name = user?.name ? `${user.name}'s Agent` : "Autonomous Agent";
@@ -232,23 +227,11 @@ export function ConnectAgentModal({ isOpen, onClose, onConnected }: ConnectAgent
           )}
 
           {selectedType === "apikey" && (
-            <div className="space-y-2">
-              <div className="flex items-center justify-between rounded-xl bg-white px-3.5 py-2.5 border border-[#EAE3D2] font-mono text-xs">
-                <span className="text-[#9E7A45] font-medium truncate mr-2">
-                  {revealed ? liveCreds.apiKey : "vrs_live_••••••••••••••••••••••••"}
-                </span>
-                <button
-                  onClick={() => handleCopy(liveCreds.apiKey)}
-                  className="text-[#8C8275] hover:text-[#1C1A17] shrink-0 ml-2 cursor-pointer p-1"
-                  title={!user ? "Login required to copy" : "Copy API Key"}
-                >
-                  {!user ? <Lock className="w-4 h-4 text-[#C59B5F]"/> : copied ? <Check className="w-4 h-4 text-[#9E7A45]"/> : <Copy className="w-4 h-4"/>}
-                </button>
-              </div>
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#FAF6EE] border border-[#EAE3D2] text-[11px] text-[#9E7A45] font-mono">
-                <AlertTriangle className="w-3.5 h-3.5 text-[#C59B5F] shrink-0" />
-                <span>Warning: This secret key will only be shown once. Store it securely in your environment variables.</span>
-              </div>
+            <div className="rounded-2xl bg-white p-3 border border-[#EAE3D2]">
+              <ApiKeyManager
+                compact
+                onKeySelected={(key) => setCurrentKey(key)}
+              />
             </div>
           )}
 
@@ -313,7 +296,9 @@ export function ConnectAgentModal({ isOpen, onClose, onConnected }: ConnectAgent
                     (user?.name ? `${user.name}'s Agent` : "FastMCP Autonomous Agent");
 
                   if (typeof window !== "undefined") {
-                    localStorage.setItem("verisett_api_key", liveApiKey);
+                    if (currentKey) {
+                      localStorage.setItem("verisett_api_key", currentKey);
+                    }
                     localStorage.setItem("verisett_agent_connected", "true");
                     localStorage.setItem("verisett_connected_agent_id", agentId);
                     localStorage.setItem("verisett_connected_agent_name", resolvedName);

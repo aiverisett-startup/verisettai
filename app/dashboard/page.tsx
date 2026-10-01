@@ -14,6 +14,7 @@ import {
   getStoredTransactions,
   TX_UPDATE_EVENT,
 } from "@/lib/agentTransactionStorage";
+import { ApiKeyManager } from "@/components/ApiKeyManager";
 import { supabase } from "@/lib/supabase";
 
 interface ProfileData {
@@ -31,13 +32,10 @@ interface VaultData {
   status?: string;
 }
 
-const DEFAULT_API_KEY = "vrs_live_aiverisettgmailcom89f72b";
-
 export default function DashboardPage() {
   const router = useRouter();
   const [modalOpen, setModalOpen] = useState(false);
   const [isConsentModalOpen, setIsConsentModalOpen] = useState(false);
-  const [activeApiKey, setActiveApiKey] = useState<string>(DEFAULT_API_KEY);
   const [isAgentConnected, setIsAgentConnected] = useState(false);
   const [connectedAgentName, setConnectedAgentName] = useState<string | null>(null);
   const [transactions, setTransactions] = useState<TransactionItem[]>([]);
@@ -66,18 +64,7 @@ export default function DashboardPage() {
       const email = localStorage.getItem("verisett_user_email");
       const name = localStorage.getItem("verisett_user_name");
       const savedAgentName = localStorage.getItem("verisett_connected_agent_name");
-      let storedKey = localStorage.getItem("verisett_api_key");
-      
-      // If user is logged in with an email, derive their personal agent key if storedKey is default
-      if (email && (!storedKey || storedKey === DEFAULT_API_KEY)) {
-        const userKeySeed = email.replace(/[^a-zA-Z0-9]/g, "").slice(0, 24);
-        storedKey = `vrs_live_${userKeySeed.padEnd(24, "89f72b1049c81a29e4d0812b")}`;
-        localStorage.setItem("verisett_api_key", storedKey);
-      } else if (!storedKey) {
-        storedKey = DEFAULT_API_KEY;
-        localStorage.setItem("verisett_api_key", DEFAULT_API_KEY);
-      }
-      setActiveApiKey(storedKey);
+      const storedKey = localStorage.getItem("verisett_api_key") || "";
 
       if (email) setUserEmail(email);
       if (name) setUserName(name);
@@ -90,8 +77,7 @@ export default function DashboardPage() {
     }
 
     const currentKey =
-      (typeof window !== "undefined" ? localStorage.getItem("verisett_api_key") : null) ||
-      DEFAULT_API_KEY;
+      (typeof window !== "undefined" ? localStorage.getItem("verisett_api_key") : null) || "";
 
     // 1. Initial fetch from verisett.db agent endpoint
     const fetchLiveAgentData = async () => {
@@ -504,6 +490,11 @@ export default function DashboardPage() {
               </div>
             ))}
           </div>
+        </div>
+
+        {/* 4. Cryptographic API Key Management Section */}
+        <div className="rounded-3xl border border-[#EAE3D2] bg-white p-6 md:p-8 shadow-[0_4px_24px_rgba(197,155,95,0.06)]">
+          <ApiKeyManager />
         </div>
       </div>
 
