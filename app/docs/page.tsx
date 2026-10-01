@@ -158,7 +158,7 @@ print(f"Settled: {settlement['status']} | Fee: 1.5% | Net Payout: ₹{settlement
             <div>
               <span className="text-[#C59B5F] font-bold">Runtime Implementation Architecture:</span>
               <p className="text-[#94A3B8] text-xs mt-0.5">
-                The live sandbox currently executes on a <strong className="text-white">native TypeScript Model Context Protocol (MCP) endpoint</strong> (JSON-RPC 2.0 at <code className="text-[#C59B5F]">/api/mcp</code>). Python FastMCP client bindings (<code className="text-[#C59B5F]">pip install verisett</code>) are planned on the public roadmap as Milestone 2.
+                The live sandbox runs a native <strong className="text-white">TypeScript Model Context Protocol (MCP) settlement engine (JSON-RPC 2.0)</strong> at <code className="text-[#C59B5F]">/api/mcp</code>. Python FastMCP client bindings (<code className="text-[#C59B5F]">pip install verisett</code>) are currently under active development and scheduled on the public roadmap.
               </p>
             </div>
           </div>

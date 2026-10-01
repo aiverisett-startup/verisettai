@@ -212,7 +212,7 @@ export default function SecurityArchitecturePage() {
             <strong>Deterministic code-level enforcement:</strong> Non-custodial programmatic vaults, SHA-256 deliverable payload hashing, execution timeouts, and TLS 1.3 encrypted FastMCP RPC transports.
           </p>
           <p className="text-xs sm:text-sm text-[#94A3B8] leading-relaxed">
-            The active sandbox runs an in-process <strong className="text-white">native TypeScript Model Context Protocol (MCP) settlement engine</strong> (JSON-RPC 2.0 endpoint at <code className="text-[#C59B5F] bg-[#070E1B] px-1.5 py-0.5 rounded">/api/mcp</code>). Planned Python FastMCP client bindings (<code className="text-[#C59B5F] bg-[#070E1B] px-1.5 py-0.5 rounded">pip install verisett</code>) are currently in active development on the public roadmap.
+            The live sandbox runs a native <strong className="text-white">TypeScript Model Context Protocol (MCP) settlement engine (JSON-RPC 2.0)</strong> at <code className="text-[#C59B5F] bg-[#070E1B] px-1.5 py-0.5 rounded">/api/mcp</code>. Python FastMCP client bindings (<code className="text-[#C59B5F] bg-[#070E1B] px-1.5 py-0.5 rounded">pip install verisett</code>) are currently under active development and scheduled on the public roadmap.
           </p>
           <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs font-mono text-[#CBD5E1]">
             <div className="flex items-center gap-2.5">
@@ -476,10 +476,10 @@ export default function SecurityArchitecturePage() {
               <div className="flex items-center justify-between">
                 <span className="text-xs font-mono font-bold text-emerald-400">MILESTONE 1</span>
                 <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-semibold">
-                  CURRENT / LIVE
+                  CURRENT / ACTIVE
                 </span>
               </div>
-              <h4 className="text-sm font-bold text-white">Live Public TypeScript Testnet Sandbox (Current)</h4>
+              <h4 className="text-sm font-bold text-white">Milestone 1: Live Public TypeScript Testnet Sandbox (Current / Active)</h4>
               <p className="text-xs text-[#94A3B8] leading-relaxed">
                 Native TypeScript Next.js MCP JSON-RPC 2.0 endpoint (<code className="text-[#C59B5F]">/api/mcp</code>), non-custodial programmatic vaults, SHA-256 payload assertion verification (&lt;50ms), and simulated testnet VRS accounting units with zero monetary fiat liability.
               </p>
@@ -493,7 +493,7 @@ export default function SecurityArchitecturePage() {
                   IN DEVELOPMENT
                 </span>
               </div>
-              <h4 className="text-sm font-bold text-white">Python FastMCP SDK / pip package</h4>
+              <h4 className="text-sm font-bold text-white">Milestone 2: Python FastMCP SDK &amp; PyPI Distribution</h4>
               <p className="text-xs text-[#94A3B8] leading-relaxed">
                 Official <code className="text-[#C59B5F]">pip install verisett</code> package providing idiomatic Python FastMCP client bindings, decorators, and middleware for autonomous frameworks (Claude Desktop, Cursor, CrewAI, AutoGen, and LangGraph).
               </p>
@@ -507,7 +507,7 @@ export default function SecurityArchitecturePage() {
                   SCHEDULED
                 </span>
               </div>
-              <h4 className="text-sm font-bold text-white">Third-Party Independent Smart Contract &amp; Cryptographic Audit</h4>
+              <h4 className="text-sm font-bold text-white">Milestone 3: Third-Party Independent Smart Contract &amp; Cryptographic Audit</h4>
               <p className="text-xs text-[#94A3B8] leading-relaxed">
                 Comprehensive third-party security audit of double-entry ledger invariants, assertion cryptographic soundness, and MCP transport penetration testing, with full public audit report release.
               </p>
@@ -521,7 +521,7 @@ export default function SecurityArchitecturePage() {
                   ROADMAP
                 </span>
               </div>
-              <h4 className="text-sm font-bold text-white">Production Fiat Escrow Rails &amp; Corporate Licensing</h4>
+              <h4 className="text-sm font-bold text-white">Milestone 4: Production Fiat Escrow Rails &amp; Corporate Licensing</h4>
               <p className="text-xs text-[#94A3B8] leading-relaxed">
                 Integration of licensed banking partners and fiat on/off-ramp gateways, production multi-sig custody, enterprise compliance certifications, and legal corporate escrow backing.
               </p>
