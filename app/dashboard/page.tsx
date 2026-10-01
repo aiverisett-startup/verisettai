@@ -67,7 +67,13 @@ export default function DashboardPage() {
       const name = localStorage.getItem("verisett_user_name");
       const savedAgentName = localStorage.getItem("verisett_connected_agent_name");
       let storedKey = localStorage.getItem("verisett_api_key");
-      if (!storedKey) {
+      
+      // If user is logged in with an email, derive their personal agent key if storedKey is default
+      if (email && (!storedKey || storedKey === DEFAULT_API_KEY)) {
+        const userKeySeed = email.replace(/[^a-zA-Z0-9]/g, "").slice(0, 24);
+        storedKey = `vrs_live_${userKeySeed.padEnd(24, "89f72b1049c81a29e4d0812b")}`;
+        localStorage.setItem("verisett_api_key", storedKey);
+      } else if (!storedKey) {
         storedKey = DEFAULT_API_KEY;
         localStorage.setItem("verisett_api_key", DEFAULT_API_KEY);
       }

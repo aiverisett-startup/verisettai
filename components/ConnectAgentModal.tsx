@@ -81,6 +81,13 @@ export function ConnectAgentModal({ isOpen, onClose, onConnected }: ConnectAgent
     }
     navigator.clipboard.writeText(text);
     setCopied(true);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("verisett_api_key", liveApiKey);
+      localStorage.setItem("verisett_agent_connected", "true");
+      localStorage.setItem("verisett_connected_agent_id", agentId);
+      const name = user?.name ? `${user.name}'s Agent` : "Autonomous Agent";
+      localStorage.setItem("verisett_connected_agent_name", name);
+    }
     if (onConnected) {
       onConnected();
     }
@@ -306,6 +313,7 @@ export function ConnectAgentModal({ isOpen, onClose, onConnected }: ConnectAgent
                     (user?.name ? `${user.name}'s Agent` : "FastMCP Autonomous Agent");
 
                   if (typeof window !== "undefined") {
+                    localStorage.setItem("verisett_api_key", liveApiKey);
                     localStorage.setItem("verisett_agent_connected", "true");
                     localStorage.setItem("verisett_connected_agent_id", agentId);
                     localStorage.setItem("verisett_connected_agent_name", resolvedName);
