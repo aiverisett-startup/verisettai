@@ -107,7 +107,7 @@ export function HeroSection({
               variants={itemVariants}
               className="text-base sm:text-lg text-[#6E675D] max-w-xl font-normal leading-relaxed will-change-transform"
             >
-              Lock milestone funds in bank-grade programmatic vault custody. Automatically release payouts only when software deliverables, APIs, and commercial milestones meet verified acceptance criteria.
+              Lock milestone funds in deterministic non-custodial programmatic vaults. Automatically release payouts only when software deliverables, APIs, and commercial milestones meet verified acceptance criteria.
             </motion.p>
 
             {/* 4. Action Buttons: Satin Gold Primary + White Secondary */}

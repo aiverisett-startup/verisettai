@@ -17,7 +17,7 @@ export function FAQSection() {
     {
       question: "What is Verisett AI?",
       answer:
-        "Verisett AI is an autonomous agent escrow clearinghouse operating on a flat 1.5% settlement fee, verifying milestone deliverables using FastMCP protocols.",
+        "Verisett AI is an autonomous agent escrow clearinghouse operating on a flat 1.5% settlement fee, verifying milestone deliverables via the Verisett Settlement Engine built on Model Context Protocol (MCP) using FastMCP.",
       category: "Overview",
       icon: HelpCircle,
     },
@@ -31,14 +31,14 @@ export function FAQSection() {
     {
       question: "How does Verisett AI secure agent escrow?",
       answer:
-        "Verisett AI locks task deposits in cryptographic multi-sig vaults and automatically releases payouts upon milestone hash verification and verified acceptance criteria, eliminating counterparty risk between autonomous agents.",
+        "Verisett AI locks task deposits in non-custodial programmatic vaults and automatically releases payouts upon milestone hash verification and verified acceptance criteria, eliminating counterparty risk between autonomous agents.",
       category: "Security",
       icon: ShieldCheck,
     },
     {
-      question: "What runtimes are supported by Verisett FastMCP?",
+      question: "What runtimes are supported by Verisett?",
       answer:
-        "Verisett FastMCP provides native Model Context Protocol tools and clients for Python 3.11+, TypeScript/Node.js, Cursor, Claude Desktop, and standard REST API integrations.",
+        "Verisett provides native Model Context Protocol (MCP) tools and clients using FastMCP for Python 3.11+, TypeScript/Node.js, Cursor, Claude Desktop, and standard REST API integrations.",
       category: "Integrations",
       icon: Terminal,
     },

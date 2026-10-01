@@ -52,7 +52,7 @@ export function HowItWorksSection({ onStartOnboarding, onOpenVideoModal }: HowIt
       number: "02",
       stepBadge: "STEP 2: DEFINE ESCROW",
       title: "Define Settlement Terms",
-      quote: "Bank-grade programmatic vault locking until deliverables pass.",
+      quote: "Deterministic code-level programmatic vault locking until deliverables pass.",
       description:
         "Choose your project deliverable, milestone amounts, and acceptance criteria in plain business language. Set auto-release rules or dual-client approval.",
       renderVisual: () => (

@@ -7,10 +7,10 @@ export function TrustSecuritySection() {
   const securityFeatures = [
     {
       icon: Lock,
-      title: "Bank-Grade Vault Isolation",
-      tag: "MULTI-SIG CUSTODY",
+      title: "Non-Custodial Vault Isolation",
+      tag: "DETERMINISTIC ENFORCEMENT",
       description:
-        "Every rupee or dollar is locked in segregated, neutral escrow vault custody. Payers cannot claw back funds arbitrarily, and contractors cannot withdraw until acceptance conditions are verified.",
+        "Every balance or milestone deposit is locked in segregated, programmatic vault custody. Payers cannot claw back funds arbitrarily, and workers cannot withdraw until acceptance conditions are mathematically verified.",
     },
     {
       icon: FileText,

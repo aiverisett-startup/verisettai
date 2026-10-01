@@ -30,12 +30,11 @@ import { VerisettLogo } from "@/components/VerisettLogo";
 
 export default function SecurityArchitecturePage() {
   const [copiedSnippet, setCopiedSnippet] = useState(false);
-  const lastAudited = "October 2026";
-  const protocolVersion = "FastMCP v2.4.0";
+  const protocolVersion = "Verisett Settlement Engine — Built on Model Context Protocol (MCP) using FastMCP";
 
   const assertionCode = `{
   "contract_id": "vrs_c7f8a912-34bc-48e5",
-  "protocol": "FastMCP/2.4",
+  "engine": "Verisett-Settlement-Engine/MCP",
   "assertion_type": "SHA256_JSON_SCHEMA",
   "timeout_seconds": 300,
   "milestone": {
@@ -86,7 +85,7 @@ export default function SecurityArchitecturePage() {
     {
       icon: Server,
       title: "TLS 1.3 & Encrypted FastMCP RPC",
-      badge: "Bank-Grade Encryption",
+      badge: "Encrypted Transport",
       description:
         "All telemetry, assertion criteria, and settlement calls traverse TLS 1.3 encrypted RPC channels. FastMCP endpoints authenticate via salted SHA-256 HMAC tokens, while deliverable payloads are verified in isolated ephemeral sandboxes to prevent injection attacks.",
     },
@@ -202,6 +201,26 @@ export default function SecurityArchitecturePage() {
             </span>
           </div>
         </div>
+
+        {/* Developer Sandbox Security & Audit Roadmap Disclosure */}
+        <section className="rounded-3xl border border-[#C59B5F]/40 bg-gradient-to-r from-[#142442]/90 via-[#0E1B33]/90 to-[#142442]/90 p-6 sm:p-8 shadow-xl space-y-4">
+          <div className="flex items-center gap-2.5 text-xs font-mono font-semibold uppercase text-[#C59B5F]">
+            <ShieldCheck className="h-4 w-4 text-[#C59B5F]" />
+            <span>Developer Sandbox Security Architecture</span>
+          </div>
+          <p className="text-sm sm:text-base text-white leading-relaxed font-medium">
+            <strong>Deterministic code-level enforcement:</strong> Non-custodial programmatic vaults, SHA-256 deliverable payload hashing, execution timeouts, and TLS 1.3 encrypted FastMCP RPC transports.
+          </p>
+          <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs font-mono text-[#CBD5E1]">
+            <div className="flex items-center gap-2.5">
+              <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse shrink-0" />
+              <span>
+                <strong className="text-amber-300">Public Roadmap Disclosure:</strong> Independent third-party cryptographic audits and production fiat gateways are currently planned on the public roadmap.
+              </span>
+            </div>
+            <span className="text-[#C59B5F] shrink-0 font-bold">Active Simulation Sandbox</span>
+          </div>
+        </section>
 
         {/* 4 Core Pillars Grid */}
         <section className="space-y-6">
@@ -449,7 +468,7 @@ export default function SecurityArchitecturePage() {
 
           <p className="text-xs sm:text-sm text-[#94A3B8] leading-relaxed">
             If you identify a security vulnerability, contract invariant edge case, or potential double-spend attack vector
-            in the FastMCP protocol or settlement gateways, please notify the security team immediately at{" "}
+            in the Verisett settlement engine, MCP integrations, or settlement gateways, please notify the security team immediately at{" "}
             <a href="mailto:security@veri-sett.com" className="text-[#C59B5F] hover:underline font-mono">
               security@veri-sett.com
             </a>
@@ -471,13 +490,16 @@ export default function SecurityArchitecturePage() {
                 </span>
               </div>
               <p className="text-xs text-[#94A3B8]">
-                Founded by Manoj S.M. — Deterministic financial settlement for autonomous agent economies.
+                Founded &amp; Architected by Manoj S.M. — Deterministic financial settlement for autonomous agent economies.
               </p>
             </div>
 
             <div className="flex flex-wrap items-center gap-5 font-mono text-xs">
               <Link href="/security" className="text-[#C59B5F] hover:text-white transition-colors font-semibold">
                 /security
+              </Link>
+              <Link href="/about" className="hover:text-white transition-colors">
+                /about
               </Link>
               <Link href="/terms" className="hover:text-white transition-colors">
                 /terms
@@ -492,8 +514,8 @@ export default function SecurityArchitecturePage() {
           </div>
 
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-[#475569]">
-            <p>© {new Date().getFullYear()} Verisett AI Inc. All rights reserved. Non-Custodial Deterministic Escrow.</p>
-            <p>Cryptographic Invariant: Lock &gt; Math Verification (&lt;50ms) &gt; Release.</p>
+            <p>© {new Date().getFullYear()} Verisett AI Project / Manoj S.M. All rights reserved. Open-Source Simulation Sandbox.</p>
+            <p>Deterministic Invariant: Lock &gt; Mathematical Verification (&lt;50ms) &gt; Release.</p>
           </div>
         </div>
       </footer>

@@ -193,7 +193,7 @@ export function AgentTransactionChart({
         <div>
           <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-[10px] font-mono text-emerald-800 mb-1.5 font-semibold">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span>AGENT ONLINE • FASTMCP NODE LINKED</span>
+            <span>AGENT ONLINE • MCP / FASTMCP NODE LINKED</span>
           </div>
           <h2 className="text-xl sm:text-2xl font-bold text-[#1C1A17] tracking-tight flex items-center gap-2">
             <span>Last Month Transaction Trajectory</span>

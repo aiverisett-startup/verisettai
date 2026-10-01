@@ -346,7 +346,7 @@ export function getTransactions(limit = 50): {
       timeStr,
       milestoneTitle: taskTitle,
       sha256Proof: proof,
-      clearingRail: "FastMCP Escrow Protocol v2.4",
+      clearingRail: "Verisett Settlement Engine — Built on Model Context Protocol (MCP) using FastMCP",
       direction: "SENT",
     };
   });
@@ -503,7 +503,7 @@ export function recordTransferInDb(params: {
     timeStr: new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", second: "2-digit" }),
     milestoneTitle: params.milestone || `Autonomous Task: ${payer?.name} -> ${worker?.name}`,
     sha256Proof: `sha256:${crypto.createHash("sha256").update(contractId).digest("hex").slice(0, 16)}`,
-    clearingRail: "FastMCP Escrow Protocol v2.4",
+    clearingRail: "Verisett Settlement Engine — Built on Model Context Protocol (MCP) using FastMCP",
     direction: "SENT",
   };
 
@@ -573,7 +573,7 @@ export function recordDepositInDb(params: {
     timeStr: new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", second: "2-digit" }),
     milestoneTitle: params.milestone || `Liquidity Injection to ${payer?.name}`,
     sha256Proof: `sha256:${crypto.createHash("sha256").update(txId).digest("hex").slice(0, 16)}`,
-    clearingRail: "FastMCP Escrow Protocol v2.4",
+    clearingRail: "Verisett Settlement Engine — Built on Model Context Protocol (MCP) using FastMCP",
     direction: "RECEIVED",
   };
 

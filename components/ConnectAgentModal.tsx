@@ -274,7 +274,7 @@ export function ConnectAgentModal({ isOpen, onClose, onConnected }: ConnectAgent
               <span className="w-2 h-2 rounded-full bg-[#C59B5F] animate-pulse"></span>
               Listening for initial agent handshake...
             </span>
-            <span className="text-[#8C8275]">FastMCP Protocol v2.4</span>
+            <span className="text-[#8C8275]">Verisett Settlement Engine (MCP / FastMCP)</span>
           </div>
         </div>
 

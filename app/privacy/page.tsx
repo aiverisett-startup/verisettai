@@ -100,7 +100,7 @@ export default function PrivacyPolicyPage() {
             <div className="h-3 w-px bg-[#1E345E]" />
             <div className="flex items-center gap-1.5 text-[#10B981]">
               <span className="h-2 w-2 rounded-full bg-[#10B981] animate-pulse" />
-              <span>Testnet Sandbox Protocol v2.4</span>
+              <span>Public Testnet Sandbox (MCP / FastMCP)</span>
             </div>
           </div>
         </div>
@@ -164,12 +164,12 @@ export default function PrivacyPolicyPage() {
             <section id="overview" className="space-y-4 scroll-mt-24">
               <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight flex items-center gap-3">
                 <span className="text-[#C59B5F] font-mono text-lg">01.</span>
-                Protocol Architecture &amp; Scope
+                Protocol Architecture &amp; Contracting Entity
               </h2>
               <p className="text-sm sm:text-base text-[#94A3B8]">
-                This Privacy Policy describes how Verisett AI (&quot;Verisett&quot;, &quot;we&quot;, &quot;us&quot;, or &quot;the Protocol&quot;) 
-                collects, manages, and protects information when developers, organizations, and autonomous AI agents interact with 
-                our non-custodial testnet sandbox, FastMCP clearinghouse server tools, web consoles, and programmatic REST endpoints 
+                This Privacy Policy describes how <strong className="text-white">Verisett AI Project / Manoj S.M.</strong> (&quot;Verisett&quot;, &quot;Project&quot;, &quot;we&quot;, &quot;us&quot;, or &quot;the Protocol&quot;) 
+                collects, manages, and protects technical metadata when developers, organizations, and autonomous AI agents interact with 
+                our experimental open-source protocol, FastMCP clearinghouse server tools, web consoles, and programmatic REST endpoints 
                 (collectively, the &quot;Platform&quot;).
               </p>
               <p className="text-sm sm:text-base text-[#94A3B8]">
@@ -182,18 +182,18 @@ export default function PrivacyPolicyPage() {
             <section id="sandbox-status" className="space-y-4 scroll-mt-24">
               <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight flex items-center gap-3">
                 <span className="text-[#C59B5F] font-mono text-lg">02.</span>
-                Non-Custodial Testnet Sandbox Notice
+                Experimental Open-Source Protocol &amp; Simulation Sandbox Notice
               </h2>
               <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-4 sm:p-5 text-sm">
                 <div className="flex items-center gap-2 font-mono text-xs font-semibold uppercase text-amber-400 mb-1.5">
                   <AlertCircle className="h-4 w-4 shrink-0" />
-                  <span>Important Testnet Notice</span>
+                  <span>Important Testnet Simulation Notice</span>
                 </div>
                 <p className="text-[#CBD5E1] text-xs sm:text-sm leading-relaxed">
-                  Verisett AI currently operates exclusively as an experimental, non-custodial software-defined escrow sandbox. 
-                  All balances, simulated settlements, transaction feeds, and test tokens displayed on the platform 
-                  <strong className="text-white"> possess zero monetary, fiat, or tangible value</strong>. Verisett does not hold, 
-                  transmit, or custody real-world banking deposits or financial assets in this sandbox phase.
+                  Verisett AI currently operates exclusively as an <strong className="text-white">experimental open-source protocol and simulation sandbox</strong>. 
+                  All dashboard metrics (vault counts, transaction volumes), simulated settlements, and test tokens displayed on the platform 
+                  represent synthetic simulation throughput, possess <strong className="text-white">zero monetary, fiat, or tangible value</strong>, 
+                  and entail <strong className="text-white">zero monetary fiat liability</strong>. Verisett does not hold, transmit, or custody real-world banking deposits or financial assets in this sandbox phase.
                 </p>
               </div>
             </section>
@@ -404,7 +404,7 @@ export default function PrivacyPolicyPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2 text-[#94A3B8]">
             <VerisettLogo size={18} />
-            <span>&copy; {new Date().getFullYear()} Verisett AI Inc. All rights reserved.</span>
+            <span>&copy; {new Date().getFullYear()} Verisett AI Project / Manoj S.M. All rights reserved.</span>
           </div>
           <div className="flex items-center gap-6 font-medium">
             <Link href="/" className="hover:text-[#C59B5F] transition-colors">Platform Home</Link>

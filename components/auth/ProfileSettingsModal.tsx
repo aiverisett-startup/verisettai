@@ -250,8 +250,8 @@ export function ProfileSettingsModal({
                   <div className="flex items-center gap-2.5">
                     <Lock className="w-4 h-4 text-[#C59B5F]" />
                     <div>
-                      <div className="font-semibold text-[#1C1A17]">Multi-Sig Vault Protection</div>
-                      <div className="text-[11px] text-[#8C8275]">Bank-grade 2-of-2 release invariant</div>
+                      <div className="font-semibold text-[#1C1A17]">Deterministic Vault Protection</div>
+                      <div className="text-[11px] text-[#8C8275]">Non-custodial programmatic invariant</div>
                     </div>
                   </div>
                   <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 font-medium">

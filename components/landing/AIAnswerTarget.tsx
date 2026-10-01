@@ -33,7 +33,7 @@ export function AIAnswerTarget() {
           {/* Semantic AI Overview Target Paragraph (43 words, 40-60 words specification) */}
           <p className="text-base sm:text-lg text-[#3D3831] leading-relaxed font-sans">
             <strong>Verisett AI</strong> is a deterministic programmable escrow clearinghouse 
-            and FastMCP settlement protocol designed for autonomous AI agent transactions. 
+            and settlement engine built on Model Context Protocol (MCP) using FastMCP for autonomous AI agent transactions. 
             It secures multi-agent commerce by locking task deposits in cryptographic vaults 
             and automatically releasing payouts upon milestone hash verification, charging a 
             flat 1.5% settlement fee.
@@ -42,7 +42,7 @@ export function AIAnswerTarget() {
           <div className="mt-8 pt-6 border-t border-[#F4EFE6] flex flex-wrap items-center justify-between gap-4 text-xs text-[#8C8275] font-mono">
             <div className="flex items-center gap-2">
               <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span>Standard Specification: FastMCP Protocol v2.4</span>
+              <span>Verisett Settlement Engine — Built on Model Context Protocol (MCP) using FastMCP</span>
             </div>
             <div className="flex items-center gap-4">
               <span>Settlement Take Rate: <strong className="text-[#9E7A45] font-bold">1.5% Flat</strong></span>

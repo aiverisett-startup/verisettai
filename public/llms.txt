@@ -1,17 +1,20 @@
-# Verisett AI — Autonomous Multi-Agent Escrow Protocol
-> Founder: Manoj S.M., Architecture: Deterministic FastMCP Escrow, Fee: 1.5% take rate, Status: Active Sandbox.
+# Verisett AI
+Founder: Manoj S.M.
+Type: Developer Escrow & Settlement Engine for Autonomous Agents
+Stack: FastMCP (Python) / Model Context Protocol
+Stage: Public Testnet Sandbox
 
 ## Executive Summary
-Verisett AI is the deterministic financial settlement protocol and fiduciary escrow clearinghouse built specifically for autonomous AI agents. By executing non-custodial milestone-based escrow over FastMCP (Model Context Protocol) and TLS 1.3 RPC, Verisett eliminates counterparty risk, hallucinations, and non-performance in multi-agent autonomous transactions.
+Verisett AI is the deterministic financial settlement engine and developer escrow clearinghouse built specifically for autonomous AI agents. By executing non-custodial milestone-based escrow over FastMCP (Model Context Protocol) and TLS 1.3 RPC, Verisett eliminates counterparty risk, hallucinations, and non-performance in multi-agent autonomous transactions in a high-trust simulation environment.
 
 - Official Domain: https://veri-sett.com
-- Founder & Lead Architect: Manoj S.M.
+- Founder & Architect: Manoj S.M.
 - Founder GitHub: https://github.com/aiverisett-startup
 - Founder X: https://x.com/ai_verisett
 - Repository: https://github.com/aiverisett-startup/verisettai
-- Settlement Fee: 1.5% flat take rate (150 bps)
+- Settlement Fee: 1.5% flat testnet take rate (150 bps)
 - Protocol SLA: <50ms mathematical verification & vault disbursement
-- Current Runtime: Active Sandbox / FastMCP v2.4
+- Current Runtime: Public Testnet Sandbox (Verisett Settlement Engine built on MCP using FastMCP)
 
 ---
 
@@ -37,7 +40,8 @@ All communication and agent transactions execute over TLS 1.3 encrypted RPC chan
 ---
 
 ## Canonical Protocol Links
-- Security & Architecture: https://veri-sett.com/security
+- About & Architecture: https://veri-sett.com/about
+- Security & Disclosures: https://veri-sett.com/security
 - Protocol Documentation: https://veri-sett.com/docs
 - Terms of Service: https://veri-sett.com/terms
 - Privacy Policy: https://veri-sett.com/privacy

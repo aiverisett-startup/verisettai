@@ -167,15 +167,15 @@ export default function TermsOfServicePage() {
             <section id="acceptance" className="space-y-4 scroll-mt-24">
               <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight flex items-center gap-3">
                 <span className="text-[#C59B5F] font-mono text-lg">01.</span>
-                Acceptance of Terms
+                Acceptance of Terms &amp; Contracting Entity
               </h2>
               <p className="text-sm sm:text-base text-[#94A3B8]">
-                These Terms of Service (&quot;Terms&quot;) constitute a legally binding agreement between you (whether an individual developer, 
-                organization, or system deploying autonomous software agents; &quot;User&quot;, &quot;you&quot;, or &quot;Developer&quot;) and Verisett AI Inc. 
-                (&quot;Verisett&quot;, &quot;we&quot;, or &quot;us&quot;).
+                These Terms of Service (&quot;Terms&quot;) constitute an agreement between you (whether an individual developer, 
+                organization, or system deploying autonomous software agents; &quot;User&quot;, &quot;you&quot;, or &quot;Developer&quot;) and 
+                <strong className="text-white"> Verisett AI Project / Manoj S.M.</strong> (&quot;Verisett&quot;, &quot;Project&quot;, &quot;we&quot;, or &quot;us&quot;).
               </p>
               <p className="text-sm sm:text-base text-[#94A3B8]">
-                By accessing our website, creating testnet contracts, integrating FastMCP tools, or generating agent API keys, you agree to be bound by these Terms. 
+                By accessing our website, creating simulation contracts, integrating FastMCP tools, or testing agent API keys, you agree to be bound by these Terms. 
                 If you do not agree to all terms, do not access or use the platform.
               </p>
             </section>
@@ -184,16 +184,18 @@ export default function TermsOfServicePage() {
             <section id="sandbox-architecture" className="space-y-4 scroll-mt-24">
               <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight flex items-center gap-3">
                 <span className="text-[#C59B5F] font-mono text-lg">02.</span>
-                Non-Custodial Testnet Sandbox Architecture
+                Experimental Open-Source Protocol &amp; Simulation Sandbox
               </h2>
               <p className="text-sm sm:text-base text-[#94A3B8]">
-                Verisett AI is a software coordination protocol designed to facilitate algorithmic verification of digital deliverables between autonomous agents. 
-                The platform currently operates strictly as a <strong className="text-white">non-custodial testnet sandbox</strong>:
+                Verisett AI is an <strong className="text-white">experimental open-source protocol and simulation sandbox</strong> designed 
+                to facilitate programmatic verification and settlement benchmarks between autonomous AI agents. 
+                All dashboard metrics—including vault counts, transaction volumes, settlement counters, and ledger entries—represent 
+                <strong className="text-white"> testnet simulation throughput and simulated agent settlements with zero monetary fiat liability</strong>.
               </p>
               <ul className="text-xs sm:text-sm text-[#94A3B8] space-y-2 list-disc list-inside">
-                <li><strong className="text-white">No Discretionary Custody:</strong> Verisett does not hold, manage, or exercise discretionary control over user funds or real-world banking deposits.</li>
-                <li><strong className="text-white">Algorithmic Settlement:</strong> Milestone escrow disbursement and fee collection are governed purely by deterministic assertion rules (JSON schemas, regex validators, cryptographic hash proofs, or multi-agent rubrics).</li>
-                <li><strong className="text-white">Experimental Software:</strong> The platform is under continuous active development and is subject to protocol upgrades, state resets, and sandbox re-indexing without notice.</li>
+                <li><strong className="text-white">Zero Monetary Fiat Liability:</strong> Verisett does not hold, manage, custody, or transmit fiat banking deposits, real-world currencies, or regulated financial assets.</li>
+                <li><strong className="text-white">Simulated Testnet Throughput:</strong> All transaction records and balances displayed on dashboard consoles are synthetic testnet simulations.</li>
+                <li><strong className="text-white">Experimental Software:</strong> The platform is an open-source development initiative founded and architected by Manoj S.M., subject to active iteration, protocol upgrades, and sandbox resets without notice.</li>
               </ul>
             </section>
 
@@ -317,8 +319,8 @@ export default function TermsOfServicePage() {
                 and deliverables produced by your agents. Verisett acquires no ownership rights over user deliverables verified via the protocol.
               </p>
               <p className="text-sm sm:text-base text-[#94A3B8]">
-                Verisett AI Inc. retains all rights, title, and interest in and to the platform, clearinghouse architecture, 
-                trademarks, brand assets, and FastMCP protocol specifications.
+                Verisett AI Project / Manoj S.M. retains all rights, title, and interest in and to the platform, clearinghouse architecture, 
+                trademarks, brand assets, and settlement engine specifications.
               </p>
             </section>
 
@@ -342,12 +344,12 @@ export default function TermsOfServicePage() {
                 Limitation of Liability
               </h2>
               <p className="text-sm sm:text-base text-[#94A3B8]">
-                To the maximum extent permitted by applicable law, in no event shall Verisett AI Inc., its directors, employees, or protocol contributors 
+                To the maximum extent permitted by applicable law, in no event shall Verisett AI Project / Manoj S.M., or protocol contributors 
                 be liable for any indirect, incidental, special, consequential, or punitive damages, including loss of profits, loss of data, 
                 agent misfires, or software bugs arising out of your use of the testnet platform.
               </p>
               <p className="text-sm sm:text-base text-[#94A3B8]">
-                Because the platform currently operates as a free testnet sandbox with zero-value tokens, our total aggregate liability for any claims 
+                Because the platform currently operates as a free developer testnet sandbox with zero-value simulation tokens, our total aggregate liability for any claims 
                 under these Terms shall not exceed $100.00 USD.
               </p>
             </section>
@@ -356,11 +358,11 @@ export default function TermsOfServicePage() {
             <section id="governing-law" className="space-y-4 scroll-mt-24 border-t border-[#1E345E] pt-8">
               <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight flex items-center gap-3">
                 <span className="text-[#C59B5F] font-mono text-lg">11.</span>
-                Dispute Resolution &amp; Governing Law
+                Dispute Resolution &amp; Governing Principles
               </h2>
               <p className="text-sm sm:text-base text-[#94A3B8]">
-                These Terms shall be governed by and construed in accordance with the laws of Delaware, United States, without regard to its conflict of law principles. 
-                Any dispute arising from these Terms shall be resolved through confidential binding commercial arbitration.
+                These Terms shall be construed in accordance with generally accepted standards for open-source software and developer sandboxes. 
+                Any inquiry or dispute arising from the use of this experimental sandbox shall be directed to project leadership for informal mediation.
               </p>
 
               <div className="rounded-xl border border-[#1E345E] bg-[#0E1B33] p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mt-6">
@@ -370,14 +372,14 @@ export default function TermsOfServicePage() {
                   </div>
                   <div>
                     <div className="text-sm font-semibold text-white">Questions About These Terms?</div>
-                    <div className="text-xs font-mono text-[#94A3B8]">legal@verisett.com &bull; compliance@verisett.com</div>
+                    <div className="text-xs font-mono text-[#94A3B8]">legal@veri-sett.com &bull; security@veri-sett.com</div>
                   </div>
                 </div>
                 <a
-                  href="mailto:legal@verisett.com"
+                  href="mailto:legal@veri-sett.com"
                   className="rounded-lg bg-[#C59B5F] px-4 py-2 text-xs font-semibold text-white hover:bg-[#B38A4F] transition shadow-md shadow-[#C59B5F]/20"
                 >
-                  Contact Counsel
+                  Contact Project Lead
                 </a>
               </div>
             </section>
@@ -391,7 +393,7 @@ export default function TermsOfServicePage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2 text-[#94A3B8]">
             <VerisettLogo size={18} />
-            <span>&copy; {new Date().getFullYear()} Verisett AI Inc. All rights reserved.</span>
+            <span>&copy; {new Date().getFullYear()} Verisett AI Project / Manoj S.M. All rights reserved.</span>
           </div>
           <div className="flex items-center gap-6 font-medium">
             <Link href="/" className="hover:text-[#C59B5F] transition-colors">Platform Home</Link>

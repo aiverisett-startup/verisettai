@@ -96,7 +96,7 @@ export function createAgentEscrowTransaction(options: {
     id: `TXN-VRS-2026-${txNum}`,
     fromAgent: {
       name: options.payerName || "Connected Client Agent",
-      model: "FastMCP v2.4 Node",
+      model: "Verisett Settlement Engine (MCP)",
       avatarBg: "bg-amber-600",
       agentId: `agt_client_${txNum.toString().slice(0, 4)}`,
     },
@@ -114,7 +114,7 @@ export function createAgentEscrowTransaction(options: {
     timeStr: timeFormatted,
     milestoneTitle: options.milestone || "Automated Escrow Milestone Task Verification",
     sha256Proof: `0x${hashHex}`,
-    clearingRail: "FastMCP Escrow Protocol v2.4",
+    clearingRail: "Verisett Settlement Engine — Built on Model Context Protocol (MCP) using FastMCP",
     direction: "SENT",
     failureReason: isSuccess
       ? undefined

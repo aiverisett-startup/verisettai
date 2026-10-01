@@ -67,7 +67,7 @@ const DEFAULT_STATE: VaultState = {
   is_agent_connected: false,
   connected_agent_id: "agt_live_node",
   connected_agent_name: "Autonomous Settlement Agent",
-  connected_agent_model: "FastMCP Protocol v2.4",
+  connected_agent_model: "Verisett Settlement Engine (MCP / FastMCP)",
   transactions: [],
   vault_deployments: [
     {
@@ -78,7 +78,7 @@ const DEFAULT_STATE: VaultState = {
       status: "Active",
       allocatedAgent: "Autonomous Settlement Agent",
       createdAt: new Date().toISOString(),
-      rail: "FastMCP Escrow Protocol v2.4",
+      rail: "Verisett Settlement Engine — Built on Model Context Protocol (MCP) using FastMCP",
     },
   ],
   last_updated: new Date().toISOString(),
@@ -128,7 +128,7 @@ export function getVaultState(): VaultState {
         status: "Active",
         allocatedAgent: state.connected_agent_name || "Autonomous Settlement Agent",
         createdAt: state.last_updated || new Date().toISOString(),
-        rail: "FastMCP Escrow Protocol v2.4",
+        rail: "Verisett Settlement Engine — Built on Model Context Protocol (MCP) using FastMCP",
       },
     ];
   } else {
@@ -233,7 +233,7 @@ export function autoDetectAgentIdentity(
     }
   }
 
-  return { name: "Autonomous Settlement Agent", model: "FastMCP Protocol v2.4", hasAgentSignals: false };
+  return { name: "Autonomous Settlement Agent", model: "Verisett Settlement Engine (MCP / FastMCP)", hasAgentSignals: false };
 }
 
 export function saveVaultState(state: VaultState): void {
@@ -257,7 +257,7 @@ export function deployNewSubVault(title: string, amount: number, agentName?: str
     status: "Active",
     allocatedAgent: agentName || state.connected_agent_name || "Autonomous Settlement Agent",
     createdAt: new Date().toISOString(),
-    rail: "FastMCP Escrow Protocol v2.4",
+    rail: "Verisett Settlement Engine — Built on Model Context Protocol (MCP) using FastMCP",
   };
   if (!state.vault_deployments) state.vault_deployments = [];
   state.vault_deployments.unshift(deployment);
@@ -324,7 +324,7 @@ export function recordAgentTransfer(params: {
     timeStr: timeFormatted,
     milestoneTitle: params.milestoneTitle || `Task: ${senderName} -> ${receiverName}`,
     sha256Proof,
-    clearingRail: "FastMCP Escrow Protocol v2.4",
+    clearingRail: "Verisett Settlement Engine — Built on Model Context Protocol (MCP) using FastMCP",
     direction: "SENT",
     failureReason: isSuccess
       ? undefined
@@ -356,7 +356,7 @@ export function recordAgentTransfer(params: {
         status: "Active",
         allocatedAgent: senderName,
         createdAt: now.toISOString(),
-        rail: "FastMCP Escrow Protocol v2.4",
+        rail: "Verisett Settlement Engine — Built on Model Context Protocol (MCP) using FastMCP",
       },
     ];
   } else {
@@ -373,7 +373,7 @@ export function recordAgentTransfer(params: {
     status: isSuccess ? "Settled" : "Active",
     allocatedAgent: senderName,
     createdAt: now.toISOString(),
-    rail: "FastMCP Escrow Protocol v2.4",
+    rail: "Verisett Settlement Engine — Built on Model Context Protocol (MCP) using FastMCP",
   });
 
   saveVaultState(state);
@@ -429,7 +429,7 @@ export function recordVaultDeposit(params: {
     timeStr: timeFormatted,
     milestoneTitle: params.milestoneTitle || `Vault Liquidity Deposit by ${agentName}`,
     sha256Proof,
-    clearingRail: "FastMCP Escrow Protocol v2.4",
+    clearingRail: "Verisett Settlement Engine — Built on Model Context Protocol (MCP) using FastMCP",
     direction: "RECEIVED",
   };
 
@@ -452,7 +452,7 @@ export function recordVaultDeposit(params: {
         status: "Active",
         allocatedAgent: agentName,
         createdAt: now.toISOString(),
-        rail: "FastMCP Escrow Protocol v2.4",
+        rail: "Verisett Settlement Engine — Built on Model Context Protocol (MCP) using FastMCP",
       },
     ];
   } else {

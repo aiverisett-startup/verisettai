@@ -113,7 +113,7 @@ print(f"Settled: {settlement['status']} | Fee: 1.5% | Net Payout: ₹{settlement
         <div className="space-y-4 max-w-3xl">
           <div className="inline-flex items-center gap-2 rounded-full border border-[#C59B5F]/40 bg-[#142442] px-4 py-1 text-xs font-mono text-[#C59B5F]">
             <BookOpen className="h-3.5 w-3.5 text-[#C59B5F]" />
-            <span>FASTMCP PROTOCOL SPECIFICATION v2.4</span>
+            <span>Verisett Settlement Engine — Built on Model Context Protocol (MCP) using FastMCP</span>
           </div>
 
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-tight">
@@ -121,8 +121,7 @@ print(f"Settled: {settlement['status']} | Fee: 1.5% | Net Payout: ₹{settlement
           </h1>
 
           <p className="text-sm sm:text-base text-[#94A3B8] leading-relaxed">
-            Integrate deterministic programmatic escrow and FastMCP settlement into your autonomous agents,
-            Claude Desktop workflows, Cursor environments, and Python or TypeScript runtimes.
+            Integrate deterministic programmatic escrow and Verisett settlement into your autonomous agents via Model Context Protocol (MCP) and FastMCP toolkits, Claude Desktop workflows, Cursor environments, and Python or TypeScript runtimes.
           </p>
 
           <div className="flex flex-wrap items-center gap-4 text-xs font-mono pt-2">
@@ -137,11 +136,17 @@ print(f"Settled: {settlement['status']} | Fee: 1.5% | Net Payout: ₹{settlement
               <ExternalLink className="w-3 h-3 text-[#64748B]" />
             </a>
             <Link
+              href="/about"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#142442] border border-[#1E345E] hover:border-[#C59B5F] text-white hover:text-[#C59B5F] transition"
+            >
+              <span>About Architecture</span>
+            </Link>
+            <Link
               href="/security"
               className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#142442] border border-[#1E345E] hover:border-[#C59B5F] text-white hover:text-[#C59B5F] transition"
             >
               <ShieldCheck className="w-4 h-4 text-[#C59B5F]" />
-              <span>Security Architecture Specification</span>
+              <span>Security Architecture</span>
             </Link>
           </div>
         </div>
@@ -261,13 +266,31 @@ print(f"Settled: {settlement['status']} | Fee: 1.5% | Net Payout: ₹{settlement
         {/* Founder Attribution Card */}
         <section className="rounded-2xl border border-[#1E345E] bg-[#142442]/50 p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-xs font-mono text-[#94A3B8]">
           <div>
-            <span className="text-[#C59B5F] font-bold">Verisett Protocol Architecture</span>
+            <span className="text-[#C59B5F] font-bold">Verisett Settlement Engine</span>
             <p className="text-white font-semibold text-sm mt-0.5">Founded &amp; Architected by Manoj S.M.</p>
             <p className="text-[#94A3B8] text-xs mt-1">Deterministic financial settlement for autonomous agent economies.</p>
           </div>
-          <div className="flex items-center gap-3 shrink-0">
-            <Link href="/security" className="text-[#C59B5F] hover:underline">
-              Security Architecture →
+          <div className="flex flex-wrap items-center gap-3 shrink-0">
+            <a
+              href="https://github.com/aiverisett-startup"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[#CBD5E1] hover:text-[#C59B5F] transition"
+            >
+              GitHub ↗
+            </a>
+            <span className="text-[#3B527E]">•</span>
+            <a
+              href="https://x.com/ai_verisett"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[#CBD5E1] hover:text-[#C59B5F] transition"
+            >
+              X (@ai_verisett) ↗
+            </a>
+            <span className="text-[#3B527E]">•</span>
+            <Link href="/about" className="text-[#C59B5F] hover:underline font-semibold">
+              About Founder &amp; Engine →
             </Link>
           </div>
         </section>
@@ -276,8 +299,11 @@ print(f"Settled: {settlement['status']} | Fee: 1.5% | Net Payout: ₹{settlement
       {/* Footer */}
       <footer className="border-t border-[#1E345E]/80 bg-[#070E1B] py-10 text-xs text-[#64748B] font-montserrat">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p>© {new Date().getFullYear()} Verisett AI Inc. Founded by Manoj S.M.</p>
+          <p>© {new Date().getFullYear()} Verisett AI Project / Manoj S.M. — Experimental Open-Source Sandbox</p>
           <div className="flex items-center gap-4 font-mono text-xs">
+            <Link href="/about" className="hover:text-white transition-colors">
+              /about
+            </Link>
             <Link href="/security" className="hover:text-white transition-colors">
               /security
             </Link>

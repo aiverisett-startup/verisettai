@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     template: "%s | Verisett AI",
   },
   description:
-    "Deterministic programmable vault escrow and FastMCP settlement protocol for autonomous AI agents.",
+    "Verisett Settlement Engine — Built on Model Context Protocol (MCP) using FastMCP. Deterministic non-custodial vault escrow for autonomous AI agents.",
   applicationName: "Verisett AI",
   icons: {
     icon: [
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     { name: "Verisett AI", url: siteUrl }
   ],
   creator: "Manoj S.M.",
-  publisher: "Verisett AI Inc.",
+  publisher: "Verisett AI Project / Manoj S.M.",
   formatDetection: {
     email: false,
     address: false,
@@ -42,17 +42,18 @@ export const metadata: Metadata = {
   },
   keywords: [
     "Verisett AI",
+    "Manoj S.M.",
     "Autonomous Agent Escrow",
     "Settlement Protocol",
     "Multi-Agent Economies",
-    "FastMCP Settlement",
+    "Model Context Protocol",
+    "MCP Settlement",
+    "FastMCP",
     "Software Escrow",
     "Milestone Protection",
     "Automated Settlement",
-    "Enterprise Escrow SaaS",
-    "FinTech Escrow",
+    "Developer Sandbox",
     "Institutional Vault Custody",
-    "FastMCP Escrow",
     "Autonomous AI Clearinghouse",
     "Deterministic Settlement",
   ],
@@ -60,9 +61,9 @@ export const metadata: Metadata = {
     canonical: "/",
   },
   openGraph: {
-    title: "Verisett AI — Autonomous Multi-Agent Escrow Protocol",
+    title: "Verisett AI — Settlement Engine for Autonomous Agents",
     description:
-      "Deterministic programmable vault escrow and FastMCP settlement protocol for autonomous AI agents.",
+      "Verisett Settlement Engine — Built on Model Context Protocol (MCP) using FastMCP. Deterministic non-custodial vault escrow for autonomous AI agents.",
     url: siteUrl,
     siteName: "Verisett AI",
     locale: "en_US",
@@ -78,10 +79,10 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Verisett AI — Autonomous Multi-Agent Escrow Protocol",
+    title: "Verisett AI — Settlement Engine for Autonomous Agents",
     description:
-      "Deterministic programmable vault escrow and FastMCP settlement protocol for autonomous AI agents.",
-    site: "@Verisett_AI",
+      "Verisett Settlement Engine — Built on Model Context Protocol (MCP) using FastMCP. Founded & Architected by Manoj S.M.",
+    site: "@ai_verisett",
     creator: "@ai_verisett",
     images: ["/icon.png"],
   },
@@ -115,8 +116,8 @@ export default function RootLayout({
         "logo": "https://veri-sett.com/icon.png",
         "image": "https://veri-sett.com/icon.png",
         "applicationCategory": "FinancialApplication",
-        "operatingSystem": "Autonomous Agent Protocol / FastMCP / REST",
-        "description": "Deterministic programmable vault escrow and FastMCP settlement protocol for autonomous AI agents with a flat 1.5% commission rate.",
+        "operatingSystem": "Model Context Protocol (MCP) / FastMCP / REST",
+        "description": "Verisett Settlement Engine — Built on Model Context Protocol (MCP) using FastMCP. Deterministic programmable vault escrow for autonomous AI agents.",
         "softwareVersion": "2.4.0",
         "offers": {
           "@type": "Offer",
@@ -135,7 +136,7 @@ export default function RootLayout({
         "hasPart": [
           {
             "@type": "WebPage",
-            "name": "Security Architecture & FastMCP Escrow",
+            "name": "Security Architecture & Deterministic Escrow",
             "url": "https://veri-sett.com/security",
             "description": "Non-custodial deterministic escrow vault architecture with <50ms mathematical verification, SHA-256 assertions, and timeout refund guarantees."
           },
@@ -144,6 +145,12 @@ export default function RootLayout({
             "name": "Terms of Service",
             "url": "https://veri-sett.com/terms",
             "description": "Institutional terms of service governing Verisett AI multi-agent settlement protocol."
+          },
+          {
+            "@type": "WebPage",
+            "name": "About Verisett AI & Leadership",
+            "url": "https://veri-sett.com/about",
+            "description": "Verisett Settlement Engine — Built on Model Context Protocol (MCP) using FastMCP. Founded and architected by Manoj S.M."
           },
           {
             "@type": "WebPage",
@@ -173,7 +180,7 @@ export default function RootLayout({
         "jobTitle": "Founder & Lead Architect",
         "worksFor": {
           "@type": "Organization",
-          "name": "Verisett AI",
+          "name": "Verisett AI Project",
           "url": "https://veri-sett.com"
         },
         "sameAs": [
@@ -209,7 +216,7 @@ export default function RootLayout({
         "name": "What is Verisett AI?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Verisett AI is an autonomous agent escrow clearinghouse operating on a flat 1.5% settlement fee, verifying milestone deliverables using FastMCP protocols."
+          "text": "Verisett AI is the Verisett Settlement Engine — Built on Model Context Protocol (MCP) using FastMCP for deterministic non-custodial milestone escrow between autonomous agents."
         }
       },
       {

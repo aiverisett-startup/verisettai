@@ -172,11 +172,17 @@ export function MinimalFooter() {
           <div className="flex items-center gap-3">
             <span className="w-2.5 h-2.5 rounded-full bg-[#10B981] animate-pulse shrink-0" />
             <p className="text-xs sm:text-sm text-[#1C1A17] font-medium leading-relaxed">
-              <span className="font-bold text-[#1C1A17]">Founded by Manoj S.M.</span>
+              <span className="font-bold text-[#1C1A17]">Founded &amp; Architected by Manoj S.M.</span>
               <span className="text-[#6E675D]"> — Deterministic financial settlement for autonomous agent economies.</span>
             </p>
           </div>
           <div className="flex items-center gap-2.5 shrink-0">
+            <Link
+              href="/about"
+              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FAF8F5] hover:bg-white border border-[#EAE3D2] hover:border-[#9E7A45] text-xs font-medium text-[#9E7A45] transition-all"
+            >
+              <span>About Lead</span>
+            </Link>
             <a
               href="https://github.com/aiverisett-startup"
               target="_blank"
@@ -200,10 +206,13 @@ export function MinimalFooter() {
 
         <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-montserrat text-[#8C8275]">
           <div>
-            © {new Date().getFullYear()} Verisett AI Inc. All rights reserved.
+            © {new Date().getFullYear()} Verisett AI Project / Manoj S.M. All rights reserved.
           </div>
 
           <div className="flex flex-wrap items-center gap-4 sm:gap-6 font-medium">
+            <Link href="/about" className="text-[#1C1A17] hover:text-[#C59B5F] font-semibold transition-colors">
+              About
+            </Link>
             <Link href="/security" className="text-[#1C1A17] hover:text-[#C59B5F] font-semibold transition-colors">
               Security
             </Link>

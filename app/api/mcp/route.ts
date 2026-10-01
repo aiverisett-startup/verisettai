@@ -63,7 +63,7 @@ export async function POST(req: NextRequest) {
             version: "2.4.0",
           },
           instructions:
-            "Verisett FastMCP protocol gateway. Use 'deposit_funds' to add money to the vault in real time, and 'create_contract_escrow' or 'transfer_funds' to execute settlements.",
+            "Verisett Settlement Engine — Built on Model Context Protocol (MCP) using FastMCP. Use 'deposit_funds' to add money to the vault in real time, and 'create_contract_escrow' or 'transfer_funds' to execute settlements.",
         },
       });
     }
