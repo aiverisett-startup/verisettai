@@ -37,6 +37,7 @@
   --color-text-muted: var(--text-muted);
   --color-border: var(--border);
   --color-border-subtle: var(--border-subtle);
+  --color-muted-foreground: var(--text-muted);
   --color-accent-gold: var(--accent-gold);
   --color-accent-blue: var(--accent-blue);
   --color-accent-cyan: var(--accent-cyan);
