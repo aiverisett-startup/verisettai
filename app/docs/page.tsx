@@ -32,7 +32,7 @@ client = FastMCPEscrowClient(
 # 1. Lock funds into deterministic escrow vault
 contract = client.create_escrow_contract(
     worker_agent="agt_data_synthesizer_01",
-    amount_cents=250000,  # ₹2,500.00 VRS
+    amount_cents=250000,  # $2,500.00 USD
     assertion_type="SHA256_JSON_SCHEMA",
     timeout_seconds=300,
     required_sha256="7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069"
@@ -44,7 +44,7 @@ settlement = client.settle_milestone(
     deliverable_payload={"metrics": {"accuracy": 0.99, "status": "PASS"}}
 )
 
-print(f"Settled: {settlement['status']} | Fee: 1.5% | Net Payout: ₹{settlement['net_amount']}")`;
+print(f"Settled: {settlement['status']} | Fee: 1.5% | Net Payout: \${settlement['net_amount']}")`;
 
   const mcpConfigSnippet = `{
   "mcpServers": {
@@ -66,19 +66,19 @@ print(f"Settled: {settlement['status']} | Fee: 1.5% | Net Payout: ₹{settlement
   };
 
   return (
-    <div className="min-h-screen bg-[#0B1528] text-[#F8FAFC] font-montserrat antialiased selection:bg-[#C59B5F]/30 selection:text-[#FAF6EE]">
+    <div className="min-h-screen bg-[#0B1528] text-[#F8FAFC] font-montserrat antialiased selection:bg-blue-600/30 selection:text-white">
       {/* Top Header */}
       <header className="sticky top-0 z-40 border-b border-[#1E345E]/80 bg-[#0B1528]/90 backdrop-blur-md">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-3">
             <Link href="/" className="flex items-center gap-2.5 group">
               <VerisettLogo size={28} />
-              <span className="text-base font-bold tracking-tight text-white group-hover:text-[#C59B5F] transition-colors">
+              <span className="text-base font-bold tracking-tight text-white group-hover:text-blue-400 transition-colors">
                 Verisett AI
               </span>
             </Link>
             <span className="hidden sm:inline-block text-[#3B527E]">/</span>
-            <span className="hidden sm:inline-block rounded-md bg-[#142442] px-2.5 py-0.5 text-[11px] font-mono text-[#C59B5F] border border-[#1E345E]">
+            <span className="hidden sm:inline-block rounded-md bg-[#142442] px-2.5 py-0.5 text-[11px] font-mono text-blue-400 border border-[#1E345E]">
               DEVELOPER // PROTOCOL DOCS
             </span>
           </div>
@@ -86,21 +86,21 @@ print(f"Settled: {settlement['status']} | Fee: 1.5% | Net Payout: ₹{settlement
           <div className="flex items-center gap-3 sm:gap-4">
             <Link
               href="/"
-              className="inline-flex items-center gap-2 rounded-xl border border-[#1E345E] bg-[#0E1B33] px-3.5 py-1.5 text-xs font-medium text-[#94A3B8] hover:border-[#C59B5F]/60 hover:text-white transition-all shadow-xs"
+              className="inline-flex items-center gap-2 rounded-xl border border-[#1E345E] bg-[#0E1B33] px-3.5 py-1.5 text-xs font-medium text-[#94A3B8] hover:border-blue-500/60 hover:text-white transition-all shadow-xs"
             >
-              <ArrowLeft className="h-3.5 w-3.5 text-[#C59B5F]" />
+              <ArrowLeft className="h-3.5 w-3.5 text-blue-400" />
               <span className="hidden sm:inline">Back to Platform</span>
               <span className="sm:hidden">Back</span>
             </Link>
             <Link
               href="/security"
-              className="text-xs font-medium text-[#94A3B8] hover:text-[#C59B5F] transition-colors hidden md:inline-block"
+              className="text-xs font-medium text-[#94A3B8] hover:text-blue-400 transition-colors hidden md:inline-block"
             >
               Security Architecture →
             </Link>
             <Link
               href="/terms"
-              className="text-xs font-medium text-[#94A3B8] hover:text-[#C59B5F] transition-colors hidden lg:inline-block"
+              className="text-xs font-medium text-[#94A3B8] hover:text-blue-400 transition-colors hidden lg:inline-block"
             >
               Terms →
             </Link>
@@ -111,8 +111,8 @@ print(f"Settled: {settlement['status']} | Fee: 1.5% | Net Payout: ₹{settlement
       <main className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8 space-y-14">
         {/* Hero */}
         <div className="space-y-4 max-w-3xl">
-          <div className="inline-flex items-center gap-2 rounded-full border border-[#C59B5F]/40 bg-[#142442] px-4 py-1 text-xs font-mono text-[#C59B5F]">
-            <BookOpen className="h-3.5 w-3.5 text-[#C59B5F]" />
+          <div className="inline-flex items-center gap-2 rounded-full border border-blue-500/30 bg-[#142442] px-4 py-1 text-xs font-mono text-cyan-400">
+            <BookOpen className="h-3.5 w-3.5 text-cyan-400" />
             <span>Verisett Settlement Engine — Built on Model Context Protocol (MCP) using FastMCP</span>
           </div>
 
@@ -129,40 +129,40 @@ print(f"Settled: {settlement['status']} | Fee: 1.5% | Net Payout: ₹{settlement
               href="https://github.com/aiverisett-startup/verisettai"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#142442] border border-[#1E345E] hover:border-[#C59B5F] text-white hover:text-[#C59B5F] transition"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#142442] border border-[#1E345E] hover:border-blue-500 text-white hover:text-blue-400 transition"
             >
-              <Code2 className="w-4 h-4 text-[#C59B5F]" />
+              <Code2 className="w-4 h-4 text-cyan-400" />
               <span>GitHub Repository</span>
               <ExternalLink className="w-3 h-3 text-[#64748B]" />
             </a>
             <Link
               href="/about"
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#142442] border border-[#1E345E] hover:border-[#C59B5F] text-white hover:text-[#C59B5F] transition"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#142442] border border-[#1E345E] hover:border-blue-500 text-white hover:text-blue-400 transition"
             >
               <span>About Architecture</span>
             </Link>
             <Link
               href="/security"
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#142442] border border-[#1E345E] hover:border-[#C59B5F] text-white hover:text-[#C59B5F] transition"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#142442] border border-[#1E345E] hover:border-blue-500 text-white hover:text-blue-400 transition"
             >
-              <ShieldCheck className="w-4 h-4 text-[#C59B5F]" />
+              <ShieldCheck className="w-4 h-4 text-cyan-400" />
               <span>Security Architecture</span>
             </Link>
           </div>
         </div>
 
         {/* Stack Alignment Notice */}
-        <section className="rounded-2xl border border-[#C59B5F]/30 bg-[#142442]/60 p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-xs font-mono text-[#CBD5E1]">
+        <section className="rounded-2xl border border-blue-500/30 bg-[#142442]/60 p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-xs font-mono text-[#CBD5E1]">
           <div className="flex items-center gap-3">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
             <div>
-              <span className="text-[#C59B5F] font-bold">Runtime Implementation Architecture:</span>
+              <span className="text-blue-400 font-bold">Runtime Implementation Architecture:</span>
               <p className="text-[#94A3B8] text-xs mt-0.5">
-                The live sandbox runs a native <strong className="text-white">TypeScript Model Context Protocol (MCP) settlement engine (JSON-RPC 2.0)</strong> at <code className="text-[#C59B5F]">/api/mcp</code>. Python FastMCP client bindings (<code className="text-[#C59B5F]">pip install verisett</code>) are currently under active development and scheduled on the public roadmap.
+                The live sandbox runs a native <strong className="text-white">TypeScript Model Context Protocol (MCP) settlement engine (JSON-RPC 2.0)</strong> at <code className="text-cyan-400">/api/mcp</code>. Python FastMCP client bindings (<code className="text-cyan-400">pip install verisett</code>) are currently under active development and scheduled on the public roadmap.
               </p>
             </div>
           </div>
-          <span className="shrink-0 px-2.5 py-1 rounded-lg bg-[#0E1B33] border border-[#1E345E] text-[11px] text-[#C59B5F]">
+          <span className="shrink-0 px-2.5 py-1 rounded-lg bg-[#0E1B33] border border-[#1E345E] text-[11px] text-cyan-400">
             TypeScript Live • Python Planned
           </span>
         </section>
@@ -171,13 +171,13 @@ print(f"Settled: {settlement['status']} | Fee: 1.5% | Net Payout: ₹{settlement
         <section className="rounded-3xl border border-[#1E345E] bg-[#0E1B33]/80 p-6 sm:p-8 space-y-5">
           <div className="flex items-center justify-between border-b border-[#1E345E] pb-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-xl bg-[#142442] border border-[#1E345E] text-[#C59B5F]">
+              <div className="p-2 rounded-xl bg-[#142442] border border-[#1E345E] text-blue-400">
                 <Terminal className="w-5 h-5" />
               </div>
               <div>
                 <div className="flex items-center gap-2">
                   <h3 className="text-base font-bold text-white">Python FastMCP Client</h3>
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#1E345E] text-[#C59B5F]">
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#1E345E] text-cyan-400">
                     Roadmap Milestone 2
                   </span>
                 </div>
@@ -186,7 +186,7 @@ print(f"Settled: {settlement['status']} | Fee: 1.5% | Net Payout: ₹{settlement
             </div>
             <button
               onClick={() => handleCopy(pythonSnippet, "python")}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#142442] border border-[#1E345E] hover:border-[#C59B5F] text-xs font-mono text-[#C59B5F] transition cursor-pointer"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#142442] border border-[#1E345E] hover:border-blue-500 text-xs font-mono text-blue-400 transition cursor-pointer"
             >
               {copiedCode === "python" ? (
                 <>
@@ -211,7 +211,7 @@ print(f"Settled: {settlement['status']} | Fee: 1.5% | Net Payout: ₹{settlement
         <section className="rounded-3xl border border-[#1E345E] bg-[#0E1B33]/80 p-6 sm:p-8 space-y-5">
           <div className="flex items-center justify-between border-b border-[#1E345E] pb-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-xl bg-[#142442] border border-[#1E345E] text-[#C59B5F]">
+              <div className="p-2 rounded-xl bg-[#142442] border border-[#1E345E] text-cyan-400">
                 <Cpu className="w-5 h-5" />
               </div>
               <div>
@@ -221,7 +221,7 @@ print(f"Settled: {settlement['status']} | Fee: 1.5% | Net Payout: ₹{settlement
             </div>
             <button
               onClick={() => handleCopy(mcpConfigSnippet, "mcp")}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#142442] border border-[#1E345E] hover:border-[#C59B5F] text-xs font-mono text-[#C59B5F] transition cursor-pointer"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#142442] border border-[#1E345E] hover:border-blue-500 text-xs font-mono text-cyan-400 transition cursor-pointer"
             >
               {copiedCode === "mcp" ? (
                 <>
@@ -287,7 +287,7 @@ print(f"Settled: {settlement['status']} | Fee: 1.5% | Net Payout: ₹{settlement
         {/* Founder Attribution Card */}
         <section className="rounded-2xl border border-[#1E345E] bg-[#142442]/50 p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-xs font-mono text-[#94A3B8]">
           <div>
-            <span className="text-[#C59B5F] font-bold">Verisett Settlement Engine</span>
+            <span className="text-blue-400 font-bold">Verisett Settlement Engine</span>
             <p className="text-white font-semibold text-sm mt-0.5">Founded &amp; Architected by Manoj S.M.</p>
             <p className="text-[#94A3B8] text-xs mt-1">Deterministic financial settlement for autonomous agent economies.</p>
           </div>
@@ -296,7 +296,7 @@ print(f"Settled: {settlement['status']} | Fee: 1.5% | Net Payout: ₹{settlement
               href="https://github.com/aiverisett-startup"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[#CBD5E1] hover:text-[#C59B5F] transition"
+              className="text-[#CBD5E1] hover:text-blue-400 transition"
             >
               GitHub ↗
             </a>
@@ -305,12 +305,12 @@ print(f"Settled: {settlement['status']} | Fee: 1.5% | Net Payout: ₹{settlement
               href="https://x.com/ai_verisett"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[#CBD5E1] hover:text-[#C59B5F] transition"
+              className="text-[#CBD5E1] hover:text-blue-400 transition"
             >
               X (@ai_verisett) ↗
             </a>
             <span className="text-[#3B527E]">•</span>
-            <Link href="/about" className="text-[#C59B5F] hover:underline font-semibold">
+            <Link href="/about" className="text-blue-400 hover:underline font-semibold">
               About Founder &amp; Engine →
             </Link>
           </div>
@@ -334,7 +334,7 @@ print(f"Settled: {settlement['status']} | Fee: 1.5% | Net Payout: ₹{settlement
             <Link href="/privacy" className="hover:text-white transition-colors">
               /privacy
             </Link>
-            <Link href="/docs" className="text-[#C59B5F] font-semibold hover:text-white transition-colors">
+            <Link href="/docs" className="text-blue-400 font-semibold hover:text-white transition-colors">
               /docs
             </Link>
           </div>

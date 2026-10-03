@@ -24,14 +24,14 @@ export function TrustSecuritySection() {
       title: "Guaranteed Timeout Refund Safeguards",
       tag: "AUTOMATED REVERSION",
       description:
-        "Deadlines are programmatically established upfront. If a contractor or vendor goes offline or fails to deliver before the agreed completion window, 100% of escrowed funds auto-refund.",
+        "Deadlines are programmatically established upfront. If an autonomous worker agent goes offline or fails to deliver before the agreed completion window, 100% of escrowed funds auto-refund.",
     },
     {
       icon: ShieldCheck,
       title: "Objective Programmatic Settlement",
       tag: "ZERO-DISPUTE RAILS",
       description:
-        "Removes subjective payment withholding. Acceptance criteria are codified before capital leaves your treasury, ensuring predictable, frictionless vendor relationships.",
+        "Removes subjective payment withholding. Acceptance criteria are codified before capital leaves your treasury, ensuring predictable, frictionless autonomous agent coordination.",
     },
   ];
 
@@ -39,26 +39,26 @@ export function TrustSecuritySection() {
     <section id="trust" className="py-24 border-t border-[#EAE3D2] bg-white relative overflow-hidden">
       {/* Background Half-Shapes flanking Trust & Security Section */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden select-none -z-10">
-        {/* Left Edge: Smooth Golden Half-Circle with Concentric Arc */}
-        <div className="absolute top-1/4 -left-16 sm:-left-20 w-64 sm:w-80 h-64 sm:h-80 opacity-35 motion-safe:animate-float-slow">
+        {/* Left Edge: Smooth Blue Half-Circle with Concentric Arc */}
+        <div className="absolute top-1/4 -left-16 sm:-left-20 w-64 sm:w-80 h-64 sm:h-80 opacity-25 motion-safe:animate-float-slow">
           <svg viewBox="0 0 300 300" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
             <defs>
               <linearGradient id="trust-left-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#D4AF37" stopOpacity="0.22" />
-                <stop offset="60%" stopColor="#C59B5F" stopOpacity="0.08" />
+                <stop offset="0%" stopColor="#06B6D4" stopOpacity="0.22" />
+                <stop offset="60%" stopColor="#2563EB" stopOpacity="0.08" />
                 <stop offset="100%" stopColor="#FAF8F5" stopOpacity="0.0" />
               </linearGradient>
             </defs>
             <path
               d="M 150,20 A 130,130 0 0,1 150,280 Z"
               fill="url(#trust-left-grad)"
-              stroke="#D4AF37"
+              stroke="#06B6D4"
               strokeWidth="1.2"
               strokeOpacity="0.35"
             />
             <path
               d="M 150,50 A 100,100 0 0,1 150,250"
-              stroke="#C59B5F"
+              stroke="#2563EB"
               strokeWidth="1"
               strokeDasharray="5 5"
               strokeOpacity="0.25"
@@ -68,25 +68,25 @@ export function TrustSecuritySection() {
         </div>
 
         {/* Right Edge: Smooth Concentric Vault Half-Arc */}
-        <div className="absolute top-1/3 -right-16 sm:-right-20 w-64 sm:w-80 h-64 sm:h-80 opacity-35 motion-safe:animate-float-reverse">
+        <div className="absolute top-1/3 -right-16 sm:-right-20 w-64 sm:w-80 h-64 sm:h-80 opacity-25 motion-safe:animate-float-reverse">
           <svg viewBox="0 0 300 300" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
             <defs>
               <linearGradient id="trust-half-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#D4AF37" stopOpacity="0.2" />
-                <stop offset="60%" stopColor="#C59B5F" stopOpacity="0.08" />
+                <stop offset="0%" stopColor="#2563EB" stopOpacity="0.2" />
+                <stop offset="60%" stopColor="#0284C7" stopOpacity="0.08" />
                 <stop offset="100%" stopColor="#FAF8F5" stopOpacity="0.0" />
               </linearGradient>
             </defs>
             <path
               d="M 150,20 A 130,130 0 0,0 150,280 Z"
               fill="url(#trust-half-grad)"
-              stroke="#D4AF37"
+              stroke="#2563EB"
               strokeWidth="1.2"
               strokeOpacity="0.35"
             />
             <path
               d="M 150,50 A 100,100 0 0,0 150,250"
-              stroke="#C59B5F"
+              stroke="#06B6D4"
               strokeWidth="1"
               strokeDasharray="4 6"
               strokeOpacity="0.25"
@@ -100,8 +100,8 @@ export function TrustSecuritySection() {
         
         {/* Section Header */}
         <div className="max-w-2xl mb-16">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#FAF6EE] border border-[#EAE3D2] text-[11px] font-mono uppercase tracking-wider text-[#9E7A45] mb-3">
-            Institutional Trust
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-blue-50 border border-blue-200 text-[11px] font-mono uppercase tracking-wider text-blue-600 mb-3">
+            Autonomous Trust &amp; Safety
           </div>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-[#1C1A17]">
             Built for enterprise compliance and zero counterparty risk.
@@ -118,13 +118,13 @@ export function TrustSecuritySection() {
             return (
               <div
                 key={idx}
-                className="p-7 sm:p-8 rounded-2xl bg-[#FDFCF9] border border-[#EAE3D2] hover:border-[#D4AF37] transition-all shadow-[0_2px_12px_rgba(197,155,95,0.03)] hover:shadow-[0_10px_32px_rgba(197,155,95,0.08)]"
+                className="p-7 sm:p-8 rounded-2xl bg-[#FDFCF9] border border-[#EAE3D2] hover:border-blue-500/50 transition-all shadow-[0_2px_12px_rgba(37,99,235,0.03)] hover:shadow-[0_10px_32px_rgba(37,99,235,0.08)]"
               >
                 <div className="flex items-center justify-between mb-5">
-                  <div className="h-11 w-11 rounded-xl bg-[#FAF6EE] border border-[#EAE3D2] flex items-center justify-center text-[#9E7A45] shadow-2xs">
+                  <div className="h-11 w-11 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600 shadow-2xs">
                     <Icon className="w-5 h-5 stroke-[2]" />
                   </div>
-                  <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-[#FAF6EE] text-[#9E7A45] border border-[#EAE3D2]">
+                  <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-600 border border-blue-200">
                     {item.tag}
                   </span>
                 </div>

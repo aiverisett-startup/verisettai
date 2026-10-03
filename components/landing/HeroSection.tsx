@@ -65,15 +65,15 @@ export function HeroSection({
       {/* Dynamic Background Design: Half-Shapes, Concentric Arcs, and Golden Grid */}
       <GoldenBackgroundShapes />
 
-      {/* Mouse-tracking Ambient Golden Spotlight */}
+      {/* Mouse-tracking Ambient Electric Blue Spotlight */}
       <motion.div
         className="pointer-events-none absolute inset-0 opacity-70 transition-opacity duration-300 will-change-transform -z-10 motion-reduce:hidden"
         style={{
           background: useMotionTemplate`
             radial-gradient(
               700px circle at ${mouseX}px ${mouseY}px,
-              rgba(212, 175, 55, 0.09),
-              rgba(197, 155, 95, 0.03) 45%,
+              rgba(37, 99, 235, 0.12),
+              rgba(6, 182, 212, 0.04) 45%,
               transparent 75%
             )
           `,
@@ -90,13 +90,13 @@ export function HeroSection({
             animate="visible"
             className="lg:col-span-7 flex flex-col items-start space-y-6 md:space-y-7 will-change-transform"
           >
-            {/* 2. Large Bold Headline with Golden Gradient Text */}
+            {/* 2. Large Bold Headline with Electric Gradient Text */}
             <motion.h1
               variants={itemVariants}
-              className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-[#1C1A17] leading-[1.14] will-change-transform"
+              className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-[#09090B] leading-[1.14] will-change-transform"
             >
               <span>Verisett AI</span>{" "}
-              <span className="text-[#9E7A45] font-normal">—</span>{" "}
+              <span className="text-blue-600 font-normal">—</span>{" "}
               <span className="text-gold-gradient">
                 Programmatic Vault Escrow for Multi-Agent Economies.
               </span>
@@ -105,12 +105,12 @@ export function HeroSection({
             {/* 3. Concise Supporting Paragraph */}
             <motion.p
               variants={itemVariants}
-              className="text-base sm:text-lg text-[#6E675D] max-w-xl font-normal leading-relaxed will-change-transform"
+              className="text-base sm:text-lg text-slate-600 max-w-xl font-normal leading-relaxed will-change-transform"
             >
               Lock milestone funds in deterministic non-custodial programmatic vaults. Automatically release payouts only when software deliverables, APIs, and commercial milestones meet verified acceptance criteria.
             </motion.p>
 
-            {/* 4. Action Buttons: Satin Gold Primary + White Secondary */}
+            {/* 4. Action Buttons: Electric Blue Primary + White Secondary */}
             <motion.div
               variants={itemVariants}
               className="flex flex-wrap items-center gap-3 pt-2 pb-2 sm:pb-0 w-full sm:w-auto relative z-10 will-change-transform"
@@ -146,11 +146,11 @@ export function HeroSection({
               {onOpenVideoModal && (
                 <button
                   onClick={onOpenVideoModal}
-                  className="w-full sm:w-auto px-4 py-2.5 rounded-full text-xs font-semibold text-[#1C1A17] hover:text-[#9E7A45] transition-all flex items-center justify-center gap-2 cursor-pointer bg-white hover:bg-[#FAF6EE] border border-[#D4AF37] shadow-xs hover:shadow-md group/tour"
+                  className="w-full sm:w-auto px-4 py-2.5 rounded-full text-xs font-semibold text-[#09090B] hover:text-blue-600 transition-all flex items-center justify-center gap-2 cursor-pointer bg-white hover:bg-blue-50/60 border border-blue-400 shadow-xs hover:shadow-md group/tour"
                   title="Watch 30-second Interactive Video Walkthrough"
                 >
-                  <div className="h-5 w-5 rounded-full bg-[#FAF6EE] group-hover/tour:bg-[#D4AF37]/20 flex items-center justify-center border border-[#D4AF37]/40 shadow-2xs transition-colors">
-                    <Play className="w-2.5 h-2.5 fill-[#9E7A45] text-[#9E7A45] ml-0.5 group-hover/tour:scale-110 transition-transform" />
+                  <div className="h-5 w-5 rounded-full bg-blue-50 group-hover/tour:bg-blue-500/20 flex items-center justify-center border border-blue-300 shadow-2xs transition-colors">
+                    <Play className="w-2.5 h-2.5 fill-blue-600 text-blue-600 ml-0.5 group-hover/tour:scale-110 transition-transform" />
                   </div>
                   <span>Watch Video Tour (30s)</span>
                 </button>
@@ -160,27 +160,27 @@ export function HeroSection({
             {/* 5. Metric Highlights */}
             <motion.div
               variants={itemVariants}
-              className="pt-8 border-t border-[#EAE3D2] w-full max-w-lg grid grid-cols-3 gap-6 text-left will-change-transform"
+              className="pt-8 border-t border-slate-200 w-full max-w-lg grid grid-cols-3 gap-6 text-left will-change-transform"
             >
               <div className="group/metric">
-                <div className="text-2xl font-bold text-[#1C1A17] transition-colors group-hover/metric:text-[#C59B5F]">
-                  ₹0
+                <div className="text-2xl font-bold text-[#09090B] transition-colors group-hover/metric:text-blue-600">
+                  $0.00
                 </div>
-                <div className="text-xs text-[#8C8275] mt-0.5 font-normal">Counterparty Risk</div>
+                <div className="text-xs text-slate-500 mt-0.5 font-normal">Counterparty Risk</div>
               </div>
 
               <div className="group/metric">
-                <div className="text-2xl font-bold text-[#C59B5F] transition-colors group-hover/metric:text-[#D4AF37]">
+                <div className="text-2xl font-bold text-blue-600 transition-colors group-hover/metric:text-cyan-500">
                   100%
                 </div>
-                <div className="text-xs text-[#8C8275] mt-0.5 font-normal">Verified Acceptance</div>
+                <div className="text-xs text-slate-500 mt-0.5 font-normal">Verified Acceptance</div>
               </div>
 
               <div className="group/metric">
-                <div className="text-2xl font-bold text-[#1C1A17] transition-colors group-hover/metric:text-[#C59B5F]">
+                <div className="text-2xl font-bold text-[#09090B] transition-colors group-hover/metric:text-blue-600">
                   &lt;50ms
                 </div>
-                <div className="text-xs text-[#8C8275] mt-0.5 font-normal">Programmatic Payout</div>
+                <div className="text-xs text-slate-500 mt-0.5 font-normal">Programmatic Payout</div>
               </div>
             </motion.div>
 

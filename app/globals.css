@@ -3,23 +3,26 @@
 :root {
   --background: #FDFCF9;
   --surface: #FFFFFF;
-  --surface-hover: #FAF8F5;
+  --surface-hover: #F8FAFC;
   --surface-card: #FFFFFF;
-  --surface-subtle: #F9F8F6;
-  --surface-sunken: #F4EFE6;
-  --text-primary: #1C1A17;
-  --text-secondary: #6E675D;
-  --text-muted: #9E9689;
-  --border: #EAE3D2;
-  --border-subtle: #F4EFE6;
-  --border-focus: #C59B5F;
+  --surface-subtle: #F1F5F9;
+  --surface-sunken: #E2E8F0;
+  --text-primary: #09090B;
+  --text-secondary: #475569;
+  --text-muted: #64748B;
+  --border: #E2E8F0;
+  --border-subtle: #F1F5F9;
+  --border-focus: #2563EB;
   
-  --accent: #C59B5F;
-  --accent-gold: #C59B5F;
-  --accent-gold-hover: #B38A4F;
-  --accent-gold-deep: #9E7A45;
-  --accent-gold-bright: #D4AF37;
-  --accent-gold-light: #FAF8F5;
+  --accent: #2563EB;
+  --accent-gold: #2563EB;
+  --accent-gold-hover: #1D4ED8;
+  --accent-gold-deep: #1E40AF;
+  --accent-gold-bright: #3B82F6;
+  --accent-gold-light: #EFF6FF;
+  --accent-blue: #2563EB;
+  --accent-cyan: #06B6D4;
+  --accent-obsidian: #09090B;
   --accent-emerald: #059669;
 }
 
@@ -35,6 +38,9 @@
   --color-border: var(--border);
   --color-border-subtle: var(--border-subtle);
   --color-accent-gold: var(--accent-gold);
+  --color-accent-blue: var(--accent-blue);
+  --color-accent-cyan: var(--accent-cyan);
+  --color-accent-obsidian: var(--accent-obsidian);
   --font-sans: "Plus Jakarta Sans", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   --font-display: "Cinzel", "Playfair Display", Georgia, serif;
@@ -124,7 +130,7 @@ body {
   overflow-x: hidden;
 }
 
-/* Minimalist Gold-Tinted Custom Scrollbars */
+/* Minimalist Electric Blue Custom Scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -133,11 +139,11 @@ body {
   background: #FDFCF9;
 }
 ::-webkit-scrollbar-thumb {
-  background: #E0D7C6;
+  background: #CBD5E1;
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #C59B5F;
+  background: #2563EB;
 }
 
 /* Hide scrollbar utility */
@@ -149,48 +155,48 @@ body {
   scrollbar-width: none;
 }
 
-/* Luxury Minimalist Card with subtle golden border and warm depth */
+/* Luxury Minimalist Card with subtle electric blue border on hover */
 .minimal-card, .institutional-card {
   background: #FFFFFF;
-  border: 1px solid #EAE3D2;
+  border: 1px solid #E2E8F0;
   border-radius: 20px;
-  box-shadow: 0 1px 3px rgba(197, 155, 95, 0.04), 0 4px 16px rgba(0, 0, 0, 0.02);
+  box-shadow: 0 1px 3px rgba(37, 99, 235, 0.04), 0 4px 16px rgba(0, 0, 0, 0.02);
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .minimal-card:hover, .institutional-card:hover {
-  border-color: #D4AF37;
-  box-shadow: 0 12px 36px -4px rgba(197, 155, 95, 0.12), 0 2px 8px rgba(0, 0, 0, 0.02);
+  border-color: #3B82F6;
+  box-shadow: 0 12px 36px -4px rgba(37, 99, 235, 0.14), 0 2px 8px rgba(0, 0, 0, 0.02);
   transform: translateY(-2px);
 }
 
-/* Primary Button: Satin warm gold with smooth lift */
+/* Primary Button: Electric Blue with smooth lift */
 .minimal-btn-primary {
-  background: #C59B5F;
+  background: #2563EB;
   color: #FFFFFF;
   border-radius: 9999px;
   padding: 0.68rem 1.5rem;
   font-weight: 500;
   font-size: 0.875rem;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 4px 14px rgba(197, 155, 95, 0.3);
-  border: 1px solid #C59B5F;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+  border: 1px solid #2563EB;
 }
 .minimal-btn-primary:hover {
-  background: #B38A4F;
-  border-color: #B38A4F;
+  background: #1D4ED8;
+  border-color: #1D4ED8;
   transform: translateY(-1px);
-  box-shadow: 0 6px 22px rgba(197, 155, 95, 0.42);
+  box-shadow: 0 6px 22px rgba(37, 99, 235, 0.45);
 }
 .minimal-btn-primary:active {
   transform: translateY(0);
-  background: #9E7A45;
+  background: #1E40AF;
 }
 
-/* Secondary Button: Crisp white with fine golden border */
+/* Secondary Button: Crisp white with fine slate border */
 .minimal-btn-secondary {
   background: #FFFFFF;
-  color: #2C2925;
-  border: 1px solid #EAE3D2;
+  color: #09090B;
+  border: 1px solid #E2E8F0;
   border-radius: 9999px;
   padding: 0.68rem 1.5rem;
   font-weight: 500;
@@ -199,26 +205,26 @@ body {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
 }
 .minimal-btn-secondary:hover {
-  background: #FAF8F5;
-  border-color: #D4AF37;
-  color: #9E7A45;
+  background: #F8FAFC;
+  border-color: #3B82F6;
+  color: #2563EB;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(197, 155, 95, 0.08);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
 }
 .minimal-btn-secondary:active {
   transform: translateY(0);
 }
 
-/* Golden text gradient utility */
+/* Electric Cyan-to-Blue text gradient utility */
 .text-gold-gradient {
-  background: linear-gradient(135deg, #9E7A45 0%, #C59B5F 50%, #D4AF37 100%);
+  background: linear-gradient(135deg, #06B6D4 0%, #3B82F6 50%, #2563EB 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-/* Golden border gradient utility */
+/* Electric Blue border gradient utility */
 .border-gold-gradient {
-  border-image: linear-gradient(135deg, #C59B5F, #EAE3D2, #D4AF37) 1;
+  border-image: linear-gradient(135deg, #2563EB, #60A5FA, #06B6D4) 1;
 }
 
 /* Cool Animations */
@@ -258,7 +264,7 @@ body {
   }
 }
 
-@keyframes pulse-gold-aura {
+@keyframes pulse-blue-aura {
   0%, 100% {
     opacity: 0.45;
     transform: scale(1);
@@ -294,8 +300,9 @@ body {
   animation: spin-reverse-slow 60s linear infinite;
 }
 
-.animate-pulse-gold {
-  animation: pulse-gold-aura 6s ease-in-out infinite;
+.animate-pulse-gold,
+.animate-pulse-blue {
+  animation: pulse-blue-aura 6s ease-in-out infinite;
 }
 
 @keyframes gradient-flow {

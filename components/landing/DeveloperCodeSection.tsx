@@ -16,40 +16,40 @@ export function DeveloperCodeSection() {
     fastmcp: `// Model Context Protocol (FastMCP) Native Escrow Tool
 const escrow = await mcp.callTool("create_contract_escrow", {
   payer_api_key: ${user ? "process.env.VERISETT_KEY" : '"[LOGIN_REQUIRED_TO_COPY_KEY]"'},
-  amount_cents: 2500000, // ₹25,000 INR
-  milestone_title: "Full-Stack SaaS MVP Deliverable",
+  amount_cents: 25000, // $250.00 USD
+  milestone_title: "Deterministic Autonomous Task Verification",
   acceptance_rules: {
     test_coverage_min: 0.95,
     lint_passed: true,
-    security_audit_cleared: true
+    deterministic_assertion_cleared: true
   },
   timeout_seconds: 604800 // 7 days vault custody
 });
 
 console.log("Vault Escrow Locked ID:", escrow.contract_id);`,
 
-    python: `# Python 3.11+ Async Enterprise Client
+    python: `# Python 3.11+ Async Autonomous Agent Client
 from verisett import VerisettClient
 
 async with VerisettClient(api_key="${user ? "vrs_live_89f72b1049c81a29e4d0812b" : "vrs_live_••••••••••••••••"}") as client:
     # Initialize programmatic milestone escrow
     escrow = await client.escrow.create(
-        amount_inr=25000,
-        beneficiary_id="contractor_nexus_01",
-        milestone="Core Architecture & Deliverable Acceptance",
+        amount_usd=250.00,
+        beneficiary_id="agent_theta_worker",
+        milestone="Core Architecture & Deterministic Assertion Acceptance",
         auto_release_on_verify=True
     )
     
-    print(f"Vault Status: {escrow.status} | Locked: ₹{escrow.amount_inr}")`,
+    print(f"Vault Status: {escrow.status} | Locked: \${escrow.amount_usd:.2f}")`,
 
     curl: `# REST API: Create Milestone Escrow Contract
 curl -X POST https://veri-sett.com/api/transfer \\
   -H "Authorization: Bearer ${user ? "vs_live_8f9a2b1c4e92a81b" : "[LOGIN_REQUIRED_TO_COPY_KEY]"}" \\
   -H "Content-Type: application/json" \\
   -d '{
-    "amount_cents": 2500000,
-    "currency": "INR",
-    "milestone_id": "ms_fullstack_mvp",
+    "amount_cents": 25000,
+    "currency": "USD",
+    "milestone_id": "ms_autonomous_agent_task",
     "auto_release": true
   }'`,
   };
@@ -70,18 +70,18 @@ curl -X POST https://veri-sett.com/api/transfer \\
       {/* Background Half-Shapes flanking Developer Code Section */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden select-none -z-10">
         {/* Left Edge: Smooth Half-Circle with Concentric Arc */}
-        <div className="absolute top-1/2 -translate-y-1/2 -left-14 sm:-left-20 w-48 sm:w-60 h-48 sm:h-60 opacity-30 motion-safe:animate-float-slow">
+        <div className="absolute top-1/2 -translate-y-1/2 -left-14 sm:-left-20 w-48 sm:w-60 h-48 sm:h-60 opacity-25 motion-safe:animate-float-slow">
           <svg viewBox="0 0 240 240" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
             <path
               d="M 120,20 A 100,100 0 0,1 120,220 Z"
-              fill="#FAF6EE"
-              stroke="#C59B5F"
+              fill="#F0F9FF"
+              stroke="#0284C7"
               strokeWidth="1.2"
               strokeOpacity="0.35"
             />
             <path
               d="M 120,45 A 75,75 0 0,1 120,195"
-              stroke="#D4AF37"
+              stroke="#2563EB"
               strokeWidth="1"
               strokeDasharray="4 4"
               strokeOpacity="0.25"
@@ -91,18 +91,18 @@ curl -X POST https://veri-sett.com/api/transfer \\
         </div>
 
         {/* Right Edge: Smooth Half-Circle with Concentric Arc */}
-        <div className="absolute top-1/2 -translate-y-1/2 -right-14 sm:-right-20 w-48 sm:w-60 h-48 sm:h-60 opacity-30 motion-safe:animate-float-reverse">
+        <div className="absolute top-1/2 -translate-y-1/2 -right-14 sm:-right-20 w-48 sm:w-60 h-48 sm:h-60 opacity-25 motion-safe:animate-float-reverse">
           <svg viewBox="0 0 240 240" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
             <path
               d="M 120,20 A 100,100 0 0,0 120,220 Z"
-              fill="#FAF6EE"
-              stroke="#D4AF37"
+              fill="#F0F9FF"
+              stroke="#2563EB"
               strokeWidth="1.2"
               strokeOpacity="0.35"
             />
             <path
               d="M 120,45 A 75,75 0 0,0 120,195"
-              stroke="#C59B5F"
+              stroke="#0284C7"
               strokeWidth="1"
               strokeDasharray="4 4"
               strokeOpacity="0.25"
@@ -115,14 +115,14 @@ curl -X POST https://veri-sett.com/api/transfer \\
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         
         {/* Collapsible Accordion Header */}
-        <div className="rounded-2xl bg-white border border-[#EAE3D2] overflow-hidden transition-all shadow-[0_2px_12px_rgba(197,155,95,0.04)] hover:border-[#D4AF37]">
+        <div className="rounded-2xl bg-white border border-[#EAE3D2] overflow-hidden transition-all shadow-[0_2px_12px_rgba(37,99,235,0.04)] hover:border-blue-500/50">
           
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="w-full p-6 sm:p-7 flex items-center justify-between text-left hover:bg-[#FAF6EE]/50 transition-colors cursor-pointer group"
+            className="w-full p-6 sm:p-7 flex items-center justify-between text-left hover:bg-blue-50/20 transition-colors cursor-pointer group"
           >
             <div className="flex items-center gap-4">
-              <div className="h-10 w-10 rounded-xl bg-[#FAF6EE] border border-[#EAE3D2] flex items-center justify-center text-[#9E7A45] shrink-0">
+              <div className="h-10 w-10 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600 shrink-0">
                 <Code2 className="w-5 h-5" />
               </div>
               <div>
@@ -130,7 +130,7 @@ curl -X POST https://veri-sett.com/api/transfer \\
                   <span className="text-base sm:text-lg font-semibold text-[#1C1A17] tracking-tight">
                     Developer Documentation &amp; API
                   </span>
-                  <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-[#FAF6EE] text-[#9E7A45] border border-[#EAE3D2]">
+                  <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-600 border border-blue-200">
                     OPTIONAL SPEC
                   </span>
                 </div>
@@ -141,10 +141,10 @@ curl -X POST https://veri-sett.com/api/transfer \\
             </div>
 
             <div className="flex items-center gap-2 shrink-0 ml-4">
-              <span className="text-xs font-mono text-[#8C8275] group-hover:text-[#9E7A45] hidden sm:inline">
+              <span className="text-xs font-mono text-[#8C8275] group-hover:text-blue-600 hidden sm:inline">
                 {isOpen ? "Collapse Spec" : "Expand Code"}
               </span>
-              <div className="h-8 w-8 rounded-full bg-[#FAF6EE] border border-[#EAE3D2] flex items-center justify-center text-[#9E7A45]">
+              <div className="h-8 w-8 rounded-full bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600">
                 {isOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
               </div>
             </div>
@@ -166,7 +166,7 @@ curl -X POST https://veri-sett.com/api/transfer \\
                       onClick={() => setActiveTab(tab.id as any)}
                       className={`px-3 py-1.5 rounded-full text-xs font-mono font-medium transition-colors cursor-pointer ${
                         activeTab === tab.id
-                          ? "bg-[#C59B5F] text-white border border-[#B38A4F] shadow-xs"
+                          ? "bg-blue-600 text-white border border-blue-600 shadow-xs"
                           : "bg-white text-[#8C8275] hover:text-[#1C1A17] border border-[#EAE3D2]"
                       }`}
                     >
@@ -180,14 +180,14 @@ curl -X POST https://veri-sett.com/api/transfer \\
                   onClick={handleCopy}
                   className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-mono transition-all cursor-pointer self-start sm:self-auto shadow-2xs ${
                     !user
-                      ? "bg-[#FAF6EE] hover:bg-[#F5EEDD] border border-[#D4AF37]/60 text-[#9E7A45] hover:text-[#C59B5F]"
-                      : "bg-white hover:bg-[#FAF6EE] border border-[#EAE3D2] hover:border-[#D4AF37] text-[#1C1A17]"
+                      ? "bg-blue-50 hover:bg-blue-100/70 border border-blue-300 text-blue-700 hover:text-blue-800"
+                      : "bg-white hover:bg-blue-50/50 border border-[#EAE3D2] hover:border-blue-400 text-[#1C1A17]"
                   }`}
                   title={!user ? "Sign in to copy FastMCP & API credentials" : "Copy code snippet"}
                 >
                   {!user ? (
                     <>
-                      <Lock className="w-3.5 h-3.5 text-[#C59B5F]" />
+                      <Lock className="w-3.5 h-3.5 text-blue-600" />
                       <span className="font-semibold">Login to Copy</span>
                     </>
                   ) : copied ? (
@@ -197,7 +197,7 @@ curl -X POST https://veri-sett.com/api/transfer \\
                     </>
                   ) : (
                     <>
-                      <Copy className="w-3.5 h-3.5 text-[#9E7A45]" />
+                      <Copy className="w-3.5 h-3.5 text-blue-600" />
                       <span>Copy Snippet</span>
                     </>
                   )}
@@ -206,27 +206,27 @@ curl -X POST https://veri-sett.com/api/transfer \\
 
               {/* Authentication Alert / Protection Banner */}
               {authNotice ? (
-                <div className="mb-3 p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs font-montserrat flex items-center justify-between gap-3 animate-in fade-in duration-200">
+                <div className="mb-3 p-3 rounded-xl bg-blue-50 border border-blue-200 text-blue-900 text-xs font-montserrat flex items-center justify-between gap-3 animate-in fade-in duration-200">
                   <div className="flex items-center gap-2">
-                    <Lock className="w-4 h-4 text-amber-700 shrink-0" />
+                    <Lock className="w-4 h-4 text-blue-600 shrink-0" />
                     <span className="font-medium">{authNotice}</span>
                   </div>
                   <Link
                     href="/login"
-                    className="shrink-0 px-3 py-1.5 rounded-lg bg-[#C59B5F] hover:bg-[#B38A4F] text-white font-bold text-xs shadow-xs transition-colors"
+                    className="shrink-0 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs transition-colors"
                   >
                     Sign In Now →
                   </Link>
                 </div>
               ) : !user ? (
-                <div className="mb-3 p-2.5 rounded-xl bg-[#FAF8F5] border border-[#EAE3D2] text-[11px] font-montserrat text-[#6E675D] flex items-center justify-between gap-2">
+                <div className="mb-3 p-2.5 rounded-xl bg-blue-50/50 border border-blue-100 text-[11px] font-montserrat text-slate-600 flex items-center justify-between gap-2">
                   <div className="flex items-center gap-2">
-                    <Lock className="w-3.5 h-3.5 text-[#C59B5F] shrink-0" />
+                    <Lock className="w-3.5 h-3.5 text-blue-600 shrink-0" />
                     <span>Protected Endpoints: FastMCP server tools and live API tokens require an authenticated account.</span>
                   </div>
                   <Link
                     href="/login"
-                    className="text-[11px] font-bold text-[#9E7A45] hover:text-[#C59B5F] underline shrink-0"
+                    className="text-[11px] font-bold text-blue-600 hover:text-blue-700 underline shrink-0"
                   >
                     Sign In to Unlock
                   </Link>
@@ -234,7 +234,7 @@ curl -X POST https://veri-sett.com/api/transfer \\
               ) : null}
 
               {/* Code Snippet Box */}
-              <pre className="p-4 rounded-xl bg-[#181613] text-[#FAF6EE] border border-[#C59B5F]/30 text-xs font-mono overflow-x-auto leading-relaxed shadow-sm">
+              <pre className="p-4 rounded-xl bg-[#09090B] text-slate-200 border border-slate-800 text-xs font-mono overflow-x-auto leading-relaxed shadow-sm">
                 <code>{snippets[activeTab]}</code>
               </pre>
             </div>

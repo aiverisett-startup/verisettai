@@ -439,10 +439,10 @@ export default function DashboardPage() {
         />
 
         {/* 3. Active Escrow Vaults Section */}
-        <div className="rounded-3xl border border-[#EAE3D2] bg-white p-6 md:p-8 shadow-[0_4px_24px_rgba(197,155,95,0.06)] space-y-4">
+        <div className="rounded-3xl border border-[#EAE3D2] bg-white p-6 md:p-8 shadow-[0_4px_24px_rgba(37,99,235,0.06)] space-y-4">
           <div className="flex items-center justify-between pb-4 border-b border-[#F0E9DC]">
             <h2 className="text-base sm:text-lg font-bold text-[#1C1A17] flex items-center gap-2">
-              <ShieldCheck className="w-5 h-5 text-[#9E7A45]" />
+              <ShieldCheck className="w-5 h-5 text-blue-500" />
               <span>Active Escrow Vault Deployments</span>
               <span className="rounded-full bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 text-xs font-mono text-emerald-800 font-semibold">
                 {activeVaults.length} Active
@@ -450,7 +450,7 @@ export default function DashboardPage() {
             </h2>
             <button
               onClick={() => setModalOpen(true)}
-              className="text-xs font-semibold text-[#9E7A45] hover:text-[#C59B5F] flex items-center gap-1.5 cursor-pointer font-mono px-3 py-1.5 rounded-xl bg-[#FAF6EE] border border-[#EAE3D2] hover:border-[#C59B5F]/40 transition"
+              className="text-xs font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1.5 cursor-pointer font-mono px-3 py-1.5 rounded-xl bg-blue-50 border border-blue-200 hover:border-blue-400 transition"
             >
               <Plus className="w-3.5 h-3.5" /> Deploy Vault Node
             </button>
@@ -460,7 +460,7 @@ export default function DashboardPage() {
             {activeVaults.map((vault) => (
               <div
                 key={vault.id}
-                className="p-4 sm:p-5 rounded-2xl border border-[#EAE3D2] bg-[#FAF8F5]/60 hover:bg-white hover:border-[#C59B5F]/50 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs"
+                className="p-4 sm:p-5 rounded-2xl border border-[#EAE3D2] bg-[#FAF8F5]/60 hover:bg-white hover:border-blue-500/40 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs"
               >
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
@@ -476,12 +476,12 @@ export default function DashboardPage() {
                     {vault.title || "Primary Autonomous Settlement Vault"}
                   </p>
                   <p className="text-[11px] font-mono text-[#8C8275]">
-                    Agent: <strong className="text-[#9E7A45] font-medium">{connectedAgentName || "Autonomous Clearinghouse Node"}</strong> • Verisett Settlement Engine (MCP / FastMCP) • 1.5% Testnet Fee Rail
+                    Agent: <strong className="text-blue-600 font-medium">{connectedAgentName || "Autonomous Clearinghouse Node"}</strong> • Verisett Settlement Engine (MCP / FastMCP) • 1.5% Testnet Fee Rail
                   </p>
                 </div>
                 <div className="text-left sm:text-right">
-                  <span className="font-mono text-base sm:text-lg font-bold text-[#9E7A45]">
-                    ₹{(vault.amount ?? profile?.testnet_balance ?? 169000).toLocaleString("en-IN")} VRS
+                  <span className="font-mono text-base sm:text-lg font-bold text-blue-600">
+                    ${((vault.amount ?? profile?.testnet_balance ?? 169000) / 100).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD
                   </span>
                   <span className="block text-[10px] font-mono text-[#8C8275]">
                     Deterministic Invariant Active

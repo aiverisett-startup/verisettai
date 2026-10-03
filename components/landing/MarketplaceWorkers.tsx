@@ -19,9 +19,8 @@ export function MarketplaceWorkers({ onSelectWorkerForTesting }: MarketplaceWork
       name: "Web Search & Extraction Pipeline",
       category: "Data & Telemetry",
       icon: Search,
-      amountINR: 25000,
-      amountDollars: 300,
-      description: "Secure milestone payouts for data ingestion pipelines. Auto-released when extraction schemas and source citation depth meet required confidence thresholds.",
+      amountDollars: 250,
+      description: "Secure milestone payouts for agent data ingestion pipelines. Auto-released when extraction schemas and source citation depth meet deterministic hash commitments.",
       tags: ["Structured Extraction", "Quality Checks", "Auto-Release"],
       deliverableChecklist: [
         "Structured entity parsing >99% confidence",
@@ -35,14 +34,13 @@ export function MarketplaceWorkers({ onSelectWorkerForTesting }: MarketplaceWork
       name: "Code Audit & Security Deliverable",
       category: "Software Development",
       icon: Code2,
-      amountINR: 100000,
-      amountDollars: 1200,
-      description: "Escrow protection for critical software deliverables and security audits. Funds unlocked only when test coverage and security criteria pass 100%.",
+      amountDollars: 1000,
+      description: "Escrow protection for critical software deliverables and autonomous security audits. Funds unlocked only when test coverage and security criteria pass 100%.",
       tags: ["Security Audit", "AST Analysis", "Zero CVEs"],
       deliverableChecklist: [
         "Zero critical/high CVE vulnerabilities",
         "Unit & integration tests pass rate >98%",
-        "Lead security engineer sign-off verified",
+        "SHA-256 Output Match",
       ],
       badge: "Condition Verified",
     },
@@ -51,14 +49,13 @@ export function MarketplaceWorkers({ onSelectWorkerForTesting }: MarketplaceWork
       name: "Architecture & Synthesis Spec",
       category: "Technical Architecture",
       icon: FileText,
-      amountINR: 50000,
-      amountDollars: 600,
-      description: "Milestone escrow for complex technical specifications, architectural blueprints, and enterprise documentation with dual-client sign-off.",
-      tags: ["System Architecture", "Dual Sign-Off", "Compliance Ready"],
+      amountDollars: 2500,
+      description: "Milestone escrow for complex agent swarm specifications, architectural blueprints, and execution pipelines with deterministic assertion cleared.",
+      tags: ["System Architecture", "Zero-Knowledge", "Compliance Ready"],
       deliverableChecklist: [
         "Architecture diagram & sequence specifications",
-        "Dual-client technical approval confirmed",
-        "Exported audit trail with hash commitment",
+        "Deterministic Assertion Cleared",
+        "Zero-Knowledge Proof Verified",
       ],
       badge: "Condition Verified",
     },
@@ -141,9 +138,9 @@ export function MarketplaceWorkers({ onSelectWorkerForTesting }: MarketplaceWork
             </p>
           </div>
 
-          <div className="flex items-center gap-2 px-3.5 py-2 rounded-full bg-white border border-[#EAE3D2] text-xs font-mono text-[#1C1A17] shadow-2xs">
-            <Sparkles className="w-3.5 h-3.5 text-[#C59B5F] shrink-0" />
-            <span className="text-[#9E7A45] font-semibold">₹40,000 Sandbox Credit Active</span>
+          <div className="flex items-center gap-2 px-3.5 py-2 rounded-full bg-white border border-[#E2E8F0] text-xs font-mono text-[#09090B] shadow-2xs">
+            <Sparkles className="w-3.5 h-3.5 text-[#2563EB] shrink-0" />
+            <span className="text-[#2563EB] font-semibold">$500.00 Testnet Sandbox Credit Active</span>
           </div>
         </div>
 
@@ -154,26 +151,26 @@ export function MarketplaceWorkers({ onSelectWorkerForTesting }: MarketplaceWork
             return (
               <div
                 key={tmpl.id}
-                className="rounded-2xl bg-white border border-[#EAE3D2] hover:border-[#D4AF37] p-6 sm:p-7 shadow-[0_2px_12px_rgba(197,155,95,0.04)] hover:shadow-[0_10px_32px_rgba(197,155,95,0.09)] flex flex-col justify-between transition-all duration-300"
+                className="rounded-2xl bg-white border border-[#E2E8F0] hover:border-[#3B82F6] p-6 sm:p-7 shadow-[0_2px_12px_rgba(37,99,235,0.04)] hover:shadow-[0_10px_32px_rgba(37,99,235,0.09)] flex flex-col justify-between transition-all duration-300"
               >
                 <div>
                   {/* Category & Price */}
                   <div className="flex items-center justify-between mb-4">
-                    <span className="text-[10px] font-mono uppercase font-semibold px-2.5 py-0.5 rounded-full bg-[#FAF6EE] text-[#9E7A45] border border-[#EAE3D2]">
+                    <span className="text-[10px] font-mono uppercase font-semibold px-2.5 py-0.5 rounded-full bg-blue-50 text-[#2563EB] border border-blue-200">
                       {tmpl.category}
                     </span>
                     <div className="text-right font-mono">
-                      <div className="text-base font-bold text-[#1C1A17]">₹{tmpl.amountINR.toLocaleString("en-IN")}</div>
-                      <div className="text-[10px] text-[#8C8275]">(${tmpl.amountDollars} USD)</div>
+                      <div className="text-base font-bold text-[#09090B]">${tmpl.amountDollars.toLocaleString("en-US")}.00</div>
+                      <div className="text-[10px] text-[#64748B]">USD (Testnet)</div>
                     </div>
                   </div>
 
                   {/* Icon & Title */}
                   <div className="flex items-center gap-3 mb-3">
-                    <div className="h-9 w-9 rounded-xl bg-[#FAF6EE] border border-[#EAE3D2] flex items-center justify-center text-[#9E7A45] shrink-0">
+                    <div className="h-9 w-9 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-[#2563EB] shrink-0">
                       <Icon className="w-4 h-4" />
                     </div>
-                    <h3 className="text-base sm:text-lg font-bold text-[#1C1A17] tracking-tight leading-snug">
+                    <h3 className="text-base sm:text-lg font-bold text-[#09090B] tracking-tight leading-snug">
                       {tmpl.name}
                     </h3>
                   </div>

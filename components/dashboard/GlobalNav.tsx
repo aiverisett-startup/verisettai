@@ -78,13 +78,13 @@ export const GlobalNav: React.FC<GlobalNavProps> = ({
                 onClick={() => onToggleEnv("sandbox")}
                 className={`flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-all ${
                   envMode === "sandbox"
-                    ? "bg-[#161922] text-[#F59E0B] border border-[#F59E0B]/30 shadow-sm"
+                    ? "bg-[#161922] text-[#3B82F6] border border-[#3B82F6]/30 shadow-sm"
                     : "text-slate-400 hover:text-slate-200"
                 }`}
               >
                 <span
                   className={`h-1.5 w-1.5 rounded-full ${
-                    envMode === "sandbox" ? "bg-[#F59E0B] animate-pulse" : "bg-slate-500"
+                    envMode === "sandbox" ? "bg-[#3B82F6] animate-pulse" : "bg-slate-500"
                   }`}
                 />
                 Sandbox
@@ -124,10 +124,10 @@ export const GlobalNav: React.FC<GlobalNavProps> = ({
 
               <div className="flex flex-col px-3 border-r border-[#1E2230] hidden md:flex">
                 <span className="text-[10px] text-slate-400 uppercase tracking-wider font-mono flex items-center gap-1">
-                  <Lock className="h-2.5 w-2.5 text-[#F59E0B]" />
+                  <Lock className="h-2.5 w-2.5 text-[#3B82F6]" />
                   Frozen
                 </span>
-                <span className="font-semibold text-[#F59E0B] font-mono">
+                <span className="font-semibold text-[#3B82F6] font-mono">
                   ${(vaultBalance.frozen_cents / 100).toLocaleString("en-US", {
                     minimumFractionDigits: 2,
                   })}
@@ -205,7 +205,7 @@ export const GlobalNav: React.FC<GlobalNavProps> = ({
                   >
                     {!user ? (
                       <>
-                        <Lock className="h-3 w-3 text-amber-400" />
+                        <Lock className="h-3 w-3 text-blue-400" />
                         <span>Login to Copy</span>
                       </>
                     ) : copiedKey ? (

@@ -13,7 +13,7 @@ export const launchVaultBalance: VaultBalance = {
 };
 
 export const launchTelemetry: TelemetryStats = {
-  volume_24h_cents: 18450000,
+  volume_24h_cents: 14280000, // $142,800.00 USD
   total_contracts: 1428,
   success_rate: 99.4,
   avg_latency_ms: 42,
@@ -85,10 +85,10 @@ export const launchContracts: ContractRecord[] = [
   },
   {
     id: "cnt_live_88d1f043",
-    payer_name: "Solana Oracle Sentinel",
-    payer_id: "usr_live_payer_sol",
-    worker_name: "StateRoot Prover Enclave",
-    worker_id: "usr_live_worker_tee",
+    payer_name: "FastMCP RPC Dispatcher",
+    payer_id: "usr_live_payer_mcp",
+    worker_name: "Redis Lock Manager (SHA-256 Cleared)",
+    worker_id: "usr_live_worker_redis",
     amount_cents: 25000, // $250.00
     fee_cents: 375,      // $3.75
     status: "SETTLED",
@@ -310,8 +310,8 @@ export const launchContracts: ContractRecord[] = [
 export const liveTickerItems = [
   {
     contractId: "cnt_live_88d1f043",
-    payer: "Solana Oracle",
-    worker: "StateRoot TEE",
+    payer: "FastMCP RPC",
+    worker: "Redis Lock Manager -> SHA-256 Assertion Verified",
     amount: "$250.00",
     state: "Settled (1.5% fee retained)",
     badgeColor: "emerald"

@@ -120,11 +120,11 @@ export function ConnectAgentModal({ isOpen, onClose, onConnected }: ConnectAgent
             onClick={() => { setSelectedType("gateway"); setRevealed(false); }}
             className={`flex flex-col items-start p-3.5 rounded-2xl border text-left transition cursor-pointer ${
               selectedType === "gateway"
-                ? "border-[#C59B5F] bg-[#FAF6EE] text-[#1C1A17] shadow-[0_4px_16px_rgba(197,155,95,0.12)] ring-1 ring-[#C59B5F]/30"
-                : "border-[#EAE3D2] bg-[#FDFCF9] text-[#8C8275] hover:border-[#C59B5F]/40 hover:text-[#1C1A17]"
+                ? "border-blue-600 bg-blue-50/50 text-[#1C1A17] shadow-[0_4px_16px_rgba(37,99,235,0.12)] ring-1 ring-blue-600/30"
+                : "border-[#EAE3D2] bg-[#FDFCF9] text-[#8C8275] hover:border-blue-500/40 hover:text-[#1C1A17]"
             }`}
           >
-            <Globe className="w-5 h-5 text-[#9E7A45] mb-2"/>
+            <Globe className="w-5 h-5 text-blue-600 mb-2"/>
             <span className="text-xs font-semibold text-[#1C1A17]">Hosted Gateway</span>
             <span className="text-[10px] text-[#8C8275] mt-1">Zero-code URL for SaaS & agents</span>
           </button>
@@ -133,11 +133,11 @@ export function ConnectAgentModal({ isOpen, onClose, onConnected }: ConnectAgent
             onClick={() => { setSelectedType("mcp"); setRevealed(false); }}
             className={`flex flex-col items-start p-3.5 rounded-2xl border text-left transition cursor-pointer ${
               selectedType === "mcp"
-                ? "border-[#C59B5F] bg-[#FAF6EE] text-[#1C1A17] shadow-[0_4px_16px_rgba(197,155,95,0.12)] ring-1 ring-[#C59B5F]/30"
-                : "border-[#EAE3D2] bg-[#FDFCF9] text-[#8C8275] hover:border-[#C59B5F]/40 hover:text-[#1C1A17]"
+                ? "border-blue-600 bg-blue-50/50 text-[#1C1A17] shadow-[0_4px_16px_rgba(37,99,235,0.12)] ring-1 ring-blue-600/30"
+                : "border-[#EAE3D2] bg-[#FDFCF9] text-[#8C8275] hover:border-blue-500/40 hover:text-[#1C1A17]"
             }`}
           >
-            <Terminal className="w-5 h-5 text-[#9E7A45] mb-2"/>
+            <Terminal className="w-5 h-5 text-blue-600 mb-2"/>
             <span className="text-xs font-semibold text-[#1C1A17]">MCP Config</span>
             <span className="text-[10px] text-[#8C8275] mt-1">Claude Desktop & Cursor</span>
           </button>
@@ -146,11 +146,11 @@ export function ConnectAgentModal({ isOpen, onClose, onConnected }: ConnectAgent
             onClick={() => { setSelectedType("apikey"); setRevealed(false); }}
             className={`flex flex-col items-start p-3.5 rounded-2xl border text-left transition cursor-pointer ${
               selectedType === "apikey"
-                ? "border-[#C59B5F] bg-[#FAF6EE] text-[#1C1A17] shadow-[0_4px_16px_rgba(197,155,95,0.12)] ring-1 ring-[#C59B5F]/30"
-                : "border-[#EAE3D2] bg-[#FDFCF9] text-[#8C8275] hover:border-[#C59B5F]/40 hover:text-[#1C1A17]"
+                ? "border-blue-600 bg-blue-50/50 text-[#1C1A17] shadow-[0_4px_16px_rgba(37,99,235,0.12)] ring-1 ring-blue-600/30"
+                : "border-[#EAE3D2] bg-[#FDFCF9] text-[#8C8275] hover:border-blue-500/40 hover:text-[#1C1A17]"
             }`}
           >
-            <Key className="w-5 h-5 text-[#9E7A45] mb-2"/>
+            <Key className="w-5 h-5 text-blue-600 mb-2"/>
             <span className="text-xs font-semibold text-[#1C1A17]">Secret API Key</span>
             <span className="text-[10px] text-[#8C8275] mt-1">Custom Python & TS daemons</span>
           </button>
@@ -158,9 +158,9 @@ export function ConnectAgentModal({ isOpen, onClose, onConnected }: ConnectAgent
 
         {/* Authentication Alert if user attempts copy without session */}
         {authError && (
-          <div className="mt-4 p-3 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-xs font-montserrat flex items-center justify-between gap-3 animate-in fade-in duration-200">
+          <div className="mt-4 p-3 rounded-2xl bg-blue-50 border border-blue-200 text-blue-900 text-xs font-montserrat flex items-center justify-between gap-3 animate-in fade-in duration-200">
             <div className="flex items-center gap-2">
-              <Lock className="w-4 h-4 text-amber-700 shrink-0" />
+              <Lock className="w-4 h-4 text-blue-700 shrink-0" />
               <span className="font-medium">{authError}</span>
             </div>
             <button
@@ -168,7 +168,7 @@ export function ConnectAgentModal({ isOpen, onClose, onConnected }: ConnectAgent
                 onClose();
                 router.push("/login");
               }}
-              className="shrink-0 px-3 py-1.5 rounded-lg bg-[#C59B5F] hover:bg-[#B38A4F] text-white font-bold text-xs shadow-xs cursor-pointer transition-colors"
+              className="shrink-0 px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs cursor-pointer transition-colors"
             >
               Sign In →
             </button>
@@ -196,7 +196,7 @@ export function ConnectAgentModal({ isOpen, onClose, onConnected }: ConnectAgent
 
           {selectedType === "gateway" && (
             <div className="flex items-center justify-between rounded-xl bg-white px-3.5 py-2.5 border border-[#EAE3D2] font-mono text-xs">
-              <span className="text-[#9E7A45] font-medium truncate mr-2">
+              <span className="text-blue-600 font-medium truncate mr-2">
                 {revealed ? liveCreds.gatewayUrl : "https://gateway.verisett.com/v1/agt_••••••••••••"}
               </span>
               <button
@@ -204,7 +204,7 @@ export function ConnectAgentModal({ isOpen, onClose, onConnected }: ConnectAgent
                 className="text-[#8C8275] hover:text-[#1C1A17] shrink-0 ml-2 cursor-pointer p-1"
                 title={!user ? "Login required to copy" : "Copy Gateway URL"}
               >
-                {!user ? <Lock className="w-4 h-4 text-[#C59B5F]"/> : copied ? <Check className="w-4 h-4 text-[#9E7A45]"/> : <Copy className="w-4 h-4"/>}
+                {!user ? <Lock className="w-4 h-4 text-blue-600"/> : copied ? <Check className="w-4 h-4 text-blue-600"/> : <Copy className="w-4 h-4"/>}
               </button>
             </div>
           )}
@@ -221,7 +221,7 @@ export function ConnectAgentModal({ isOpen, onClose, onConnected }: ConnectAgent
                 className="absolute top-2.5 right-2.5 text-[#8C8275] hover:text-[#1C1A17] cursor-pointer p-1 bg-[#FAF8F5] rounded border border-[#EAE3D2]"
                 title={!user ? "Login required to copy" : "Copy MCP Config"}
               >
-                {!user ? <Lock className="w-4 h-4 text-[#C59B5F]"/> : copied ? <Check className="w-4 h-4 text-[#9E7A45]"/> : <Copy className="w-4 h-4"/>}
+                {!user ? <Lock className="w-4 h-4 text-blue-600"/> : copied ? <Check className="w-4 h-4 text-blue-600"/> : <Copy className="w-4 h-4"/>}
               </button>
             </div>
           )}
@@ -254,7 +254,7 @@ export function ConnectAgentModal({ isOpen, onClose, onConnected }: ConnectAgent
           {/* Live Handshake Status Indicator */}
           <div className="mt-3 flex items-center justify-between text-[11px] text-[#8C8275]">
             <span className="flex items-center gap-1.5 text-[#8C8275] font-mono">
-              <span className="w-2 h-2 rounded-full bg-[#C59B5F] animate-pulse"></span>
+              <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
               Listening for initial agent handshake...
             </span>
             <span className="text-[#8C8275]">Verisett Settlement Engine (MCP / FastMCP)</span>
@@ -275,7 +275,7 @@ export function ConnectAgentModal({ isOpen, onClose, onConnected }: ConnectAgent
                 onClose();
                 router.push("/login");
               }}
-              className="flex items-center gap-2 rounded-xl bg-[#C59B5F] hover:bg-[#B38A4F] px-4 py-2 text-xs font-semibold text-white transition cursor-pointer shadow-md shadow-[#C59B5F]/20 hover:scale-[1.02] active:scale-[0.98]"
+              className="flex items-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 px-4 py-2 text-xs font-semibold text-white transition cursor-pointer shadow-md shadow-blue-500/20 hover:scale-[1.02] active:scale-[0.98]"
             >
               <Lock className="w-3.5 h-3.5"/>
               <span>Sign In to Connect Agent</span>
@@ -319,7 +319,7 @@ export function ConnectAgentModal({ isOpen, onClose, onConnected }: ConnectAgent
                   if (onConnected) onConnected(resolvedName);
                   onClose();
                 }}
-                className="flex items-center gap-2 rounded-xl bg-[#C59B5F] hover:bg-[#B38A4F] px-4 py-2 text-xs font-semibold text-white transition cursor-pointer shadow-md shadow-[#C59B5F]/20 hover:scale-[1.02] active:scale-[0.98]"
+                className="flex items-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 px-4 py-2 text-xs font-semibold text-white transition cursor-pointer shadow-md shadow-blue-500/20 hover:scale-[1.02] active:scale-[0.98]"
               >
                 <ShieldCheck className="w-3.5 h-3.5"/>
                 <span>Authorize &amp; Connect Agent</span>

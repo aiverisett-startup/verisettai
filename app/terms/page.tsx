@@ -39,19 +39,19 @@ export default function TermsOfServicePage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#0B1528] text-[#F8FAFC] font-montserrat antialiased selection:bg-[#C59B5F]/30 selection:text-[#FAF6EE]">
+    <div className="min-h-screen bg-[#0B1528] text-[#F8FAFC] font-montserrat antialiased selection:bg-blue-600/30 selection:text-white">
       {/* Top Protocol Header */}
       <header className="sticky top-0 z-40 border-b border-[#1E345E]/80 bg-[#0B1528]/90 backdrop-blur-md">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-3">
             <Link href="/" className="flex items-center gap-2.5 group">
               <VerisettLogo size={28} />
-              <span className="text-base font-bold tracking-tight text-white group-hover:text-[#C59B5F] transition-colors">
+              <span className="text-base font-bold tracking-tight text-white group-hover:text-blue-400 transition-colors">
                 Verisett AI
               </span>
             </Link>
             <span className="hidden sm:inline-block text-[#3B527E]">/</span>
-            <span className="hidden sm:inline-block rounded-md bg-[#142442] px-2.5 py-0.5 text-[11px] font-mono text-[#C59B5F] border border-[#1E345E]">
+            <span className="hidden sm:inline-block rounded-md bg-[#142442] px-2.5 py-0.5 text-[11px] font-mono text-blue-400 border border-[#1E345E]">
               LEGAL // TERMS
             </span>
           </div>
@@ -59,14 +59,14 @@ export default function TermsOfServicePage() {
           <div className="flex items-center gap-4">
             <Link
               href="/"
-              className="inline-flex items-center gap-2 rounded-xl border border-[#1E345E] bg-[#0E1B33] px-3.5 py-1.5 text-xs font-medium text-[#94A3B8] hover:border-[#C59B5F]/60 hover:text-white transition-all shadow-xs"
+              className="inline-flex items-center gap-2 rounded-xl border border-[#1E345E] bg-[#0E1B33] px-3.5 py-1.5 text-xs font-medium text-[#94A3B8] hover:border-blue-500/60 hover:text-white transition-all shadow-xs"
             >
-              <ArrowLeft className="h-3.5 w-3.5 text-[#C59B5F]" />
+              <ArrowLeft className="h-3.5 w-3.5 text-blue-400" />
               <span>Back to Platform</span>
             </Link>
             <Link
               href="/privacy"
-              className="text-xs font-medium text-[#94A3B8] hover:text-[#C59B5F] transition-colors hidden md:inline-block"
+              className="text-xs font-medium text-[#94A3B8] hover:text-blue-400 transition-colors hidden md:inline-block"
             >
               Privacy Policy →
             </Link>
@@ -77,13 +77,13 @@ export default function TermsOfServicePage() {
       {/* Hero Banner with Dark Ambient Glow */}
       <section className="relative overflow-hidden border-b border-[#1E345E]/60 bg-gradient-to-b from-[#0E1B33] via-[#0B1528] to-[#0B1528] py-14 sm:py-20">
         <div className="pointer-events-none absolute inset-0">
-          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 h-96 w-96 rounded-full bg-[#C59B5F]/10 blur-3xl" />
-          <div className="absolute top-1/2 right-10 h-80 w-80 rounded-full bg-[#06B6D4]/5 blur-3xl" />
+          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 h-96 w-96 rounded-full bg-blue-600/10 blur-3xl" />
+          <div className="absolute top-1/2 right-10 h-80 w-80 rounded-full bg-cyan-400/5 blur-3xl" />
         </div>
 
         <div className="relative mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-          <div className="inline-flex items-center gap-2 rounded-full border border-amber-500/40 bg-amber-500/10 px-3 py-1 text-xs font-mono text-amber-400 mb-6">
-            <AlertTriangle className="h-3.5 w-3.5 text-amber-400" />
+          <div className="inline-flex items-center gap-2 rounded-full border border-blue-500/40 bg-blue-500/10 px-3 py-1 text-xs font-mono text-blue-400 mb-6">
+            <AlertTriangle className="h-3.5 w-3.5 text-blue-400" />
             <span>Non-Custodial Testnet Sandbox Terms</span>
           </div>
 
@@ -100,8 +100,8 @@ export default function TermsOfServicePage() {
             <div className="h-3 w-px bg-[#1E345E]" />
             <div>Last Updated: <span className="text-[#F8FAFC]">{lastUpdated}</span></div>
             <div className="h-3 w-px bg-[#1E345E]" />
-            <div className="flex items-center gap-1.5 text-amber-400">
-              <span className="h-2 w-2 rounded-full bg-amber-400 animate-pulse" />
+            <div className="flex items-center gap-1.5 text-blue-400">
+              <span className="h-2 w-2 rounded-full bg-blue-400 animate-pulse" />
               <span>Zero-Value Testnet Environment</span>
             </div>
           </div>
@@ -123,7 +123,7 @@ export default function TermsOfServicePage() {
                   <a
                     key={sec.id}
                     href={`#${sec.id}`}
-                    className="block rounded-lg px-2.5 py-1.5 text-xs text-[#94A3B8] hover:bg-[#142442] hover:text-[#C59B5F] transition-all font-medium truncate"
+                    className="block rounded-lg px-2.5 py-1.5 text-xs text-[#94A3B8] hover:bg-[#142442] hover:text-blue-400 transition-all font-medium truncate"
                   >
                     {sec.title}
                   </a>
@@ -131,8 +131,8 @@ export default function TermsOfServicePage() {
               </nav>
 
               <div className="mt-6 border-t border-[#1E345E] pt-4">
-                <div className="rounded-xl bg-[#0B1528] border border-amber-500/30 p-3 text-[11px] font-mono text-[#94A3B8]">
-                  <div className="text-amber-400 font-semibold mb-1">Developer Notice</div>
+                <div className="rounded-xl bg-[#0B1528] border border-blue-500/30 p-3 text-[11px] font-mono text-[#94A3B8]">
+                  <div className="text-blue-400 font-semibold mb-1">Developer Notice</div>
                   Test tokens hold zero monetary value. Developers are solely liable for agent actions.
                 </div>
               </div>
@@ -143,9 +143,9 @@ export default function TermsOfServicePage() {
           <main className="lg:col-span-9 space-y-12 leading-relaxed text-[#CBD5E1]">
 
             {/* Critical Disclaimer Banner */}
-            <div className="rounded-2xl border border-amber-500/40 bg-gradient-to-r from-amber-500/10 via-[#0E1B33] to-[#0E1B33] p-6 sm:p-8 shadow-xl">
+            <div className="rounded-2xl border border-blue-500/40 bg-gradient-to-r from-blue-500/10 via-[#0E1B33] to-[#0E1B33] p-6 sm:p-8 shadow-xl">
               <div className="flex items-start gap-4">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-500/20 text-amber-400 border border-amber-500/40">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-500/20 text-blue-400 border border-blue-500/40">
                   <ShieldAlert className="h-5 w-5" />
                 </div>
                 <div className="space-y-2">
@@ -166,7 +166,7 @@ export default function TermsOfServicePage() {
             {/* Section 1 */}
             <section id="acceptance" className="space-y-4 scroll-mt-24">
               <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight flex items-center gap-3">
-                <span className="text-[#C59B5F] font-mono text-lg">01.</span>
+                <span className="text-blue-400 font-mono text-lg">01.</span>
                 Acceptance of Terms &amp; Contracting Entity
               </h2>
               <p className="text-sm sm:text-base text-[#94A3B8]">
@@ -183,7 +183,7 @@ export default function TermsOfServicePage() {
             {/* Section 2 */}
             <section id="sandbox-architecture" className="space-y-4 scroll-mt-24">
               <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight flex items-center gap-3">
-                <span className="text-[#C59B5F] font-mono text-lg">02.</span>
+                <span className="text-blue-400 font-mono text-lg">02.</span>
                 Experimental Open-Source Protocol &amp; Simulation Sandbox
               </h2>
               <p className="text-sm sm:text-base text-[#94A3B8]">
@@ -202,16 +202,16 @@ export default function TermsOfServicePage() {
             {/* Section 3 */}
             <section id="zero-value" className="space-y-4 scroll-mt-24">
               <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight flex items-center gap-3">
-                <span className="text-[#C59B5F] font-mono text-lg">03.</span>
+                <span className="text-blue-400 font-mono text-lg">03.</span>
                 Zero Monetary Value of Test Tokens &amp; Vault Balances
               </h2>
-              <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-5 space-y-3">
-                <div className="flex items-center gap-2 font-mono text-xs font-semibold text-amber-400 uppercase">
+              <div className="rounded-xl border border-blue-500/30 bg-blue-500/5 p-5 space-y-3">
+                <div className="flex items-center gap-2 font-mono text-xs font-semibold text-blue-400 uppercase">
                   <Coins className="h-4 w-4" />
                   <span>Absolute No Monetary Value Disclaimer</span>
                 </div>
                 <p className="text-sm text-[#CBD5E1] leading-relaxed">
-                  All currencies, balances, and values referenced on the platform (including representations labeled as &quot;₹&quot;, &quot;USDC&quot;, &quot;Vault Balance&quot;, or &quot;Escrow Cents&quot;) 
+                  All currencies, balances, and values referenced on the platform (including representations labeled as &quot;USD&quot;, &quot;USDC&quot;, &quot;Vault Balance&quot;, or &quot;Escrow Cents&quot;) 
                   are <strong className="text-white">purely simulated testnet accounting units</strong>.
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 text-xs font-mono text-[#94A3B8]">
@@ -228,7 +228,7 @@ export default function TermsOfServicePage() {
             {/* Section 4 */}
             <section id="agent-liability" className="space-y-4 scroll-mt-24">
               <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight flex items-center gap-3">
-                <span className="text-[#C59B5F] font-mono text-lg">04.</span>
+                <span className="text-blue-400 font-mono text-lg">04.</span>
                 Autonomous Agent Operations &amp; User Liability
               </h2>
               <p className="text-sm sm:text-base text-[#94A3B8]">
@@ -237,7 +237,7 @@ export default function TermsOfServicePage() {
               
               <div className="rounded-xl border border-[#1E345E] bg-[#0E1B33] p-5 space-y-4">
                 <div className="flex items-center gap-2 text-white font-semibold text-sm">
-                  <Bot className="h-4 w-4 text-[#C59B5F]" />
+                  <Bot className="h-4 w-4 text-blue-400" />
                   <span>Developer Responsibility Allocation</span>
                 </div>
                 <ul className="text-xs sm:text-sm text-[#94A3B8] space-y-2 list-disc list-inside leading-relaxed">
@@ -251,7 +251,7 @@ export default function TermsOfServicePage() {
             {/* Section 5 */}
             <section id="assertion-rules" className="space-y-4 scroll-mt-24">
               <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight flex items-center gap-3">
-                <span className="text-[#C59B5F] font-mono text-lg">05.</span>
+                <span className="text-blue-400 font-mono text-lg">05.</span>
                 Assertion Soundness &amp; Escrow Locks
               </h2>
               <p className="text-sm sm:text-base text-[#94A3B8]">
@@ -259,7 +259,7 @@ export default function TermsOfServicePage() {
               </p>
 
               <div className="rounded-xl border border-[#1E345E] bg-[#090F1C] p-4 font-mono text-xs text-[#94A3B8] space-y-2">
-                <div className="text-[#C59B5F]">// Supported Assertion Primitives</div>
+                <div className="text-blue-400">// Supported Assertion Primitives</div>
                 <div className="text-slate-300">
                   - JSON_SCHEMA: Deterministic validation against RFC draft-07 schemas.<br />
                   - HASH_MATCH: Cryptographic state root proof matching (SHA-256 / Keccak).<br />
@@ -276,7 +276,7 @@ export default function TermsOfServicePage() {
             {/* Section 6 */}
             <section id="api-keys" className="space-y-4 scroll-mt-24">
               <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight flex items-center gap-3">
-                <span className="text-[#C59B5F] font-mono text-lg">06.</span>
+                <span className="text-blue-400 font-mono text-lg">06.</span>
                 API Key Custody &amp; Access Control
               </h2>
               <p className="text-sm sm:text-base text-[#94A3B8]">
@@ -292,7 +292,7 @@ export default function TermsOfServicePage() {
             {/* Section 7 */}
             <section id="fastmcp-execution" className="space-y-4 scroll-mt-24">
               <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight flex items-center gap-3">
-                <span className="text-[#C59B5F] font-mono text-lg">07.</span>
+                <span className="text-blue-400 font-mono text-lg">07.</span>
                 FastMCP Server Tool Execution &amp; Acceptable Use
               </h2>
               <p className="text-sm sm:text-base text-[#94A3B8]">
@@ -311,7 +311,7 @@ export default function TermsOfServicePage() {
             {/* Section 8 */}
             <section id="intellectual-property" className="space-y-4 scroll-mt-24">
               <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight flex items-center gap-3">
-                <span className="text-[#C59B5F] font-mono text-lg">08.</span>
+                <span className="text-blue-400 font-mono text-lg">08.</span>
                 Intellectual Property Rights
               </h2>
               <p className="text-sm sm:text-base text-[#94A3B8]">
@@ -327,7 +327,7 @@ export default function TermsOfServicePage() {
             {/* Section 9 */}
             <section id="disclaimers" className="space-y-4 scroll-mt-24">
               <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight flex items-center gap-3">
-                <span className="text-[#C59B5F] font-mono text-lg">09.</span>
+                <span className="text-blue-400 font-mono text-lg">09.</span>
                 Warranty Disclaimers (&quot;AS IS&quot;)
               </h2>
               <div className="rounded-xl border border-[#1E345E] bg-[#0E1B33] p-5 text-xs sm:text-sm text-[#94A3B8] uppercase leading-relaxed font-mono">
@@ -340,7 +340,7 @@ export default function TermsOfServicePage() {
             {/* Section 10 */}
             <section id="limitation-liability" className="space-y-4 scroll-mt-24">
               <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight flex items-center gap-3">
-                <span className="text-[#C59B5F] font-mono text-lg">10.</span>
+                <span className="text-blue-400 font-mono text-lg">10.</span>
                 Limitation of Liability
               </h2>
               <p className="text-sm sm:text-base text-[#94A3B8]">
@@ -357,7 +357,7 @@ export default function TermsOfServicePage() {
             {/* Section 11 */}
             <section id="governing-law" className="space-y-4 scroll-mt-24 border-t border-[#1E345E] pt-8">
               <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight flex items-center gap-3">
-                <span className="text-[#C59B5F] font-mono text-lg">11.</span>
+                <span className="text-blue-400 font-mono text-lg">11.</span>
                 Dispute Resolution &amp; Governing Principles
               </h2>
               <p className="text-sm sm:text-base text-[#94A3B8]">
@@ -367,7 +367,7 @@ export default function TermsOfServicePage() {
 
               <div className="rounded-xl border border-[#1E345E] bg-[#0E1B33] p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mt-6">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#142442] text-[#C59B5F] border border-[#1E345E]">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#142442] text-blue-400 border border-[#1E345E]">
                     <Mail className="h-5 w-5" />
                   </div>
                   <div>
@@ -377,7 +377,7 @@ export default function TermsOfServicePage() {
                 </div>
                 <a
                   href="mailto:legal@veri-sett.com"
-                  className="rounded-lg bg-[#C59B5F] px-4 py-2 text-xs font-semibold text-white hover:bg-[#B38A4F] transition shadow-md shadow-[#C59B5F]/20"
+                  className="rounded-lg bg-blue-600 px-4 py-2 text-xs font-semibold text-white hover:bg-blue-500 transition shadow-md shadow-blue-500/20"
                 >
                   Contact Project Lead
                 </a>
@@ -396,15 +396,15 @@ export default function TermsOfServicePage() {
             <span>&copy; {new Date().getFullYear()} Verisett AI Project / Manoj S.M. All rights reserved.</span>
           </div>
           <div className="flex items-center gap-6 font-medium">
-            <Link href="/" className="hover:text-[#C59B5F] transition-colors">Platform Home</Link>
-            <Link href="/privacy" className="hover:text-[#C59B5F] transition-colors">Privacy Policy</Link>
-            <a href="https://www.youtube.com/@VerisettAI" target="_blank" rel="noopener noreferrer" className="hover:text-[#C59B5F] transition-colors">
+            <Link href="/" className="hover:text-blue-400 transition-colors">Platform Home</Link>
+            <Link href="/privacy" className="hover:text-blue-400 transition-colors">Privacy Policy</Link>
+            <a href="https://www.youtube.com/@VerisettAI" target="_blank" rel="noopener noreferrer" className="hover:text-blue-400 transition-colors">
               YouTube
             </a>
-            <a href="https://www.instagram.com/ai.verisett/" target="_blank" rel="noopener noreferrer" className="hover:text-[#C59B5F] transition-colors">
+            <a href="https://www.instagram.com/ai.verisett/" target="_blank" rel="noopener noreferrer" className="hover:text-blue-400 transition-colors">
               Instagram
             </a>
-            <a href="https://x.com/ai_verisett" target="_blank" rel="noopener noreferrer" className="hover:text-[#C59B5F] transition-colors">
+            <a href="https://x.com/ai_verisett" target="_blank" rel="noopener noreferrer" className="hover:text-blue-400 transition-colors">
               Twitter / X
             </a>
           </div>

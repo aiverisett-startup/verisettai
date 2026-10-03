@@ -22,16 +22,16 @@ export function VerisettLogo({
 
   // Coordinates of all verification nodes with staggered pulse delays
   const nodes = [
-    { cx: 20, cy: 25, r: 4.5, isApex: true, color: "#C59B5F" },
-    { cx: 35, cy: 25, r: 3.5, isApex: false, color: "#D4AF37" },
-    { cx: 80, cy: 25, r: 4.5, isApex: true, color: "#C59B5F" },
-    { cx: 65, cy: 25, r: 3.5, isApex: false, color: "#D4AF37" },
-    { cx: 32, cy: 40, r: 3.5, isApex: false, color: "#D4AF37" },
-    { cx: 68, cy: 40, r: 3.5, isApex: false, color: "#D4AF37" },
-    { cx: 40, cy: 50, r: 3.5, isApex: false, color: "#D4AF37" },
-    { cx: 60, cy: 50, r: 3.5, isApex: false, color: "#D4AF37" },
-    { cx: 50, cy: 55, r: 3.0, isApex: false, color: "#D4AF37" },
-    { cx: 50, cy: 78, r: 5.0, isApex: true, color: "#9E7A45" },
+    { cx: 20, cy: 25, r: 4.5, isApex: true, color: "#2563EB" },
+    { cx: 35, cy: 25, r: 3.5, isApex: false, color: "#3B82F6" },
+    { cx: 80, cy: 25, r: 4.5, isApex: true, color: "#2563EB" },
+    { cx: 65, cy: 25, r: 3.5, isApex: false, color: "#3B82F6" },
+    { cx: 32, cy: 40, r: 3.5, isApex: false, color: "#3B82F6" },
+    { cx: 68, cy: 40, r: 3.5, isApex: false, color: "#3B82F6" },
+    { cx: 40, cy: 50, r: 3.5, isApex: false, color: "#06B6D4" },
+    { cx: 60, cy: 50, r: 3.5, isApex: false, color: "#06B6D4" },
+    { cx: 50, cy: 55, r: 3.0, isApex: false, color: "#3B82F6" },
+    { cx: 50, cy: 78, r: 5.0, isApex: true, color: "#1E40AF" },
   ];
 
   return (
@@ -53,7 +53,7 @@ export function VerisettLogo({
             cy={25}
             r={4.5}
             fill="none"
-            stroke="#D4AF37"
+            stroke="#3B82F6"
             strokeWidth="1.5"
             animate={{
               r: [4.5, 11, 14],
@@ -73,7 +73,7 @@ export function VerisettLogo({
             cy={25}
             r={4.5}
             fill="none"
-            stroke="#D4AF37"
+            stroke="#3B82F6"
             strokeWidth="1.5"
             animate={{
               r: [4.5, 11, 14],
@@ -93,7 +93,7 @@ export function VerisettLogo({
             cy={78}
             r={5}
             fill="none"
-            stroke="#C59B5F"
+            stroke="#2563EB"
             strokeWidth="1.8"
             animate={{
               r: [5, 13, 17],
@@ -110,9 +110,9 @@ export function VerisettLogo({
 
         <defs>
           <linearGradient id="logo-gold-struts" x1="20" y1="25" x2="80" y2="78" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stopColor="#C59B5F" />
-            <stop offset="50%" stopColor="#D4AF37" />
-            <stop offset="100%" stopColor="#9E7A45" />
+            <stop offset="0%" stopColor="#06B6D4" />
+            <stop offset="50%" stopColor="#3B82F6" />
+            <stop offset="100%" stopColor="#2563EB" />
           </linearGradient>
         </defs>
 
@@ -167,7 +167,7 @@ export function VerisettLogo({
             inverted ? "text-white" : "text-[#1C1A17]"
           }`}
         >
-          Verisett <span className="text-[#C59B5F] font-semibold">AI</span>
+          Verisett <span className="text-[#2563EB] font-semibold">AI</span>
         </span>
       )}
     </div>

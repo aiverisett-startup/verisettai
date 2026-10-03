@@ -37,8 +37,8 @@ export function TransactionReceiptModal({
 
   if (!isOpen || !transaction) return null;
 
-  const commissionINR = Math.round(transaction.amountINR * transaction.commissionRate);
-  const netAmountINR = transaction.amountINR - commissionINR;
+  const commission = Number((transaction.amountINR * transaction.commissionRate).toFixed(2));
+  const netAmount = Number((transaction.amountINR - commission).toFixed(2));
 
   const handleCopy = (text: string, fieldName: string) => {
     navigator.clipboard.writeText(text);
@@ -49,47 +49,50 @@ export function TransactionReceiptModal({
   const isSuccess = transaction.status === "SUCCESSFUL";
   const isFailed = transaction.status === "FAILED";
 
+  const formatUSD = (val: number) =>
+    `$${val.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
   return (
     <div
       role="dialog"
       aria-modal="true"
       aria-labelledby="receipt-modal-title"
-      className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-6 bg-stone-900/80 backdrop-blur-md overflow-y-auto animate-in fade-in duration-200"
+      className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-6 bg-black/70 backdrop-blur-md overflow-y-auto animate-in fade-in duration-200"
     >
-      <div className="relative w-full max-w-md my-auto rounded-3xl bg-white border border-[#EAE3D2] shadow-2xl overflow-hidden font-sans">
+      <div className="relative w-full max-w-md my-auto rounded-3xl bg-[#09090B] border border-slate-800 shadow-2xl overflow-hidden font-sans text-slate-200">
         
         {/* Top Header Bar with Close */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#F0E9DC] bg-[#FAF8F5]">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800 bg-slate-900/60">
           <div className="flex items-center gap-2">
             <VerisettLogo size={22} />
-            <span className="font-mono text-[11px] font-semibold tracking-wider text-[#9E7A45] uppercase">
+            <span className="font-mono text-[11px] font-semibold tracking-wider text-blue-400 uppercase">
               Official Clearing Receipt
             </span>
           </div>
           <button
             onClick={onClose}
             aria-label="Close transaction receipt"
-            className="p-1.5 rounded-full text-[#8C8275] hover:text-[#1C1A17] hover:bg-black/5 transition-colors cursor-pointer"
+            className="p-1.5 rounded-full text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
-        {/* PhonePe / UPI-Style Hero Card */}
-        <div className="p-6 text-center border-b border-[#F0E9DC] bg-gradient-to-b from-white to-[#FCFAF6] space-y-3">
+        {/* Hero Card */}
+        <div className="p-6 text-center border-b border-slate-800 bg-gradient-to-b from-[#09090B] to-slate-900/40 space-y-3">
           {/* Status Icon */}
           <div className="flex justify-center">
             {isSuccess ? (
-              <div className="w-16 h-16 rounded-full bg-emerald-50 border-4 border-emerald-100 flex items-center justify-center shadow-inner animate-in zoom-in-75 duration-300">
-                <CheckCircle2 className="w-9 h-9 text-emerald-600 stroke-[2.2]" />
+              <div className="w-16 h-16 rounded-full bg-emerald-950/40 border-4 border-emerald-900/50 flex items-center justify-center shadow-inner animate-in zoom-in-75 duration-300">
+                <CheckCircle2 className="w-9 h-9 text-emerald-400 stroke-[2.2]" />
               </div>
             ) : isFailed ? (
-              <div className="w-16 h-16 rounded-full bg-rose-50 border-4 border-rose-100 flex items-center justify-center shadow-inner animate-in zoom-in-75 duration-300">
-                <XCircle className="w-9 h-9 text-rose-600 stroke-[2.2]" />
+              <div className="w-16 h-16 rounded-full bg-rose-950/40 border-4 border-rose-900/50 flex items-center justify-center shadow-inner animate-in zoom-in-75 duration-300">
+                <XCircle className="w-9 h-9 text-rose-400 stroke-[2.2]" />
               </div>
             ) : (
-              <div className="w-16 h-16 rounded-full bg-amber-50 border-4 border-amber-100 flex items-center justify-center shadow-inner animate-in zoom-in-75 duration-300">
-                <Clock className="w-9 h-9 text-amber-600 stroke-[2.2]" />
+              <div className="w-16 h-16 rounded-full bg-blue-950/40 border-4 border-blue-900/50 flex items-center justify-center shadow-inner animate-in zoom-in-75 duration-300">
+                <Clock className="w-9 h-9 text-blue-400 stroke-[2.2]" />
               </div>
             )}
           </div>
@@ -98,26 +101,26 @@ export function TransactionReceiptModal({
             <span
               className={`inline-block px-3 py-0.5 rounded-full text-[11px] font-mono font-bold tracking-wide uppercase ${
                 isSuccess
-                  ? "bg-emerald-50 text-emerald-800 border border-emerald-200"
+                  ? "bg-emerald-950/40 text-emerald-400 border border-emerald-800/50"
                   : isFailed
-                  ? "bg-rose-50 text-rose-800 border border-rose-200"
-                  : "bg-amber-50 text-amber-800 border border-amber-200"
+                  ? "bg-rose-950/40 text-rose-400 border border-rose-800/50"
+                  : "bg-blue-950/40 text-blue-400 border border-blue-800/50"
               }`}
             >
               {isSuccess ? "Transaction Successful" : isFailed ? "Transaction Failed / Refunded" : "Escrow Pending"}
             </span>
-            <div className="text-3xl font-extrabold text-[#1C1A17] font-mono mt-2 tracking-tight">
-              ₹{transaction.amountINR.toLocaleString("en-IN")}
+            <div className="text-3xl font-extrabold text-white font-mono mt-2 tracking-tight">
+              {formatUSD(transaction.amountINR)}
             </div>
-            <p className="text-xs text-[#8C8275] mt-1 font-mono">{transaction.timestamp}</p>
+            <p className="text-xs text-slate-400 mt-1 font-mono">{transaction.timestamp}</p>
           </div>
 
           {/* Failure Alert Box if Failed */}
           {isFailed && transaction.failureReason && (
-            <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-left text-xs text-rose-900 leading-relaxed">
-              <span className="font-semibold block mb-0.5">Verification Discrepancy:</span>
+            <div className="p-3 rounded-xl bg-rose-950/30 border border-rose-900/40 text-left text-xs text-rose-300 leading-relaxed">
+              <span className="font-semibold block mb-0.5 text-rose-200">Verification Discrepancy:</span>
               {transaction.failureReason}
-              <span className="block mt-1 font-medium text-[11px] text-rose-700">
+              <span className="block mt-1 font-medium text-[11px] text-rose-400">
                 Funds have been automatically refunded to the payer vault.
               </span>
             </div>
@@ -128,99 +131,99 @@ export function TransactionReceiptModal({
         <div className="p-6 space-y-4 text-xs">
           
           {/* From Agent -> To Agent Box */}
-          <div className="rounded-2xl border border-[#EAE3D2] bg-[#FAF8F5] p-4 space-y-3">
+          <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-4 space-y-3">
             {/* Sender Agent */}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2.5">
-                <div className={`w-8 h-8 rounded-full ${transaction.fromAgent.avatarBg} text-white flex items-center justify-center text-xs font-bold shadow-xs`}>
+                <div className={`w-8 h-8 rounded-full ${transaction.fromAgent.avatarBg || "bg-blue-600"} text-white flex items-center justify-center text-xs font-bold shadow-xs`}>
                   {transaction.fromAgent.name.slice(0, 2).toUpperCase()}
                 </div>
                 <div>
                   <div className="flex items-center gap-1.5">
-                    <span className="text-[10px] text-[#8C8275] font-mono uppercase">From:</span>
-                    <span className="font-bold text-[#1C1A17]">{transaction.fromAgent.name}</span>
+                    <span className="text-[10px] text-slate-400 font-mono uppercase">From:</span>
+                    <span className="font-bold text-white">{transaction.fromAgent.name}</span>
                   </div>
-                  <span className="text-[10px] font-mono text-[#9E7A45]">{transaction.fromAgent.model}</span>
+                  <span className="text-[10px] font-mono text-blue-400">{transaction.fromAgent.model}</span>
                 </div>
               </div>
-              <span className="text-[10px] font-mono text-[#8C8275] bg-white px-2 py-0.5 rounded border border-[#EAE3D2]">
+              <span className="text-[10px] font-mono text-slate-400 bg-slate-800/80 px-2 py-0.5 rounded border border-slate-700">
                 Payer
               </span>
             </div>
 
-            <div className="h-px bg-[#EAE3D2]/70 w-full" />
+            <div className="h-px bg-slate-800 w-full" />
 
             {/* Recipient Agent */}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2.5">
-                <div className={`w-8 h-8 rounded-full ${transaction.toAgent.avatarBg} text-white flex items-center justify-center text-xs font-bold shadow-xs`}>
+                <div className={`w-8 h-8 rounded-full ${transaction.toAgent.avatarBg || "bg-emerald-600"} text-white flex items-center justify-center text-xs font-bold shadow-xs`}>
                   {transaction.toAgent.name.slice(0, 2).toUpperCase()}
                 </div>
                 <div>
                   <div className="flex items-center gap-1.5">
-                    <span className="text-[10px] text-[#8C8275] font-mono uppercase">To:</span>
-                    <span className="font-bold text-[#1C1A17]">{transaction.toAgent.name}</span>
+                    <span className="text-[10px] text-slate-400 font-mono uppercase">To:</span>
+                    <span className="font-bold text-white">{transaction.toAgent.name}</span>
                   </div>
-                  <span className="text-[10px] font-mono text-[#9E7A45]">{transaction.toAgent.model}</span>
+                  <span className="text-[10px] font-mono text-blue-400">{transaction.toAgent.model}</span>
                 </div>
               </div>
-              <span className="text-[10px] font-mono text-[#8C8275] bg-white px-2 py-0.5 rounded border border-[#EAE3D2]">
+              <span className="text-[10px] font-mono text-slate-400 bg-slate-800/80 px-2 py-0.5 rounded border border-slate-700">
                 Beneficiary
               </span>
             </div>
           </div>
 
           {/* Financial Breakdown (Gross, 1.5% Commission, Net Credited) */}
-          <div className="rounded-2xl border border-[#EAE3D2] bg-white p-4 space-y-2.5">
-            <div className="flex items-center justify-between text-[#6E675D]">
+          <div className="rounded-2xl border border-slate-800 bg-slate-900/30 p-4 space-y-2.5">
+            <div className="flex items-center justify-between text-slate-400">
               <span>Milestone Task</span>
-              <span className="font-semibold text-[#1C1A17] text-right truncate max-w-[200px]">
+              <span className="font-semibold text-white text-right truncate max-w-[200px]">
                 {transaction.milestoneTitle}
               </span>
             </div>
 
-            <div className="flex items-center justify-between text-[#6E675D]">
+            <div className="flex items-center justify-between text-slate-400">
               <span>Gross Escrow Amount</span>
-              <span className="font-mono font-medium text-[#1C1A17]">
-                ₹{transaction.amountINR.toLocaleString("en-IN")}
+              <span className="font-mono font-medium text-white">
+                {formatUSD(transaction.amountINR)}
               </span>
             </div>
 
-            <div className="flex items-center justify-between text-[#6E675D] border-t border-[#F0E9DC] pt-2">
+            <div className="flex items-center justify-between text-slate-400 border-t border-slate-800 pt-2">
               <span className="flex items-center gap-1">
                 <span>Protocol Fee</span>
-                <span className="text-[10px] font-mono font-bold text-[#9E7A45] bg-[#FAF6EE] px-1.5 py-0.5 rounded">
+                <span className="text-[10px] font-mono font-bold text-blue-400 bg-blue-950/60 border border-blue-800/40 px-1.5 py-0.5 rounded">
                   1.5% Flat
                 </span>
               </span>
-              <span className="font-mono font-medium text-[#9E7A45]">
-                -₹{commissionINR.toLocaleString("en-IN")}
+              <span className="font-mono font-medium text-blue-400">
+                -{formatUSD(commission)}
               </span>
             </div>
 
-            <div className="flex items-center justify-between text-sm font-bold text-[#1C1A17] border-t border-[#F0E9DC] pt-2">
+            <div className="flex items-center justify-between text-sm font-bold text-white border-t border-slate-800 pt-2">
               <span>Net Credited to Recipient</span>
-              <span className="font-mono text-emerald-700">
-                ₹{isSuccess ? netAmountINR.toLocaleString("en-IN") : "0.00"}
+              <span className="font-mono text-emerald-400">
+                {isSuccess ? formatUSD(netAmount) : "$0.00"}
               </span>
             </div>
           </div>
 
           {/* Transaction Metadata & Hash Proof */}
-          <div className="space-y-2 text-[11px] font-mono text-[#8C8275]">
-            <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#FAF8F5] border border-[#EAE3D2]">
+          <div className="space-y-2 text-[11px] font-mono text-slate-400">
+            <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-900/60 border border-slate-800">
               <div>
-                <span className="block text-[10px] text-[#8C8275] uppercase">Transaction Ref ID</span>
-                <span className="font-bold text-[#1C1A17]">{transaction.id}</span>
+                <span className="block text-[10px] text-slate-500 uppercase">Transaction Ref ID</span>
+                <span className="font-bold text-white">{transaction.id}</span>
               </div>
               <button
                 onClick={() => handleCopy(transaction.id, "txId")}
-                className="flex items-center gap-1 text-[10px] font-sans font-semibold text-[#9E7A45] hover:text-[#C59B5F] cursor-pointer"
+                className="flex items-center gap-1 text-[10px] font-sans font-semibold text-blue-400 hover:text-blue-300 cursor-pointer"
               >
                 {copiedField === "txId" ? (
                   <>
-                    <Check className="w-3 h-3 text-emerald-600" />
-                    <span className="text-emerald-600">Copied</span>
+                    <Check className="w-3 h-3 text-emerald-400" />
+                    <span className="text-emerald-400">Copied</span>
                   </>
                 ) : (
                   <>
@@ -231,21 +234,21 @@ export function TransactionReceiptModal({
               </button>
             </div>
 
-            <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#FAF8F5] border border-[#EAE3D2]">
+            <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-900/60 border border-slate-800">
               <div className="min-w-0 flex-1 pr-2">
-                <span className="block text-[10px] text-[#8C8275] uppercase">SHA-256 Ledger Proof</span>
-                <span className="text-[#1C1A17] truncate block text-[10px]">
+                <span className="block text-[10px] text-slate-500 uppercase">SHA-256 Ledger Proof</span>
+                <span className="text-slate-300 truncate block text-[10px]">
                   {transaction.sha256Proof}
                 </span>
               </div>
               <button
                 onClick={() => handleCopy(transaction.sha256Proof, "proof")}
-                className="flex items-center gap-1 text-[10px] font-sans font-semibold text-[#9E7A45] hover:text-[#C59B5F] cursor-pointer shrink-0"
+                className="flex items-center gap-1 text-[10px] font-sans font-semibold text-blue-400 hover:text-blue-300 cursor-pointer shrink-0"
               >
                 {copiedField === "proof" ? (
                   <>
-                    <Check className="w-3 h-3 text-emerald-600" />
-                    <span className="text-emerald-600">Copied</span>
+                    <Check className="w-3 h-3 text-emerald-400" />
+                    <span className="text-emerald-400">Copied</span>
                   </>
                 ) : (
                   <>
@@ -260,19 +263,19 @@ export function TransactionReceiptModal({
         </div>
 
         {/* Footer Actions */}
-        <div className="p-4 bg-[#FAF8F5] border-t border-[#EAE3D2] flex items-center justify-between gap-3">
+        <div className="p-4 bg-slate-900/60 border-t border-slate-800 flex items-center justify-between gap-3">
           <button
             onClick={() => handleCopy(JSON.stringify(transaction, null, 2), "all")}
-            className="flex-1 py-2.5 px-3 rounded-xl border border-[#EAE3D2] bg-white hover:bg-[#FAF6EE] text-xs font-semibold text-[#1C1A17] transition flex items-center justify-center gap-1.5 cursor-pointer"
+            className="flex-1 py-2.5 px-3 rounded-xl border border-slate-800 bg-slate-900 hover:bg-slate-800 text-xs font-semibold text-white transition flex items-center justify-center gap-1.5 cursor-pointer"
           >
             {copiedField === "all" ? (
               <>
-                <Check className="w-3.5 h-3.5 text-emerald-600" />
-                <span className="text-emerald-700">Receipt Copied!</span>
+                <Check className="w-3.5 h-3.5 text-emerald-400" />
+                <span className="text-emerald-400">Receipt Copied!</span>
               </>
             ) : (
               <>
-                <Copy className="w-3.5 h-3.5 text-[#9E7A45]" />
+                <Copy className="w-3.5 h-3.5 text-blue-400" />
                 <span>Copy Full Receipt</span>
               </>
             )}
@@ -280,7 +283,7 @@ export function TransactionReceiptModal({
 
           <button
             onClick={onClose}
-            className="flex-1 py-2.5 px-3 rounded-xl bg-[#C59B5F] hover:bg-[#B38A4F] text-white text-xs font-bold transition shadow-xs cursor-pointer text-center"
+            className="flex-1 py-2.5 px-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition shadow-xs cursor-pointer text-center"
           >
             Done
           </button>

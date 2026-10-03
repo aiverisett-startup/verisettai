@@ -48,17 +48,17 @@ export const ContractLedger: React.FC<ContractLedgerProps> = ({
   const filterOptions = ["ALL", "SETTLED", "CLAIMED", "FUNDED", "DISPUTED"];
 
   return (
-    <div id="contracts" className="rounded-2xl bg-white border border-[#EAE3D2] shadow-[0_4px_24px_rgba(197,155,95,0.06)] overflow-hidden">
+    <div id="contracts" className="rounded-2xl bg-white border border-slate-200 shadow-[0_4px_24px_rgba(37,99,235,0.06)] overflow-hidden">
       {/* Table Toolbar */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-6 sm:p-7 border-b border-[#EAE3D2] bg-[#FAF8F5]">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-6 sm:p-7 border-b border-slate-200 bg-slate-50">
         <div>
-          <h2 className="text-xl font-bold text-[#1C1A17] flex items-center gap-2.5">
-            <span>Institutional Escrow Ledger</span>
-            <span className="rounded-full bg-white border border-[#EAE3D2] px-2.5 py-0.5 text-xs font-mono text-[#9E7A45] shadow-2xs">
+          <h2 className="text-xl font-bold text-[#09090B] flex items-center gap-2.5">
+            <span>Autonomous Escrow Ledger</span>
+            <span className="rounded-full bg-white border border-slate-200 px-2.5 py-0.5 text-xs font-mono text-blue-600 shadow-2xs">
               {filteredContracts.length} records
             </span>
           </h2>
-          <p className="text-xs sm:text-sm text-[#8C8275] mt-1">
+          <p className="text-xs sm:text-sm text-slate-500 mt-1">
             Audited transaction ledger with double-entry cryptographic verification records
           </p>
         </div>
@@ -66,15 +66,15 @@ export const ContractLedger: React.FC<ContractLedgerProps> = ({
         {/* Filter Pills & Search */}
         <div className="flex flex-wrap items-center gap-2.5 w-full sm:w-auto">
           {/* Status Filters */}
-          <div className="flex items-center rounded-full border border-[#EAE3D2] bg-white p-0.5 shadow-2xs">
+          <div className="flex items-center rounded-full border border-slate-200 bg-white p-0.5 shadow-2xs">
             {filterOptions.map((opt) => (
               <button
                 key={opt}
                 onClick={() => setStatusFilter(opt)}
                 className={`rounded-full px-3 py-1 text-xs font-mono font-medium transition-all cursor-pointer ${
                   statusFilter === opt
-                    ? "bg-[#C59B5F] text-white shadow-xs font-semibold"
-                    : "text-[#8C8275] hover:text-[#1C1A17]"
+                    ? "bg-blue-600 text-white shadow-xs font-semibold"
+                    : "text-slate-500 hover:text-[#09090B]"
                 }`}
               >
                 {opt}
@@ -84,13 +84,13 @@ export const ContractLedger: React.FC<ContractLedgerProps> = ({
 
           {/* Search Box */}
           <div className="relative flex-1 sm:w-60">
-            <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#8C8275]" />
+            <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
             <input
               type="text"
-              placeholder="Search ID, Client..."
+              placeholder="Search ID, Agent..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full rounded-full border border-[#EAE3D2] bg-white py-1.5 pl-8 pr-3 text-xs text-[#1C1A17] placeholder-[#8C8275] focus:border-[#D4AF37] focus:outline-none font-mono transition-colors shadow-2xs"
+              className="w-full rounded-full border border-slate-200 bg-white py-1.5 pl-8 pr-3 text-xs text-[#09090B] placeholder-slate-400 focus:border-blue-500 focus:outline-none font-mono transition-colors shadow-2xs"
             />
           </div>
         </div>
@@ -100,10 +100,10 @@ export const ContractLedger: React.FC<ContractLedgerProps> = ({
       <div className="overflow-x-auto">
         <table className="w-full text-left text-xs border-collapse">
           <thead>
-            <tr className="border-b border-[#EAE3D2] bg-[#FAF8F5] text-[11px] font-mono text-[#8C8275] uppercase tracking-wider">
+            <tr className="border-b border-slate-200 bg-slate-50 text-[11px] font-mono text-slate-500 uppercase tracking-wider">
               <th className="py-3.5 px-5">Contract ID</th>
-              <th className="py-3.5 px-4">Payer / Client</th>
-              <th className="py-3.5 px-4">Contractor / Vendor</th>
+              <th className="py-3.5 px-4">Payer Agent</th>
+              <th className="py-3.5 px-4">Worker Agent</th>
               <th className="py-3.5 px-4 text-right">Escrow Value</th>
               <th className="py-3.5 px-4">Rule</th>
               <th className="py-3.5 px-4">Vault Status</th>
@@ -111,16 +111,15 @@ export const ContractLedger: React.FC<ContractLedgerProps> = ({
               <th className="py-3.5 px-3"></th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-[#EAE3D2] font-mono bg-white">
+          <tbody className="divide-y divide-slate-200 font-mono bg-white">
             {filteredContracts.length === 0 ? (
               <tr>
-                <td colSpan={8} className="py-12 text-center text-[#8C8275] font-mono">
+                <td colSpan={8} className="py-12 text-center text-slate-500 font-mono">
                   No escrow contracts found matching filter criteria.
                 </td>
               </tr>
             ) : (
               filteredContracts.map((contract) => {
-                const amountINR = Math.round((contract.amount_cents / 100) * 83);
                 const isSettled = contract.status === "SETTLED";
                 const isFunded = contract.status === "FUNDED";
                 const isClaimed = contract.status === "CLAIMED";
@@ -129,14 +128,14 @@ export const ContractLedger: React.FC<ContractLedgerProps> = ({
                   <tr
                     key={contract.id}
                     onClick={() => onSelectContract(contract)}
-                    className="hover:bg-[#FAF8F5] transition-colors cursor-pointer group"
+                    className="hover:bg-slate-50 transition-colors cursor-pointer group"
                   >
                     {/* Contract ID */}
-                    <td className="py-4 px-5 font-mono font-medium text-[#1C1A17] flex items-center gap-1.5">
-                      <span className="text-[#9E7A45] font-semibold">{contract.id}</span>
+                    <td className="py-4 px-5 font-mono font-medium text-[#09090B] flex items-center gap-1.5">
+                      <span className="text-blue-600 font-semibold">{contract.id}</span>
                       <button
                         onClick={(e) => handleCopy(contract.id, e)}
-                        className="opacity-0 group-hover:opacity-100 text-[#8C8275] hover:text-[#1C1A17] transition-opacity p-0.5 cursor-pointer"
+                        className="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-[#09090B] transition-opacity p-0.5 cursor-pointer"
                         title="Copy ID"
                       >
                         {copiedId === contract.id ? (
@@ -148,32 +147,29 @@ export const ContractLedger: React.FC<ContractLedgerProps> = ({
                     </td>
 
                     {/* Payer Agent */}
-                    <td className="py-4 px-4 font-sans font-medium text-[#1C1A17]">
+                    <td className="py-4 px-4 font-sans font-medium text-[#09090B]">
                       {contract.payer_name}
                     </td>
 
                     {/* Worker Agent */}
                     <td className="py-4 px-4 font-sans">
                       {contract.worker_name ? (
-                        <span className="text-[#1C1A17] font-medium">{contract.worker_name}</span>
+                        <span className="text-[#09090B] font-medium">{contract.worker_name}</span>
                       ) : (
-                        <span className="text-[#8C8275] italic text-[11px]">Unassigned</span>
+                        <span className="text-slate-400 italic text-[11px]">Unassigned</span>
                       )}
                     </td>
 
                     {/* Escrow Amount */}
                     <td className="py-4 px-4 text-right">
-                      <span className="font-semibold text-[#1C1A17]">
-                        ₹{amountINR.toLocaleString("en-IN")}
-                      </span>
-                      <span className="block text-[10px] text-[#8C8275]">
+                      <span className="font-semibold text-[#09090B]">
                         ${(contract.amount_cents / 100).toFixed(2)} USD
                       </span>
                     </td>
 
                     {/* Milestone Rule */}
                     <td className="py-4 px-4">
-                      <span className="rounded-full border border-[#EAE3D2] bg-[#FAF8F5] px-2.5 py-0.5 text-[10px] font-medium text-[#1C1A17]">
+                      <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-0.5 text-[10px] font-medium text-[#09090B]">
                         {contract.assertion_type}
                       </span>
                     </td>
@@ -185,7 +181,7 @@ export const ContractLedger: React.FC<ContractLedgerProps> = ({
                           isSettled
                             ? "bg-emerald-50 text-emerald-800 border-emerald-200"
                             : isClaimed
-                            ? "bg-[#FAF6EE] text-[#9E7A45] border-[#EAE3D2]"
+                            ? "bg-blue-50 text-blue-700 border-blue-200"
                             : isFunded
                             ? "bg-amber-50 text-amber-800 border-amber-200"
                             : "bg-rose-50 text-rose-800 border-rose-200"
@@ -212,7 +208,7 @@ export const ContractLedger: React.FC<ContractLedgerProps> = ({
 
                     {/* Release Guarantee */}
                     <td className="py-4 px-4">
-                      <span className="text-[11px] text-[#8C8275] flex items-center gap-1 font-mono">
+                      <span className="text-[11px] text-slate-500 flex items-center gap-1 font-mono">
                         <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                         <span>Instant Release</span>
                       </span>
@@ -220,7 +216,7 @@ export const ContractLedger: React.FC<ContractLedgerProps> = ({
 
                     {/* Chevron */}
                     <td className="py-4 px-3 text-right">
-                      <ChevronRight className="h-4 w-4 text-[#8C8275] group-hover:text-[#1C1A17] transition-colors" />
+                      <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-[#09090B] transition-colors" />
                     </td>
                   </tr>
                 );

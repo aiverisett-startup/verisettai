@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: `Successfully deposited ₹${amount.toLocaleString("en-IN")} to Vault by ${agentName}`,
+      message: `Successfully deposited $${amount.toLocaleString("en-US")} USD to Vault by ${agentName}`,
       newBalance: result.state.available_balance,
       vaultBalance: {
         testnet_balance: result.state.testnet_balance,

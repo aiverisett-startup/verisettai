@@ -90,7 +90,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({
         success: true,
         type: "DEPOSIT",
-        message: `Successfully deposited ₹${amount.toLocaleString("en-IN")} into Vault by ${agentName}`,
+        message: `Successfully deposited $${amount.toLocaleString("en-US")} USD into Vault by ${agentName}`,
         transaction: depositResult.transaction,
         vaultBalance: {
           testnet_balance: depositResult.state.testnet_balance,
@@ -185,7 +185,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       success: true,
       type: "TRANSFER",
-      message: `Transaction settled successfully for ₹${amount.toLocaleString("en-IN")}`,
+      message: `Transaction settled successfully for $${amount.toLocaleString("en-US")} USD`,
       transaction: result.transaction,
       vaultBalance: {
         testnet_balance: result.state.testnet_balance,

@@ -21,7 +21,7 @@ interface Scenario {
   id: string;
   name: string;
   category: string;
-  amountINR: number;
+  amountUSD: number;
   contractor: string;
   criteria: string[];
   testMetric: string;
@@ -30,10 +30,10 @@ interface Scenario {
 const SCENARIOS: Scenario[] = [
   {
     id: "sc_web_mvp",
-    name: "Full-Stack SaaS MVP & API Integration",
-    category: "Software Development",
-    amountINR: 25000,
-    contractor: "Nexus Software Labs",
+    name: "Autonomous Agent Swarm Orchestration",
+    category: "M2M Agent Swarms",
+    amountUSD: 250,
+    contractor: "Agent_Theta_Worker",
     criteria: [
       "Unit & integration test pass rate > 98%",
       "Zero critical security vulnerabilities",
@@ -43,10 +43,10 @@ const SCENARIOS: Scenario[] = [
   },
   {
     id: "sc_ai_agent",
-    name: "Enterprise AI Model & Pipeline Automation",
-    category: "AI & Data Engineering",
-    amountINR: 100000,
-    contractor: "AcroTech AI Systems",
+    name: "Enterprise FastMCP Model & Pipeline Swarm",
+    category: "AI & Autonomous Inference",
+    amountUSD: 1000,
+    contractor: "Agent_Gamma_Inference",
     criteria: [
       "Structured output schema validation passed",
       "Model inference benchmark < 850ms",
@@ -56,14 +56,14 @@ const SCENARIOS: Scenario[] = [
   },
   {
     id: "sc_security",
-    name: "Smart Contract & Cloud Security Audit",
-    category: "Security & Compliance",
-    amountINR: 250000,
-    contractor: "Certik Shield Audits",
+    name: "Deterministic ZK Proof & State Verification",
+    category: "Cryptographic Consensus",
+    amountUSD: 2500,
+    contractor: "Agent_Sigma_Auditor",
     criteria: [
       "Formal verification mathematical proofs passed",
       "Zero high/medium static analysis alerts",
-      "Multi-sig release authorization signed",
+      "SHA-256 state root assertion cleared",
     ],
     testMetric: "Zero Security Vulnerabilities Detected",
   },
@@ -104,14 +104,14 @@ export const DeveloperPlayground: React.FC<DeveloperPlaygroundProps> = ({
       setSimulationState("settled");
 
       const now = new Date().toISOString();
-      const amountCents = Math.round((scenario.amountINR / 83) * 100);
+      const amountCents = scenario.amountUSD * 100;
       const feeCents = Math.round(amountCents * 0.015);
 
       const newRecord: ContractRecord = {
         id: `TX-${Math.random().toString(36).substring(2, 9).toUpperCase()}`,
-        payer_id: "acct_payer_client",
-        payer_name: "Apex Financial Ltd",
-        worker_id: "acct_worker_vendor",
+        payer_id: "acct_payer_buyer",
+        payer_name: "Agent_Alpha_Buyer",
+        worker_id: "acct_worker_theta",
         worker_name: scenario.contractor,
         amount_cents: amountCents,
         fee_cents: feeCents,
@@ -128,7 +128,7 @@ export const DeveloperPlayground: React.FC<DeveloperPlaygroundProps> = ({
             id: `led_${Date.now()}_1`,
             contract_id: "TX-ACTIVE",
             entry_type: "ESCROW_LOCK",
-            from_account: "Apex Financial Ltd (Vault)",
+            from_account: "Agent_Alpha_Buyer (Vault)",
             to_account: "Neutral Vault Custody",
             amount_cents: amountCents,
             created_at: now,
@@ -160,21 +160,21 @@ export const DeveloperPlayground: React.FC<DeveloperPlaygroundProps> = ({
   };
 
   return (
-    <div id="sandbox" className="rounded-2xl bg-white border border-[#EAE3D2] shadow-[0_4px_24px_rgba(197,155,95,0.06)] overflow-hidden">
+    <div id="sandbox" className="rounded-2xl bg-white border border-slate-200 shadow-[0_4px_24px_rgba(37,99,235,0.06)] overflow-hidden">
       
       {/* Sandbox Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-6 sm:p-7 border-b border-[#EAE3D2] bg-[#FAF8F5]">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-6 sm:p-7 border-b border-slate-200 bg-slate-50">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="h-2 w-2 rounded-full bg-[#D4AF37] animate-pulse" />
-            <span className="text-[11px] font-mono uppercase tracking-wider text-[#9E7A45] font-semibold">
+            <span className="h-2 w-2 rounded-full bg-blue-500 animate-pulse" />
+            <span className="text-[11px] font-mono uppercase tracking-wider text-blue-600 font-semibold">
               Interactive Escrow Sandbox
             </span>
           </div>
-          <h2 className="text-xl sm:text-2xl font-bold text-[#1C1A17] tracking-tight">
+          <h2 className="text-xl sm:text-2xl font-bold text-[#09090B] tracking-tight">
             Visual Milestone Verification Simulator
           </h2>
-          <p className="text-xs sm:text-sm text-[#8C8275] mt-1">
+          <p className="text-xs sm:text-sm text-slate-500 mt-1">
             Test how Verisett secures funds in neutral vault custody and executes instant auto-release upon deliverable acceptance.
           </p>
         </div>
@@ -183,7 +183,7 @@ export const DeveloperPlayground: React.FC<DeveloperPlaygroundProps> = ({
         {simulationState === "settled" && (
           <button
             onClick={handleReset}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white hover:bg-[#FAF6EE] border border-[#EAE3D2] text-[#9E7A45] text-xs font-mono transition-colors cursor-pointer shadow-xs"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white hover:bg-blue-50 border border-slate-200 text-blue-600 text-xs font-mono transition-colors cursor-pointer shadow-xs"
           >
             <RefreshCw className="w-3 h-3" />
             <span>Reset Test</span>
@@ -192,8 +192,8 @@ export const DeveloperPlayground: React.FC<DeveloperPlaygroundProps> = ({
       </div>
 
       {/* Scenario Selector Pills */}
-      <div className="px-6 py-3.5 border-b border-[#EAE3D2] bg-white flex items-center gap-2 overflow-x-auto no-scrollbar">
-        <span className="text-xs font-mono text-[#8C8275] shrink-0 mr-1">Select Scenario:</span>
+      <div className="px-6 py-3.5 border-b border-slate-200 bg-white flex items-center gap-2 overflow-x-auto no-scrollbar">
+        <span className="text-xs font-mono text-slate-500 shrink-0 mr-1">Select Scenario:</span>
         {SCENARIOS.map((sc, i) => (
           <button
             key={sc.id}
@@ -203,23 +203,23 @@ export const DeveloperPlayground: React.FC<DeveloperPlaygroundProps> = ({
             }}
             className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all shrink-0 cursor-pointer ${
               selectedScenarioIndex === i
-                ? "bg-[#C59B5F] text-white border border-[#B38A4F] shadow-xs font-semibold"
-                : "bg-[#FDFCF9] text-[#8C8275] border border-[#EAE3D2] hover:text-[#1C1A17] hover:bg-[#FAF6EE]"
+                ? "bg-blue-600 text-white border border-blue-500 shadow-xs font-semibold"
+                : "bg-slate-50 text-slate-600 border border-slate-200 hover:text-[#09090B] hover:bg-blue-50"
             }`}
           >
-            {sc.name.split("&")[0]} (₹{sc.amountINR.toLocaleString("en-IN")})
+            {sc.name.split("&")[0]} (${sc.amountUSD.toLocaleString("en-US", { minimumFractionDigits: 2 })})
           </button>
         ))}
       </div>
 
       {/* Dual Visual Card Workspace */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 divide-y lg:divide-y-0 lg:divide-x divide-[#EAE3D2] bg-white">
+      <div className="grid grid-cols-1 lg:grid-cols-12 divide-y lg:divide-y-0 lg:divide-x divide-slate-200 bg-white">
         
         {/* Left Pane: Milestone Terms & Vault Security */}
-        <div className="lg:col-span-6 p-6 sm:p-7 space-y-5 bg-[#FAF8F5]">
+        <div className="lg:col-span-6 p-6 sm:p-7 space-y-5 bg-slate-50">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-mono font-semibold text-[#1C1A17] uppercase tracking-wider flex items-center gap-2">
-              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#C59B5F] text-[10px] text-white font-mono">
+            <span className="text-xs font-mono font-semibold text-[#09090B] uppercase tracking-wider flex items-center gap-2">
+              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-600 text-[10px] text-white font-mono">
                 1
               </span>
               Milestone Escrow Terms
@@ -231,31 +231,31 @@ export const DeveloperPlayground: React.FC<DeveloperPlaygroundProps> = ({
           </div>
 
           {/* Value Card */}
-          <div className="rounded-xl bg-white border border-[#EAE3D2] p-4 flex items-center justify-between shadow-xs">
+          <div className="rounded-xl bg-white border border-slate-200 p-4 flex items-center justify-between shadow-xs">
             <div>
-              <div className="text-xs text-[#8C8275] font-medium">Milestone Escrow Value</div>
-              <div className="text-2xl font-bold font-mono text-[#1C1A17] mt-0.5">
-                ₹{scenario.amountINR.toLocaleString("en-IN")}
+              <div className="text-xs text-slate-500 font-medium">Milestone Escrow Value</div>
+              <div className="text-2xl font-bold font-mono text-[#09090B] mt-0.5">
+                ${scenario.amountUSD.toLocaleString("en-US", { minimumFractionDigits: 2 })} USD
               </div>
-              <div className="text-[11px] text-[#8C8275] font-mono mt-0.5">
-                Payer: Apex Financial Ltd ➔ Contractor: {scenario.contractor}
+              <div className="text-[11px] text-slate-500 font-mono mt-0.5">
+                Buyer: Agent_Alpha_Buyer ➔ Worker: {scenario.contractor}
               </div>
             </div>
 
-            <div className="h-10 w-10 rounded-xl bg-[#FAF6EE] border border-[#EAE3D2] flex items-center justify-center text-[#9E7A45]">
+            <div className="h-10 w-10 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600">
               <Lock className="w-5 h-5" />
             </div>
           </div>
 
           {/* Deliverable Acceptance Criteria Checklist */}
           <div className="space-y-2">
-            <div className="text-xs font-semibold text-[#1C1A17]">
+            <div className="text-xs font-semibold text-[#09090B]">
               Pre-Agreed Acceptance Criteria:
             </div>
             {scenario.criteria.map((c, i) => (
               <div
                 key={i}
-                className="flex items-center gap-2.5 p-2.5 rounded-lg bg-white border border-[#EAE3D2] text-xs text-[#1C1A17] shadow-xs"
+                className="flex items-center gap-2.5 p-2.5 rounded-lg bg-white border border-slate-200 text-xs text-[#09090B] shadow-xs"
               >
                 <div className="h-4 w-4 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700 shrink-0">
                   <Check className="w-2.5 h-2.5 stroke-[2.5]" />
@@ -266,12 +266,12 @@ export const DeveloperPlayground: React.FC<DeveloperPlaygroundProps> = ({
           </div>
 
           {/* Status Badge */}
-          <div className="p-3 rounded-xl bg-white border border-[#EAE3D2] flex items-center justify-between text-xs shadow-xs">
+          <div className="p-3 rounded-xl bg-white border border-slate-200 flex items-center justify-between text-xs shadow-xs">
             <div className="flex items-center gap-2">
               <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
-              <span className="text-[#1C1A17] font-medium">Funds Locked in Escrow: ₹{scenario.amountINR.toLocaleString("en-IN")}</span>
+              <span className="text-[#09090B] font-medium">Funds Locked in Escrow: ${scenario.amountUSD.toLocaleString("en-US", { minimumFractionDigits: 2 })} USD</span>
             </div>
-            <span className="text-[11px] font-mono text-[#8C8275]">1.5% Fee</span>
+            <span className="text-[11px] font-mono text-slate-500">1.5% Fee</span>
           </div>
         </div>
 
@@ -279,8 +279,8 @@ export const DeveloperPlayground: React.FC<DeveloperPlaygroundProps> = ({
         <div className="lg:col-span-6 p-6 sm:p-7 space-y-5 flex flex-col justify-between bg-white">
           <div>
             <div className="flex items-center justify-between mb-4">
-              <span className="text-xs font-mono font-semibold text-[#1C1A17] uppercase tracking-wider flex items-center gap-2">
-                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#C59B5F] text-[10px] text-white font-mono">
+              <span className="text-xs font-mono font-semibold text-[#09090B] uppercase tracking-wider flex items-center gap-2">
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-600 text-[10px] text-white font-mono">
                   2
                 </span>
                 Automated Verification Gate
@@ -291,7 +291,7 @@ export const DeveloperPlayground: React.FC<DeveloperPlaygroundProps> = ({
                 onClick={handleSimulate}
                 disabled={simulationState === "evaluating"}
                 className={`minimal-btn-primary flex items-center gap-2 text-xs font-semibold cursor-pointer disabled:opacity-50 ${
-                  simulationState === "settled" ? "bg-emerald-700 hover:bg-emerald-800 border-emerald-700" : ""
+                  simulationState === "settled" ? "bg-emerald-700 hover:bg-emerald-800 border-emerald-700 text-white" : ""
                 }`}
               >
                 {simulationState === "evaluating" ? (
@@ -314,18 +314,18 @@ export const DeveloperPlayground: React.FC<DeveloperPlaygroundProps> = ({
             </div>
 
             {/* Deliverable Submission Box */}
-            <div className="p-4 rounded-xl bg-[#FAF8F5] border border-[#EAE3D2] space-y-3">
+            <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
               <div className="flex items-center justify-between text-xs">
-                <span className="text-[#8C8275]">Delivered Artifact:</span>
-                <span className="font-mono text-[#1C1A17] font-semibold">Production Ready Build</span>
+                <span className="text-slate-500">Delivered Artifact:</span>
+                <span className="font-mono text-[#09090B] font-semibold">Production Ready Build</span>
               </div>
 
-              <div className="p-3 rounded-lg bg-white border border-[#EAE3D2] text-xs font-mono space-y-1 shadow-xs">
-                <div className="flex justify-between text-[#8C8275]">
+              <div className="p-3 rounded-lg bg-white border border-slate-200 text-xs font-mono space-y-1 shadow-xs">
+                <div className="flex justify-between text-slate-500">
                   <span>Deliverable:</span>
-                  <span className="text-[#1C1A17] font-medium">{scenario.name}</span>
+                  <span className="text-[#09090B] font-medium">{scenario.name}</span>
                 </div>
-                <div className="flex justify-between text-[#8C8275]">
+                <div className="flex justify-between text-slate-500">
                   <span>Evaluation Metric:</span>
                   <span className="text-emerald-700 font-medium">{scenario.testMetric}</span>
                 </div>
@@ -334,14 +334,14 @@ export const DeveloperPlayground: React.FC<DeveloperPlaygroundProps> = ({
               {/* Progress Bar */}
               <div className="space-y-1.5 pt-1">
                 <div className="flex justify-between text-[11px] font-mono">
-                  <span className="text-[#8C8275]">Verification Progress:</span>
-                  <span className={`font-bold ${simulationState === "settled" ? "text-emerald-700" : "text-[#9E7A45]"}`}>
+                  <span className="text-slate-500">Verification Progress:</span>
+                  <span className={`font-bold ${simulationState === "settled" ? "text-emerald-700" : "text-blue-600"}`}>
                     {progressPercent}%
                   </span>
                 </div>
-                <div className="w-full bg-[#FAF6EE] h-2.5 rounded-full overflow-hidden p-0.5 border border-[#EAE3D2]/60">
+                <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden p-0.5 border border-slate-200">
                   <div
-                    className="h-full rounded-full bg-gradient-to-r from-[#C59B5F] to-[#D4AF37] transition-all duration-500"
+                    className="h-full rounded-full bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-400 transition-all duration-500"
                     style={{ width: `${progressPercent}%` }}
                   />
                 </div>
@@ -360,30 +360,30 @@ export const DeveloperPlayground: React.FC<DeveloperPlaygroundProps> = ({
                     <span className="font-mono font-bold text-emerald-700">PASSED</span>
                   </div>
 
-                  <div className="p-3 rounded-xl bg-[#FAF6EE] border border-[#EAE3D2] flex items-center justify-between text-xs text-[#9E7A45]">
+                  <div className="p-3 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-between text-xs text-blue-700">
                     <div className="flex items-center gap-2">
-                      <Sparkles className="w-4 h-4 text-[#C59B5F] shrink-0" />
+                      <Sparkles className="w-4 h-4 text-blue-600 shrink-0" />
                       <span className="font-semibold">Auto-Release Complete: 100%</span>
                     </div>
-                    <span className="font-mono font-bold text-[#1C1A17]">₹{scenario.amountINR.toLocaleString("en-IN")} Disbursed</span>
+                    <span className="font-mono font-bold text-[#09090B]">${scenario.amountUSD.toLocaleString("en-US", { minimumFractionDigits: 2 })} USD Disbursed</span>
                   </div>
                 </>
               ) : simulationState === "evaluating" ? (
-                <div className="p-3 rounded-xl bg-[#FAF6EE] border border-[#EAE3D2] flex items-center gap-2.5 text-xs text-[#9E7A45] animate-pulse">
-                  <RefreshCw className="w-4 h-4 animate-spin shrink-0 text-[#C59B5F]" />
+                <div className="p-3 rounded-xl bg-blue-50 border border-blue-200 flex items-center gap-2.5 text-xs text-blue-700 animate-pulse">
+                  <RefreshCw className="w-4 h-4 animate-spin shrink-0 text-blue-600" />
                   <span>Checking Acceptance Invariants & Automated Test Results...</span>
                 </div>
               ) : (
-                <div className="p-3 rounded-xl bg-[#FDFCF9] border border-[#EAE3D2] flex items-center justify-between text-xs text-[#8C8275]">
+                <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between text-xs text-slate-500">
                   <span>Status: Ready to Verify Milestone</span>
-                  <span className="font-mono text-[#9E7A45] font-semibold">Click button to test</span>
+                  <span className="font-mono text-blue-600 font-semibold">Click button to test</span>
                 </div>
               )}
             </div>
           </div>
 
           {/* Programmatic Guarantee Receipt */}
-          <div className="mt-4 pt-3 border-t border-[#F0E9DC] flex items-center justify-between text-[11px] text-[#8C8275]">
+          <div className="mt-4 pt-3 border-t border-slate-200 flex items-center justify-between text-[11px] text-slate-500">
             <span>Instant Auto-Release Settlement Speed:</span>
             <span className="font-mono text-emerald-700 font-semibold">38ms Guaranteed</span>
           </div>

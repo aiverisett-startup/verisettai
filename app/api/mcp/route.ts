@@ -375,7 +375,7 @@ export async function POST(req: NextRequest) {
       }
 
       if (toolName === "deposit_funds" || toolName === "deposit") {
-        const amount = Number(args.amount_inr || args.amount || 5000);
+        const amount = Number(args.amount_usd || args.amount_inr || args.amount || 250);
         const agentName = args.agent_name || state.connected_agent_name || "Connected Agent";
 
         const res = recordVaultDeposit({
@@ -391,7 +391,7 @@ export async function POST(req: NextRequest) {
             content: [
               {
                 type: "text",
-                text: `SUCCESS: Deposited ₹${amount.toLocaleString("en-IN")} into Verisett Vault by agent '${agentName}'. New Vault Balance: ₹${res.state.available_balance.toLocaleString("en-IN")}. Ref: ${res.transaction.id}`,
+                text: `SUCCESS: Deposited $${amount.toLocaleString("en-US")} USD into Verisett Vault by agent '${agentName}'. New Vault Balance: $${res.state.available_balance.toLocaleString("en-US")} USD. Ref: ${res.transaction.id}`,
               },
             ],
             isError: false,
@@ -400,9 +400,9 @@ export async function POST(req: NextRequest) {
       }
 
       if (toolName === "transfer_funds" || toolName === "create_escrow" || toolName === "create_contract_escrow") {
-        const amount = Number(args.amount_inr ?? args.amount ?? (args.amount_cents ? Math.round(Number(args.amount_cents) / 100) : 2500));
-        const fromName = args.from_agent || args.payer_name || state.connected_agent_name || "Client Agent";
-        const toName = args.to_agent || args.worker_name || args.beneficiary_id || "Worker Agent";
+        const amount = Number(args.amount_usd ?? args.amount_inr ?? args.amount ?? (args.amount_cents ? Math.round(Number(args.amount_cents) / 100) : 250));
+        const fromName = args.from_agent || args.payer_name || state.connected_agent_name || "Agent_Alpha_Buyer";
+        const toName = args.to_agent || args.worker_name || args.beneficiary_id || "Agent_Theta_Worker";
         const status = args.status === "FAILED" ? "FAILED" : "SUCCESSFUL";
 
         const res = recordAgentTransfer({
@@ -420,7 +420,7 @@ export async function POST(req: NextRequest) {
             content: [
               {
                 type: "text",
-                text: `SUCCESS: Settlement processed for ₹${amount.toLocaleString("en-IN")} from '${fromName}' to '${toName}'. Status: ${status}. Vault Balance: ₹${res.state.available_balance.toLocaleString("en-IN")}. Trajectory Graph: ${status === "SUCCESSFUL" ? "+1 Up" : "-1 Down"}. Ref: ${res.transaction.id}`,
+                text: `SUCCESS: Settlement processed for $${amount.toLocaleString("en-US")} USD from '${fromName}' to '${toName}'. Status: ${status}. Vault Balance: $${res.state.available_balance.toLocaleString("en-US")} USD. Trajectory Graph: ${status === "SUCCESSFUL" ? "+1 Up" : "-1 Down"}. Ref: ${res.transaction.id}`,
               },
             ],
             isError: false,
@@ -436,7 +436,7 @@ export async function POST(req: NextRequest) {
             content: [
               {
                 type: "text",
-                text: `Current Vault Available Balance: ₹${state.available_balance.toLocaleString("en-IN")} VRS. Total Settlements: ${state.transactions.length}. Connected Agent: ${state.connected_agent_name}`,
+                text: `Current Vault Available Balance: $${state.available_balance.toLocaleString("en-US")} USD. Total Settlements: ${state.transactions.length}. Connected Agent: ${state.connected_agent_name}`,
               },
             ],
           },
