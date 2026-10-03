@@ -9,9 +9,7 @@ import {
   LogOut,
   Copy,
   Check,
-  ExternalLink,
   Lock,
-  User,
   CheckCircle2,
   Sparkles,
   ArrowRight,
@@ -19,7 +17,6 @@ import {
   Save,
 } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { GoogleIcon } from "@/components/ui/GoogleIcon";
 import { AuthUser } from "@/lib/useAuthUser";
 
@@ -38,7 +35,6 @@ export function ProfileSettingsModal({
   onSignOut,
   onUpdateProfile,
 }: ProfileSettingsModalProps) {
-  const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const [copiedId, setCopiedId] = useState(false);
   const [isEditingName, setIsEditingName] = useState(false);
@@ -49,7 +45,11 @@ export function ProfileSettingsModal({
     setMounted(true);
   }, []);
 
-  const accountId = user.accountId || "VAULT-2026-IN-982";
+  // Neutralized identifier format avoiding hardcoded country codes
+  const accountId =
+    user.accountId && !user.accountId.includes("-IN-")
+      ? user.accountId
+      : "VAULT-2026-0x982F";
 
   const handleCopyId = () => {
     navigator.clipboard.writeText(accountId);
@@ -97,22 +97,23 @@ export function ProfileSettingsModal({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.96, y: 8 }}
             transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-            className="relative w-full max-w-lg rounded-3xl bg-white border border-[#EAE3D2] shadow-[0_24px_64px_rgba(197,155,95,0.18)] overflow-hidden font-montserrat text-[#1C1A17] z-10"
+            className="relative w-full max-w-lg rounded-3xl bg-white border border-zinc-200 shadow-[0_24px_64px_rgba(0,0,0,0.12)] overflow-hidden font-sans text-zinc-900 z-10"
           >
             {/* Top Modal Header */}
-            <div className="flex items-center justify-between border-b border-[#F0E9DC] px-6 py-4 bg-[#FDFCF9]">
-              <div className="flex items-center gap-2">
-                <div className="p-1.5 rounded-lg bg-[#FAF6EE] border border-[#EAE3D2] text-[#9E7A45]">
-                  <ShieldCheck className="w-4 h-4 text-[#C59B5F]" />
+            <div className="flex items-center justify-between border-b border-zinc-100 px-6 py-4 bg-[#FDFCF9]">
+              <div className="flex items-center gap-2.5">
+                <div className="p-1.5 rounded-lg bg-blue-50 border border-blue-100 text-blue-600 flex items-center justify-center">
+                  <ShieldCheck className="w-4 h-4 text-blue-600" />
                 </div>
-                <h2 className="text-sm sm:text-base font-bold text-[#1C1A17] tracking-tight">
-                  Profile & Account Settings
+                <h2 className="text-sm sm:text-base font-bold text-zinc-900 tracking-tight">
+                  Profile &amp; Account Settings
                 </h2>
               </div>
 
               <button
+                type="button"
                 onClick={onClose}
-                className="p-1.5 rounded-full text-[#8C8275] hover:text-[#1C1A17] hover:bg-[#FAF6EE] transition-colors cursor-pointer"
+                className="p-1.5 rounded-full text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 transition-colors cursor-pointer"
                 title="Close"
               >
                 <X className="w-4 h-4" />
@@ -121,10 +122,10 @@ export function ProfileSettingsModal({
 
             <div className="p-6 space-y-6 max-h-[85vh] overflow-y-auto">
               {/* User Identity Hero Section */}
-              <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 p-4 rounded-2xl bg-[#FAF8F5] border border-[#EAE3D2]">
-                {/* Round Profile Avatar with Google Image */}
+              <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 p-4 rounded-2xl bg-zinc-50/70 border border-zinc-200">
+                {/* Round Profile Avatar with subtle blue/zinc ring */}
                 <div className="relative shrink-0">
-                  <div className="w-16 h-16 rounded-full ring-2 ring-[#D4AF37] ring-offset-2 ring-offset-white overflow-hidden bg-gradient-to-tr from-[#FAF1E3] to-[#F5E8D0] flex items-center justify-center shadow-md">
+                  <div className="w-16 h-16 rounded-full ring-2 ring-blue-500/20 ring-offset-2 ring-offset-white border border-zinc-200 overflow-hidden bg-gradient-to-tr from-blue-50 to-blue-100/60 flex items-center justify-center shadow-sm">
                     {user.avatar && !imageError ? (
                       <img
                         src={user.avatar}
@@ -134,7 +135,7 @@ export function ProfileSettingsModal({
                         onError={() => setImageError(true)}
                       />
                     ) : (
-                      <span className="text-lg font-bold text-[#9E7A45] font-mono">
+                      <span className="text-lg font-bold text-blue-600 font-mono">
                         {userInitials}
                       </span>
                     )}
@@ -155,12 +156,13 @@ export function ProfileSettingsModal({
                           type="text"
                           value={nameInput}
                           onChange={(e) => setNameInput(e.target.value)}
-                          className="px-2 py-1 text-sm font-bold border border-[#D4AF37] rounded-lg bg-white focus:outline-none focus:ring-1 focus:ring-[#D4AF37]"
+                          className="px-2.5 py-1 text-sm font-semibold border border-blue-400 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                           autoFocus
                         />
                         <button
+                          type="button"
                           onClick={handleSaveName}
-                          className="p-1.5 text-xs bg-[#C59B5F] text-white rounded-lg hover:bg-[#B38A4F] cursor-pointer"
+                          className="p-1.5 text-xs bg-blue-600 text-white rounded-lg hover:bg-blue-500 cursor-pointer transition-colors"
                           title="Save Name"
                         >
                           <Save className="w-3.5 h-3.5" />
@@ -168,12 +170,13 @@ export function ProfileSettingsModal({
                       </div>
                     ) : (
                       <div className="flex items-center gap-2">
-                        <h3 className="text-base font-bold text-[#1C1A17] truncate">
+                        <h3 className="text-base font-bold text-zinc-900 truncate">
                           {user.name}
                         </h3>
                         <button
+                          type="button"
                           onClick={() => setIsEditingName(true)}
-                          className="text-[#8C8275] hover:text-[#C59B5F] transition-colors p-0.5"
+                          className="text-zinc-400 hover:text-blue-600 transition-colors p-0.5 cursor-pointer"
                           title="Edit Display Name"
                         >
                           <Edit2 className="w-3.5 h-3.5" />
@@ -182,7 +185,7 @@ export function ProfileSettingsModal({
                     )}
                   </div>
 
-                  <p className="text-xs text-[#6E675D] truncate">{user.email}</p>
+                  <p className="text-xs text-zinc-500 truncate">{user.email}</p>
 
                   <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 pt-1">
                     <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
@@ -191,14 +194,14 @@ export function ProfileSettingsModal({
                     </span>
 
                     {user.provider === "google" && (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-white text-[#6E675D] border border-[#EAE3D2]">
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-white text-zinc-600 border border-zinc-200">
                         <GoogleIcon className="w-3 h-3" />
                         <span>Google SSO</span>
                       </span>
                     )}
 
                     {user.provider !== "google" && (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-white text-[#6E675D] border border-[#EAE3D2] uppercase font-mono">
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-white text-zinc-600 border border-zinc-200 uppercase font-mono">
                         {user.provider}
                       </span>
                     )}
@@ -207,33 +210,34 @@ export function ProfileSettingsModal({
               </div>
 
               {/* Institutional Vault Custody Card */}
-              <div className="rounded-2xl bg-white border border-[#EAE3D2] p-4 space-y-3 shadow-xs">
-                <div className="flex items-center justify-between text-xs pb-2 border-b border-[#F0E9DC]">
-                  <span className="text-[#8C8275]">Vault Account Ref</span>
+              <div className="rounded-2xl bg-white border border-zinc-200 p-4 space-y-3 shadow-2xs">
+                <div className="flex items-center justify-between text-xs pb-2 border-b border-zinc-100">
+                  <span className="text-zinc-500 font-medium">Vault Account Ref</span>
                   <button
+                    type="button"
                     onClick={handleCopyId}
-                    className="flex items-center gap-1.5 font-mono text-xs font-semibold text-[#9E7A45] hover:text-[#C59B5F] bg-[#FAF6EE] px-2 py-0.5 rounded border border-[#EAE3D2] cursor-pointer"
+                    className="flex items-center gap-1.5 font-mono tracking-tight text-xs font-semibold text-blue-600 hover:text-blue-700 bg-blue-50/70 hover:bg-blue-100/70 px-2 py-0.5 rounded border border-blue-200/80 cursor-pointer transition-colors"
                     title="Click to copy account ID"
                   >
                     <span>{accountId}</span>
                     {copiedId ? (
                       <Check className="w-3 h-3 text-emerald-600" />
                     ) : (
-                      <Copy className="w-3 h-3" />
+                      <Copy className="w-3 h-3 text-blue-600" />
                     )}
                   </button>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3 pt-1">
-                  <div className="p-2.5 rounded-xl bg-[#FAF8F5] border border-[#EAE3D2]">
-                    <div className="text-[10px] text-[#8C8275]">Vault Available Balance</div>
-                    <div className="text-sm font-bold font-mono text-[#1C1A17] mt-0.5">
+                  <div className="p-3 rounded-xl bg-zinc-50 border border-zinc-200/80">
+                    <div className="text-[10px] font-medium text-zinc-500">Vault Available Balance</div>
+                    <div className="font-sans font-semibold text-lg text-zinc-900 mt-0.5 tabular-nums">
                       10,000 VRS
                     </div>
                   </div>
-                  <div className="p-2.5 rounded-xl bg-[#FAF8F5] border border-[#EAE3D2]">
-                    <div className="text-[10px] text-[#8C8275]">Frozen in Escrow</div>
-                    <div className="text-sm font-bold font-mono text-[#C59B5F] mt-0.5">
+                  <div className="p-3 rounded-xl bg-zinc-50 border border-zinc-200/80">
+                    <div className="text-[10px] font-medium text-zinc-500">Frozen in Escrow</div>
+                    <div className="font-sans font-medium text-lg text-zinc-500 mt-0.5 tabular-nums">
                       0.00 VRS
                     </div>
                   </div>
@@ -242,16 +246,18 @@ export function ProfileSettingsModal({
 
               {/* Protocol Security & Permissions Overview */}
               <div className="space-y-2 text-xs">
-                <div className="text-[11px] font-semibold text-[#8C8275] uppercase tracking-wider">
-                  Security & Protocol Settings
+                <div className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">
+                  Security &amp; Protocol Settings
                 </div>
-                
-                <div className="flex items-center justify-between p-3 rounded-xl bg-[#FDFCF9] border border-[#EAE3D2]">
+
+                <div className="flex items-center justify-between p-3 rounded-xl bg-zinc-50/60 border border-zinc-200">
                   <div className="flex items-center gap-2.5">
-                    <Lock className="w-4 h-4 text-[#C59B5F]" />
+                    <div className="w-8 h-8 rounded-lg bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 shrink-0">
+                      <Lock className="w-4 h-4 text-blue-600" />
+                    </div>
                     <div>
-                      <div className="font-semibold text-[#1C1A17]">Deterministic Vault Protection</div>
-                      <div className="text-[11px] text-[#8C8275]">Non-custodial programmatic invariant</div>
+                      <div className="font-semibold text-zinc-900">Deterministic Vault Protection</div>
+                      <div className="text-[11px] text-zinc-500">Non-custodial programmatic invariant</div>
                     </div>
                   </div>
                   <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 font-medium">
@@ -259,15 +265,17 @@ export function ProfileSettingsModal({
                   </span>
                 </div>
 
-                <div className="flex items-center justify-between p-3 rounded-xl bg-[#FDFCF9] border border-[#EAE3D2]">
+                <div className="flex items-center justify-between p-3 rounded-xl bg-zinc-50/60 border border-zinc-200">
                   <div className="flex items-center gap-2.5">
-                    <Sparkles className="w-4 h-4 text-[#C59B5F]" />
+                    <div className="w-8 h-8 rounded-lg bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 shrink-0">
+                      <Sparkles className="w-4 h-4 text-blue-600" />
+                    </div>
                     <div>
-                      <div className="font-semibold text-[#1C1A17]">FastMCP Agent Clearinghouse</div>
-                      <div className="text-[11px] text-[#8C8275]">Sub-50ms automated escrow execution</div>
+                      <div className="font-semibold text-zinc-900">FastMCP Agent Clearinghouse</div>
+                      <div className="text-[11px] text-zinc-500">Sub-50ms automated escrow execution</div>
                     </div>
                   </div>
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#FAF6EE] text-[#9E7A45] border border-[#EAE3D2] font-medium">
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 border border-blue-200 font-medium">
                     v2.4
                   </span>
                 </div>
@@ -278,15 +286,16 @@ export function ProfileSettingsModal({
                 <Link
                   href="/dashboard"
                   onClick={onClose}
-                  className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-[#C59B5F] hover:bg-[#B38A4F] text-white font-semibold text-xs tracking-wider transition-all shadow-md cursor-pointer"
+                  className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-medium text-xs tracking-wider transition-all shadow-md shadow-blue-500/20 cursor-pointer"
                 >
                   <span>ENTER AGENT CONSOLE</span>
                   <ArrowRight className="w-4 h-4" />
                 </Link>
 
                 <button
+                  type="button"
                   onClick={handleSignOutClick}
-                  className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border border-red-200 hover:border-red-300 text-red-700 bg-red-50/50 hover:bg-red-50 font-medium text-xs transition-colors cursor-pointer"
+                  className="w-full flex items-center justify-center gap-2 border border-zinc-200 hover:border-red-200 text-zinc-600 hover:text-red-600 hover:bg-red-50/50 py-2.5 rounded-xl transition-colors text-sm font-medium cursor-pointer"
                 >
                   <LogOut className="w-3.5 h-3.5" />
                   <span>Sign Out of Verisett</span>
