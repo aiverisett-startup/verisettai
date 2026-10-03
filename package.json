@@ -8,6 +8,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
+    "test:settlement": "npx tsx scripts/test-settlement.ts",
+    "protocol:verify": "npx tsx scripts/test-settlement.ts",
     "video:preview": "remotion preview remotion/index.ts",
     "video:render": "remotion render remotion/index.ts VerisettTeaser out/verisett-teaser.mp4"
   },
