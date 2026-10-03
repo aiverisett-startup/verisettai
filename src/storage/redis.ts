@@ -6,6 +6,8 @@
 
 import crypto from "crypto";
 import { Vault } from "../types";
+import Redis from "ioredis";
+
 
 export interface IVaultStorage {
   getVault(vaultId: string): Promise<Vault | null>;
@@ -223,7 +225,7 @@ export function getVaultStorage(): IVaultStorage {
     try {
       // Attempt dynamic loading of ioredis if configured
       // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const Redis = require("ioredis");
+      // Using static import of Redis
       const client = new Redis(redisUrl, {
         lazyConnect: true,
         maxRetriesPerRequest: 1,

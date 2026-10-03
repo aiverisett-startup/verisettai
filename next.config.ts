@@ -78,6 +78,8 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  // Disable SWC minifier on Windows to avoid native binary errors
+
   // Hide Next.js technology stack fingerprint from vulnerability scanners
   poweredByHeader: false,
   
