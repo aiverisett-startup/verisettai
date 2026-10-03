@@ -63,9 +63,9 @@ export function MinimalFooter() {
             <path
               d="M 90,10 A 80,80 0 0,1 90,170 Z"
               fill="#FAF6EE"
-              stroke="#C59B5F"
+              stroke="#3B82F6"
               strokeWidth="1.2"
-              strokeOpacity="0.3"
+              strokeOpacity="0.2"
             />
           </svg>
         </div>
@@ -76,9 +76,9 @@ export function MinimalFooter() {
             <path
               d="M 90,10 A 80,80 0 0,0 90,170 Z"
               fill="#FAF6EE"
-              stroke="#D4AF37"
+              stroke="#94A3B8"
               strokeWidth="1.2"
-              strokeOpacity="0.3"
+              strokeOpacity="0.2"
             />
           </svg>
         </div>
@@ -89,8 +89,8 @@ export function MinimalFooter() {
           
           <div className="flex items-center gap-3">
             <VerisettLogo size={24} />
-            <span className="text-xs font-montserrat font-semibold text-[#9E7A45]">
-              / Institutional Software &amp; Milestone Escrow
+            <span className="text-xs text-muted-foreground font-medium">
+              / Autonomous M2M Clearinghouse Protocol
             </span>
           </div>
 
@@ -101,13 +101,13 @@ export function MinimalFooter() {
               href="https://github.com/aiverisett-startup"
               target="_blank"
               rel="noopener noreferrer"
-              className="group inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white hover:bg-[#FAF6EE] border border-[#EAE3D2] hover:border-[#1C1A17] shadow-xs hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 text-xs font-montserrat font-medium text-[#1C1A17]"
+              className="group inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white hover:bg-slate-50 border border-[#EAE3D2] hover:border-[#1C1A17] shadow-xs hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 text-xs font-medium text-[#1C1A17]"
             >
               <GithubIcon className="w-4 h-4 shrink-0 text-[#1C1A17] transition-transform duration-300 group-hover:scale-110" />
-              <span className="text-[#6E675D] group-hover:text-[#1C1A17] transition-colors">
+              <span className="text-slate-500 group-hover:text-[#1C1A17] transition-colors">
                 GitHub:
               </span>
-              <span className="font-bold text-[#1C1A17] group-hover:text-[#C59B5F] transition-colors">
+              <span className="font-bold text-[#1C1A17] group-hover:text-blue-600 transition-colors">
                 aiverisett-startup
               </span>
               <ExternalLink className="w-3 h-3 text-[#8C8275] group-hover:text-[#1C1A17] transition-transform group-hover:translate-x-0.5" />
@@ -118,16 +118,16 @@ export function MinimalFooter() {
               href="https://x.com/ai_verisett"
               target="_blank"
               rel="noopener noreferrer"
-              className="group inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white hover:bg-[#FAF6EE] border border-[#EAE3D2] hover:border-[#C59B5F] shadow-xs hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 text-xs font-montserrat font-medium text-[#1C1A17]"
+              className="group inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white hover:bg-slate-50 border border-[#EAE3D2] hover:border-blue-500 shadow-xs hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 text-xs font-medium text-[#1C1A17]"
             >
-              <TwitterXIcon className="w-3.5 h-3.5 shrink-0 text-[#1C1A17] group-hover:text-[#C59B5F] transition-colors" />
-              <span className="text-[#6E675D] group-hover:text-[#1C1A17] transition-colors">
+              <TwitterXIcon className="w-3.5 h-3.5 shrink-0 text-[#1C1A17] group-hover:text-blue-600 transition-colors" />
+              <span className="text-slate-500 group-hover:text-[#1C1A17] transition-colors">
                 X (Twitter):
               </span>
-              <span className="font-bold text-[#9E7A45] group-hover:text-[#C59B5F] transition-colors">
+              <span className="font-bold text-blue-600 group-hover:text-blue-500 transition-colors">
                 @ai_verisett
               </span>
-              <ExternalLink className="w-3 h-3 text-[#8C8275] group-hover:text-[#C59B5F] transition-transform group-hover:translate-x-0.5" />
+              <ExternalLink className="w-3 h-3 text-[#8C8275] group-hover:text-blue-600 transition-transform group-hover:translate-x-0.5" />
             </a>
 
             {/* YouTube Follow Button */}
@@ -135,10 +135,10 @@ export function MinimalFooter() {
               href="https://www.youtube.com/@VerisettAI"
               target="_blank"
               rel="noopener noreferrer"
-              className="group inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white hover:bg-[#FAF6EE] border border-[#EAE3D2] hover:border-[#FF0000]/60 shadow-xs hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 text-xs font-montserrat font-medium text-[#1C1A17]"
+              className="group inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white hover:bg-slate-50 border border-[#EAE3D2] hover:border-[#FF0000]/60 shadow-xs hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 text-xs font-medium text-[#1C1A17]"
             >
               <YouTubeIcon className="w-4 h-4 shrink-0 text-[#FF0000] transition-transform duration-300 group-hover:scale-110" />
-              <span className="text-[#6E675D] group-hover:text-[#1C1A17] transition-colors">
+              <span className="text-slate-500 group-hover:text-[#1C1A17] transition-colors">
                 YouTube:
               </span>
               <span className="font-bold text-[#FF0000] group-hover:text-[#CC0000] transition-colors">
@@ -152,16 +152,16 @@ export function MinimalFooter() {
               href="https://www.instagram.com/ai.verisett/"
               target="_blank"
               rel="noopener noreferrer"
-              className="group inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white hover:bg-[#FAF6EE] border border-[#EAE3D2] hover:border-[#C59B5F] shadow-xs hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 text-xs font-montserrat font-medium text-[#1C1A17]"
+              className="group inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white hover:bg-slate-50 border border-[#EAE3D2] hover:border-blue-500 shadow-xs hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 text-xs font-medium text-[#1C1A17]"
             >
               <InstagramGradientIcon className="w-4 h-4 shrink-0 transition-transform duration-300 group-hover:scale-110" />
-              <span className="text-[#6E675D] group-hover:text-[#1C1A17] transition-colors">
+              <span className="text-slate-500 group-hover:text-[#1C1A17] transition-colors">
                 Instagram:
               </span>
-              <span className="font-bold text-[#9E7A45] group-hover:text-[#C59B5F] transition-colors">
+              <span className="font-bold text-blue-600 group-hover:text-blue-500 transition-colors">
                 @ai.verisett
               </span>
-              <ExternalLink className="w-3 h-3 text-[#8C8275] group-hover:text-[#C59B5F] transition-transform group-hover:translate-x-0.5" />
+              <ExternalLink className="w-3 h-3 text-[#8C8275] group-hover:text-blue-600 transition-transform group-hover:translate-x-0.5" />
             </a>
           </div>
 
@@ -173,13 +173,13 @@ export function MinimalFooter() {
             <span className="w-2.5 h-2.5 rounded-full bg-[#10B981] animate-pulse shrink-0" />
             <p className="text-xs sm:text-sm text-[#1C1A17] font-medium leading-relaxed">
               <span className="font-bold text-[#1C1A17]">Founded &amp; Architected by Manoj S.M.</span>
-              <span className="text-[#6E675D]"> — Deterministic financial settlement for autonomous agent economies.</span>
+              <span className="text-slate-500"> — Deterministic financial settlement for autonomous agent economies.</span>
             </p>
           </div>
           <div className="flex items-center gap-2.5 shrink-0">
             <Link
               href="/about"
-              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FAF8F5] hover:bg-white border border-[#EAE3D2] hover:border-[#9E7A45] text-xs font-medium text-[#9E7A45] transition-all"
+              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-zinc-200 text-zinc-700 hover:bg-zinc-50 text-xs font-medium transition-all"
             >
               <span>About Lead</span>
             </Link>
@@ -187,7 +187,7 @@ export function MinimalFooter() {
               href="https://github.com/aiverisett-startup"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FAF8F5] hover:bg-white border border-[#EAE3D2] hover:border-[#1C1A17] text-xs font-medium text-[#1C1A17] transition-all"
+              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-zinc-200 hover:border-zinc-300 text-xs font-medium text-[#1C1A17] transition-all"
             >
               <GithubIcon className="w-3.5 h-3.5 text-[#1C1A17]" />
               <span>GitHub</span>
@@ -196,7 +196,7 @@ export function MinimalFooter() {
               href="https://x.com/ai_verisett"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FAF8F5] hover:bg-white border border-[#EAE3D2] hover:border-[#C59B5F] text-xs font-medium text-[#1C1A17] transition-all"
+              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-zinc-200 hover:border-blue-400 text-xs font-medium text-[#1C1A17] transition-all"
             >
               <TwitterXIcon className="w-3 h-3 text-[#1C1A17]" />
               <span>X @ai_verisett</span>
@@ -204,37 +204,37 @@ export function MinimalFooter() {
           </div>
         </div>
 
-        <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-montserrat text-[#8C8275]">
+        <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
           <div>
-            © {new Date().getFullYear()} Verisett AI Project / Manoj S.M. All rights reserved.
+            © 2026 Verisett AI. All rights reserved.
           </div>
 
           <div className="flex flex-wrap items-center gap-4 sm:gap-6 font-medium">
-            <Link href="/about" className="text-[#1C1A17] hover:text-[#C59B5F] font-semibold transition-colors">
+            <Link href="/about" className="text-[#1C1A17] hover:text-blue-600 font-semibold transition-colors">
               About
             </Link>
-            <Link href="/security" className="text-[#1C1A17] hover:text-[#C59B5F] font-semibold transition-colors">
+            <Link href="/security" className="text-[#1C1A17] hover:text-blue-600 font-semibold transition-colors">
               Security
             </Link>
-            <Link href="/docs" className="text-[#1C1A17] hover:text-[#C59B5F] font-semibold transition-colors">
+            <Link href="/docs" className="text-[#1C1A17] hover:text-blue-600 font-semibold transition-colors">
               Docs
             </Link>
-            <Link href="/pricing" className="text-[#1C1A17] hover:text-[#C59B5F] font-semibold transition-colors">
+            <Link href="/pricing" className="text-[#1C1A17] hover:text-blue-600 font-semibold transition-colors">
               Pricing
             </Link>
-            <Link href="/terms" className="hover:text-[#C59B5F] transition-colors">
+            <Link href="/terms" className="hover:text-blue-600 transition-colors">
               Terms
             </Link>
-            <Link href="/privacy" className="hover:text-[#C59B5F] transition-colors">
+            <Link href="/privacy" className="hover:text-blue-600 transition-colors">
               Privacy
             </Link>
-            <a href="#milestones" className="hover:text-[#C59B5F] transition-colors">
+            <a href="#milestones" className="hover:text-blue-600 transition-colors">
               Milestones
             </a>
-            <a href="#how-it-works" className="hover:text-[#C59B5F] transition-colors">
+            <a href="#how-it-works" className="hover:text-blue-600 transition-colors">
               How It Works
             </a>
-            <a href="#sandbox" className="hover:text-[#C59B5F] transition-colors">
+            <a href="#sandbox" className="hover:text-blue-600 transition-colors">
               Sandbox
             </a>
           </div>
