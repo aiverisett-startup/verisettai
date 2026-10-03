@@ -219,6 +219,9 @@ export function MinimalFooter() {
             <Link href="/docs" className="text-[#1C1A17] hover:text-[#C59B5F] font-semibold transition-colors">
               Docs
             </Link>
+            <Link href="/pricing" className="text-[#1C1A17] hover:text-[#C59B5F] font-semibold transition-colors">
+              Pricing
+            </Link>
             <Link href="/terms" className="hover:text-[#C59B5F] transition-colors">
               Terms
             </Link>

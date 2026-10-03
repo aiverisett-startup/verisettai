@@ -12,6 +12,7 @@ import { MinimalFooter } from "@/components/landing/MinimalFooter";
 import { MarketplaceWorkers } from "@/components/landing/MarketplaceWorkers";
 import { AIAnswerTarget } from "@/components/landing/AIAnswerTarget";
 import { FAQSection } from "@/components/landing/FAQSection";
+import { PricingSection } from "@/components/landing/PricingSection";
 import { LiveSettlementStream } from "@/components/dashboard/LiveSettlementStream";
 import { ContractLedger } from "@/components/dashboard/ContractLedger";
 import { ContractDrawer } from "@/components/dashboard/ContractDrawer";
@@ -289,7 +290,10 @@ export default function Home() {
       {/* 5. Developer FastMCP & REST Code Section */}
       <DeveloperCodeSection />
 
-      {/* 6. Frequently Asked Questions with FAQPage Structured Data */}
+      {/* 6. Deterministic M2M Pricing & Autonomous Tier Architecture */}
+      <PricingSection />
+
+      {/* 7. Frequently Asked Questions with FAQPage Structured Data */}
       <FAQSection />
 
       {/* 7. Trust, Compliance & Security Invariants */}

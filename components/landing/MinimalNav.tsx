@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
@@ -124,6 +124,9 @@ export function MinimalNav({
           <a href="#how-it-works" className="shrink-0 whitespace-nowrap hover:text-blue-600 transition-colors">
             How It Works
           </a>
+          <a href="#pricing" className="shrink-0 whitespace-nowrap hover:text-blue-600 transition-colors">
+            Pricing
+          </a>
           <Link href="/docs" className="shrink-0 whitespace-nowrap hover:text-blue-600 transition-colors">
             Docs
           </Link>
@@ -247,6 +250,15 @@ export function MinimalNav({
               >
                 <HelpCircle className="w-3.5 h-3.5 text-blue-600" />
                 <span>How It Works</span>
+              </a>
+
+              <a
+                href="#pricing"
+                onClick={closeMobileMenu}
+                className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-50 border border-slate-200 hover:border-blue-400 text-[#09090B] transition-all"
+              >
+                <span className="w-3.5 h-3.5 flex items-center justify-center text-xs font-bold text-blue-600 font-mono">$</span>
+                <span>Pricing</span>
               </a>
 
               <a
