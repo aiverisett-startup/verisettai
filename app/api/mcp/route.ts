@@ -182,7 +182,7 @@ export async function POST(req: NextRequest) {
     if (method === "create_vault") {
       const args = params || {};
       const vId = args.vault_id || args.vaultId || `vlt_${Date.now()}`;
-      const payer = args.payer || args.payer_name || state.connected_agent_name || "Agent A";
+      const payer = args.payer || args.payer_name || clientName || "Agent A";
       const payee = args.payee || args.payee_name || "Agent B";
       const amount = Number(args.amount ?? args.amount_vrs ?? 100);
       const ttl = Number(args.ttl || 300);

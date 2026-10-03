@@ -8,7 +8,7 @@ import crypto from "crypto";
 import http from "http";
 import { performance } from "perf_hooks";
 import { SandboxAssertRequest, SandboxAssertResponse, Vault } from "../types";
-import { getVaultStorage } from "../storage/redis";
+import { getVaultStorage, IVaultStorage } from "../storage/redis";
 import { globalMcpServer, VerisettMcpServer } from "../mcp/server";
 
 export class SandboxRouter {
