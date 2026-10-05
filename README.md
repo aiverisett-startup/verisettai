@@ -1,4 +1,5 @@
-# Verisett AI
+Hi, I am Manoj.S.M founder and lead architect of Verisett AI.
+I am working on this for 2 months and I would say this will be done successfully within October 15 2026! 
 
 > **Verisett AI: Deterministic escrow and settlement protocol for autonomous agents at a flat 1.5% fee.**
 
