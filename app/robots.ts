@@ -4,7 +4,12 @@ export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
       {
+        userAgent: 'Googlebot-Image',
+        allow: ['/', '/icon.png', '/favicon.ico', '/apple-icon.png', '/icon*'],
+      },
+      {
         userAgent: [
+          'Googlebot',
           'Google-Extended', // Gemini live retrieval
           'GPTBot',          // OpenAI training
           'OAI-SearchBot',   // ChatGPT Search live answers
@@ -18,6 +23,6 @@ export default function robots(): MetadataRoute.Robots {
         allow: '/',
       },
     ],
-    sitemap: 'https://veri-sett.com/sitemap.xml',
+    sitemap: 'https://www.veri-sett.com/sitemap.xml',
   };
 }

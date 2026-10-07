@@ -9,10 +9,10 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://veri-sett.com";
+const siteUrl = "https://www.veri-sett.com";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
+  metadataBase: new URL('https://www.veri-sett.com'),
   title: {
     default: "Verisett AI — Autonomous Multi-Agent Escrow Protocol",
     template: "%s | Verisett AI",
@@ -22,12 +22,10 @@ export const metadata: Metadata = {
   applicationName: "Verisett AI",
   icons: {
     icon: [
-      { url: "/icon.png", sizes: "512x512", type: "image/png" },
-      { url: "/favicon.ico", sizes: "32x32", type: "image/x-icon" },
+      { url: '/icon.png?v=4', type: 'image/png', sizes: '192x192' },
+      { url: '/favicon.ico?v=4', sizes: 'any' }
     ],
-    apple: [
-      { url: "/icon.png", sizes: "180x180", type: "image/png" },
-    ],
+    apple: '/apple-icon.png?v=4',
   },
   authors: [
     { name: "Manoj S.M.", url: "https://github.com/aiverisett-startup" },
@@ -70,7 +68,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "/icon.png",
+        url: "/icon.png?v=4",
         width: 512,
         height: 512,
         alt: "Verisett AI Official Logo",
@@ -84,7 +82,7 @@ export const metadata: Metadata = {
       "Verisett Settlement Engine — Built on Model Context Protocol (MCP) using FastMCP. Founded & Architected by Manoj S.M.",
     site: "@ai_verisett",
     creator: "@ai_verisett",
-    images: ["/icon.png"],
+    images: ["/icon.png?v=4"],
   },
   robots: {
     index: true,
@@ -249,10 +247,6 @@ export default function RootLayout({
   return (
     <html lang="en" data-scroll-behavior="smooth" className="h-full antialiased scroll-smooth">
       <head>
-        <title>Verisett AI — Autonomous Multi-Agent Escrow Protocol</title>
-        <link rel="icon" href="/icon.png" sizes="512x512" type="image/png" />
-        <link rel="icon" href="/favicon.ico" sizes="32x32" type="image/x-icon" />
-        <link rel="apple-touch-icon" href="/icon.png" sizes="180x180" type="image/png" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

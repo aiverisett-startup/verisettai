@@ -2,7 +2,7 @@ import { MetadataRoute } from 'next';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   // Ensure this matches your production domain exactly (no trailing slash)
-  const baseUrl = 'https://veri-sett.com';
+  const baseUrl = 'https://www.veri-sett.com';
 
   return [
     {
