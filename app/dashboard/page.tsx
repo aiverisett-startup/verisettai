@@ -109,6 +109,18 @@ export default function DashboardPage() {
   const [depositAmount, setDepositAmount] = useState<string>("10000");
   const [isDepositing, setIsDepositing] = useState<boolean>(false);
 
+  // Payment Success notification state
+  const [paymentSuccessNotice, setPaymentSuccessNotice] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("payment") === "success") {
+        setPaymentSuccessNotice(true);
+      }
+    }
+  }, []);
+
   // Currency calculations (1 USD ≈ 84 INR)
   const balanceINR = balancePaise / 100;
   const balanceUSD = balanceINR / 84;
@@ -621,6 +633,24 @@ export default function DashboardPage() {
             </button>
           </div>
         </header>
+
+        {/* Payment Success Alert Banner */}
+        {paymentSuccessNotice && (
+          <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs sm:text-sm font-semibold flex items-center justify-between gap-3 shadow-xs animate-in fade-in">
+            <div className="flex items-center gap-2.5">
+              <Sparkles className="w-5 h-5 text-emerald-600 shrink-0" />
+              <span>
+                Payment Confirmed: Your Founder Node Pass (₹29,999.00) is active with permanent 0.75% take-rate!
+              </span>
+            </div>
+            <button
+              onClick={() => setPaymentSuccessNotice(false)}
+              className="text-xs font-mono text-emerald-700 hover:text-emerald-900 px-2.5 py-1 rounded-lg bg-emerald-100/70 cursor-pointer"
+            >
+              Dismiss
+            </button>
+          </div>
+        )}
 
         {/* Top Overview Bar: User Profile, Dual Realtime Balance, Settlement Metrics */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
