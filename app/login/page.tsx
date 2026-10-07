@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, Suspense } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
@@ -31,6 +31,26 @@ type AuthMode = "signin" | "signup" | "magic_link";
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const targetDestination = searchParams.get("redirect") || searchParams.get("next") || "/dashboard";
+
+  // On initial mount / render, check the active Supabase session
+  useEffect(() => {
+    let isMounted = true;
+    const checkActiveSession = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user && isMounted) {
+          router.replace(targetDestination);
+        }
+      } catch {
+        // Ignore session checking errors
+      }
+    };
+    checkActiveSession();
+    return () => {
+      isMounted = false;
+    };
+  }, [router, targetDestination]);
 
   // Auth Mode: signin | signup | magic_link
   const [authMode, setAuthMode] = useState<AuthMode>("signin");
@@ -120,7 +140,7 @@ function LoginForm() {
         const { error } = await supabase.auth.signInWithOtp({
           email: trimmedEmail,
           options: {
-            emailRedirectTo: `${typeof window !== "undefined" ? window.location.origin : ""}/auth/callback?next=/`,
+            emailRedirectTo: `${typeof window !== "undefined" ? window.location.origin : ""}/auth/callback?next=${encodeURIComponent(targetDestination)}`,
           },
         });
 
@@ -136,7 +156,7 @@ function LoginForm() {
             localStorage.setItem("verisett_user_name", trimmedEmail.split("@")[0]);
             localStorage.setItem("verisett_auth_provider", "magic_link");
             dispatchAuthChange();
-            setTimeout(() => router.push("/"), 1200);
+            setTimeout(() => router.push(targetDestination), 800);
             return;
           }
           throw error;
@@ -197,7 +217,7 @@ function LoginForm() {
             localStorage.setItem("verisett_user_name", trimmedEmail.split("@")[0]);
             localStorage.setItem("verisett_auth_provider", "email");
             dispatchAuthChange();
-            setTimeout(() => router.push("/"), 1200);
+            setTimeout(() => router.push(targetDestination), 800);
             return;
           }
           throw error;
@@ -214,14 +234,14 @@ function LoginForm() {
             type: "success",
             message: "Account created and authenticated! Entering portal...",
           });
-          setTimeout(() => router.push("/"), 800);
+          setTimeout(() => router.push(targetDestination), 600);
         } else {
           setFeedback({
             type: "success",
             message:
               "Account registered! Verification link sent to your email. Redirecting...",
           });
-          setTimeout(() => router.push("/"), 1500);
+          setTimeout(() => router.push(targetDestination), 1000);
         }
       } catch (err: unknown) {
         const msg = err instanceof Error ? err.message : "Registration failed. Please try again.";
@@ -259,7 +279,7 @@ function LoginForm() {
           localStorage.setItem("verisett_user_name", trimmedEmail.split("@")[0]);
           localStorage.setItem("verisett_auth_provider", "email");
           dispatchAuthChange();
-          setTimeout(() => router.push("/"), 1000);
+          setTimeout(() => router.push(targetDestination), 800);
           return;
         }
 
@@ -288,7 +308,7 @@ function LoginForm() {
           localStorage.setItem("verisett_user_name", trimmedEmail.split("@")[0]);
           localStorage.setItem("verisett_auth_provider", "email");
           dispatchAuthChange();
-          setTimeout(() => router.push("/"), 1000);
+          setTimeout(() => router.push(targetDestination), 800);
           return;
         }
 
@@ -305,7 +325,7 @@ function LoginForm() {
         type: "success",
         message: "Credentials verified. Connecting to enterprise vault...",
       });
-      setTimeout(() => router.push("/"), 600);
+      setTimeout(() => router.push(targetDestination), 500);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Authentication failed.";
       setFeedback({ type: "error", message: msg });
@@ -357,8 +377,9 @@ function LoginForm() {
           theme="light"
           buttonText="Continue with Google"
           className="font-montserrat"
+          redirect={targetDestination}
           onSuccess={() => {
-            router.push("/");
+            router.push(targetDestination);
           }}
         />
 
@@ -366,16 +387,18 @@ function LoginForm() {
           theme="light"
           buttonText="Continue with GitHub"
           className="font-montserrat"
+          redirect={targetDestination}
           onSuccess={() => {
-            router.push("/");
+            router.push(targetDestination);
           }}
         />
 
         <TwitterSignInButton
           className="font-montserrat"
           buttonText="Continue with X"
+          redirect={targetDestination}
           onSuccess={() => {
-            router.push("/");
+            router.push(targetDestination);
           }}
         />
       </div>

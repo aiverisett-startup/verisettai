@@ -1,3 +1,4 @@
+import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 // In-memory rate limiting store for edge requests
@@ -53,7 +54,7 @@ const MALICIOUS_PATH_PATTERNS = [
   /\.\./,  // Path traversal
 ];
 
-export function proxy(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
   const rawPath = `${pathname}${search}`;
 
@@ -77,10 +78,14 @@ export function proxy(request: NextRequest) {
   if (pathname.startsWith("/auth/callback")) {
     const nextParam = request.nextUrl.searchParams.get("next");
     if (nextParam) {
-      // Reject any non-relative URLs or protocol-relative URLs (e.g. //evil.com, https://attacker.com)
-      if (!nextParam.startsWith("/") || nextParam.startsWith("//") || nextParam.startsWith("/\\") || nextParam.includes(":")) {
+      if (
+        !nextParam.startsWith("/") ||
+        nextParam.startsWith("//") ||
+        nextParam.startsWith("/\\") ||
+        nextParam.includes(":")
+      ) {
         const sanitizedUrl = request.nextUrl.clone();
-        sanitizedUrl.searchParams.set("next", "/");
+        sanitizedUrl.searchParams.set("next", "/dashboard");
         return NextResponse.redirect(sanitizedUrl);
       }
     }
@@ -91,7 +96,6 @@ export function proxy(request: NextRequest) {
     const forwardedFor = request.headers.get("x-forwarded-for");
     const ip = forwardedFor ? forwardedFor.split(",")[0].trim() : "127.0.0.1";
 
-    // Strict rate limit on contact submission (5 per minute per IP)
     if (pathname === "/api/contact") {
       const allowed = checkRateLimit(ip, "contact", 5, 60 * 1000);
       if (!allowed) {
@@ -111,7 +115,6 @@ export function proxy(request: NextRequest) {
       }
     }
 
-    // Rate limit on auth endpoints (25 per minute per IP)
     if (pathname.startsWith("/api/auth/")) {
       const allowed = checkRateLimit(ip, "auth", 25, 60 * 1000);
       if (!allowed) {
@@ -131,7 +134,6 @@ export function proxy(request: NextRequest) {
       }
     }
 
-    // General API rate limit (60 requests per minute per IP)
     const generalAllowed = checkRateLimit(ip, "general_api", 60, 60 * 1000);
     if (!generalAllowed) {
       return new NextResponse(
@@ -150,19 +152,73 @@ export function proxy(request: NextRequest) {
     }
   }
 
-  // 4. Inject runtime security headers into downstream responses
-  const response = NextResponse.next();
-  response.headers.set("X-Content-Type-Options", "nosniff");
-  response.headers.set("X-Frame-Options", "DENY");
-  response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+  // 4. Supabase Session Validation & Cookie Sync via @supabase/ssr
+  let supabaseResponse = NextResponse.next({
+    request,
+  });
 
-  return response;
+  const supabaseUrl =
+    process.env.NEXT_PUBLIC_SUPABASE_URL || "https://lpoconfurcrrkndguycr.supabase.co";
+  const supabaseAnonKey =
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxwb2NvbmZ1cmNycmtuZGd1eWNyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkyMTIzNDIsImV4cCI6MjEwNDc4ODM0Mn0.3yyJUB6duad7COImmhU8afbMoDtOOi7NaaWzL8jHiTA";
+
+  const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
+    cookies: {
+      getAll() {
+        return request.cookies.getAll();
+      },
+      setAll(cookiesToSet) {
+        cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
+        supabaseResponse = NextResponse.next({
+          request,
+        });
+        cookiesToSet.forEach(({ name, value, options }) =>
+          supabaseResponse.cookies.set(name, value, options)
+        );
+      },
+    },
+  });
+
+  // Read current user
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  // 5. Route Protection Rules
+  // Any unauthenticated request to /dashboard/* or /checkout/* must redirect to /login?redirect=<path>
+  const isDashboardRoute = pathname === "/dashboard" || pathname.startsWith("/dashboard/");
+  const isCheckoutRoute = pathname === "/checkout" || pathname.startsWith("/checkout/");
+
+  if ((isDashboardRoute || isCheckoutRoute) && !user) {
+    const redirectPath = `${pathname}${search}`;
+    const loginUrl = new URL(`/login?redirect=${encodeURIComponent(redirectPath)}`, request.url);
+    const redirectResponse = NextResponse.redirect(loginUrl);
+    supabaseResponse.cookies.getAll().forEach((c) => {
+      redirectResponse.cookies.set(c.name, c.value);
+    });
+    return redirectResponse;
+  }
+
+  // Any authenticated user navigating to /login or /signup must automatically redirect to /dashboard
+  const isAuthRoute = pathname === "/login" || pathname === "/signup";
+  if (isAuthRoute && user) {
+    const dashboardUrl = new URL("/dashboard", request.url);
+    const redirectResponse = NextResponse.redirect(dashboardUrl);
+    supabaseResponse.cookies.getAll().forEach((c) => {
+      redirectResponse.cookies.set(c.name, c.value);
+    });
+    return redirectResponse;
+  }
+
+  // Inject security headers
+  supabaseResponse.headers.set("X-Content-Type-Options", "nosniff");
+  supabaseResponse.headers.set("X-Frame-Options", "DENY");
+  supabaseResponse.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+
+  return supabaseResponse;
 }
 
-// Default export for maximum compatibility
-export default proxy;
-
-// Configure proxy matching: apply to all requests except static assets
 export const config = {
   matcher: [
     "/((?!_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|.*\\.(?:svg|png|jpg|jpeg|gif|webp|webm|mp4)).*)",

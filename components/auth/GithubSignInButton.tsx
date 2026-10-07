@@ -10,12 +10,14 @@ interface GithubSignInButtonProps {
   className?: string;
   buttonText?: string;
   theme?: "light" | "dark";
+  redirect?: string;
 }
 
 export function GithubSignInButton({
   onSuccess,
   className = "",
   buttonText = "Continue with GitHub",
+  redirect = "/dashboard",
 }: GithubSignInButtonProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -25,10 +27,11 @@ export function GithubSignInButton({
     setIsLoading(true);
     setNotice(null);
     try {
+      const target = redirect || "/dashboard";
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "github",
         options: {
-          redirectTo: `${typeof window !== "undefined" ? window.location.origin : ""}/auth/callback?next=/`,
+          redirectTo: `${typeof window !== "undefined" ? window.location.origin : ""}/auth/callback?next=${encodeURIComponent(target)}`,
         },
       });
 

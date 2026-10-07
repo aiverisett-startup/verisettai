@@ -163,6 +163,16 @@ export function MinimalNav({
             </button>
           )}
 
+          {isLoaded && user && (
+            <Link
+              href="/dashboard"
+              className="shrink-0 hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold whitespace-nowrap shadow-xs transition-colors"
+            >
+              <span>Dashboard</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          )}
+
           {isLoaded && user ? (
             <button
               onClick={() => setIsProfileModalOpen(true)}

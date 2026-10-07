@@ -11,12 +11,14 @@ interface TwitterSignInButtonProps {
   className?: string;
   buttonText?: string;
   theme?: "light" | "dark";
+  redirect?: string;
 }
 
 export function TwitterSignInButton({
   onSuccess,
   className = "",
   buttonText = "Continue with X",
+  redirect = "/dashboard",
 }: TwitterSignInButtonProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -26,11 +28,12 @@ export function TwitterSignInButton({
     setIsLoading(true);
     setNotice(null);
     try {
+      const target = redirect || "/dashboard";
       // Connect to Supabase client auth with 'x' (and graceful 'twitter' fallback)
       let res = await supabase.auth.signInWithOAuth({
         provider: "x" as any,
         options: {
-          redirectTo: `${typeof window !== "undefined" ? window.location.origin : ""}/auth/callback`,
+          redirectTo: `${typeof window !== "undefined" ? window.location.origin : ""}/auth/callback?next=${encodeURIComponent(target)}`,
         },
       });
 
@@ -38,7 +41,7 @@ export function TwitterSignInButton({
         res = await supabase.auth.signInWithOAuth({
           provider: "twitter",
           options: {
-            redirectTo: `${typeof window !== "undefined" ? window.location.origin : ""}/auth/callback`,
+            redirectTo: `${typeof window !== "undefined" ? window.location.origin : ""}/auth/callback?next=${encodeURIComponent(target)}`,
           },
         });
       }

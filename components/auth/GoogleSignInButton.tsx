@@ -16,6 +16,7 @@ interface GoogleSignInButtonProps {
   className?: string;
   buttonText?: string;
   theme?: "light" | "dark";
+  redirect?: string;
 }
 
 interface GoogleJwtPayload {
@@ -47,6 +48,7 @@ export function GoogleSignInButton({
   onSuccess,
   className = "",
   buttonText = "Continue with Google",
+  redirect = "/dashboard",
 }: GoogleSignInButtonProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -84,7 +86,7 @@ export function GoogleSignInButton({
     if (onSuccess) {
       onSuccess(userData);
     } else {
-      router.push("/");
+      router.push(redirect || "/dashboard");
     }
   };
 
@@ -126,10 +128,11 @@ export function GoogleSignInButton({
 
     // 1. Try Google OAuth via Supabase
     try {
+      const target = redirect || "/dashboard";
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: `${typeof window !== "undefined" ? window.location.origin : ""}/auth/callback?next=/`,
+          redirectTo: `${typeof window !== "undefined" ? window.location.origin : ""}/auth/callback?next=${encodeURIComponent(target)}`,
         },
       });
 
