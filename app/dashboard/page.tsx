@@ -29,6 +29,7 @@ import {
 import { VerisettLogo } from "@/components/VerisettLogo";
 import { GoldenBackgroundShapes } from "@/components/ui/GoldenBackgroundShapes";
 import { AgentTransactionChart } from "@/components/dashboard/AgentTransactionChart";
+import { TransactionChart } from "@/components/dashboard/TransactionChart";
 import { supabase } from "@/lib/supabase";
 import { dispatchAuthChange } from "@/lib/useAuthUser";
 import { TransactionItem } from "@/lib/agentTransactionStorage";
@@ -48,8 +49,11 @@ interface VaultRecord {
   user_id: string;
   name: string;
   balance: number;
+  balance_cents?: number;
   currency: string;
   status: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 interface SettlementRecord {
@@ -59,6 +63,18 @@ interface SettlementRecord {
   fee: number;
   status: "SETTLED" | "DISPUTED" | "FAILED" | "PENDING";
   job_title?: string;
+  created_at: string;
+}
+
+interface LedgerEntryRecord {
+  id: string;
+  user_id: string;
+  vault_id?: string;
+  transaction_id: string;
+  entry_type: "DEBIT" | "CREDIT";
+  amount: number;
+  currency: string;
+  description: string;
   created_at: string;
 }
 
@@ -93,6 +109,8 @@ export default function DashboardPage() {
   const [vaultId, setVaultId] = useState<string>("VLT-PRIMARY");
 
   // Agents & Settlements
+  const [vaults, setVaults] = useState<VaultRecord[]>([]);
+  const [ledgerEntries, setLedgerEntries] = useState<LedgerEntryRecord[]>([]);
   const [agents, setAgents] = useState<AgentRecord[]>([]);
   const [settlements, setSettlements] = useState<SettlementRecord[]>([]);
   const [transactions, setTransactions] = useState<TransactionItem[]>([]);
@@ -221,6 +239,7 @@ export default function DashboardPage() {
         .order("created_at", { ascending: false });
 
       if (vaultRows && vaultRows.length > 0) {
+        setVaults(vaultRows as VaultRecord[]);
         setVaultId(vaultRows[0].id.slice(0, 8).toUpperCase());
         if (verifiedPaise === 0 && vaultRows[0].balance_cents) {
           verifiedPaise = Number(vaultRows[0].balance_cents);
@@ -241,11 +260,27 @@ export default function DashboardPage() {
           .maybeSingle();
 
         if (newVault) {
+          setVaults([newVault as VaultRecord]);
           setVaultId(newVault.id.slice(0, 8).toUpperCase());
         }
       }
 
       setBalancePaise(verifiedPaise);
+
+      // Query ledger_entries for velocity analytics
+      try {
+        const { data: ledgerRows } = await supabase
+          .from("ledger_entries")
+          .select("*")
+          .eq("user_id", userId)
+          .order("created_at", { ascending: false });
+
+        if (ledgerRows) {
+          setLedgerEntries(ledgerRows as LedgerEntryRecord[]);
+        }
+      } catch (ledgerErr) {
+        console.warn("Could not fetch ledger_entries:", ledgerErr);
+      }
 
       // 2. Query public.api_keys for existing active keys
       try {
@@ -461,6 +496,65 @@ export default function DashboardPage() {
       disputeRate: disputeRate.toFixed(1),
     };
   }, [settlements]);
+
+  // Escrow Clearing Velocity: Daily counts for the last 7 days from vaults & ledger_entries
+  const velocityChartData = useMemo(() => {
+    const days: Array<{ date: string; dateKey: string; completed: number; incomplete: number }> = [];
+    const now = new Date();
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(now);
+      d.setDate(d.getDate() - i);
+      const dateKey = d.toISOString().split("T")[0];
+      const dateLabel = d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+      days.push({
+        date: dateLabel,
+        dateKey,
+        completed: 0,
+        incomplete: 0,
+      });
+    }
+
+    // Tally daily counts from vaults
+    vaults.forEach((v) => {
+      const vDate = v.created_at || v.updated_at;
+      if (!vDate) return;
+      const vKey = new Date(vDate).toISOString().split("T")[0];
+      const targetDay = days.find((d) => d.dateKey === vKey);
+      if (targetDay) {
+        const st = (v.status || "").toUpperCase();
+        if (st === "SETTLED" || st === "VERIFIED") {
+          targetDay.completed += 1;
+        } else if (
+          st === "CREATED" ||
+          st === "FUNDED" ||
+          st === "WORKING" ||
+          st === "PENDING" ||
+          st === "ACTIVE" ||
+          st === "ACTIVE CUSTODY"
+        ) {
+          targetDay.incomplete += 1;
+        }
+      }
+    });
+
+    // Also factor in completed ledger_entries
+    ledgerEntries.forEach((l) => {
+      if (!l.created_at) return;
+      const lKey = new Date(l.created_at).toISOString().split("T")[0];
+      const targetDay = days.find((d) => d.dateKey === lKey);
+      if (targetDay) {
+        if (l.entry_type === "CREDIT") {
+          targetDay.completed += 1;
+        }
+      }
+    });
+
+    return days.map(({ date, completed, incomplete }) => ({
+      date,
+      completed,
+      incomplete,
+    }));
+  }, [vaults, ledgerEntries]);
 
   // Handle FastMCP Key Generation
   const handleGenerateFastMcpKey = async () => {
@@ -801,6 +895,9 @@ export default function DashboardPage() {
             </div>
           </div>
         </div>
+
+        {/* ESCROW CLEARING VELOCITY LINE GRAPH */}
+        <TransactionChart data={velocityChartData} />
 
         {/* MAIN BODY: ZERO-AGENT STATE vs ACTIVE-AGENT STATE */}
         {agents.length === 0 ? (
