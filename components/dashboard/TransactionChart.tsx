@@ -33,10 +33,10 @@ export function TransactionChart({ data }: TransactionChartProps) {
 
   const chartData = data && data.length > 0 ? data : fallbackDays;
 
-  // Chart Dimension Math (Linear / Apple compact geometry)
-  const SVG_WIDTH = 700;
-  const SVG_HEIGHT = 190;
-  const PADDING = { top: 20, right: 24, bottom: 28, left: 32 };
+  // Big, expansive canvas geometry
+  const SVG_WIDTH = 960;
+  const SVG_HEIGHT = 270;
+  const PADDING = { top: 25, right: 35, bottom: 35, left: 45 };
   const PLOT_W = SVG_WIDTH - PADDING.left - PADDING.right;
   const PLOT_H = SVG_HEIGHT - PADDING.top - PADDING.bottom;
 
@@ -50,7 +50,7 @@ export function TransactionChart({ data }: TransactionChartProps) {
 
   // Subtle Horizontal Gridlines
   const gridLines = useMemo(() => {
-    const steps = 3;
+    const steps = 4;
     return Array.from({ length: steps + 1 }, (_, i) => {
       const ratio = i / steps;
       const y = PADDING.top + PLOT_H * (1 - ratio);
@@ -126,40 +126,40 @@ export function TransactionChart({ data }: TransactionChartProps) {
   );
 
   return (
-    <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-6 shadow-xs font-sans">
-      {/* Minimalist Header & Linear Pill Legend */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-5">
+    <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-3xl p-6 sm:p-8 lg:p-9 shadow-sm font-sans">
+      {/* Expansive Header & Linear Pill Legend */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-neutral-100 dark:border-neutral-800/80 mb-2">
         <div>
-          <h3 className="text-[14px] font-medium text-neutral-900 dark:text-neutral-100 tracking-tight">
+          <h3 className="text-base sm:text-lg font-semibold text-neutral-900 dark:text-neutral-100 tracking-tight">
             Settlement Velocity
           </h3>
-          <p className="text-[12px] text-neutral-500 dark:text-neutral-400 mt-0.5">
+          <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 mt-1">
             Past 7 days cleared vs pending volume
           </p>
         </div>
 
         {/* Clean Pill Legend */}
-        <div className="flex items-center gap-2">
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-neutral-50 dark:bg-neutral-800/60 border border-neutral-200/80 dark:border-neutral-800 text-[12px] text-neutral-600 dark:text-neutral-300">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#059669]" />
+        <div className="flex items-center gap-2.5">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-neutral-50 dark:bg-neutral-800/60 border border-neutral-200/80 dark:border-neutral-800 text-xs sm:text-sm font-medium text-neutral-700 dark:text-neutral-200">
+            <span className="w-2 h-2 rounded-full bg-[#059669]" />
             <span>Cleared</span>
-            <span className="text-[11px] font-mono text-neutral-400 ml-0.5">({totalCompleted})</span>
+            <span className="text-xs font-mono text-neutral-400 ml-1">({totalCompleted})</span>
           </div>
 
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-neutral-50 dark:bg-neutral-800/60 border border-neutral-200/80 dark:border-neutral-800 text-[12px] text-neutral-600 dark:text-neutral-300">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#64748b]" />
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-neutral-50 dark:bg-neutral-800/60 border border-neutral-200/80 dark:border-neutral-800 text-xs sm:text-sm font-medium text-neutral-700 dark:text-neutral-200">
+            <span className="w-2 h-2 rounded-full bg-[#64748b]" />
             <span>Pending</span>
-            <span className="text-[11px] font-mono text-neutral-400 ml-0.5">({totalInFlight})</span>
+            <span className="text-xs font-mono text-neutral-400 ml-1">({totalInFlight})</span>
           </div>
         </div>
       </div>
 
-      {/* SVG Canvas */}
-      <div className="relative w-full overflow-hidden">
+      {/* Large SVG Canvas */}
+      <div className="relative w-full overflow-hidden pt-2">
         <svg
           viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`}
           preserveAspectRatio="none"
-          className="w-full h-44 sm:h-48 select-none"
+          className="w-full h-64 sm:h-72 md:h-80 select-none"
           onMouseLeave={() => setHoveredIndex(null)}
         >
           <defs>
@@ -189,10 +189,10 @@ export function TransactionChart({ data }: TransactionChartProps) {
               />
               {val !== "" && (
                 <text
-                  x={PADDING.left - 8}
+                  x={PADDING.left - 10}
                   y={y + 3.5}
                   textAnchor="end"
-                  className="text-[10px] font-mono fill-neutral-400 dark:fill-neutral-500 font-normal select-none"
+                  className="text-[11px] font-mono fill-neutral-400 dark:fill-neutral-500 font-normal select-none"
                 >
                   {val}
                 </text>
@@ -209,27 +209,27 @@ export function TransactionChart({ data }: TransactionChartProps) {
             />
           )}
 
-          {/* Pending Line: Thin stroke 1.75 in Muted Slate (#64748b) with dashed pattern */}
+          {/* Pending Line: Thin stroke 2 in Muted Slate (#64748b) with dashed pattern */}
           {!allZero && (
             <path
               d={incompleteLinePath}
               fill="none"
               stroke="#64748b"
-              strokeWidth={1.75}
-              strokeDasharray="3 3"
+              strokeWidth={2}
+              strokeDasharray="4 4"
               strokeLinecap="round"
               strokeLinejoin="round"
               className="transition-all duration-200"
             />
           )}
 
-          {/* Cleared Line: Thin flat stroke 1.75 in Emerald (#059669) */}
+          {/* Cleared Line: Thin flat stroke 2 in Emerald (#059669) */}
           {!allZero && (
             <path
               d={completedLinePath}
               fill="none"
               stroke="#059669"
-              strokeWidth={1.75}
+              strokeWidth={2}
               strokeLinecap="round"
               strokeLinejoin="round"
               className="transition-all duration-200"
@@ -261,7 +261,7 @@ export function TransactionChart({ data }: TransactionChartProps) {
                   <circle
                     cx={pt.x}
                     cy={pt.incompleteY}
-                    r={isHovered ? 4 : 3}
+                    r={isHovered ? 5 : 3.5}
                     fill="#64748b"
                     stroke="#ffffff"
                     strokeWidth={1.5}
@@ -274,7 +274,7 @@ export function TransactionChart({ data }: TransactionChartProps) {
                   <circle
                     cx={pt.x}
                     cy={pt.completedY}
-                    r={isHovered ? 4.5 : 3}
+                    r={isHovered ? 5.5 : 4}
                     fill="#059669"
                     stroke="#ffffff"
                     strokeWidth={1.5}
@@ -284,21 +284,21 @@ export function TransactionChart({ data }: TransactionChartProps) {
 
                 {/* Clean Transparent Hitbox for Hover */}
                 <rect
-                  x={pt.x - 24}
+                  x={pt.x - 30}
                   y={PADDING.top}
-                  width={48}
-                  height={PLOT_H + 16}
+                  width={60}
+                  height={PLOT_H + 20}
                   fill="transparent"
                   className="cursor-pointer"
                   onMouseEnter={() => setHoveredIndex(idx)}
                 />
 
-                {/* Subtle small uppercase date labels along X-axis */}
+                {/* Subtle uppercase date labels along X-axis */}
                 <text
                   x={pt.x}
-                  y={SVG_HEIGHT - 6}
+                  y={SVG_HEIGHT - 8}
                   textAnchor="middle"
-                  className={`text-[10px] font-mono uppercase tracking-wider transition-colors select-none ${
+                  className={`text-[11px] font-mono uppercase tracking-wider transition-colors select-none ${
                     isHovered
                       ? "fill-neutral-900 dark:fill-neutral-100 font-semibold"
                       : "fill-neutral-400 dark:fill-neutral-500 font-normal"
@@ -319,8 +319,8 @@ export function TransactionChart({ data }: TransactionChartProps) {
               left: `${(points[hoveredIndex].x / SVG_WIDTH) * 100}%`,
             }}
           >
-            <div className="bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 px-2.5 py-1.5 rounded-md shadow-md text-[11px] font-sans space-y-1 min-w-[120px] border border-neutral-800 dark:border-neutral-200">
-              <div className="text-[10px] font-mono text-neutral-400 dark:text-neutral-500 pb-0.5 border-b border-neutral-800 dark:border-neutral-100">
+            <div className="bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 px-3 py-2 rounded-xl shadow-lg text-xs font-sans space-y-1.5 min-w-[130px] border border-neutral-800 dark:border-neutral-200">
+              <div className="text-[11px] font-mono text-neutral-400 dark:text-neutral-500 pb-1 border-b border-neutral-800 dark:border-neutral-100">
                 {points[hoveredIndex].data.date.toUpperCase()}
               </div>
               <div className="flex items-center justify-between text-emerald-400 dark:text-emerald-700">
