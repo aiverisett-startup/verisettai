@@ -12,7 +12,25 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { TelemetryStats } from "./types";
-import { liveTickerItems } from "./launchData";
+
+const liveTickerItems = [
+  {
+    contractId: "vst_fastmcp_core",
+    payer: "FastMCP Consensus Node",
+    worker: "Autonomous Escrow Verification Rail",
+    amount: "Active",
+    state: "Listening to Ledger Movements",
+    badgeColor: "emerald",
+  },
+  {
+    contractId: "vst_settle_rail",
+    payer: "Orchestrator Swarm",
+    worker: "Double-Entry Ledger Verification",
+    amount: "Standing By",
+    state: "Deterministic Consensus Ready",
+    badgeColor: "emerald",
+  },
+];
 
 interface LiveSettlementStreamProps {
   telemetry: TelemetryStats;

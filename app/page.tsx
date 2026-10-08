@@ -30,17 +30,22 @@ import {
   TelemetryStats,
   VaultBalance,
 } from "@/components/dashboard/types";
-import {
-  initialContracts,
-  initialTelemetry,
-  initialVaultBalance,
-} from "@/components/dashboard/launchData";
 
 export default function Home() {
   const [envMode, setEnvMode] = useState<EnvironmentMode>("sandbox");
-  const [vaultBalance, setVaultBalance] = useState<VaultBalance>(initialVaultBalance);
-  const [telemetry, setTelemetry] = useState<TelemetryStats>(initialTelemetry);
-  const [contracts, setContracts] = useState<ContractRecord[]>(initialContracts);
+  const [vaultBalance, setVaultBalance] = useState<VaultBalance>({
+    total_custody_cents: 0,
+    available_cents: 0,
+    frozen_cents: 0,
+    currency: "USDC",
+  });
+  const [telemetry, setTelemetry] = useState<TelemetryStats>({
+    volume_24h_cents: 0,
+    total_contracts: 0,
+    success_rate: 100.0,
+    avg_latency_ms: 24,
+  });
+  const [contracts, setContracts] = useState<ContractRecord[]>([]);
   const [selectedContract, setSelectedContract] = useState<ContractRecord | null>(null);
   const [isDepositModalOpen, setIsDepositModalOpen] = useState<boolean>(false);
   const [isVideoModalOpen, setIsVideoModalOpen] = useState<boolean>(false);
@@ -50,6 +55,21 @@ export default function Home() {
 
   useEffect(() => {
     let isMounted = true;
+
+    // Fetch live protocol statistics from Supabase
+    fetch("/api/protocol/stats")
+      .then((res) => res.json())
+      .then((stats) => {
+        if (stats && isMounted) {
+          setTelemetry((prev) => ({
+            ...prev,
+            total_contracts: stats.totalCleared || 0,
+            volume_24h_cents: Math.round((stats.totalVolumeUSD || 0) * 100),
+          }));
+        }
+      })
+      .catch(() => {});
+
     const checkLegalConsent = async () => {
       try {
         const storedEmail = localStorage.getItem("verisett_user_email");

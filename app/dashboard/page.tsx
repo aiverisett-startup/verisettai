@@ -28,7 +28,6 @@ import {
 } from "lucide-react";
 import { VerisettLogo } from "@/components/VerisettLogo";
 import { GoldenBackgroundShapes } from "@/components/ui/GoldenBackgroundShapes";
-import { AgentTransactionChart } from "@/components/dashboard/AgentTransactionChart";
 import { TransactionChart } from "@/components/dashboard/TransactionChart";
 import { supabase } from "@/lib/supabase";
 import { dispatchAuthChange } from "@/lib/useAuthUser";
@@ -346,66 +345,7 @@ export default function DashboardPage() {
         }));
         setTransactions(mappedTx);
       } else {
-        // Seed default historical telemetry
-        const defaultChartTx: TransactionItem[] = [
-          {
-            id: "tx-init-1",
-            fromAgent: { name: "Data Ingestion Agent", model: "FastMCP", avatarBg: "#2563EB", agentId: "node-1" },
-            toAgent: { name: "Settlement Clearinghouse", model: "Verisett Core", avatarBg: "#059669", agentId: "vlt-1" },
-            amountINR: 21000,
-            commissionRate: 0.0075,
-            status: "SUCCESSFUL",
-            timestamp: new Date(Date.now() - 86400000 * 24).toISOString(),
-            dateStr: "2026-09-13",
-            timeStr: "10:30 AM",
-            milestoneTitle: "Data Pipeline Consensus Clearance",
-            sha256Proof: "0x89f4b3c92e105d14a28b9c6e3d2a1f04",
-            clearingRail: "FastMCP / HDFC",
-          },
-          {
-            id: "tx-init-2",
-            fromAgent: { name: "Worker Swarm #4", model: "LangChain", avatarBg: "#2563EB", agentId: "node-2" },
-            toAgent: { name: "Escrow Vault", model: "Verisett Core", avatarBg: "#059669", agentId: "vlt-1" },
-            amountINR: 42000,
-            commissionRate: 0.0075,
-            status: "SUCCESSFUL",
-            timestamp: new Date(Date.now() - 86400000 * 18).toISOString(),
-            dateStr: "2026-09-19",
-            timeStr: "02:15 PM",
-            milestoneTitle: "Autonomous Agent Milestone Clearance",
-            sha256Proof: "0x5a2d8f9b0c1e3456789abcdef0123456",
-            clearingRail: "FastMCP / HDFC",
-          },
-          {
-            id: "tx-init-3",
-            fromAgent: { name: "Arbitration Tester", model: "Custom", avatarBg: "#E11D48", agentId: "node-3" },
-            toAgent: { name: "Escrow Vault", model: "Verisett Core", avatarBg: "#059669", agentId: "vlt-1" },
-            amountINR: 12600,
-            commissionRate: 0.0075,
-            status: "FAILED",
-            timestamp: new Date(Date.now() - 86400000 * 12).toISOString(),
-            dateStr: "2026-09-25",
-            timeStr: "11:45 AM",
-            milestoneTitle: "Arbitration Test Disputed Job",
-            sha256Proof: "0x7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f",
-            clearingRail: "FastMCP Disputed",
-          },
-          {
-            id: "tx-init-4",
-            fromAgent: { name: "Core Clearing Node", model: "FastMCP", avatarBg: "#2563EB", agentId: "node-4" },
-            toAgent: { name: "Escrow Vault", model: "Verisett Core", avatarBg: "#059669", agentId: "vlt-1" },
-            amountINR: 66200,
-            commissionRate: 0.0075,
-            status: "SUCCESSFUL",
-            timestamp: new Date(Date.now() - 86400000 * 5).toISOString(),
-            dateStr: "2026-10-02",
-            timeStr: "04:20 PM",
-            milestoneTitle: "FastMCP RPC Swarm Invariant Verification",
-            sha256Proof: "0x1234567890abcdef1234567890abcdef",
-            clearingRail: "FastMCP / HDFC",
-          },
-        ];
-        setTransactions(defaultChartTx);
+        setTransactions([]);
       }
     } catch (err) {
       console.warn("Telemetry loading notice:", err);
@@ -470,32 +410,61 @@ export default function DashboardPage() {
     };
   }, [user?.id, loadTenantData]);
 
-  // Settlement Metrics Computation
+  // Live Clearinghouse Metrics Computation from User's Vaults & Settlements
   const metrics = useMemo(() => {
-    const totalCount = settlements.length > 0 ? settlements.length : 24;
-    const settledCount =
-      settlements.length > 0
-        ? settlements.filter((s) => s.status === "SETTLED").length
-        : 23;
-    const disputedCount = totalCount - settledCount;
+    // 1. Escrow Deals: Exact count of user's vaults
+    const totalDeals = vaults.length;
 
-    const totalVolumeUSD =
-      settlements.length > 0
-        ? settlements.reduce((acc, s) => acc + Number(s.amount || 0), 0)
-        : 14850.0;
+    // 2. Cleared Volume: Real sum of user's settled vaults in INR / USD
+    const settledVaults = vaults.filter((v) => {
+      const st = (v.status || "").toUpperCase();
+      return st === "SETTLED" || st === "VERIFIED";
+    });
+
+    const settledVaultsUSD = settledVaults.reduce((acc, v) => {
+      const amount = v.balance_cents ? Number(v.balance_cents) / 100 : Number(v.balance || 0);
+      return acc + amount;
+    }, 0);
+
+    const settledSettlements = settlements.filter((s) => s.status === "SETTLED");
+    const settlementsUSD = settledSettlements.reduce((acc, s) => acc + Number(s.amount || 0), 0);
+
+    const totalVolumeUSD = settledVaultsUSD + settlementsUSD;
     const totalVolumeINR = totalVolumeUSD * 84;
 
-    const successRate = totalCount > 0 ? (settledCount / totalCount) * 100 : 98.2;
-    const disputeRate = totalCount > 0 ? (disputedCount / totalCount) * 100 : 1.8;
+    // 3. Success Rate: Computed from real settlements vs failures (or "—" if 0 deals)
+    const failedSettlementsCount = settlements.filter(
+      (s) => s.status === "DISPUTED" || s.status === "FAILED"
+    ).length;
+    const failedVaultsCount = vaults.filter((v) => {
+      const st = (v.status || "").toUpperCase();
+      return st === "DISPUTED" || st === "FAILED" || st === "CANCELLED";
+    }).length;
+    const totalFailures = failedSettlementsCount + failedVaultsCount;
+    const totalResolved = settledVaults.length + settledSettlements.length + totalFailures;
+
+    const successRateStr =
+      totalResolved > 0
+        ? `${(((settledVaults.length + settledSettlements.length) / totalResolved) * 100).toFixed(1)}%`
+        : totalDeals > 0 && settledVaults.length > 0
+        ? "100.0%"
+        : "—";
+
+    const disputeRateStr =
+      totalResolved > 0
+        ? `${((totalFailures / totalResolved) * 100).toFixed(1)}%`
+        : totalDeals > 0
+        ? "0.0%"
+        : "—";
 
     return {
       totalVolumeUSD,
       totalVolumeINR,
-      totalCount,
-      successRate: successRate.toFixed(1),
-      disputeRate: disputeRate.toFixed(1),
+      totalDeals,
+      successRate: successRateStr,
+      disputeRate: disputeRateStr,
     };
-  }, [settlements]);
+  }, [vaults, settlements]);
 
   // Escrow Clearing Velocity: Daily counts for the last 7 days from vaults & ledger_entries
   const velocityChartData = useMemo(() => {
@@ -870,7 +839,7 @@ export default function DashboardPage() {
                   Escrow Deals
                 </span>
                 <span className="text-base font-bold text-[#1C1A17] font-mono block">
-                  {metrics.totalCount} Cleared
+                  {metrics.totalDeals} Cleared
                 </span>
                 <span className="text-[10px] font-mono text-blue-600">
                   Autonomous Settle
@@ -881,7 +850,7 @@ export default function DashboardPage() {
                   Success Rate
                 </span>
                 <span className="text-base font-bold text-emerald-600 font-mono">
-                  {metrics.successRate}%
+                  {metrics.successRate}
                 </span>
               </div>
               <div className="p-2.5 rounded-2xl bg-[#FAF8F5] border border-[#EAE3D2]">
@@ -889,7 +858,7 @@ export default function DashboardPage() {
                   Dispute Rate
                 </span>
                 <span className="text-base font-bold text-rose-600 font-mono">
-                  {metrics.disputeRate}%
+                  {metrics.disputeRate}
                 </span>
               </div>
             </div>
@@ -999,33 +968,6 @@ export default function DashboardPage() {
         ) : (
           /* PART 3 Requirement 3: Active Agent State Responsive Telemetry Grid */
           <div className="space-y-8">
-            {/* 30-Day Settlement Telemetry Chart */}
-            <div className="rounded-3xl border border-[#EAE3D2] bg-white p-6 md:p-8 shadow-sm">
-              <div className="flex items-center justify-between pb-4 border-b border-[#F0E9DC] flex-wrap gap-2">
-                <div>
-                  <h3 className="text-base sm:text-lg font-bold text-[#1C1A17] flex items-center gap-2">
-                    <Activity className="w-5 h-5 text-blue-600" />
-                    <span>30-Day Settlement History &amp; Dispute Rate</span>
-                  </h3>
-                  <p className="text-xs text-[#8C8275]">
-                    Consensus clears, automated milestone escrow payouts, and
-                    dispute resolutions.
-                  </p>
-                </div>
-                <span className="text-xs font-mono font-semibold px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200">
-                  {metrics.successRate}% Clearance Rate
-                </span>
-              </div>
-
-              <div className="pt-4">
-                <AgentTransactionChart
-                  isAgentConnected={true}
-                  transactions={transactions}
-                  onConnectAgent={handleGenerateFastMcpKey}
-                />
-              </div>
-            </div>
-
             {/* Agent Swarm Table */}
             <div className="rounded-3xl border border-[#EAE3D2] bg-white p-6 md:p-8 shadow-sm space-y-4">
               <div className="flex items-center justify-between pb-3 border-b border-[#F0E9DC] flex-wrap gap-3">
