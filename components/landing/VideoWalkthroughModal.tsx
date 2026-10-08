@@ -54,7 +54,7 @@ export const CHAPTERS: Chapter[] = [
     timeEnd: 10,
     badge: "CHAPTER 02 / 06",
     title: "Global Control & Vault Custody",
-    subtitle: "Single-line top navigation, Sandbox/Mainnet switcher & $10,000 Vault",
+    subtitle: "Single-line top navigation, Sandbox/Mainnet switcher & Verified Vault",
     desc: "Unified single-line navigation. Toggle seamlessly between Sandbox and Live Mainnet, track your vault balance, and deposit pre-funded budgets.",
     icon: Layers,
     targetAnchor: "#",

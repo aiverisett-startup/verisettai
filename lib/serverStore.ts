@@ -66,8 +66,8 @@ const DATA_DIR = path.join(process.cwd(), "data");
 const STATE_FILE = path.join(DATA_DIR, "live_vault_state.json");
 
 const DEFAULT_STATE: VaultState = {
-  testnet_balance: 10000,
-  available_balance: 10000,
+  testnet_balance: 0,
+  available_balance: 0,
   frozen_balance: 0,
   total_volume: 0,
   total_commission: 0,
@@ -80,7 +80,7 @@ const DEFAULT_STATE: VaultState = {
     {
       id: "VLT-PRIMARY-NODE",
       title: "Primary Autonomous Settlement Vault",
-      amount: 10000,
+      amount: 0,
       currency: "VRS",
       status: "Active",
       allocatedAgent: "Autonomous Settlement Agent",
@@ -130,7 +130,7 @@ export function getVaultState(): VaultState {
       {
         id: "VLT-PRIMARY-NODE",
         title: "Primary Autonomous Settlement Vault",
-        amount: state.available_balance || 10000,
+        amount: state.available_balance || 0,
         currency: "VRS",
         status: "Active",
         allocatedAgent: state.connected_agent_name || "Autonomous Settlement Agent",

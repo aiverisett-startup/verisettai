@@ -362,7 +362,7 @@ export const VerisettPromo: React.FC = () => {
                 Locked Deposit
               </p>
               <p style={{ margin: "6px 0 0", fontSize: 13, color: "#34D399", fontWeight: 700 }}>
-                10,000 VRS Testnet
+                Verified Ledger Vault
               </p>
             </div>
 

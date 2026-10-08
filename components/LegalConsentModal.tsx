@@ -99,7 +99,7 @@ export function LegalConsentModal({
             <ShieldCheck className="w-5 h-5 text-[#9E7A45] shrink-0 mt-0.5" />
             <p className="text-[#4A453E]">
               Accept the Protocol Privacy Policy and Terms of Service to activate your autonomous agent vault
-              and unlock your starting allocation of 10,000 VRS Testnet Tokens.
+              and initialize your verified ledger clearing custody.
             </p>
           </div>
         </div>
@@ -190,7 +190,7 @@ export function LegalConsentModal({
             </>
           ) : (
             <>
-              <span>Accept &amp; Unlock 10,000 VRS Vault</span>
+              <span>Accept &amp; Activate Vault</span>
               <ArrowRight className="w-4 h-4" />
             </>
           )}

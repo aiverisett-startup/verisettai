@@ -19,6 +19,7 @@ import {
 import Link from "next/link";
 import { GoogleIcon } from "@/components/ui/GoogleIcon";
 import { AuthUser } from "@/lib/useAuthUser";
+import { supabase } from "@/lib/supabase";
 
 interface ProfileSettingsModalProps {
   isOpen: boolean;
@@ -40,10 +41,33 @@ export function ProfileSettingsModal({
   const [isEditingName, setIsEditingName] = useState(false);
   const [nameInput, setNameInput] = useState(user.name);
   const [imageError, setImageError] = useState(false);
+  const [balanceDisplay, setBalanceDisplay] = useState("₹0.00 ($0.00)");
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (!user.id) return;
+    const fetchBal = async () => {
+      try {
+        const { data: rpcBal, error } = await supabase.rpc("get_verified_balance", {
+          p_user_id: user.id,
+        });
+        if (!error && rpcBal !== null) {
+          const paise = Number(rpcBal);
+          const inr = paise / 100;
+          const usd = inr / 84;
+          setBalanceDisplay(`₹${inr.toFixed(2)} ($${usd.toFixed(2)})`);
+          return;
+        }
+      } catch {
+        // Fallback
+      }
+      setBalanceDisplay("₹0.00 ($0.00)");
+    };
+    fetchBal();
+  }, [user.id]);
 
   // Neutralized identifier format avoiding hardcoded country codes
   const accountId =
@@ -231,14 +255,14 @@ export function ProfileSettingsModal({
                 <div className="grid grid-cols-2 gap-3 pt-1">
                   <div className="p-3 rounded-xl bg-zinc-50 border border-zinc-200/80">
                     <div className="text-[10px] font-medium text-zinc-500">Vault Available Balance</div>
-                    <div className="font-sans font-semibold text-lg text-zinc-900 mt-0.5 tabular-nums">
-                      10,000 VRS
+                    <div className="font-sans font-semibold text-sm text-zinc-900 mt-0.5 tabular-nums font-mono">
+                      {balanceDisplay}
                     </div>
                   </div>
                   <div className="p-3 rounded-xl bg-zinc-50 border border-zinc-200/80">
                     <div className="text-[10px] font-medium text-zinc-500">Frozen in Escrow</div>
-                    <div className="font-sans font-medium text-lg text-zinc-500 mt-0.5 tabular-nums">
-                      0.00 VRS
+                    <div className="font-sans font-medium text-sm text-zinc-500 mt-0.5 tabular-nums font-mono">
+                      ₹0.00 ($0.00)
                     </div>
                   </div>
                 </div>

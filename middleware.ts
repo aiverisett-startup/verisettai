@@ -180,17 +180,18 @@ export async function middleware(request: NextRequest) {
     },
   });
 
-  // Read current user
+  // Read current session from cookies
   const {
-    data: { user },
-  } = await supabase.auth.getUser();
+    data: { session },
+  } = await supabase.auth.getSession();
 
   // 5. Route Protection Rules
   // Any unauthenticated request to /dashboard/* or /checkout/* must redirect to /login?redirect=<path>
   const isDashboardRoute = pathname === "/dashboard" || pathname.startsWith("/dashboard/");
   const isCheckoutRoute = pathname === "/checkout" || pathname.startsWith("/checkout/");
 
-  if ((isDashboardRoute || isCheckoutRoute) && !user) {
+  // If session does not exist (session === null), redirect to /login. If session exists, DO NOT redirect. Allow pass-through to /dashboard.
+  if ((isDashboardRoute || isCheckoutRoute) && session === null) {
     const redirectPath = `${pathname}${search}`;
     const loginUrl = new URL(`/login?redirect=${encodeURIComponent(redirectPath)}`, request.url);
     const redirectResponse = NextResponse.redirect(loginUrl);
@@ -200,9 +201,9 @@ export async function middleware(request: NextRequest) {
     return redirectResponse;
   }
 
-  // Any authenticated user navigating to /login or /signup must automatically redirect to /dashboard
+  // On /login and /signup: If data.session !== null, redirect immediately to /dashboard
   const isAuthRoute = pathname === "/login" || pathname === "/signup";
-  if (isAuthRoute && user) {
+  if (isAuthRoute && session !== null) {
     const dashboardUrl = new URL("/dashboard", request.url);
     const redirectResponse = NextResponse.redirect(dashboardUrl);
     supabaseResponse.cookies.getAll().forEach((c) => {

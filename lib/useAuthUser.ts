@@ -51,14 +51,7 @@ export function useAuthUser() {
   }, []);
 
   const refreshUser = useCallback(async () => {
-    const local = readLocalUser();
-    if (local) {
-      setUser(local);
-      setIsLoaded(true);
-      return;
-    }
-
-    // Try Supabase session fallback
+    // 1. Check Supabase session from cookies first
     try {
       const { data } = await supabase.auth.getSession();
       if (data.session?.user) {
@@ -90,14 +83,23 @@ export function useAuthUser() {
         localStorage.setItem("verisett_auth_provider", provider);
 
         setUser(resolved);
-      } else {
-        setUser(null);
+        setIsLoaded(true);
+        return;
       }
     } catch {
-      setUser(null);
-    } finally {
-      setIsLoaded(true);
+      // Ignore
     }
+
+    // 2. Fallback to localStorage demo session if available
+    const local = readLocalUser();
+    if (local) {
+      setUser(local);
+      setIsLoaded(true);
+      return;
+    }
+
+    setUser(null);
+    setIsLoaded(true);
   }, [readLocalUser]);
 
   useEffect(() => {

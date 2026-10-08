@@ -108,7 +108,7 @@ export function FAQSection() {
                       <Icon className="w-4 h-4" />
                     </div>
                     <div>
-                      <span className="text-[10px] font-mono uppercase tracking-wider text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/40 px-2.5 py-0.5 rounded-full inline-block mb-1.5 font-semibold">
+                      <span className="bg-neutral-100 text-neutral-800 border border-neutral-300 dark:bg-neutral-900 dark:text-neutral-200 dark:border-neutral-800 font-mono text-xs uppercase tracking-wider px-2.5 py-0.5 rounded-full inline-block mb-1.5 font-semibold">
                         {faq.category}
                       </span>
                       <h3 itemProp="name" className="text-base sm:text-lg font-bold text-[#1C1A17] tracking-tight">

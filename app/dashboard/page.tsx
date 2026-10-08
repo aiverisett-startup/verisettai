@@ -22,8 +22,9 @@ import {
   CreditCard,
   RefreshCw,
   Clock,
-  Trash2,
   Lock,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import { VerisettLogo } from "@/components/VerisettLogo";
 import { GoldenBackgroundShapes } from "@/components/ui/GoldenBackgroundShapes";
@@ -88,7 +89,7 @@ export default function DashboardPage() {
   const [isLoadingAuth, setIsLoadingAuth] = useState<boolean>(true);
 
   // Balance state in paise (smallest unit)
-  const [balancePaise, setBalancePaise] = useState<number>(14196000); // Default: ₹1,41,960.00 (~$1,690 USD)
+  const [balancePaise, setBalancePaise] = useState<number>(0); // Default real ledger balance: ₹0.00
   const [vaultId, setVaultId] = useState<string>("VLT-PRIMARY");
 
   // Agents & Settlements
@@ -96,6 +97,15 @@ export default function DashboardPage() {
   const [settlements, setSettlements] = useState<SettlementRecord[]>([]);
   const [transactions, setTransactions] = useState<TransactionItem[]>([]);
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
+
+  // Active API Key state from public.api_keys
+  const [existingKey, setExistingKey] = useState<{
+    id: string;
+    key_hint: string;
+    prefix: string;
+    name?: string;
+  } | null>(null);
+  const [isKeyRevealed, setIsKeyRevealed] = useState<boolean>(false);
 
   // API Key Generation Modal state
   const [isKeyModalOpen, setIsKeyModalOpen] = useState<boolean>(false);
@@ -196,7 +206,7 @@ export default function DashboardPage() {
         const { data: rpcBal, error: rpcErr } = await supabase.rpc("get_verified_balance", {
           p_user_id: userId,
         });
-        if (!rpcErr && rpcBal !== null && Number(rpcBal) > 0) {
+        if (!rpcErr && rpcBal !== null) {
           verifiedPaise = Number(rpcBal);
         }
       } catch {
@@ -212,21 +222,18 @@ export default function DashboardPage() {
 
       if (vaultRows && vaultRows.length > 0) {
         setVaultId(vaultRows[0].id.slice(0, 8).toUpperCase());
-        if (verifiedPaise <= 0) {
-          const cents =
-            Number(vaultRows[0].balance_cents) ||
-            Math.round(Number(vaultRows[0].balance || 1690) * 100);
-          verifiedPaise = cents * 84;
+        if (verifiedPaise === 0 && vaultRows[0].balance_cents) {
+          verifiedPaise = Number(vaultRows[0].balance_cents);
         }
       } else {
-        // Initialize default primary vault for this user
+        // Initialize default primary vault for this user with real 0 balance
         const { data: newVault } = await supabase
           .from("vaults")
           .insert({
             user_id: userId,
             name: "Primary Autonomous Settlement Vault",
-            balance: 1690.0,
-            balance_cents: 169000,
+            balance: 0.0,
+            balance_cents: 0,
             currency: "USD",
             status: "Active Custody",
           })
@@ -236,16 +243,29 @@ export default function DashboardPage() {
         if (newVault) {
           setVaultId(newVault.id.slice(0, 8).toUpperCase());
         }
-        if (verifiedPaise <= 0) {
-          verifiedPaise = 169000 * 84;
+      }
+
+      setBalancePaise(verifiedPaise);
+
+      // 2. Query public.api_keys for existing active keys
+      try {
+        const { data: keyRows } = await supabase
+          .from("api_keys")
+          .select("id, key_hint, prefix, name, status, created_at")
+          .eq("user_id", userId)
+          .eq("status", "ACTIVE")
+          .order("created_at", { ascending: false });
+
+        if (keyRows && keyRows.length > 0) {
+          setExistingKey(keyRows[0]);
+        } else {
+          setExistingKey(null);
         }
+      } catch (keyErr) {
+        console.warn("Could not fetch active api_keys:", keyErr);
       }
 
-      if (verifiedPaise > 0) {
-        setBalancePaise(verifiedPaise);
-      }
-
-      // 2. Agents
+      // 3. Agents
       const { data: agentRows } = await supabase
         .from("agents")
         .select("*")
@@ -571,9 +591,12 @@ export default function DashboardPage() {
     }
   };
 
-  const terminalSnippet = `npx -y @verisett/mcp-server@latest --key=${
-    generatedKey || "vst_live_98a7bc6241de820f4b3c"
-  }`;
+  const maskedKeySnippet = "vst_live_••••••••";
+  const displayKey = isKeyRevealed
+    ? generatedKey || (existingKey ? `${existingKey.prefix || "vst_live_"}••••••••${existingKey.key_hint || ""}` : maskedKeySnippet)
+    : maskedKeySnippet;
+
+  const terminalSnippet = `npx -y @verisett/mcp-server@latest --key=${displayKey}`;
 
   return (
     <div className="relative min-h-screen bg-[#FDFCF9] text-[#1C1A17] p-4 sm:p-8 md:p-12 font-sans overflow-hidden">
@@ -797,8 +820,8 @@ export default function DashboardPage() {
               </p>
             </div>
 
-            {/* Interactive Generate Key Button */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
+            {/* Interactive Generate Key Button and Actions */}
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
               <button
                 onClick={handleGenerateFastMcpKey}
                 disabled={isGeneratingKey}
@@ -808,9 +831,38 @@ export default function DashboardPage() {
                 <span>
                   {isGeneratingKey
                     ? "Generating FastMCP Key..."
+                    : existingKey || generatedKey
+                    ? "Generate New Key"
                     : "Generate FastMCP Access Key"}
                 </span>
               </button>
+
+              {(existingKey || generatedKey) && (
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsKeyRevealed((prev) => !prev)}
+                    className="px-4 py-3 rounded-2xl border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 text-xs font-mono font-medium transition flex items-center gap-2 cursor-pointer shadow-xs"
+                    title={isKeyRevealed ? "Hide Key" : "Reveal Key"}
+                  >
+                    {isKeyRevealed ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                    <span>{isKeyRevealed ? "Hide" : "Reveal"}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const keyToCopy = generatedKey || `${existingKey?.prefix || "vst_live_"}••••••••`;
+                      copyToClipboard(keyToCopy, "key");
+                    }}
+                    className="px-4 py-3 rounded-2xl border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 text-xs font-mono font-medium transition flex items-center gap-2 cursor-pointer shadow-xs"
+                    title="Copy Existing Key"
+                  >
+                    {copiedKey ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                    <span>{copiedKey ? "Copied" : "Copy Existing Key"}</span>
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Terminal Code Snippet with Copy Button */}
@@ -820,17 +872,27 @@ export default function DashboardPage() {
                   <Terminal className="w-3.5 h-3.5 text-blue-400" />
                   Terminal CLI Initialization
                 </span>
-                <button
-                  onClick={() => copyToClipboard(terminalSnippet, "snippet")}
-                  className="inline-flex items-center gap-1 text-zinc-300 hover:text-white transition cursor-pointer"
-                >
-                  {copiedSnippet ? (
-                    <Check className="w-3.5 h-3.5 text-emerald-400" />
-                  ) : (
-                    <Copy className="w-3.5 h-3.5" />
-                  )}
-                  <span>{copiedSnippet ? "Copied" : "Copy"}</span>
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setIsKeyRevealed((prev) => !prev)}
+                    className="inline-flex items-center gap-1 text-zinc-400 hover:text-white transition cursor-pointer text-[10px]"
+                    title={isKeyRevealed ? "Hide Key" : "Reveal Key"}
+                  >
+                    {isKeyRevealed ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
+                    <span>{isKeyRevealed ? "Hide" : "Reveal"}</span>
+                  </button>
+                  <button
+                    onClick={() => copyToClipboard(terminalSnippet, "snippet")}
+                    className="inline-flex items-center gap-1 text-zinc-300 hover:text-white transition cursor-pointer"
+                  >
+                    {copiedSnippet ? (
+                      <Check className="w-3.5 h-3.5 text-emerald-400" />
+                    ) : (
+                      <Copy className="w-3.5 h-3.5" />
+                    )}
+                    <span>{copiedSnippet ? "Copied" : "Copy"}</span>
+                  </button>
+                </div>
               </div>
               <div className="bg-zinc-950 p-4 rounded-b-2xl border border-zinc-800 text-xs font-mono text-emerald-400 overflow-x-auto shadow-inner">
                 <code>{terminalSnippet}</code>

@@ -36,9 +36,9 @@ export class MemoryVaultStorage implements IVaultStorage {
   private balances = new Map<string, number>();
 
   constructor() {
-    // Seed default testnet liquidity accounts
-    this.balances.set("agent:buyer:primary", 1_000_000); // 10,000 VRS / $10,000.00
-    this.balances.set("agent:buyer:default", 500_000);   // 5,000 VRS
+    // Seed default liquidity accounts
+    this.balances.set("agent:buyer:primary", 0);
+    this.balances.set("agent:buyer:default", 0);
     this.balances.set("agent:seller:primary", 0);
     this.balances.set("account:platform:fees", 0);
   }

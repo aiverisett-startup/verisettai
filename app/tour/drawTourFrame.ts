@@ -199,7 +199,7 @@ export function drawTourFrame(
     ctx.strokeRect(1410, navY + 22, 170, 36);
     ctx.fillStyle = "#10B981";
     ctx.font = "bold 14px monospace";
-    ctx.fillText("● Vault: $10,000", 1425, navY + 45);
+    ctx.fillText("● Vault: ₹0.00", 1425, navY + 45);
 
     const cy = 480;
     const cW = 490;

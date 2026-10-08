@@ -64,22 +64,31 @@ export function MinimalNav({
     const fetchBalance = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
-        if (session?.user) {
-          const { data } = await supabase
-            .from("profiles")
-            .select("testnet_balance, accepted_terms")
-            .eq("id", session.user.id)
+        const targetUserId = session?.user?.id || user.id;
+        if (targetUserId) {
+          const { data: rpcBal, error: rpcErr } = await supabase.rpc("get_verified_balance", {
+            p_user_id: targetUserId,
+          });
+
+          if (!rpcErr && rpcBal !== null) {
+            setBalance(Number(rpcBal));
+            return;
+          }
+
+          const { data: vaultRow } = await supabase
+            .from("vaults")
+            .select("balance_cents")
+            .eq("user_id", targetUserId)
             .maybeSingle();
 
-          if (data && typeof data.testnet_balance === "number") {
-            setBalance(data.testnet_balance);
+          if (vaultRow && vaultRow.balance_cents !== null) {
+            setBalance(Number(vaultRow.balance_cents));
             return;
           }
         }
-        const termsAccepted = localStorage.getItem("verisett_accepted_terms") === "true";
-        setBalance(termsAccepted ? 10000 : 0);
+        setBalance(0);
       } catch {
-        setBalance(10000);
+        setBalance(0);
       }
     };
 
@@ -152,13 +161,13 @@ export function MinimalNav({
           {user && (
             <button
               onClick={onOpenDepositModal}
-              className="shrink-0 hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-border hover:border-blue-400 transition-colors text-xs whitespace-nowrap shadow-xs cursor-pointer"
-              title="Click to view testnet balance & vault deposit"
+              className="shrink-0 hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-border hover:border-blue-400 transition-colors text-xs whitespace-nowrap shadow-xs cursor-pointer font-mono"
+              title="Click to view verified ledger balance & vault deposit"
             >
               <Lock className="w-3 h-3 text-blue-600 shrink-0" />
-              <span className="text-muted-foreground">Vault:</span>
+              <span className="text-muted-foreground font-sans">Vault:</span>
               <span className="font-semibold text-[#09090B] tabular-nums">
-                ${(balance ?? 100).toLocaleString("en-US", { minimumFractionDigits: 2 })} USD
+                ₹{((balance ?? 0) / 100).toFixed(2)} (${(((balance ?? 0) / 100) / 84).toFixed(2)})
               </span>
             </button>
           )}
@@ -195,12 +204,20 @@ export function MinimalNav({
               )}
             </button>
           ) : (
-            <Link
-              href="/login"
-              className="shrink-0 whitespace-nowrap flex items-center justify-center px-4 py-1.5 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold tracking-wider transition-colors cursor-pointer"
-            >
-              LOGIN
-            </Link>
+            <div className="flex items-center gap-2">
+              <Link
+                href="/docs"
+                className="shrink-0 hidden sm:inline-flex items-center text-xs font-semibold text-muted-foreground hover:text-[#09090B] px-3 py-1.5 transition-colors"
+              >
+                Docs
+              </Link>
+              <Link
+                href="/login"
+                className="shrink-0 whitespace-nowrap flex items-center justify-center px-4 py-1.5 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold tracking-wider transition-colors cursor-pointer"
+              >
+                Sign In
+              </Link>
+            </div>
           )}
 
           {/* Mobile menu toggle (center nav is hidden below lg) */}
