@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { Activity, ShieldCheck, Clock } from "lucide-react";
 
 export interface VelocityDataPoint {
   date: string;
@@ -34,14 +33,14 @@ export function TransactionChart({ data }: TransactionChartProps) {
 
   const chartData = data && data.length > 0 ? data : fallbackDays;
 
-  // Chart Dimension Constants
+  // Chart Dimension Math (Linear / Apple compact geometry)
   const SVG_WIDTH = 700;
-  const SVG_HEIGHT = 220;
-  const PADDING = { top: 25, right: 30, bottom: 40, left: 45 };
+  const SVG_HEIGHT = 190;
+  const PADDING = { top: 20, right: 24, bottom: 28, left: 32 };
   const PLOT_W = SVG_WIDTH - PADDING.left - PADDING.right;
   const PLOT_H = SVG_HEIGHT - PADDING.top - PADDING.bottom;
 
-  // Determine Max Scale
+  // Scale computation
   const rawMax = Math.max(
     0,
     ...chartData.map((d) => Math.max(d.completed, d.incomplete))
@@ -49,18 +48,18 @@ export function TransactionChart({ data }: TransactionChartProps) {
   const allZero = rawMax === 0;
   const maxVal = allZero ? 4 : Math.max(4, Math.ceil(rawMax * 1.25));
 
-  // Compute 4 grid intervals
+  // Subtle Horizontal Gridlines
   const gridLines = useMemo(() => {
-    const steps = 4;
+    const steps = 3;
     return Array.from({ length: steps + 1 }, (_, i) => {
       const ratio = i / steps;
       const y = PADDING.top + PLOT_H * (1 - ratio);
-      const val = allZero ? (i === 0 ? 0 : i) : Math.round(maxVal * ratio);
+      const val = allZero ? (i === 0 ? 0 : "") : Math.round(maxVal * ratio);
       return { y, val, isBaseline: i === 0 };
     });
   }, [PLOT_H, maxVal, allZero]);
 
-  // Map Data to SVG Coordinates
+  // Points mapping
   const points = useMemo(() => {
     const n = chartData.length;
     return chartData.map((d, i) => {
@@ -82,7 +81,7 @@ export function TransactionChart({ data }: TransactionChartProps) {
     });
   }, [chartData, PLOT_W, PLOT_H, maxVal, allZero]);
 
-  // Smooth Bezier Curve Path Builder
+  // Flat, Crisp Cubic Bezier Path Builder
   const buildSmoothPath = (pts: Array<{ x: number; y: number }>): string => {
     if (pts.length === 0) return "";
     if (pts.length === 1) return `M ${pts[0].x} ${pts[0].y}`;
@@ -108,16 +107,15 @@ export function TransactionChart({ data }: TransactionChartProps) {
   }, [points]);
 
   const completedAreaPath = useMemo(() => {
-    if (points.length === 0) return "";
+    if (points.length === 0 || allZero) return "";
     const baselineY = PADDING.top + PLOT_H;
     return `${completedLinePath} L ${points[points.length - 1].x.toFixed(1)} ${baselineY} L ${points[0].x.toFixed(1)} ${baselineY} Z`;
-  }, [completedLinePath, points, PLOT_H]);
+  }, [completedLinePath, points, PLOT_H, allZero]);
 
   const incompleteLinePath = useMemo(() => {
     return buildSmoothPath(points.map((p) => ({ x: p.x, y: p.incompleteY })));
   }, [points]);
 
-  // Aggregate totals
   const totalCompleted = useMemo(
     () => chartData.reduce((acc, curr) => acc + curr.completed, 0),
     [chartData]
@@ -128,84 +126,51 @@ export function TransactionChart({ data }: TransactionChartProps) {
   );
 
   return (
-    <div className="border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 rounded-xl p-5 shadow-xs">
-      {/* Header with Title, Subtitle, and Legend */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-neutral-100 dark:border-neutral-900">
+    <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-6 shadow-xs font-sans">
+      {/* Minimalist Header & Linear Pill Legend */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-5">
         <div>
-          <div className="flex items-center gap-2">
-            <span className="p-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400">
-              <Activity className="w-4 h-4" />
-            </span>
-            <h3 className="text-base font-bold text-neutral-900 dark:text-neutral-100 tracking-tight font-sans">
-              Escrow Clearing Velocity
-            </h3>
-          </div>
-          <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">
-            Daily completed settlements vs pending/in-flight vaults
+          <h3 className="text-[14px] font-medium text-neutral-900 dark:text-neutral-100 tracking-tight">
+            Settlement Velocity
+          </h3>
+          <p className="text-[12px] text-neutral-500 dark:text-neutral-400 mt-0.5">
+            Past 7 days cleared vs pending volume
           </p>
         </div>
 
-        {/* Legend */}
-        <div className="flex items-center gap-5 text-xs font-mono">
-          <div className="flex items-center gap-2">
-            <span className="w-3 h-3 rounded-full bg-[#10b981] shadow-xs" />
-            <span className="text-neutral-700 dark:text-neutral-300 font-medium">
-              Completed / Settled
-            </span>
-            <span className="text-[11px] text-neutral-400 font-semibold">
-              ({totalCompleted})
-            </span>
+        {/* Clean Pill Legend */}
+        <div className="flex items-center gap-2">
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-neutral-50 dark:bg-neutral-800/60 border border-neutral-200/80 dark:border-neutral-800 text-[12px] text-neutral-600 dark:text-neutral-300">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#059669]" />
+            <span>Cleared</span>
+            <span className="text-[11px] font-mono text-neutral-400 ml-0.5">({totalCompleted})</span>
           </div>
 
-          <div className="flex items-center gap-2">
-            <span
-              className="w-4 h-0 border-t-2 border-dashed border-[#f59e0b]"
-              style={{ strokeDasharray: "4 4" }}
-            />
-            <span className="text-neutral-700 dark:text-neutral-300 font-medium">
-              In-Flight / Pending
-            </span>
-            <span className="text-[11px] text-neutral-400 font-semibold">
-              ({totalInFlight})
-            </span>
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-neutral-50 dark:bg-neutral-800/60 border border-neutral-200/80 dark:border-neutral-800 text-[12px] text-neutral-600 dark:text-neutral-300">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#64748b]" />
+            <span>Pending</span>
+            <span className="text-[11px] font-mono text-neutral-400 ml-0.5">({totalInFlight})</span>
           </div>
         </div>
       </div>
 
       {/* SVG Canvas */}
-      <div className="relative pt-4 w-full overflow-hidden">
+      <div className="relative w-full overflow-hidden">
         <svg
           viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`}
           preserveAspectRatio="none"
-          className="w-full h-52 sm:h-56 select-none"
+          className="w-full h-44 sm:h-48 select-none"
           onMouseLeave={() => setHoveredIndex(null)}
         >
           <defs>
-            {/* Emerald Gradient Fill for Completed Path */}
-            <linearGradient id="completedVelocityGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#10b981" stopOpacity="0.18" />
-              <stop offset="100%" stopColor="#10b981" stopOpacity="0.0" />
+            {/* Very faint, subtle gradient fading to 0% opacity */}
+            <linearGradient id="minimalClearedGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#059669" stopOpacity="0.04" />
+              <stop offset="100%" stopColor="#059669" stopOpacity="0.0" />
             </linearGradient>
-
-            {/* Amber Pattern for In-Flight Line */}
-            <pattern
-              id="gridPattern"
-              width="20"
-              height="20"
-              patternUnits="userSpaceOnUse"
-            >
-              <line
-                x1="0"
-                y1="0"
-                x2="20"
-                y2="0"
-                stroke="currentColor"
-                strokeOpacity="0.04"
-              />
-            </pattern>
           </defs>
 
-          {/* Horizontal Gridlines & Y-Axis Labels */}
+          {/* Thin Horizontal Dashed Gridlines (No vertical clutter lines) */}
           {gridLines.map(({ y, val, isBaseline }, idx) => (
             <g key={idx}>
               <line
@@ -213,76 +178,71 @@ export function TransactionChart({ data }: TransactionChartProps) {
                 y1={y}
                 x2={SVG_WIDTH - PADDING.right}
                 y2={y}
-                stroke={isBaseline ? "currentColor" : "currentColor"}
-                strokeOpacity={isBaseline ? 0.2 : 0.07}
-                strokeWidth={isBaseline ? 1.2 : 1}
-                strokeDasharray={isBaseline ? undefined : "3 3"}
-                className="text-neutral-400 dark:text-neutral-600"
+                stroke="currentColor"
+                strokeWidth={1}
+                strokeDasharray={isBaseline ? undefined : "2 2"}
+                className={
+                  isBaseline
+                    ? "text-neutral-200 dark:text-neutral-800"
+                    : "text-neutral-200/70 dark:text-neutral-800/80"
+                }
               />
-              <text
-                x={PADDING.left - 8}
-                y={y + 3.5}
-                textAnchor="end"
-                className="text-[10px] font-mono fill-neutral-400 dark:fill-neutral-500 font-medium"
-              >
-                {val}
-              </text>
+              {val !== "" && (
+                <text
+                  x={PADDING.left - 8}
+                  y={y + 3.5}
+                  textAnchor="end"
+                  className="text-[10px] font-mono fill-neutral-400 dark:fill-neutral-500 font-normal select-none"
+                >
+                  {val}
+                </text>
+              )}
             </g>
           ))}
 
-          {/* Path 1: Completed Area Fill */}
+          {/* Subtle Area Fill (Opacity 0.04) */}
           {!allZero && (
             <path
               d={completedAreaPath}
-              fill="url(#completedVelocityGrad)"
-              className="transition-opacity duration-300"
+              fill="url(#minimalClearedGrad)"
+              className="transition-opacity duration-200"
             />
           )}
 
-          {/* Path 2: Incomplete / Pending Dashed Line in #f59e0b */}
-          <path
-            d={incompleteLinePath}
-            fill="none"
-            stroke="#f59e0b"
-            strokeWidth={2}
-            strokeDasharray="4 4"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="transition-all duration-300"
-          />
-
-          {/* Path 1: Completed Solid Line in #10b981 */}
-          <path
-            d={completedLinePath}
-            fill="none"
-            stroke="#10b981"
-            strokeWidth={2.5}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="transition-all duration-300"
-          />
-
-          {/* Baseline Indicator when All Values are 0 */}
-          {allZero && (
-            <g>
-              <text
-                x={SVG_WIDTH / 2}
-                y={PADDING.top + PLOT_H / 2}
-                textAnchor="middle"
-                className="text-xs font-mono fill-neutral-400 dark:fill-neutral-500 font-medium select-none"
-              >
-                ● 0 Escrow Movements Recorded — Baseline Ready
-              </text>
-            </g>
+          {/* Pending Line: Thin stroke 1.75 in Muted Slate (#64748b) with dashed pattern */}
+          {!allZero && (
+            <path
+              d={incompleteLinePath}
+              fill="none"
+              stroke="#64748b"
+              strokeWidth={1.75}
+              strokeDasharray="3 3"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="transition-all duration-200"
+            />
           )}
 
-          {/* Data Points & Interactive Hover Columns */}
+          {/* Cleared Line: Thin flat stroke 1.75 in Emerald (#059669) */}
+          {!allZero && (
+            <path
+              d={completedLinePath}
+              fill="none"
+              stroke="#059669"
+              strokeWidth={1.75}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="transition-all duration-200"
+            />
+          )}
+
+          {/* Minimalist Data Nodes and Hitboxes */}
           {points.map((pt, idx) => {
             const isHovered = hoveredIndex === idx;
 
             return (
               <g key={idx}>
-                {/* Vertical hover column guide line */}
+                {/* Thin hover column vertical guide line */}
                 {isHovered && (
                   <line
                     x1={pt.x}
@@ -290,94 +250,92 @@ export function TransactionChart({ data }: TransactionChartProps) {
                     x2={pt.x}
                     y2={PADDING.top + PLOT_H}
                     stroke="currentColor"
-                    strokeOpacity={0.25}
                     strokeWidth={1}
                     strokeDasharray="2 2"
-                    className="text-neutral-500 dark:text-neutral-400"
+                    className="text-neutral-300 dark:text-neutral-700 pointer-events-none"
                   />
                 )}
 
-                {/* Incomplete Dot */}
-                <circle
-                  cx={pt.x}
-                  cy={pt.incompleteY}
-                  r={isHovered ? 4.5 : 3}
-                  fill="#f59e0b"
-                  stroke="#ffffff"
-                  strokeWidth={1.5}
-                  className="transition-all duration-150"
-                />
+                {/* Incomplete / Pending Dot (r="3" with white border, highlighting when hovered) */}
+                {!allZero && pt.data.incomplete > 0 && (
+                  <circle
+                    cx={pt.x}
+                    cy={pt.incompleteY}
+                    r={isHovered ? 4 : 3}
+                    fill="#64748b"
+                    stroke="#ffffff"
+                    strokeWidth={1.5}
+                    className="dark:stroke-neutral-900 transition-all duration-100"
+                  />
+                )}
 
-                {/* Completed Dot */}
-                <circle
-                  cx={pt.x}
-                  cy={pt.completedY}
-                  r={isHovered ? 5.5 : 3.5}
-                  fill="#10b981"
-                  stroke="#ffffff"
-                  strokeWidth={2}
-                  className="transition-all duration-150 shadow-sm"
-                />
+                {/* Completed / Cleared Dot (r="3" with white border, highlighting when hovered) */}
+                {!allZero && pt.data.completed > 0 && (
+                  <circle
+                    cx={pt.x}
+                    cy={pt.completedY}
+                    r={isHovered ? 4.5 : 3}
+                    fill="#059669"
+                    stroke="#ffffff"
+                    strokeWidth={1.5}
+                    className="dark:stroke-neutral-900 transition-all duration-100"
+                  />
+                )}
 
-                {/* Invisible Hover Hitbox for touch & mouse */}
+                {/* Clean Transparent Hitbox for Hover */}
                 <rect
-                  x={pt.x - 25}
+                  x={pt.x - 24}
                   y={PADDING.top}
-                  width={50}
-                  height={PLOT_H + 20}
+                  width={48}
+                  height={PLOT_H + 16}
                   fill="transparent"
                   className="cursor-pointer"
                   onMouseEnter={() => setHoveredIndex(idx)}
                 />
 
-                {/* X-Axis Date Stamp */}
+                {/* Subtle small uppercase date labels along X-axis */}
                 <text
                   x={pt.x}
-                  y={SVG_HEIGHT - 12}
+                  y={SVG_HEIGHT - 6}
                   textAnchor="middle"
-                  className={`text-[10px] font-mono transition-colors ${
+                  className={`text-[10px] font-mono uppercase tracking-wider transition-colors select-none ${
                     isHovered
-                      ? "fill-neutral-900 dark:fill-neutral-100 font-bold"
-                      : "fill-neutral-500 dark:fill-neutral-400"
+                      ? "fill-neutral-900 dark:fill-neutral-100 font-semibold"
+                      : "fill-neutral-400 dark:fill-neutral-500 font-normal"
                   }`}
                 >
-                  {pt.data.date}
+                  {pt.data.date.toUpperCase()}
                 </text>
               </g>
             );
           })}
         </svg>
 
-        {/* Hover Tooltip Overlay Card */}
+        {/* Minimalist Linear Tooltip Card */}
         {hoveredIndex !== null && points[hoveredIndex] && (
           <div
-            className="absolute z-20 pointer-events-none transition-all duration-150 -translate-x-1/2 -top-1"
+            className="absolute z-20 pointer-events-none transition-all duration-100 -translate-x-1/2 top-0"
             style={{
               left: `${(points[hoveredIndex].x / SVG_WIDTH) * 100}%`,
             }}
           >
-            <div className="bg-neutral-900/95 dark:bg-neutral-100/95 text-white dark:text-neutral-900 px-3 py-2 rounded-lg shadow-xl text-xs font-mono space-y-1 min-w-[140px] border border-neutral-700/50">
-              <div className="font-bold text-[11px] pb-1 border-b border-neutral-700 dark:border-neutral-300 flex items-center justify-between">
-                <span>{points[hoveredIndex].data.date}</span>
-                <Clock className="w-3 h-3 text-neutral-400 dark:text-neutral-600" />
+            <div className="bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 px-2.5 py-1.5 rounded-md shadow-md text-[11px] font-sans space-y-1 min-w-[120px] border border-neutral-800 dark:border-neutral-200">
+              <div className="text-[10px] font-mono text-neutral-400 dark:text-neutral-500 pb-0.5 border-b border-neutral-800 dark:border-neutral-100">
+                {points[hoveredIndex].data.date.toUpperCase()}
               </div>
               <div className="flex items-center justify-between text-emerald-400 dark:text-emerald-700">
                 <span className="flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                  Completed:
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#059669]" />
+                  Cleared:
                 </span>
-                <span className="font-bold">
-                  {points[hoveredIndex].data.completed}
-                </span>
+                <span className="font-mono font-medium">{points[hoveredIndex].data.completed}</span>
               </div>
-              <div className="flex items-center justify-between text-amber-400 dark:text-amber-700">
+              <div className="flex items-center justify-between text-neutral-400 dark:text-neutral-600">
                 <span className="flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-                  In-Flight:
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#64748b]" />
+                  Pending:
                 </span>
-                <span className="font-bold">
-                  {points[hoveredIndex].data.incomplete}
-                </span>
+                <span className="font-mono font-medium">{points[hoveredIndex].data.incomplete}</span>
               </div>
             </div>
           </div>
@@ -386,3 +344,5 @@ export function TransactionChart({ data }: TransactionChartProps) {
     </div>
   );
 }
+
+export default TransactionChart;
