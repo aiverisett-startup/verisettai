@@ -23,6 +23,7 @@ import {
   Clock,
   Lock,
   Bot,
+  Trash2,
 } from "lucide-react";
 import { VerisettLogo } from "@/components/VerisettLogo";
 import { GoldenBackgroundShapes } from "@/components/ui/GoldenBackgroundShapes";
@@ -37,8 +38,9 @@ interface AgentRecord {
   user_id: string;
   name: string;
   framework: string;
-  ping_latency_ms: number;
-  status: "Active" | "Idle" | "Revoked";
+  ping_latency_ms?: number | null;
+  last_heartbeat_at?: string | null;
+  status: "Active" | "Idle" | "Revoked" | "Offline" | "Unlinked" | string;
   spending_limit?: number;
   webhook_url?: string | null;
   created_at?: string;
@@ -287,8 +289,9 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
           user_id: r.user_id,
           name: r.agent_name,
           framework: r.framework || "FastMCP",
-          ping_latency_ms: 18,
-          status: "Active",
+          ping_latency_ms: null,
+          last_heartbeat_at: null,
+          status: "Unlinked",
           spending_limit: Number(r.spending_limit || 0),
           webhook_url: r.webhook_url,
           created_at: r.created_at,
@@ -577,13 +580,13 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
         status: "ACTIVE",
       });
 
-      // 2. Insert initial active agent node into agents table
+      // 2. Insert initial agent node into agents table with Unlinked status
       await supabase.from("agents").insert({
         user_id: user.id,
         name: `FastMCP-Swarm-${Math.floor(100 + Math.random() * 900)}`,
         framework: "FastMCP",
-        ping_latency_ms: Math.floor(14 + Math.random() * 12),
-        status: "Active",
+        ping_latency_ms: null,
+        status: "Unlinked",
       });
 
       // Show key in modal
@@ -611,6 +614,44 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
       );
     } catch (err) {
       console.warn("Could not revoke agent:", err);
+    }
+  };
+
+  // Delete Agent from Supabase and immediately filter out from local state array
+  const handleDeleteAgent = async (agentId: string, agentName?: string) => {
+    try {
+      // 1. Delete from agents table
+      await supabase
+        .from("agents")
+        .delete()
+        .eq("id", agentId)
+        .eq("user_id", user.id);
+
+      // 2. Also delete from registered_agents table if matched by ID or name
+      try {
+        await supabase
+          .from("registered_agents")
+          .delete()
+          .eq("id", agentId)
+          .eq("user_id", user.id);
+
+        if (agentName) {
+          await supabase
+            .from("registered_agents")
+            .delete()
+            .eq("agent_name", agentName)
+            .eq("user_id", user.id);
+        }
+      } catch (regErr) {
+        // Ignore if table does not contain row
+      }
+
+      // 3. Immediately filter out from local state array
+      setAgents((prev) => prev.filter((a) => a.id !== agentId));
+    } catch (err) {
+      console.warn("Could not delete agent:", err);
+      // Still remove locally so UI reflects removal immediately
+      setAgents((prev) => prev.filter((a) => a.id !== agentId));
     }
   };
 
@@ -767,26 +808,26 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
         {/* Top Overview Bar: User Profile, Dual Realtime Balance, Settlement Metrics */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
           {/* 1. User Profile & Tenant Badge */}
-          <div className="rounded-3xl border border-[#EAE3D2] bg-white p-7 sm:p-8 shadow-sm flex flex-col justify-between space-y-6">
-            <div className="flex items-start justify-between gap-3">
-              <div>
+          <div className="rounded-3xl border border-[#EAE3D2] bg-white p-7 sm:p-8 shadow-sm flex flex-col justify-between space-y-6 overflow-hidden">
+            <div className="flex items-center justify-between gap-3 flex-wrap sm:flex-nowrap">
+              <div className="min-w-0 flex-1">
                 <p className="text-xs font-mono uppercase tracking-wider text-[#8C8275] font-semibold">
                   Authenticated Tenant
                 </p>
-                <h2 className="text-lg sm:text-xl font-bold text-[#1C1A17] truncate max-w-[280px] mt-1">
+                <h2 className="text-lg sm:text-xl font-bold text-[#1C1A17] truncate mt-1" title={user.email}>
                   {user.email}
                 </h2>
-                <p className="text-xs sm:text-sm font-mono text-blue-600 font-medium mt-1.5">
+                <p className="text-xs sm:text-sm font-mono text-blue-600 font-medium mt-1">
                   Node Ref: {vaultId}
                 </p>
               </div>
               {hasFounderPass ? (
-                <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs font-bold shadow-2xs shrink-0">
-                  <Sparkles className="w-3.5 h-3.5 text-blue-600" />
+                <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs font-bold shadow-2xs shrink-0 whitespace-nowrap">
+                  <Sparkles className="w-3.5 h-3.5 text-blue-600 shrink-0" />
                   <span>Founder Node Pass</span>
                 </span>
               ) : (
-                <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-slate-700 text-xs font-medium shrink-0">
+                <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-slate-700 text-xs font-medium shrink-0 whitespace-nowrap">
                   Standard Tier
                 </span>
               )}
@@ -1000,63 +1041,107 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
                       <th className="py-4 px-4">Name</th>
                       <th className="py-4 px-4">Framework</th>
                       <th className="py-4 px-4">Spending Cap</th>
-                      <th className="py-4 px-4">Ping Latency</th>
+                      <th className="py-4 px-4">Latency</th>
                       <th className="py-4 px-4">Status</th>
                       <th className="py-4 px-4 text-right">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[#F0E9DC]">
-                    {agents.map((agent) => (
-                      <tr
-                        key={agent.id}
-                        className="hover:bg-[#FAF8F5]/80 transition-colors"
-                      >
-                        <td className="py-4 sm:py-5 px-4 font-mono font-semibold text-[#1C1A17]">
-                          {agent.id.slice(0, 8)}...
-                        </td>
-                        <td className="py-4 sm:py-5 px-4 font-semibold text-[#1C1A17]">
-                          {agent.name}
-                        </td>
-                        <td className="py-4 sm:py-5 px-4">
-                          <span className="px-2.5 py-1 rounded-lg bg-[#FAF8F5] border border-[#EAE3D2] font-mono text-xs text-[#4A453E]">
-                            {agent.framework || "FastMCP"}
-                          </span>
-                        </td>
-                        <td className="py-4 sm:py-5 px-4 font-mono text-xs text-[#1C1A17] font-semibold">
-                          {agent.spending_limit !== undefined
-                            ? `₹${agent.spending_limit.toLocaleString("en-IN", { minimumFractionDigits: 2 })}`
-                            : "Unlimited"}
-                        </td>
-                        <td className="py-4 sm:py-5 px-4 font-mono text-[#6E675D]">
-                          <span className="inline-flex items-center gap-1.5 text-emerald-600 font-semibold">
-                            <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                            {agent.ping_latency_ms || 24}ms
-                          </span>
-                        </td>
-                        <td className="py-4 sm:py-5 px-4">
-                          <span
-                            className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-mono font-bold uppercase ${
-                              agent.status === "Active"
-                                ? "bg-emerald-50 text-emerald-800 border border-emerald-200"
-                                : agent.status === "Idle"
-                                ? "bg-amber-50 text-amber-800 border border-amber-200"
-                                : "bg-zinc-100 text-zinc-600 border border-zinc-200"
-                            }`}
-                          >
-                            {agent.status}
-                          </span>
-                        </td>
-                        <td className="py-4 sm:py-5 px-4 text-right">
-                          <button
-                            onClick={() => handleRevokeAgent(agent.id)}
-                            disabled={agent.status === "Revoked"}
-                            className="text-xs font-mono px-3 py-1.5 rounded-xl border border-rose-200 bg-rose-50 hover:bg-rose-100 text-rose-700 transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed font-medium"
-                          >
-                            Revoke Key
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
+                    {agents.map((agent) => {
+                      const isRevoked = (agent.status || "").toUpperCase() === "REVOKED";
+                      const isHeartbeatValid =
+                        !isRevoked &&
+                        Boolean(
+                          agent.last_heartbeat_at &&
+                            Date.now() - new Date(agent.last_heartbeat_at).getTime() <= 60000
+                        );
+
+                      return (
+                        <tr
+                          key={agent.id}
+                          className="hover:bg-[#FAF8F5]/80 transition-colors"
+                        >
+                          <td className="py-4 sm:py-5 px-4 font-mono font-semibold text-[#1C1A17]">
+                            {agent.id.slice(0, 8)}...
+                          </td>
+                          <td className="py-4 sm:py-5 px-4 font-semibold text-[#1C1A17]">
+                            {agent.name}
+                          </td>
+                          <td className="py-4 sm:py-5 px-4">
+                            <span className="px-2.5 py-1 rounded-lg bg-[#FAF8F5] border border-[#EAE3D2] font-mono text-xs text-[#4A453E]">
+                              {agent.framework || "FastMCP"}
+                            </span>
+                          </td>
+                          <td className="py-4 sm:py-5 px-4 font-mono text-xs text-[#1C1A17] font-semibold">
+                            {agent.spending_limit !== undefined
+                              ? `₹${agent.spending_limit.toLocaleString("en-IN", { minimumFractionDigits: 2 })}`
+                              : "Unlimited"}
+                          </td>
+                          <td className="py-4 sm:py-5 px-4 font-mono">
+                            {isRevoked ? (
+                              <span className="inline-flex items-center gap-1.5 text-neutral-400 font-medium text-xs">
+                                <span className="w-2 h-2 rounded-full bg-neutral-300" />
+                                Offline
+                              </span>
+                            ) : isHeartbeatValid && agent.ping_latency_ms ? (
+                              <span className="inline-flex items-center gap-1.5 text-emerald-600 font-semibold text-xs">
+                                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                                {agent.ping_latency_ms}ms
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center gap-1.5 text-neutral-400 font-medium text-xs">
+                                <span className="w-2 h-2 rounded-full bg-neutral-300" />
+                                Unlinked
+                              </span>
+                            )}
+                          </td>
+                          <td className="py-4 sm:py-5 px-4">
+                            {isRevoked ? (
+                              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-mono font-bold uppercase bg-zinc-100 text-zinc-600 border border-zinc-200">
+                                Revoked
+                              </span>
+                            ) : isHeartbeatValid ? (
+                              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-mono font-bold uppercase bg-emerald-50 text-emerald-800 border border-emerald-200">
+                                Active
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-mono font-bold uppercase bg-neutral-100 text-neutral-500 border border-neutral-200">
+                                {agent.status === "Idle" ? "Idle" : "Unlinked"}
+                              </span>
+                            )}
+                          </td>
+                          <td className="py-4 sm:py-5 px-4 text-right">
+                            {isRevoked ? (
+                              <button
+                                onClick={() => handleDeleteAgent(agent.id, agent.name)}
+                                className="inline-flex items-center gap-1.5 text-xs font-mono px-3 py-1.5 rounded-xl border border-rose-200 bg-rose-50 hover:bg-rose-100 text-rose-700 transition cursor-pointer font-medium shadow-2xs"
+                                title="Delete Revoked Node"
+                              >
+                                <Trash2 className="w-3.5 h-3.5 text-rose-600" />
+                                <span>Delete</span>
+                              </button>
+                            ) : (
+                              <div className="inline-flex items-center gap-1.5 justify-end">
+                                <button
+                                  onClick={() => handleRevokeAgent(agent.id)}
+                                  className="text-xs font-mono px-3 py-1.5 rounded-xl border border-zinc-200 bg-zinc-50 hover:bg-rose-50 hover:border-rose-200 hover:text-rose-700 text-zinc-700 transition cursor-pointer font-medium"
+                                  title="Revoke Credentials"
+                                >
+                                  Revoke Key
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteAgent(agent.id, agent.name)}
+                                  className="p-1.5 rounded-xl border border-zinc-200 bg-zinc-50 hover:bg-rose-50 hover:border-rose-200 text-zinc-400 hover:text-rose-600 transition cursor-pointer"
+                                  title="Delete Agent"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>

@@ -145,8 +145,8 @@ export async function registerAgentAction(
         user_id: user.id,
         name: trimmedName,
         framework: frameworkValue,
-        ping_latency_ms: Math.floor(12 + Math.random() * 14),
-        status: "Active",
+        ping_latency_ms: null,
+        status: "Unlinked",
       });
     } catch (e) {
       console.warn("Telemetry agents insertion notice:", e);
