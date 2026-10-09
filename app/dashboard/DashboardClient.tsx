@@ -10,7 +10,6 @@ import {
   Key,
   Copy,
   Check,
-  Terminal,
   Activity,
   Sparkles,
   Zap,
@@ -23,8 +22,6 @@ import {
   RefreshCw,
   Clock,
   Lock,
-  Eye,
-  EyeOff,
   Bot,
 } from "lucide-react";
 import { VerisettLogo } from "@/components/VerisettLogo";
@@ -135,14 +132,12 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
     prefix: string;
     name?: string;
   } | null>(null);
-  const [isKeyRevealed, setIsKeyRevealed] = useState<boolean>(false);
 
   // API Key Generation Modal state
   const [isKeyModalOpen, setIsKeyModalOpen] = useState<boolean>(false);
   const [generatedKey, setGeneratedKey] = useState<string>("");
   const [isGeneratingKey, setIsGeneratingKey] = useState<boolean>(false);
   const [copiedKey, setCopiedKey] = useState<boolean>(false);
-  const [copiedSnippet, setCopiedSnippet] = useState<boolean>(false);
 
   // AI Agent Registration Form Modal state
   const [isRegisterAgentModalOpen, setIsRegisterAgentModalOpen] = useState<boolean>(false);
@@ -678,23 +673,11 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
     router.replace("/login");
   };
 
-  const copyToClipboard = (text: string, type: "key" | "snippet") => {
+  const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
-    if (type === "key") {
-      setCopiedKey(true);
-      setTimeout(() => setCopiedKey(false), 2000);
-    } else {
-      setCopiedSnippet(true);
-      setTimeout(() => setCopiedSnippet(false), 2000);
-    }
+    setCopiedKey(true);
+    setTimeout(() => setCopiedKey(false), 2000);
   };
-
-  const maskedKeySnippet = "vst_live_••••••••";
-  const displayKey = isKeyRevealed
-    ? generatedKey || (existingKey ? `${existingKey.prefix || "vst_live_"}••••••••${existingKey.key_hint || ""}` : maskedKeySnippet)
-    : maskedKeySnippet;
-
-  const terminalSnippet = `npx -y @verisett/mcp-server@latest --key=${displayKey}`;
 
   return (
     <div className="relative min-h-screen bg-[#FDFCF9] text-[#1C1A17] px-4 sm:px-8 lg:px-12 xl:px-16 py-8 sm:py-10 font-sans overflow-x-hidden">
@@ -954,67 +937,22 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
                 </span>
               </button>
 
-              {(existingKey || generatedKey) && (
-                <div className="flex items-center gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setIsKeyRevealed((prev) => !prev)}
-                    className="px-5 py-4 rounded-2xl border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 text-sm font-mono font-medium transition flex items-center gap-2 cursor-pointer shadow-xs"
-                    title={isKeyRevealed ? "Hide Key" : "Reveal Key"}
-                  >
-                    {isKeyRevealed ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                    <span>{isKeyRevealed ? "Hide" : "Reveal"}</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const keyToCopy = generatedKey || `${existingKey?.prefix || "vst_live_"}••••••••`;
-                      copyToClipboard(keyToCopy, "key");
-                    }}
-                    className="px-5 py-4 rounded-2xl border border-zinc-300 bg-white hover:bg-zinc-50 text-zinc-700 text-sm font-mono font-medium transition flex items-center gap-2 cursor-pointer shadow-xs"
-                    title="Copy Existing Key"
-                  >
-                    {copiedKey ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
-                    <span>{copiedKey ? "Copied" : "Copy Existing Key"}</span>
-                  </button>
-                </div>
-              )}
             </div>
 
-            {/* Terminal Code Snippet with Copy Button */}
-            <div className="max-w-3xl mx-auto pt-4 text-left">
-              <div className="flex items-center justify-between px-5 py-3 bg-zinc-900 border-t border-x border-zinc-800 rounded-t-2xl text-xs font-mono text-zinc-400">
-                <span className="flex items-center gap-2">
-                  <Terminal className="w-4 h-4 text-blue-400" />
-                  Terminal CLI Initialization
-                </span>
-                <div className="flex items-center gap-3">
-                  <button
-                    onClick={() => setIsKeyRevealed((prev) => !prev)}
-                    className="inline-flex items-center gap-1.5 text-zinc-400 hover:text-white transition cursor-pointer text-xs"
-                    title={isKeyRevealed ? "Hide Key" : "Reveal Key"}
-                  >
-                    {isKeyRevealed ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-                    <span>{isKeyRevealed ? "Hide" : "Reveal"}</span>
-                  </button>
-                  <button
-                    onClick={() => copyToClipboard(terminalSnippet, "snippet")}
-                    className="inline-flex items-center gap-1.5 text-zinc-300 hover:text-white transition cursor-pointer text-xs"
-                  >
-                    {copiedSnippet ? (
-                      <Check className="w-3.5 h-3.5 text-emerald-400" />
-                    ) : (
-                      <Copy className="w-3.5 h-3.5" />
-                    )}
-                    <span>{copiedSnippet ? "Copied" : "Copy"}</span>
-                  </button>
+            {/* Scoped Credential Status (Never exposes raw secret key without explicit re-auth) */}
+            {existingKey && (
+              <div className="pt-2 flex justify-center animate-in fade-in">
+                <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-2xl bg-[#FAF8F5] border border-[#EAE3D2] text-[#6E675D] text-xs font-mono">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
+                  <span>
+                    Scoped Key Active:{" "}
+                    <span className="font-semibold text-[#1C1A17]">
+                      {existingKey.prefix || "vst_live_"}...{existingKey.key_hint || ""}
+                    </span>
+                  </span>
                 </div>
               </div>
-              <div className="bg-zinc-950 p-5 rounded-b-2xl border border-zinc-800 text-sm font-mono text-emerald-400 overflow-x-auto shadow-inner leading-relaxed">
-                <code>{terminalSnippet}</code>
-              </div>
-            </div>
+            )}
           </div>
         ) : (
           /* Active Agent State Responsive Telemetry Grid */
@@ -1154,7 +1092,7 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
               <div className="flex items-center justify-between p-3 rounded-xl bg-zinc-950 border border-zinc-800 text-emerald-400 font-mono text-xs">
                 <span className="truncate mr-2">{generatedKey}</span>
                 <button
-                  onClick={() => copyToClipboard(generatedKey, "key")}
+                  onClick={() => copyToClipboard(generatedKey)}
                   className="shrink-0 p-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-white transition cursor-pointer"
                   title="Copy Key"
                 >
