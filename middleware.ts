@@ -152,7 +152,14 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // 4. Supabase Session Validation & Cookie Sync via @supabase/ssr
+  // 4. Supabase Session Validation & Cookie Sync via @supabase/ssr updateSession
+  return await updateSession(request);
+}
+
+/**
+ * Refreshes user session cookies on every request and enforces route access controls.
+ */
+async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,
   });
@@ -180,18 +187,21 @@ export async function middleware(request: NextRequest) {
     },
   });
 
-  // Read current session from cookies
+  // IMPORTANT: Use getUser() instead of getSession() to securely revalidate
+  // the Auth token with the Supabase Auth server and refresh cookies via setAll.
   const {
-    data: { session },
-  } = await supabase.auth.getSession();
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const { pathname, search } = request.nextUrl;
 
   // 5. Route Protection Rules
-  // Any unauthenticated request to /dashboard/* or /checkout/* must redirect to /login?redirect=<path>
   const isDashboardRoute = pathname === "/dashboard" || pathname.startsWith("/dashboard/");
   const isCheckoutRoute = pathname === "/checkout" || pathname.startsWith("/checkout/");
+  const isAuthRoute = pathname === "/login" || pathname === "/signup";
 
-  // If session does not exist (session === null), redirect to /login. If session exists, DO NOT redirect. Allow pass-through to /dashboard.
-  if ((isDashboardRoute || isCheckoutRoute) && session === null) {
+  // If unauthenticated user requests /dashboard or /checkout, redirect to /login
+  if ((isDashboardRoute || isCheckoutRoute) && !user) {
     const redirectPath = `${pathname}${search}`;
     const loginUrl = new URL(`/login?redirect=${encodeURIComponent(redirectPath)}`, request.url);
     const redirectResponse = NextResponse.redirect(loginUrl);
@@ -201,10 +211,10 @@ export async function middleware(request: NextRequest) {
     return redirectResponse;
   }
 
-  // On /login and /signup: If data.session !== null, redirect immediately to /dashboard
-  const isAuthRoute = pathname === "/login" || pathname === "/signup";
-  if (isAuthRoute && session !== null) {
-    const dashboardUrl = new URL("/dashboard", request.url);
+  // If authenticated user hits /login or /signup, redirect immediately to /dashboard
+  if (isAuthRoute && user) {
+    const redirectTarget = request.nextUrl.searchParams.get("redirect") || "/dashboard";
+    const dashboardUrl = new URL(redirectTarget, request.url);
     const redirectResponse = NextResponse.redirect(dashboardUrl);
     supabaseResponse.cookies.getAll().forEach((c) => {
       redirectResponse.cookies.set(c.name, c.value);

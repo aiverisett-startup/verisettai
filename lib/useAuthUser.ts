@@ -53,9 +53,13 @@ export function useAuthUser() {
   const refreshUser = useCallback(async () => {
     // 1. Check Supabase session from cookies first
     try {
-      const { data } = await supabase.auth.getSession();
-      if (data.session?.user) {
-        const supaUser = data.session.user;
+      let supaUser = (await supabase.auth.getSession()).data.session?.user;
+      if (!supaUser) {
+        const { data: userData } = await supabase.auth.getUser();
+        supaUser = userData.user || undefined;
+      }
+
+      if (supaUser) {
         const email = supaUser.email || "operator@enterprise-vault.com";
         const name =
           supaUser.user_metadata?.full_name ||

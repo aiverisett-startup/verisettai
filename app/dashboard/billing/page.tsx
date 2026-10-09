@@ -67,16 +67,18 @@ export default function BillingPage() {
   useEffect(() => {
     const fetchSessionAndLedger = async () => {
       try {
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
+        let supaUser = (await supabase.auth.getSession()).data.session?.user;
+        if (!supaUser) {
+          const { data: userData } = await supabase.auth.getUser();
+          supaUser = userData.user || undefined;
+        }
 
         let uid: string | undefined;
 
-        if (session?.user) {
-          uid = session.user.id;
-          setUserEmail(session.user.email || "operator@verisett.ai");
-          const shortId = session.user.id.replace(/-/g, "").slice(0, 8).toUpperCase();
+        if (supaUser) {
+          uid = supaUser.id;
+          setUserEmail(supaUser.email || "operator@verisett.ai");
+          const shortId = supaUser.id.replace(/-/g, "").slice(0, 8).toUpperCase();
           setTenantId(`TENANT-${shortId}`);
         } else {
           const storedEmail =

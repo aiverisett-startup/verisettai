@@ -38,8 +38,12 @@ function LoginForm() {
     let isMounted = true;
     const checkActiveSession = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session?.user && isMounted) {
+        let supaUser = (await supabase.auth.getSession()).data.session?.user;
+        if (!supaUser) {
+          const { data: userData } = await supabase.auth.getUser();
+          supaUser = userData.user || undefined;
+        }
+        if (supaUser && isMounted) {
           router.replace(targetDestination);
         }
       } catch {
