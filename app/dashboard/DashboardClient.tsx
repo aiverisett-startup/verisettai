@@ -25,10 +25,12 @@ import {
   Lock,
   Eye,
   EyeOff,
+  Bot,
 } from "lucide-react";
 import { VerisettLogo } from "@/components/VerisettLogo";
 import { GoldenBackgroundShapes } from "@/components/ui/GoldenBackgroundShapes";
 import { TransactionChart } from "@/components/dashboard/TransactionChart";
+import { RegisterAgentModal } from "@/components/dashboard/RegisterAgentModal";
 import { supabase } from "@/lib/supabase";
 import { dispatchAuthChange } from "@/lib/useAuthUser";
 import { TransactionItem } from "@/lib/agentTransactionStorage";
@@ -40,6 +42,8 @@ interface AgentRecord {
   framework: string;
   ping_latency_ms: number;
   status: "Active" | "Idle" | "Revoked";
+  spending_limit?: number;
+  webhook_url?: string | null;
   created_at?: string;
 }
 
@@ -139,6 +143,9 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
   const [isGeneratingKey, setIsGeneratingKey] = useState<boolean>(false);
   const [copiedKey, setCopiedKey] = useState<boolean>(false);
   const [copiedSnippet, setCopiedSnippet] = useState<boolean>(false);
+
+  // AI Agent Registration Form Modal state
+  const [isRegisterAgentModalOpen, setIsRegisterAgentModalOpen] = useState<boolean>(false);
 
   // Deposit test modal (INR default)
   const [isDepositModalOpen, setIsDepositModalOpen] = useState<boolean>(false);
@@ -247,15 +254,53 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
         console.warn("Could not fetch active api_keys:", keyErr);
       }
 
-      // 3. Agents
+      // 3. Agents & Registered Agents
       const { data: agentRows } = await supabase
         .from("agents")
         .select("*")
         .eq("user_id", userId)
         .order("created_at", { ascending: false });
 
-      if (agentRows) {
-        setAgents(agentRows as AgentRecord[]);
+      const registeredMap = new Map<string, any>();
+      try {
+        const { data: regRows } = await supabase
+          .from("registered_agents")
+          .select("*")
+          .eq("user_id", userId)
+          .order("created_at", { ascending: false });
+
+        if (regRows && regRows.length > 0) {
+          regRows.forEach((r) => registeredMap.set(r.agent_name, r));
+        }
+      } catch (regErr) {
+        // Graceful fallback if table is newly migrating
+      }
+
+      if (agentRows && agentRows.length > 0) {
+        const enrichedAgents: AgentRecord[] = agentRows.map((a) => {
+          const reg = registeredMap.get(a.name);
+          return {
+            ...a,
+            spending_limit: reg?.spending_limit !== undefined ? Number(reg.spending_limit) : undefined,
+            webhook_url: reg?.webhook_url || null,
+          };
+        });
+        setAgents(enrichedAgents);
+      } else if (registeredMap.size > 0) {
+        const fallbackFromReg: AgentRecord[] = Array.from(registeredMap.values()).map((r) => ({
+          id: r.id,
+          user_id: r.user_id,
+          name: r.agent_name,
+          framework: r.framework || "FastMCP",
+          ping_latency_ms: 18,
+          status: "Active",
+          spending_limit: Number(r.spending_limit || 0),
+          webhook_url: r.webhook_url,
+          created_at: r.created_at,
+        }));
+        setAgents(fallbackFromReg);
+      } else {
+        setAgents([]);
       }
 
       // 4. Settlements
@@ -379,6 +424,18 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
           event: "*",
           schema: "public",
           table: "agents",
+          filter: `user_id=eq.${userId}`,
+        },
+        () => {
+          loadTenantData(userId);
+        }
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "registered_agents",
           filter: `user_id=eq.${userId}`,
         },
         () => {
@@ -681,8 +738,16 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
             </nav>
 
             <button
-              onClick={() => setIsDepositModalOpen(true)}
+              onClick={() => setIsRegisterAgentModalOpen(true)}
               className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs sm:text-sm font-semibold shadow-xs transition cursor-pointer"
+            >
+              <Bot className="w-4 h-4" />
+              <span>Register AI Agent</span>
+            </button>
+
+            <button
+              onClick={() => setIsDepositModalOpen(true)}
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[#EAE3D2] bg-white hover:bg-neutral-50 text-[#1C1A17] text-xs sm:text-sm font-semibold shadow-xs transition cursor-pointer"
             >
               <Plus className="w-4 h-4" />
               <span>Deposit Funds</span>
@@ -867,17 +932,25 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
             {/* Interactive Generate Key Button and Actions */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
               <button
+                onClick={() => setIsRegisterAgentModalOpen(true)}
+                className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white font-bold text-base tracking-wide shadow-md shadow-blue-500/25 transition-all flex items-center justify-center gap-3 cursor-pointer"
+              >
+                <Bot className="w-5 h-5" />
+                <span>Register Autonomous Agent</span>
+              </button>
+
+              <button
                 onClick={handleGenerateFastMcpKey}
                 disabled={isGeneratingKey}
-                className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white font-bold text-base tracking-wide shadow-md shadow-blue-500/25 transition-all flex items-center justify-center gap-3 cursor-pointer disabled:opacity-60"
+                className="w-full sm:w-auto px-6 py-4 rounded-2xl border border-zinc-300 bg-white hover:bg-zinc-50 active:bg-zinc-100 text-[#1C1A17] font-semibold text-sm transition-all flex items-center justify-center gap-2.5 cursor-pointer shadow-xs disabled:opacity-60"
               >
-                <Key className="w-5 h-5" />
+                <Key className="w-4 h-4 text-blue-600" />
                 <span>
                   {isGeneratingKey
                     ? "Generating FastMCP Key..."
                     : existingKey || generatedKey
-                    ? "Generate New Key"
-                    : "Generate FastMCP Access Key"}
+                    ? "Quick Re-Key"
+                    : "Quick Connect FastMCP"}
                 </span>
               </button>
 
@@ -963,13 +1036,22 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
                   </p>
                 </div>
 
-                <button
-                  onClick={handleGenerateFastMcpKey}
-                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 text-xs sm:text-sm font-semibold font-mono transition cursor-pointer"
-                >
-                  <Plus className="w-4 h-4" />
-                  <span>Connect Another Agent</span>
-                </button>
+                <div className="flex items-center gap-2.5">
+                  <button
+                    onClick={() => setIsRegisterAgentModalOpen(true)}
+                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs sm:text-sm font-semibold transition cursor-pointer shadow-xs"
+                  >
+                    <Bot className="w-4 h-4" />
+                    <span>Register AI Agent</span>
+                  </button>
+                  <button
+                    onClick={handleGenerateFastMcpKey}
+                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 text-xs sm:text-sm font-semibold font-mono transition cursor-pointer"
+                  >
+                    <Plus className="w-4 h-4" />
+                    <span>Quick Connect</span>
+                  </button>
+                </div>
               </div>
 
               <div className="overflow-x-auto">
@@ -979,6 +1061,7 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
                       <th className="py-4 px-4">Agent ID</th>
                       <th className="py-4 px-4">Name</th>
                       <th className="py-4 px-4">Framework</th>
+                      <th className="py-4 px-4">Spending Cap</th>
                       <th className="py-4 px-4">Ping Latency</th>
                       <th className="py-4 px-4">Status</th>
                       <th className="py-4 px-4 text-right">Actions</th>
@@ -1000,6 +1083,11 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
                           <span className="px-2.5 py-1 rounded-lg bg-[#FAF8F5] border border-[#EAE3D2] font-mono text-xs text-[#4A453E]">
                             {agent.framework || "FastMCP"}
                           </span>
+                        </td>
+                        <td className="py-4 sm:py-5 px-4 font-mono text-xs text-[#1C1A17] font-semibold">
+                          {agent.spending_limit !== undefined
+                            ? `₹${agent.spending_limit.toLocaleString("en-IN", { minimumFractionDigits: 2 })}`
+                            : "Unlimited"}
                         </td>
                         <td className="py-4 sm:py-5 px-4 font-mono text-[#6E675D]">
                           <span className="inline-flex items-center gap-1.5 text-emerald-600 font-semibold">
@@ -1161,6 +1249,13 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
           </div>
         </div>
       )}
+
+      {/* MODAL 3: Autonomous AI Agent Registration Form */}
+      <RegisterAgentModal
+        isOpen={isRegisterAgentModalOpen}
+        onClose={() => setIsRegisterAgentModalOpen(false)}
+        onAgentRegistered={() => loadTenantData(user.id)}
+      />
     </div>
   );
 }
