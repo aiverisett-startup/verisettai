@@ -3,6 +3,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import { MinimalNav } from "@/components/landing/MinimalNav";
 import { HeroSection } from "@/components/landing/HeroSection";
+import { AgentCapabilitiesMarquee } from "@/components/landing/AgentCapabilitiesMarquee";
+import { ProtocolOrbitShowcase } from "@/components/landing/ProtocolOrbitShowcase";
 import { HowItWorksSection } from "@/components/landing/HowItWorksSection";
 import { ProtocolArchitecture } from "@/components/landing/ProtocolArchitecture";
 import { DeveloperCodeSection } from "@/components/landing/DeveloperCodeSection";
@@ -189,6 +191,12 @@ export default function Home() {
       <HeroSection
         onExploreConsole={scrollToConsole}
       />
+
+      {/* Infinite Horizontal Capabilities Stream */}
+      <AgentCapabilitiesMarquee />
+
+      {/* Concentric Radar Orbit Settlement Showcase */}
+      <ProtocolOrbitShowcase />
 
       {/* Semantic AI Answer Target for Google AI Overviews & Perplexity Citations */}
       <AIAnswerTarget />

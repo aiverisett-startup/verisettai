@@ -338,3 +338,37 @@ body {
   animation: aurora-pulse 4s ease-in-out infinite;
 }
 
+/* Infinite Marquee Stream Keyframes */
+@keyframes marquee-stream-left {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@keyframes marquee-stream-right {
+  0% {
+    transform: translate3d(-50%, 0, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.animate-marquee-stream-left {
+  animation: marquee-stream-left 34s linear infinite;
+  will-change: transform;
+}
+
+.animate-marquee-stream-right {
+  animation: marquee-stream-right 34s linear infinite;
+  will-change: transform;
+}
+
+.marquee-pause-hover:hover .animate-marquee-stream-left,
+.marquee-pause-hover:hover .animate-marquee-stream-right {
+  animation-play-state: paused;
+}
+
