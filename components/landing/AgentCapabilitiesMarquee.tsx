@@ -204,12 +204,6 @@ export function AgentCapabilitiesMarquee() {
 
       {/* Top Protocol Subheader */}
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mb-8 text-center">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-zinc-200 dark:border-zinc-800 bg-white/90 dark:bg-zinc-900/90 shadow-2xs mb-3">
-          <span className="h-1.5 w-1.5 rounded-full bg-blue-600 dark:bg-cyan-400 animate-pulse" />
-          <span className="text-[11px] font-mono uppercase tracking-wider font-semibold text-zinc-700 dark:text-zinc-300">
-            AUTONOMOUS PROTOCOL STREAM
-          </span>
-        </div>
         <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-zinc-950 dark:text-zinc-100 font-sans">
           Built For Production-Grade Multi-Agent Workflows
         </h3>
