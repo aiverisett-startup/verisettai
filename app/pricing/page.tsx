@@ -1,15 +1,16 @@
-"use client";
-
 import React from "react";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { VerisettLogo } from "@/components/VerisettLogo";
-import { PricingSection } from "@/components/landing/PricingSection";
+import { PricingSection } from "@/components/PricingSection";
 import { FAQSection } from "@/components/landing/FAQSection";
 import { WebsiteEdgeShapes } from "@/components/ui/WebsiteEdgeShapes";
 import { GoldenBackgroundShapes } from "@/components/ui/GoldenBackgroundShapes";
+import { getPlans } from "@/app/actions/register";
 
-export default function PricingPage() {
+export default async function PricingPage() {
+  const initialPlans = await getPlans();
+
   return (
     <div className="min-h-screen bg-[#FDFCF9] text-[#1C1A17] font-sans antialiased selection:bg-blue-600 selection:text-white relative overflow-x-hidden">
       {/* Background Ambience */}
@@ -51,8 +52,8 @@ export default function PricingPage() {
       </header>
 
       <main>
-        {/* Core Tiered Capacity Pricing Component */}
-        <PricingSection />
+        {/* Core Tiered Capacity Pricing Component with direct Server-fetched capacity stats */}
+        <PricingSection initialPlans={initialPlans} />
 
         {/* Pricing FAQ Section */}
         <FAQSection />
