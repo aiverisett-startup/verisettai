@@ -17,6 +17,8 @@ import {
   Sparkles,
 } from "lucide-react";
 import { VerisettLogo } from "@/components/VerisettLogo";
+import { GoldenBackgroundShapes } from "@/components/ui/GoldenBackgroundShapes";
+import { WebsiteEdgeShapes } from "@/components/ui/WebsiteEdgeShapes";
 
 function TwitterXIcon({ className = "w-4 h-4" }: { className?: string }) {
   return (
@@ -40,7 +42,11 @@ function GithubIcon({ className = "w-4 h-4" }: { className?: string }) {
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen bg-[#0B1528] text-[#F8FAFC] font-montserrat antialiased selection:bg-[#C59B5F]/30 selection:text-[#FAF6EE]">
+    <div className="min-h-screen bg-[#FDFCF9] text-[#1C1A17] font-sans antialiased selection:bg-blue-600 selection:text-white relative overflow-x-hidden">
+      {/* Platform Ambient Edge Shapes & Golden Accents */}
+      <WebsiteEdgeShapes />
+      <GoldenBackgroundShapes variant="subtle" density="dense" />
+
       {/* Schema.org AboutPage Structured Data */}
       <script
         type="application/ld+json"
@@ -58,29 +64,29 @@ export default function AboutPage() {
               "worksFor": {
                 "@type": "Organization",
                 "name": "Verisett AI Project",
-                "url": "https://veri-sett.com"
+                "url": "https://veri-sett.com",
               },
               "sameAs": [
                 "https://github.com/aiverisett-startup",
-                "https://x.com/ai_verisett"
-              ]
-            }
+                "https://x.com/ai_verisett",
+              ],
+            },
           }),
         }}
       />
 
-      {/* Header */}
-      <header className="sticky top-0 z-40 border-b border-[#1E345E]/80 bg-[#0B1528]/90 backdrop-blur-md">
+      {/* Top Header */}
+      <header className="sticky top-0 z-40 border-b border-[#EAE3D2] bg-white/90 backdrop-blur-md">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-3">
             <Link href="/" className="flex items-center gap-2.5 group">
-              <VerisettLogo size={28} />
-              <span className="text-base font-bold tracking-tight text-white group-hover:text-[#C59B5F] transition-colors">
+              <VerisettLogo size={30} />
+              <span className="text-base font-bold tracking-tight text-[#1C1A17] group-hover:text-blue-600 transition-colors">
                 Verisett AI
               </span>
             </Link>
-            <span className="hidden sm:inline-block text-[#3B527E]">/</span>
-            <span className="hidden sm:inline-block rounded-md bg-[#142442] px-2.5 py-0.5 text-[11px] font-mono text-[#C59B5F] border border-[#1E345E]">
+            <span className="hidden sm:inline-block text-[#EAE3D2]">/</span>
+            <span className="hidden sm:inline-block rounded-lg bg-[#FAF8F5] px-2.5 py-1 text-[11px] font-mono text-[#6E675D] border border-[#EAE3D2]">
               PROJECT LEADERSHIP &amp; ARCHITECTURE
             </span>
           </div>
@@ -88,15 +94,15 @@ export default function AboutPage() {
           <div className="flex items-center gap-3 sm:gap-4">
             <Link
               href="/"
-              className="inline-flex items-center gap-2 rounded-xl border border-[#1E345E] bg-[#0E1B33] px-3.5 py-1.5 text-xs font-medium text-[#94A3B8] hover:border-[#C59B5F]/60 hover:text-white transition-all shadow-xs"
+              className="inline-flex items-center gap-2 rounded-xl border border-[#EAE3D2] bg-white px-3.5 py-1.5 text-xs font-semibold text-[#1C1A17] hover:border-blue-400 hover:text-blue-600 transition-all shadow-2xs"
             >
-              <ArrowLeft className="h-3.5 w-3.5 text-[#C59B5F]" />
+              <ArrowLeft className="h-3.5 w-3.5 text-blue-600" />
               <span className="hidden sm:inline">Back to Platform</span>
               <span className="sm:hidden">Back</span>
             </Link>
             <Link
               href="/security"
-              className="text-xs font-medium text-[#94A3B8] hover:text-[#C59B5F] transition-colors hidden md:inline-block"
+              className="text-xs font-semibold text-[#6E675D] hover:text-[#1C1A17] transition-colors hidden md:inline-block"
             >
               Security Architecture →
             </Link>
@@ -105,24 +111,24 @@ export default function AboutPage() {
       </header>
 
       {/* Main Content */}
-      <main className="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8 space-y-12">
+      <main className="mx-auto max-w-5xl px-4 py-10 sm:py-14 lg:px-8 space-y-10">
         
         {/* Prominent Founder Hero */}
-        <section className="rounded-3xl border border-[#C59B5F]/50 bg-gradient-to-b from-[#142442] to-[#0E1B33] p-8 sm:p-12 shadow-2xl relative overflow-hidden space-y-6">
-          <div className="inline-flex items-center gap-2 rounded-full border border-[#C59B5F]/40 bg-[#0B1528] px-3.5 py-1 text-xs font-mono text-[#C59B5F]">
-            <Sparkles className="h-3.5 w-3.5 text-[#C59B5F]" />
+        <section className="rounded-3xl border border-[#EAE3D2] bg-gradient-to-br from-white via-[#FAF8F5] to-blue-50/25 p-8 sm:p-12 shadow-xs relative overflow-hidden space-y-6">
+          <div className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-3.5 py-1 text-xs font-mono font-semibold text-blue-700 shadow-2xs">
+            <Sparkles className="h-3.5 w-3.5 text-blue-600" />
             <span>FOUNDER &amp; ARCHITECTURAL LEADERSHIP</span>
           </div>
 
           <div className="space-y-4 max-w-3xl">
-            <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white leading-tight">
+            <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-[#1C1A17] leading-tight">
               Founded &amp; Architected by{" "}
-              <span className="bg-gradient-to-r from-[#D4AF37] via-[#C59B5F] to-[#9E7A45] bg-clip-text text-transparent">
+              <span className="text-blue-600">
                 Manoj S.M.
               </span>
             </h1>
-            <p className="text-sm sm:text-base text-[#CBD5E1] leading-relaxed">
-              Verisett AI was initiated by <strong>Manoj S.M.</strong> to engineer the deterministic financial settlement and milestone verification clearinghouse required for autonomous machine-to-machine economies.
+            <p className="text-sm sm:text-base text-[#4A453E] leading-relaxed">
+              Verisett AI was initiated by <strong className="text-[#1C1A17]">Manoj S.M.</strong> to engineer the deterministic financial settlement and milestone verification clearinghouse required for autonomous machine-to-machine economies.
             </p>
           </div>
 
@@ -132,70 +138,72 @@ export default function AboutPage() {
               href="https://github.com/aiverisett-startup"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#0B1528] border border-[#1E345E] hover:border-[#C59B5F] text-xs font-mono font-medium text-white hover:text-[#C59B5F] transition shadow-xs"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-[#EAE3D2] hover:border-blue-400 text-xs font-mono font-semibold text-[#1C1A17] hover:text-blue-600 transition shadow-2xs"
             >
-              <GithubIcon className="w-4 h-4 text-[#C59B5F]" />
+              <GithubIcon className="w-4 h-4 text-[#1C1A17]" />
               <span>GitHub: @aiverisett-startup</span>
-              <ExternalLink className="w-3 h-3 text-[#64748B]" />
+              <ExternalLink className="w-3 h-3 text-[#8C8275]" />
             </a>
 
             <a
               href="https://x.com/ai_verisett"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#0B1528] border border-[#1E345E] hover:border-[#C59B5F] text-xs font-mono font-medium text-white hover:text-[#C59B5F] transition shadow-xs"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-[#EAE3D2] hover:border-blue-400 text-xs font-mono font-semibold text-[#1C1A17] hover:text-blue-600 transition shadow-2xs"
             >
-              <TwitterXIcon className="w-3.5 h-3.5 text-[#C59B5F]" />
+              <TwitterXIcon className="w-3.5 h-3.5 text-[#1C1A17]" />
               <span>Twitter / X: @ai_verisett</span>
-              <ExternalLink className="w-3 h-3 text-[#64748B]" />
+              <ExternalLink className="w-3 h-3 text-[#8C8275]" />
             </a>
           </div>
         </section>
 
         {/* Technology Clarification & Framework Framing */}
-        <section className="rounded-3xl border border-[#1E345E] bg-[#0E1B33]/80 p-7 sm:p-10 space-y-6">
+        <section className="rounded-3xl border border-[#EAE3D2] bg-white p-7 sm:p-10 shadow-xs space-y-6">
           <div className="space-y-2">
-            <span className="text-xs font-mono uppercase text-[#C59B5F] tracking-wider">
+            <span className="text-xs font-mono uppercase text-[#8C8275] font-semibold tracking-wider block">
               Technology Stack &amp; Implementation Architecture
             </span>
-            <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+            <h2 className="text-2xl sm:text-3xl font-bold text-[#1C1A17] tracking-tight">
               Verisett Settlement Engine — Native TypeScript MCP with Python FastMCP Roadmap
             </h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
-            <div className="rounded-2xl border border-[#1E345E] bg-[#142442]/70 p-6 space-y-3">
-              <div className="flex items-center gap-2 text-white font-bold text-sm">
-                <Cpu className="w-4 h-4 text-[#C59B5F]" />
+            <div className="rounded-2xl border border-[#EAE3D2] bg-[#FAF8F5] p-6 space-y-3">
+              <div className="flex items-center gap-2 text-[#1C1A17] font-bold text-sm">
+                <Cpu className="w-4 h-4 text-blue-600" />
                 <span>Native TypeScript MCP Settlement Engine (Live Sandbox)</span>
               </div>
-              <p className="text-xs sm:text-sm text-[#94A3B8] leading-relaxed">
-                The live simulation sandbox executes directly on a native <strong className="text-white">TypeScript Model Context Protocol (MCP) settlement engine (JSON-RPC 2.0)</strong> embedded inside Next.js (endpoint at <code className="text-[#C59B5F]">/api/mcp</code>). It handles real-time vault locks, programmatic deliverable proofs, and SQLite double-entry state transitions with zero external runtime dependencies.
+              <p className="text-xs sm:text-sm text-[#4A453E] leading-relaxed">
+                The live simulation sandbox executes directly on a native <strong className="text-[#1C1A17]">TypeScript Model Context Protocol (MCP) settlement engine (JSON-RPC 2.0)</strong> embedded inside Next.js (endpoint at <code className="px-1.5 py-0.5 rounded bg-white border border-[#EAE3D2] text-blue-700 font-mono text-xs font-bold">/api/mcp</code>). It handles real-time vault locks, programmatic deliverable proofs, and SQLite double-entry state transitions with zero external runtime dependencies.
               </p>
             </div>
 
-            <div className="rounded-2xl border border-[#1E345E] bg-[#142442]/70 p-6 space-y-3">
-              <div className="flex items-center gap-2 text-white font-bold text-sm">
-                <Scale className="w-4 h-4 text-emerald-400" />
+            <div className="rounded-2xl border border-[#EAE3D2] bg-[#FAF8F5] p-6 space-y-3">
+              <div className="flex items-center gap-2 text-[#1C1A17] font-bold text-sm">
+                <Scale className="w-4 h-4 text-emerald-600" />
                 <span>Python FastMCP Client Bindings (Roadmap Milestone 2)</span>
               </div>
-              <p className="text-xs sm:text-sm text-[#94A3B8] leading-relaxed">
-                FastMCP serves as the target framework for our upcoming Python SDK and PyPI distribution (<code className="text-[#C59B5F]">pip install verisett</code>), which are currently under active development and scheduled on the public roadmap as Milestone 2. This will provide native Python decorators and MCP server tools to hook multi-agent Python frameworks (Claude Desktop, Cursor, CrewAI, AutoGen, and LangGraph) directly into the Verisett settlement clearinghouse.
+              <p className="text-xs sm:text-sm text-[#4A453E] leading-relaxed">
+                FastMCP serves as the target framework for our upcoming Python SDK and PyPI distribution (<code className="px-1.5 py-0.5 rounded bg-white border border-[#EAE3D2] text-blue-700 font-mono text-xs font-bold">pip install verisett</code>), which are currently under active development and scheduled on the public roadmap as Milestone 2. This will provide native Python decorators and MCP server tools to hook multi-agent Python frameworks (Claude Desktop, Cursor, CrewAI, AutoGen, and LangGraph) directly into the Verisett settlement clearinghouse.
               </p>
             </div>
           </div>
         </section>
 
         {/* Public Protocol Roadmap Modernization */}
-        <section className="rounded-3xl border border-[#1E345E] bg-[#0E1B33]/80 p-7 sm:p-10 space-y-6">
-          <div className="border-b border-[#1E345E] pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <section className="rounded-3xl border border-[#EAE3D2] bg-white p-7 sm:p-10 shadow-xs space-y-6">
+          <div className="border-b border-[#F0E9DC] pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
-              <span className="text-xs font-mono uppercase text-[#C59B5F] tracking-wider">Public Protocol Roadmap</span>
-              <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight mt-0.5">
+              <span className="text-xs font-mono uppercase text-[#8C8275] font-semibold tracking-wider block">
+                Public Protocol Roadmap
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-bold text-[#1C1A17] tracking-tight mt-0.5">
                 Technical Milestones &amp; Implementation Roadmap
               </h2>
             </div>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#142442] border border-[#1E345E] text-xs font-mono text-[#C59B5F]">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-xs font-mono font-bold text-emerald-800 shadow-2xs">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               Milestone 1 Active
             </span>
@@ -203,57 +211,65 @@ export default function AboutPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Milestone 1 */}
-            <div className="rounded-2xl border border-emerald-500/40 bg-emerald-500/5 p-5 space-y-3">
+            <div className="rounded-2xl border-2 border-emerald-300 bg-emerald-50/40 p-5 sm:p-6 space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-mono font-bold text-emerald-400">MILESTONE 1</span>
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-semibold">
+                <span className="text-xs font-mono font-bold text-emerald-800">MILESTONE 1</span>
+                <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-emerald-100 border border-emerald-300 text-emerald-800 font-bold">
                   CURRENT / ACTIVE
                 </span>
               </div>
-              <h3 className="text-sm font-bold text-white">Milestone 1: Live Public TypeScript Testnet Sandbox (Current / Active)</h3>
-              <p className="text-xs text-[#94A3B8] leading-relaxed">
-                Native TypeScript Next.js MCP JSON-RPC 2.0 endpoint (<code className="text-[#C59B5F]">/api/mcp</code>), non-custodial programmatic vaults, SHA-256 payload assertion verification (&lt;50ms), and simulated testnet VRS accounting units with zero monetary fiat liability.
+              <h3 className="text-sm sm:text-base font-bold text-[#1C1A17]">
+                Milestone 1: Live Public TypeScript Testnet Sandbox (Current / Active)
+              </h3>
+              <p className="text-xs sm:text-sm text-[#4A453E] leading-relaxed">
+                Native TypeScript Next.js MCP JSON-RPC 2.0 endpoint (<code className="px-1.5 py-0.5 rounded bg-white border border-[#EAE3D2] text-blue-700 font-mono text-xs font-semibold">/api/mcp</code>), non-custodial programmatic vaults, SHA-256 payload assertion verification (&lt;50ms), and simulated testnet VRS accounting units with zero monetary fiat liability.
               </p>
             </div>
 
             {/* Milestone 2 */}
-            <div className="rounded-2xl border border-[#1E345E] bg-[#142442]/60 p-5 space-y-3">
+            <div className="rounded-2xl border border-[#EAE3D2] bg-[#FAF8F5] p-5 sm:p-6 space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-mono font-bold text-[#C59B5F]">MILESTONE 2</span>
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#1E345E] text-[#94A3B8]">
+                <span className="text-xs font-mono font-bold text-blue-700">MILESTONE 2</span>
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-white border border-[#EAE3D2] text-[#6E675D] font-semibold">
                   IN DEVELOPMENT
                 </span>
               </div>
-              <h3 className="text-sm font-bold text-white">Milestone 2: Python FastMCP SDK &amp; PyPI Distribution</h3>
-              <p className="text-xs text-[#94A3B8] leading-relaxed">
-                Official <code className="text-[#C59B5F]">pip install verisett</code> PyPI package providing idiomatic Python FastMCP client bindings, decorators, and middleware for autonomous frameworks (Claude Desktop, Cursor, CrewAI, AutoGen, and LangGraph).
+              <h3 className="text-sm sm:text-base font-bold text-[#1C1A17]">
+                Milestone 2: Python FastMCP SDK &amp; PyPI Distribution
+              </h3>
+              <p className="text-xs sm:text-sm text-[#4A453E] leading-relaxed">
+                Official <code className="px-1.5 py-0.5 rounded bg-white border border-[#EAE3D2] text-blue-700 font-mono text-xs font-semibold">pip install verisett</code> PyPI package providing idiomatic Python FastMCP client bindings, decorators, and middleware for autonomous frameworks (Claude Desktop, Cursor, CrewAI, AutoGen, and LangGraph).
               </p>
             </div>
 
             {/* Milestone 3 */}
-            <div className="rounded-2xl border border-[#1E345E] bg-[#142442]/60 p-5 space-y-3">
+            <div className="rounded-2xl border border-[#EAE3D2] bg-[#FAF8F5] p-5 sm:p-6 space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-mono font-bold text-[#38BDF8]">MILESTONE 3</span>
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#1E345E] text-[#94A3B8]">
+                <span className="text-xs font-mono font-bold text-indigo-700">MILESTONE 3</span>
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-white border border-[#EAE3D2] text-[#6E675D] font-semibold">
                   SCHEDULED
                 </span>
               </div>
-              <h3 className="text-sm font-bold text-white">Milestone 3: Third-Party Independent Smart Contract &amp; Cryptographic Audit</h3>
-              <p className="text-xs text-[#94A3B8] leading-relaxed">
+              <h3 className="text-sm sm:text-base font-bold text-[#1C1A17]">
+                Milestone 3: Third-Party Independent Smart Contract &amp; Cryptographic Audit
+              </h3>
+              <p className="text-xs sm:text-sm text-[#4A453E] leading-relaxed">
                 Comprehensive third-party security audit of double-entry ledger invariants, assertion cryptographic soundness, and MCP transport penetration testing, with full public audit report release.
               </p>
             </div>
 
             {/* Milestone 4 */}
-            <div className="rounded-2xl border border-[#1E345E] bg-[#142442]/60 p-5 space-y-3">
+            <div className="rounded-2xl border border-[#EAE3D2] bg-[#FAF8F5] p-5 sm:p-6 space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-mono font-bold text-[#A855F7]">MILESTONE 4</span>
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#1E345E] text-[#94A3B8]">
+                <span className="text-xs font-mono font-bold text-purple-700">MILESTONE 4</span>
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-white border border-[#EAE3D2] text-[#6E675D] font-semibold">
                   ROADMAP
                 </span>
               </div>
-              <h3 className="text-sm font-bold text-white">Milestone 4: Production Fiat Escrow Rails &amp; Corporate Licensing</h3>
-              <p className="text-xs text-[#94A3B8] leading-relaxed">
+              <h3 className="text-sm sm:text-base font-bold text-[#1C1A17]">
+                Milestone 4: Production Fiat Escrow Rails &amp; Corporate Licensing
+              </h3>
+              <p className="text-xs sm:text-sm text-[#4A453E] leading-relaxed">
                 Integration of licensed banking partners and fiat on/off-ramp gateways, production multi-sig custody, enterprise compliance certifications, and legal corporate escrow backing.
               </p>
             </div>
@@ -261,84 +277,84 @@ export default function AboutPage() {
         </section>
 
         {/* Public Sandbox Notice & Audit Roadmap */}
-        <section className="rounded-3xl border border-amber-500/30 bg-amber-500/5 p-7 sm:p-10 space-y-4">
-          <div className="flex items-center gap-2 text-xs font-mono font-semibold uppercase text-amber-400">
-            <ShieldCheck className="w-4 h-4" />
+        <section className="rounded-3xl border border-amber-200 bg-amber-50/50 p-7 sm:p-10 space-y-4">
+          <div className="flex items-center gap-2 text-xs font-mono font-bold uppercase text-amber-800">
+            <ShieldCheck className="w-4 h-4 text-amber-700 shrink-0" />
             <span>Developer Sandbox &amp; Audit Disclosure</span>
           </div>
 
-          <div className="space-y-3 text-xs sm:text-sm text-[#CBD5E1] leading-relaxed">
+          <div className="space-y-3 text-xs sm:text-sm text-[#4A453E] leading-relaxed">
             <p>
-              Verisett AI currently operates strictly as an <strong>experimental open-source protocol and developer simulation sandbox</strong>.
+              Verisett AI currently operates strictly as an <strong className="text-[#1C1A17]">experimental open-source protocol and developer simulation sandbox</strong>.
               All dashboard metrics—including active vault counts, transaction volumes, settlement throughput, and token balances—represent
-              <strong> testnet simulation throughput with zero monetary fiat liability</strong>.
+              <strong className="text-[#1C1A17]"> testnet simulation throughput with zero monetary fiat liability</strong>.
             </p>
-            <p className="pt-2 border-t border-amber-500/20 text-[#94A3B8]">
-              <strong className="text-white">Public Roadmap Commitment:</strong> Independent third-party cryptographic audits and production fiat gateways are currently planned on the public roadmap as the protocol transitions from testnet sandbox to institutional multi-agent clearinghouse.
+            <p className="pt-2 border-t border-amber-200/80 text-[#6E675D]">
+              <strong className="text-[#1C1A17]">Public Roadmap Commitment:</strong> Independent third-party cryptographic audits and production fiat gateways are currently planned on the public roadmap as the protocol transitions from testnet sandbox to institutional multi-agent clearinghouse.
             </p>
           </div>
         </section>
 
         {/* Navigation Quick Links */}
-        <section className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 text-xs font-mono">
+        <section className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 text-xs font-mono">
           <Link
             href="/security"
-            className="flex items-center justify-between p-4 rounded-xl bg-[#0E1B33] border border-[#1E345E] hover:border-[#C59B5F] text-white transition group"
+            className="flex items-center justify-between p-4 sm:p-5 rounded-2xl bg-white border border-[#EAE3D2] hover:border-blue-400 text-[#1C1A17] hover:text-blue-600 transition shadow-2xs group font-semibold"
           >
             <span>Security Architecture</span>
-            <ArrowLeft className="w-3.5 h-3.5 rotate-180 text-[#C59B5F] group-hover:translate-x-1 transition-transform" />
+            <ArrowLeft className="w-3.5 h-3.5 rotate-180 text-blue-600 group-hover:translate-x-1 transition-transform" />
           </Link>
           <Link
             href="/terms"
-            className="flex items-center justify-between p-4 rounded-xl bg-[#0E1B33] border border-[#1E345E] hover:border-[#C59B5F] text-white transition group"
+            className="flex items-center justify-between p-4 sm:p-5 rounded-2xl bg-white border border-[#EAE3D2] hover:border-blue-400 text-[#1C1A17] hover:text-blue-600 transition shadow-2xs group font-semibold"
           >
             <span>Terms of Service</span>
-            <ArrowLeft className="w-3.5 h-3.5 rotate-180 text-[#C59B5F] group-hover:translate-x-1 transition-transform" />
+            <ArrowLeft className="w-3.5 h-3.5 rotate-180 text-blue-600 group-hover:translate-x-1 transition-transform" />
           </Link>
           <Link
             href="/privacy"
-            className="flex items-center justify-between p-4 rounded-xl bg-[#0E1B33] border border-[#1E345E] hover:border-[#C59B5F] text-white transition group"
+            className="flex items-center justify-between p-4 sm:p-5 rounded-2xl bg-white border border-[#EAE3D2] hover:border-blue-400 text-[#1C1A17] hover:text-blue-600 transition shadow-2xs group font-semibold"
           >
             <span>Privacy Policy</span>
-            <ArrowLeft className="w-3.5 h-3.5 rotate-180 text-[#C59B5F] group-hover:translate-x-1 transition-transform" />
+            <ArrowLeft className="w-3.5 h-3.5 rotate-180 text-blue-600 group-hover:translate-x-1 transition-transform" />
           </Link>
         </section>
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-[#1E345E]/80 bg-[#070E1B] py-12 text-xs text-[#64748B] font-montserrat mt-16">
+      <footer className="border-t border-[#EAE3D2] bg-[#FAF8F5] py-14 text-sm text-[#8C8275] font-sans mt-16 relative overflow-hidden">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-6">
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pb-6 border-b border-[#1E345E]/60">
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pb-6 border-b border-[#EAE3D2]">
             <div className="space-y-1">
               <div className="flex items-center gap-2.5">
-                <VerisettLogo size={22} />
-                <span className="text-sm font-bold text-white tracking-tight">Verisett AI</span>
+                <VerisettLogo size={24} />
+                <span className="text-base font-bold text-[#1C1A17] tracking-tight">Verisett AI</span>
               </div>
-              <p className="text-xs text-[#94A3B8]">
+              <p className="text-xs text-[#6E675D]">
                 Founded &amp; Architected by Manoj S.M. — Deterministic financial settlement for autonomous agent economies.
               </p>
             </div>
 
             <div className="flex flex-wrap items-center gap-5 font-mono text-xs">
-              <Link href="/about" className="text-[#C59B5F] hover:text-white transition-colors font-semibold">
+              <Link href="/about" className="text-blue-600 hover:text-blue-700 transition-colors font-bold">
                 /about
               </Link>
-              <Link href="/security" className="hover:text-white transition-colors">
+              <Link href="/security" className="hover:text-[#1C1A17] transition-colors">
                 /security
               </Link>
-              <Link href="/docs" className="hover:text-white transition-colors">
+              <Link href="/docs" className="hover:text-[#1C1A17] transition-colors">
                 /docs
               </Link>
-              <Link href="/terms" className="hover:text-white transition-colors">
+              <Link href="/terms" className="hover:text-[#1C1A17] transition-colors">
                 /terms
               </Link>
-              <Link href="/privacy" className="hover:text-white transition-colors">
+              <Link href="/privacy" className="hover:text-[#1C1A17] transition-colors">
                 /privacy
               </Link>
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-[#475569]">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#8C8275] font-mono">
             <p>© {new Date().getFullYear()} Verisett AI Project / Manoj S.M. All rights reserved. Open-Source Simulation Sandbox.</p>
             <p>Built on Model Context Protocol (MCP) using FastMCP.</p>
           </div>
