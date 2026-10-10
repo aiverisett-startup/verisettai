@@ -5,7 +5,7 @@ import Link from "next/link";
 import { ExternalLink } from "lucide-react";
 import { VerisettLogo } from "../VerisettLogo";
 
-function InstagramGradientIcon({ className = "w-4 h-4" }: { className?: string }) {
+function InstagramGradientIcon({ className = "w-3.5 h-3.5" }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
       <defs>
@@ -24,7 +24,7 @@ function InstagramGradientIcon({ className = "w-4 h-4" }: { className?: string }
   );
 }
 
-function TwitterXIcon({ className = "w-4 h-4" }: { className?: string }) {
+function TwitterXIcon({ className = "w-3.5 h-3.5" }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="currentColor">
       <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
@@ -32,7 +32,7 @@ function TwitterXIcon({ className = "w-4 h-4" }: { className?: string }) {
   );
 }
 
-function YouTubeIcon({ className = "w-4 h-4" }: { className?: string }) {
+function YouTubeIcon({ className = "w-3.5 h-3.5" }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="currentColor">
       <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
@@ -40,7 +40,7 @@ function YouTubeIcon({ className = "w-4 h-4" }: { className?: string }) {
   );
 }
 
-function GithubIcon({ className = "w-4 h-4" }: { className?: string }) {
+function GithubIcon({ className = "w-3.5 h-3.5" }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="currentColor">
       <path
@@ -54,11 +54,10 @@ function GithubIcon({ className = "w-4 h-4" }: { className?: string }) {
 
 export function MinimalFooter() {
   return (
-    <footer className="border-t border-[#EAE3D2] bg-[#FAF8F5] py-14 text-sm text-[#8C8275] font-montserrat relative overflow-hidden">
-      {/* Background Half-Shapes flanking Footer */}
+    <footer className="border-t border-zinc-200 bg-[#FAF8F5] py-14 text-sm font-sans relative overflow-hidden">
+      {/* Background Subtle Semicircles */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden select-none -z-10">
-        {/* Left Edge: Smooth Half-Circle Arc */}
-        <div className="absolute bottom-4 -left-8 sm:-left-12 w-36 sm:w-48 h-36 opacity-30">
+        <div className="absolute bottom-4 -left-8 sm:-left-12 w-36 sm:w-48 h-36 opacity-25">
           <svg viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
             <path
               d="M 90,10 A 80,80 0 0,1 90,170 Z"
@@ -69,9 +68,7 @@ export function MinimalFooter() {
             />
           </svg>
         </div>
-
-        {/* Right Edge: Smooth Half-Circle Arc */}
-        <div className="absolute bottom-4 -right-8 sm:-right-12 w-36 sm:w-48 h-36 opacity-30">
+        <div className="absolute bottom-4 -right-8 sm:-right-12 w-36 sm:w-48 h-36 opacity-25">
           <svg viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
             <path
               d="M 90,10 A 80,80 0 0,0 90,170 Z"
@@ -84,102 +81,101 @@ export function MinimalFooter() {
         </div>
       </div>
 
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pb-8 border-b border-[#EAE3D2]">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-8">
+        
+        {/* 1. Brand & Social Row */}
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pb-8 border-b border-zinc-200">
           
-          <div className="flex items-center gap-3">
-            <VerisettLogo size={24} />
-            <span className="text-xs text-muted-foreground font-medium">
-              / Autonomous M2M Clearinghouse Protocol
+          {/* Left: Verisett AI Logo & Protocol Tag aligned vertically */}
+          <div className="flex flex-col items-start gap-1">
+            <div className="flex items-center gap-2.5">
+              <VerisettLogo size={24} />
+              <span className="font-bold text-base tracking-tight text-zinc-950 font-sans">
+                Verisett AI
+              </span>
+            </div>
+            <span className="text-[11px] font-mono text-zinc-500 uppercase tracking-wider">
+              Autonomous M2M Clearinghouse Protocol
             </span>
           </div>
 
-          {/* Social Follow & Status Badges */}
-          <div className="flex flex-wrap items-center gap-3">
-            {/* GitHub Follow Button */}
+          {/* Right: Unified 4 Social Links in an evenly spaced single flex row */}
+          <div className="flex flex-wrap sm:flex-nowrap items-center gap-2.5">
+            {/* GitHub */}
             <a
               href="https://github.com/aiverisett-startup"
               target="_blank"
               rel="noopener noreferrer"
-              className="group inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white hover:bg-slate-50 border border-[#EAE3D2] hover:border-[#1C1A17] shadow-xs hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 text-xs font-medium text-[#1C1A17]"
+              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white hover:bg-zinc-50 border border-zinc-200 hover:border-zinc-300 text-xs font-medium text-zinc-700 hover:text-zinc-950 transition-all shadow-2xs group"
             >
-              <GithubIcon className="w-4 h-4 shrink-0 text-[#1C1A17] transition-transform duration-300 group-hover:scale-110" />
-              <span className="text-slate-500 group-hover:text-[#1C1A17] transition-colors">
-                GitHub:
-              </span>
-              <span className="font-bold text-[#1C1A17] group-hover:text-blue-600 transition-colors">
-                aiverisett-startup
-              </span>
-              <ExternalLink className="w-3 h-3 text-[#8C8275] group-hover:text-[#1C1A17] transition-transform group-hover:translate-x-0.5" />
+              <GithubIcon className="w-3.5 h-3.5 text-zinc-800 transition-transform group-hover:scale-110" />
+              <span>GitHub</span>
+              <ExternalLink className="w-2.5 h-2.5 text-zinc-400 group-hover:text-zinc-600 transition-transform group-hover:translate-x-0.5" />
             </a>
 
-            {/* Twitter / X Follow Button */}
+            {/* X */}
             <a
               href="https://x.com/ai_verisett"
               target="_blank"
               rel="noopener noreferrer"
-              className="group inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white hover:bg-slate-50 border border-[#EAE3D2] hover:border-blue-500 shadow-xs hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 text-xs font-medium text-[#1C1A17]"
+              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white hover:bg-zinc-50 border border-zinc-200 hover:border-zinc-300 text-xs font-medium text-zinc-700 hover:text-zinc-950 transition-all shadow-2xs group"
             >
-              <TwitterXIcon className="w-3.5 h-3.5 shrink-0 text-[#1C1A17] group-hover:text-blue-600 transition-colors" />
-              <span className="text-slate-500 group-hover:text-[#1C1A17] transition-colors">
-                X (Twitter):
-              </span>
-              <span className="font-bold text-blue-600 group-hover:text-blue-500 transition-colors">
-                @ai_verisett
-              </span>
-              <ExternalLink className="w-3 h-3 text-[#8C8275] group-hover:text-blue-600 transition-transform group-hover:translate-x-0.5" />
+              <TwitterXIcon className="w-3.5 h-3.5 text-zinc-800 transition-transform group-hover:scale-110" />
+              <span>X</span>
+              <ExternalLink className="w-2.5 h-2.5 text-zinc-400 group-hover:text-zinc-600 transition-transform group-hover:translate-x-0.5" />
             </a>
 
-            {/* YouTube Follow Button */}
+            {/* YouTube */}
             <a
               href="https://www.youtube.com/@VerisettAI"
               target="_blank"
               rel="noopener noreferrer"
-              className="group inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white hover:bg-slate-50 border border-[#EAE3D2] hover:border-[#FF0000]/60 shadow-xs hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 text-xs font-medium text-[#1C1A17]"
+              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white hover:bg-zinc-50 border border-zinc-200 hover:border-zinc-300 text-xs font-medium text-zinc-700 hover:text-zinc-950 transition-all shadow-2xs group"
             >
-              <YouTubeIcon className="w-4 h-4 shrink-0 text-[#FF0000] transition-transform duration-300 group-hover:scale-110" />
-              <span className="text-slate-500 group-hover:text-[#1C1A17] transition-colors">
-                YouTube:
-              </span>
-              <span className="font-bold text-[#FF0000] group-hover:text-[#CC0000] transition-colors">
-                @Verisett AI
-              </span>
-              <ExternalLink className="w-3 h-3 text-[#8C8275] group-hover:text-[#FF0000] transition-transform group-hover:translate-x-0.5" />
+              <YouTubeIcon className="w-3.5 h-3.5 text-[#FF0000] transition-transform group-hover:scale-110" />
+              <span>YouTube</span>
+              <ExternalLink className="w-2.5 h-2.5 text-zinc-400 group-hover:text-zinc-600 transition-transform group-hover:translate-x-0.5" />
             </a>
 
-            {/* Instagram Follow Button */}
+            {/* Instagram */}
             <a
               href="https://www.instagram.com/ai.verisett/"
               target="_blank"
               rel="noopener noreferrer"
-              className="group inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white hover:bg-slate-50 border border-[#EAE3D2] hover:border-blue-500 shadow-xs hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 text-xs font-medium text-[#1C1A17]"
+              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white hover:bg-zinc-50 border border-zinc-200 hover:border-zinc-300 text-xs font-medium text-zinc-700 hover:text-zinc-950 transition-all shadow-2xs group"
             >
-              <InstagramGradientIcon className="w-4 h-4 shrink-0 transition-transform duration-300 group-hover:scale-110" />
-              <span className="text-slate-500 group-hover:text-[#1C1A17] transition-colors">
-                Instagram:
-              </span>
-              <span className="font-bold text-blue-600 group-hover:text-blue-500 transition-colors">
-                @ai.verisett
-              </span>
-              <ExternalLink className="w-3 h-3 text-[#8C8275] group-hover:text-blue-600 transition-transform group-hover:translate-x-0.5" />
+              <InstagramGradientIcon className="w-3.5 h-3.5 transition-transform group-hover:scale-110" />
+              <span>Instagram</span>
+              <ExternalLink className="w-2.5 h-2.5 text-zinc-400 group-hover:text-zinc-600 transition-transform group-hover:translate-x-0.5" />
             </a>
           </div>
 
         </div>
 
-        {/* Founder & Mission Section */}
-        <div className="py-6 my-6 border-b border-[#EAE3D2] flex flex-col md:flex-row items-start md:items-center justify-between gap-4 bg-white/70 px-5 py-4 rounded-2xl border border-[#EAE3D2]/70 shadow-xs">
-          <div className="flex items-center gap-3">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#10B981] animate-pulse shrink-0" />
-            <p className="text-xs sm:text-sm text-[#1C1A17] font-medium leading-relaxed">
-              <span className="font-bold text-[#1C1A17]">Founded &amp; Architected by Manoj S.M.</span>
-              <span className="text-slate-500"> — Deterministic financial settlement for autonomous agent economies.</span>
+        {/* 2. Founder & Architecture Bar */}
+        <div className="rounded-2xl border border-zinc-200 bg-white/80 p-4 sm:p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-2xs">
+          
+          {/* Left: Green status pulse + credit text */}
+          <div className="flex items-center gap-3 min-w-0">
+            <span className="relative flex h-2.5 w-2.5 shrink-0">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+            </span>
+            <p className="text-xs sm:text-sm text-zinc-700 leading-relaxed font-sans">
+              <span className="font-semibold text-zinc-950">
+                Founded &amp; Architected by Manoj S.M.
+              </span>{" "}
+              <span className="text-zinc-500">
+                — Deterministic financial settlement for autonomous agent economies.
+              </span>
             </p>
           </div>
-          <div className="flex items-center gap-2.5 shrink-0">
+
+          {/* Right: Quick action buttons group */}
+          <div className="flex items-center gap-2 shrink-0 self-end md:self-auto">
             <Link
               href="/about"
-              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-zinc-200 text-zinc-700 hover:bg-zinc-50 text-xs font-medium transition-all"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-zinc-50 hover:bg-zinc-100 border border-zinc-200 text-xs font-medium text-zinc-800 hover:text-zinc-950 transition-colors shadow-2xs"
             >
               <span>About Lead</span>
             </Link>
@@ -187,59 +183,72 @@ export function MinimalFooter() {
               href="https://github.com/aiverisett-startup"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-zinc-200 hover:border-zinc-300 text-xs font-medium text-[#1C1A17] transition-all"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-zinc-50 hover:bg-zinc-100 border border-zinc-200 text-xs font-medium text-zinc-800 hover:text-zinc-950 transition-colors shadow-2xs"
             >
-              <GithubIcon className="w-3.5 h-3.5 text-[#1C1A17]" />
+              <GithubIcon className="w-3.5 h-3.5 text-zinc-800" />
               <span>GitHub</span>
             </a>
             <a
               href="https://x.com/ai_verisett"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-zinc-200 hover:border-blue-400 text-xs font-medium text-[#1C1A17] transition-all"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-zinc-50 hover:bg-zinc-100 border border-zinc-200 text-xs font-medium text-zinc-800 hover:text-zinc-950 transition-colors shadow-2xs"
             >
-              <TwitterXIcon className="w-3 h-3 text-[#1C1A17]" />
-              <span>X @ai_verisett</span>
+              <TwitterXIcon className="w-3 h-3 text-zinc-800" />
+              <span>X</span>
             </a>
           </div>
+
         </div>
 
-        <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
-          <div>
+        {/* 3. Bottom Navigation & Copyright */}
+        <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
+          
+          {/* Bottom Left: Copyright */}
+          <div className="text-zinc-500 font-sans">
             © 2026 Verisett AI. All rights reserved.
           </div>
 
-          <div className="flex flex-wrap items-center gap-4 sm:gap-6 font-medium">
-            <Link href="/about" className="text-[#1C1A17] hover:text-blue-600 font-semibold transition-colors">
+          {/* Bottom Right: Evenly spaced single-line horizontal bar with subtle dividers */}
+          <nav className="flex flex-wrap items-center justify-center sm:justify-end gap-x-3 sm:gap-x-4 gap-y-2 text-zinc-600 font-sans font-medium">
+            <Link href="/about" className="hover:text-zinc-950 transition-colors">
               About
             </Link>
-            <Link href="/security" className="text-[#1C1A17] hover:text-blue-600 font-semibold transition-colors">
+            <span className="text-zinc-300 select-none">•</span>
+            <Link href="/security" className="hover:text-zinc-950 transition-colors">
               Security
             </Link>
-            <Link href="/docs" className="text-[#1C1A17] hover:text-blue-600 font-semibold transition-colors">
+            <span className="text-zinc-300 select-none">•</span>
+            <Link href="/docs" className="hover:text-zinc-950 transition-colors">
               Docs
             </Link>
-            <Link href="/pricing" className="text-[#1C1A17] hover:text-blue-600 font-semibold transition-colors">
+            <span className="text-zinc-300 select-none">•</span>
+            <Link href="/pricing" className="hover:text-zinc-950 transition-colors">
               Pricing
             </Link>
-            <Link href="/terms" className="hover:text-blue-600 transition-colors">
+            <span className="text-zinc-300 select-none">•</span>
+            <Link href="/terms" className="hover:text-zinc-950 transition-colors">
               Terms
             </Link>
-            <Link href="/privacy" className="hover:text-blue-600 transition-colors">
+            <span className="text-zinc-300 select-none">•</span>
+            <Link href="/privacy" className="hover:text-zinc-950 transition-colors">
               Privacy
             </Link>
-            <a href="#milestones" className="hover:text-blue-600 transition-colors">
-              Milestones
-            </a>
-            <a href="#how-it-works" className="hover:text-blue-600 transition-colors">
+            <span className="text-zinc-300 select-none">•</span>
+            <a href="#how-it-works" className="hover:text-zinc-950 transition-colors">
               How It Works
             </a>
-            <a href="#sandbox" className="hover:text-blue-600 transition-colors">
+            <span className="text-zinc-300 select-none">•</span>
+            <a href="#sandbox" className="hover:text-zinc-950 transition-colors">
               Sandbox
             </a>
-          </div>
+          </nav>
+
         </div>
+
       </div>
     </footer>
   );
 }
+
+export default MinimalFooter;
