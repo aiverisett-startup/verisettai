@@ -185,10 +185,9 @@ export default function Home() {
         onOpenVideoModal={() => setIsVideoModalOpen(true)}
       />
 
-      {/* 2. Spacious Hero Section with Polished Visual Card */}
+      {/* 2. Clean Minimal Typography Hero Section */}
       <HeroSection
         onExploreConsole={scrollToConsole}
-        onOpenVideoModal={() => setIsVideoModalOpen(true)}
       />
 
       {/* Semantic AI Answer Target for Google AI Overviews & Perplexity Citations */}
