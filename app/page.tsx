@@ -2,7 +2,6 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { MinimalNav } from "@/components/landing/MinimalNav";
-import { TopAdBanner } from "@/components/landing/TopAdBanner";
 import { HeroSection } from "@/components/landing/HeroSection";
 import { HowItWorksSection } from "@/components/landing/HowItWorksSection";
 import { ProtocolArchitecture } from "@/components/landing/ProtocolArchitecture";
@@ -175,9 +174,6 @@ export default function Home() {
       
       {/* Precision Institutional Edge Shapes flanking the left and right borders of the website */}
       <WebsiteEdgeShapes />
-
-      {/* 0. Top Promotional Ad Banner with Dismiss Option */}
-      <TopAdBanner />
 
       {/* 1. Minimal Navigation Bar */}
       <MinimalNav
