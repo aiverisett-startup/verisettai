@@ -173,7 +173,7 @@ function CheckoutInner() {
     )}&am=${selectedPlan.price_inr}&cu=INR&tn=${encodeURIComponent(agentId)}`;
 
     QRCode.toDataURL(upiUri, {
-      width: 280,
+      width: 360,
       margin: 1,
       color: {
         dark: "#09090b",
@@ -331,81 +331,81 @@ function CheckoutInner() {
             <form onSubmit={handleSubmit} className="space-y-6">
               
               {/* Box 1: Auto-Generated Agent ID (Locked) */}
-              <div className="rounded-2xl border border-zinc-200 bg-white p-5 sm:p-6 shadow-xs space-y-4">
-                <div className="flex items-center justify-between pb-3 border-b border-zinc-100">
+              <div className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 sm:p-7 shadow-xs space-y-4">
+                <div className="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-zinc-800 flex-wrap gap-2">
                   <div className="flex items-center gap-2">
-                    <Cpu className="w-4 h-4 text-blue-600" />
-                    <span className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-900">
+                    <Cpu className="w-5 h-5 text-blue-600" />
+                    <span className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-900 dark:text-zinc-100">
                       Step 1: Minted Agent Node Identifier
                     </span>
                   </div>
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 font-semibold uppercase">
+                  <span className="text-xs font-mono px-2.5 py-1 rounded-full bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 font-semibold uppercase">
                     Auto-Provisioned
                   </span>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-zinc-700 mb-1.5">
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-800 dark:text-zinc-200 mb-1.5">
                     Cryptographic Node Agent ID (Read-Only)
                   </label>
                   <div className="relative flex items-center">
-                    <div className="absolute left-3.5 text-zinc-400">
-                      <Lock className="w-4 h-4" />
+                    <div className="absolute left-3.5 text-zinc-500 dark:text-zinc-400 pointer-events-none flex items-center">
+                      <Lock className="w-5 h-5" />
                     </div>
                     <input
                       type="text"
                       readOnly
                       value={agentId}
-                      className="w-full pl-10 pr-24 py-2.5 rounded-xl border border-zinc-300 bg-zinc-50/80 font-mono text-sm font-bold text-zinc-900 select-all cursor-not-allowed focus:outline-hidden"
+                      className="w-full min-h-[48px] text-base font-mono font-bold tracking-wider pl-11 pr-28 py-3 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800/80 text-zinc-950 dark:text-zinc-50 select-all cursor-not-allowed focus:outline-hidden"
                     />
                     <button
                       type="button"
                       onClick={handleCopyAgentId}
-                      className="absolute right-2 px-3 py-1 rounded-lg bg-white hover:bg-zinc-100 border border-zinc-200 text-xs font-mono font-medium text-zinc-700 hover:text-zinc-950 flex items-center gap-1.5 transition-colors shadow-2xs cursor-pointer"
+                      className="absolute right-2 min-h-[36px] px-3 py-1.5 rounded-md bg-white dark:bg-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-600 border border-zinc-300 dark:border-zinc-600 text-xs font-mono font-semibold text-zinc-800 dark:text-zinc-100 flex items-center gap-1.5 transition-colors shadow-2xs cursor-pointer"
                       title="Copy Agent ID"
                     >
                       {copiedId ? (
                         <>
-                          <Check className="w-3 h-3 text-emerald-600" />
-                          <span className="text-emerald-700 font-bold">Copied</span>
+                          <Check className="w-3.5 h-3.5 text-emerald-600" />
+                          <span className="text-emerald-700 dark:text-emerald-400 font-bold">Copied</span>
                         </>
                       ) : (
                         <>
-                          <Copy className="w-3 h-3 text-zinc-500" />
+                          <Copy className="w-3.5 h-3.5 text-zinc-600 dark:text-zinc-300" />
                           <span>Copy ID</span>
                         </>
                       )}
                     </button>
                   </div>
-                  <p className="text-[11px] font-mono text-zinc-500 mt-1.5">
+                  <p className="text-xs font-mono text-zinc-700 dark:text-zinc-300 mt-2 leading-relaxed">
                     Unique hardware-attested node handle. Automatically minted to prevent tampering.
                   </p>
                 </div>
               </div>
 
               {/* Box 2: Organization & Operator Information */}
-              <div className="rounded-2xl border border-zinc-200 bg-white p-5 sm:p-6 shadow-xs space-y-4">
-                <div className="flex items-center justify-between pb-3 border-b border-zinc-100">
+              <div className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 sm:p-7 shadow-xs space-y-5">
+                <div className="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-zinc-800 flex-wrap gap-2">
                   <div className="flex items-center gap-2">
-                    <Building2 className="w-4 h-4 text-blue-600" />
-                    <span className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-900">
+                    <Building2 className="w-5 h-5 text-blue-600" />
+                    <span className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-900 dark:text-zinc-100">
                       Step 2: Organization &amp; Operator Details
                     </span>
                   </div>
-                  <span className="text-[10px] font-mono text-zinc-500">
+                  <span className="text-xs font-mono text-zinc-600 dark:text-zinc-400 font-medium">
                     Hostinger Protocol Standard
                   </span>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   {/* Org Name */}
                   <div className="sm:col-span-2">
-                    <label className="block text-xs font-semibold text-zinc-800 mb-1">
+                    <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-800 dark:text-zinc-200 mb-1.5">
                       Legal Entity / Developer Organization Name <span className="text-rose-500">*</span>
                     </label>
                     <div className="relative flex items-center">
-                      <div className="absolute left-3 text-zinc-400">
-                        <Building2 className="w-4 h-4" />
+                      <div className="absolute left-3.5 text-zinc-500 dark:text-zinc-400 pointer-events-none flex items-center">
+                        <Building2 className="w-5 h-5" />
                       </div>
                       <input
                         type="text"
@@ -413,19 +413,19 @@ function CheckoutInner() {
                         value={orgName}
                         onChange={(e) => setOrgName(e.target.value)}
                         placeholder="e.g. Apex Autonomous Labs Pvt Ltd"
-                        className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-zinc-300 bg-white text-xs sm:text-sm text-zinc-900 focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 focus:outline-hidden transition-all placeholder:text-zinc-400"
+                        className="w-full min-h-[48px] text-base pl-11 pr-4 py-3 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-950 dark:text-zinc-50 focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 focus:outline-hidden transition-all placeholder:text-zinc-400 leading-normal"
                       />
                     </div>
                   </div>
 
                   {/* Corporate Work Email */}
                   <div>
-                    <label className="block text-xs font-semibold text-zinc-800 mb-1">
+                    <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-800 dark:text-zinc-200 mb-1.5">
                       Corporate Work Email <span className="text-rose-500">*</span>
                     </label>
                     <div className="relative flex items-center">
-                      <div className="absolute left-3 text-zinc-400">
-                        <Mail className="w-4 h-4" />
+                      <div className="absolute left-3.5 text-zinc-500 dark:text-zinc-400 pointer-events-none flex items-center">
+                        <Mail className="w-5 h-5" />
                       </div>
                       <input
                         type="email"
@@ -433,57 +433,57 @@ function CheckoutInner() {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="operator@company.com"
-                        className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-zinc-300 bg-white text-xs sm:text-sm text-zinc-900 focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 focus:outline-hidden transition-all placeholder:text-zinc-400"
+                        className="w-full min-h-[48px] text-base pl-11 pr-4 py-3 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-950 dark:text-zinc-50 focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 focus:outline-hidden transition-all placeholder:text-zinc-400 leading-normal"
                       />
                     </div>
                   </div>
 
                   {/* Operator Full Name */}
                   <div>
-                    <label className="block text-xs font-semibold text-zinc-800 mb-1">
+                    <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-800 dark:text-zinc-200 mb-1.5">
                       Operator Full Name
                     </label>
                     <div className="relative flex items-center">
-                      <div className="absolute left-3 text-zinc-400">
-                        <User className="w-4 h-4" />
+                      <div className="absolute left-3.5 text-zinc-500 dark:text-zinc-400 pointer-events-none flex items-center">
+                        <User className="w-5 h-5" />
                       </div>
                       <input
                         type="text"
                         value={operatorName}
                         onChange={(e) => setOperatorName(e.target.value)}
                         placeholder="e.g. Manoj S.M."
-                        className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-zinc-300 bg-white text-xs sm:text-sm text-zinc-900 focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 focus:outline-hidden transition-all placeholder:text-zinc-400"
+                        className="w-full min-h-[48px] text-base pl-11 pr-4 py-3 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-950 dark:text-zinc-50 focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 focus:outline-hidden transition-all placeholder:text-zinc-400 leading-normal"
                       />
                     </div>
                   </div>
 
                   {/* Billing Region / Country & State */}
                   <div>
-                    <label className="block text-xs font-semibold text-zinc-800 mb-1">
+                    <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-800 dark:text-zinc-200 mb-1.5">
                       Billing Region / Country &amp; State
                     </label>
                     <div className="relative flex items-center">
-                      <div className="absolute left-3 text-zinc-400">
-                        <MapPin className="w-4 h-4" />
+                      <div className="absolute left-3.5 text-zinc-500 dark:text-zinc-400 pointer-events-none flex items-center">
+                        <MapPin className="w-5 h-5" />
                       </div>
                       <input
                         type="text"
                         value={countryState}
                         onChange={(e) => setCountryState(e.target.value)}
                         placeholder="e.g. India — Karnataka"
-                        className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-zinc-300 bg-white text-xs sm:text-sm text-zinc-900 focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 focus:outline-hidden transition-all placeholder:text-zinc-400"
+                        className="w-full min-h-[48px] text-base pl-11 pr-4 py-3 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-950 dark:text-zinc-50 focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 focus:outline-hidden transition-all placeholder:text-zinc-400 leading-normal"
                       />
                     </div>
                   </div>
 
                   {/* Optional GSTIN */}
                   <div>
-                    <label className="block text-xs font-semibold text-zinc-800 mb-1">
-                      GSTIN / Tax ID <span className="text-zinc-400 font-normal">(Optional)</span>
+                    <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-800 dark:text-zinc-200 mb-1.5">
+                      GSTIN / Tax ID <span className="text-zinc-500 dark:text-zinc-400 font-normal normal-case">(Optional)</span>
                     </label>
                     <div className="relative flex items-center">
-                      <div className="absolute left-3 text-zinc-400">
-                        <FileText className="w-4 h-4" />
+                      <div className="absolute left-3.5 text-zinc-500 dark:text-zinc-400 pointer-events-none flex items-center">
+                        <FileText className="w-5 h-5" />
                       </div>
                       <input
                         type="text"
@@ -491,20 +491,20 @@ function CheckoutInner() {
                         onChange={(e) => setGstin(e.target.value.toUpperCase())}
                         placeholder="29AAAAA0000A1Z5"
                         maxLength={15}
-                        className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-zinc-300 bg-white text-xs sm:text-sm font-mono text-zinc-900 focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 focus:outline-hidden transition-all placeholder:text-zinc-400 uppercase"
+                        className="w-full min-h-[48px] text-base pl-11 pr-4 py-3 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-950 dark:text-zinc-50 font-mono focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 focus:outline-hidden transition-all placeholder:text-zinc-400 uppercase leading-normal"
                       />
                     </div>
                   </div>
 
                   {/* Settlement Protocol Purpose */}
                   <div className="sm:col-span-2">
-                    <label className="block text-xs font-semibold text-zinc-800 mb-1">
+                    <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-800 dark:text-zinc-200 mb-1.5">
                       Settlement Protocol Purpose
                     </label>
                     <select
                       value={protocolPurpose}
                       onChange={(e) => setProtocolPurpose(e.target.value)}
-                      className="w-full px-3 py-2.5 rounded-xl border border-zinc-300 bg-white text-xs sm:text-sm text-zinc-900 focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 focus:outline-hidden transition-all"
+                      className="w-full min-h-[48px] text-base px-4 py-3 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-950 dark:text-zinc-50 focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 focus:outline-hidden transition-all cursor-pointer leading-normal"
                     >
                       {PROTOCOL_PURPOSES.map((purpose) => (
                         <option key={purpose} value={purpose}>
@@ -518,15 +518,15 @@ function CheckoutInner() {
 
               {/* Error Alert */}
               {errorMessage && (
-                <div className="p-3.5 rounded-xl border border-rose-300 bg-rose-50 text-rose-800 text-xs font-mono flex items-center gap-2">
-                  <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
-                  <span>{errorMessage}</span>
+                <div className="p-4 rounded-xl border border-rose-300 bg-rose-50 text-rose-800 text-xs font-mono flex items-center gap-3">
+                  <AlertCircle className="w-5 h-5 shrink-0 text-rose-600" />
+                  <span className="whitespace-normal leading-relaxed">{errorMessage}</span>
                 </div>
               )}
 
               {/* Desktop Notice */}
-              <div className="text-[11px] font-mono text-zinc-500 flex items-center gap-2">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+              <div className="text-xs font-mono text-zinc-700 dark:text-zinc-300 flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
                 <span>Deterministic FastMCP clearinghouse registration under Verisett Protocol v1.4.</span>
               </div>
             </form>
@@ -536,26 +536,26 @@ function CheckoutInner() {
           <div className="lg:col-span-5 space-y-6 lg:sticky lg:top-24">
             
             {/* Box 3: Plan Selector & Summary */}
-            <div className="rounded-2xl border border-zinc-200 bg-white p-5 sm:p-6 shadow-xs space-y-5">
+            <div className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 sm:p-7 shadow-xs space-y-6">
               
-              <div className="flex items-center justify-between pb-3 border-b border-zinc-100">
+              <div className="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-zinc-800 flex-wrap gap-2">
                 <div className="flex items-center gap-2">
-                  <Zap className="w-4 h-4 text-blue-600" />
-                  <span className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-900">
+                  <Zap className="w-5 h-5 text-blue-600" />
+                  <span className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-900 dark:text-zinc-100">
                     Order Summary
                   </span>
                 </div>
-                <span className="text-[10px] font-mono font-bold text-zinc-500">
+                <span className="text-xs font-mono font-bold text-zinc-700 dark:text-zinc-300">
                   {totalPaidClaimed} / 1,500 Paid Claimed
                 </span>
               </div>
 
               {/* Quick Plan Switcher Pills */}
               <div>
-                <label className="block text-[11px] font-mono text-zinc-500 uppercase mb-2">
+                <label className="block text-xs font-mono text-zinc-700 dark:text-zinc-300 uppercase tracking-wider font-semibold mb-2.5">
                   Select Clearing Tier
                 </label>
-                <div className="grid grid-cols-2 gap-2 text-xs font-mono">
+                <div className="grid grid-cols-2 gap-2.5 text-xs font-mono">
                   {plans.map((p) => {
                     const active = p.id === selectedPlanId;
                     return (
@@ -563,17 +563,19 @@ function CheckoutInner() {
                         key={p.id}
                         type="button"
                         onClick={() => setSelectedPlanId(p.id)}
-                        className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${
+                        className={`p-3 rounded-xl border text-left transition-all cursor-pointer ${
                           active
-                            ? "border-blue-600 bg-blue-50/60 ring-1 ring-blue-600 text-blue-900 font-bold"
-                            : "border-zinc-200 hover:border-zinc-300 bg-white text-zinc-700"
+                            ? "border-blue-600 bg-blue-50/70 dark:bg-blue-950/40 ring-1 ring-blue-600 text-blue-950 dark:text-blue-100 font-bold"
+                            : "border-zinc-300 dark:border-zinc-700 hover:border-zinc-400 bg-white dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200"
                         }`}
                       >
-                        <div className="flex items-center justify-between">
-                          <span className="truncate">{p.name.replace(" Node", "").replace(" Settlement", "")}</span>
-                          {active && <Check className="w-3 h-3 text-blue-600 shrink-0" />}
+                        <div className="flex items-center justify-between gap-1 flex-wrap">
+                          <span className="whitespace-normal break-words leading-snug font-semibold text-xs sm:text-sm">
+                            {p.name.replace(" Node", "").replace(" Settlement", "")}
+                          </span>
+                          {active && <Check className="w-4 h-4 text-blue-600 shrink-0" />}
                         </div>
-                        <div className="text-[11px] text-zinc-500 mt-0.5">
+                        <div className="text-xs sm:text-sm font-mono text-zinc-700 dark:text-zinc-300 font-bold mt-1.5">
                           {p.price_inr === 0 ? "₹0" : `₹${p.price_inr.toLocaleString()}`}
                         </div>
                       </button>
@@ -583,39 +585,39 @@ function CheckoutInner() {
               </div>
 
               {/* Selected Plan Details & Pricing Breakdown */}
-              <div className="p-4 rounded-xl border border-zinc-200 bg-zinc-50/80 space-y-2.5">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="font-semibold text-zinc-900">{selectedPlan.name}</span>
-                  <span className="font-mono font-bold text-zinc-950">
+              <div className="p-4 sm:p-5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50/90 dark:bg-zinc-800/60 space-y-3">
+                <div className="flex items-center justify-between text-sm sm:text-base">
+                  <span className="font-semibold text-zinc-950 dark:text-zinc-50">{selectedPlan.name}</span>
+                  <span className="font-mono font-bold text-zinc-950 dark:text-white">
                     ₹{selectedPlan.price_inr.toLocaleString()}
                   </span>
                 </div>
 
-                <div className="flex items-center justify-between text-[11px] font-mono text-zinc-500">
+                <div className="flex items-center justify-between text-xs sm:text-sm font-mono text-zinc-700 dark:text-zinc-300">
                   <span>Capacity Allocation</span>
-                  <span>
+                  <span className="font-semibold text-zinc-900 dark:text-zinc-100">
                     {selectedPlan.max_capacity ? `${selectedPlan.max_capacity} Seats Pool` : "Unmetered Sandbox"}
                   </span>
                 </div>
 
-                <div className="flex items-center justify-between text-[11px] font-mono text-zinc-500">
+                <div className="flex items-center justify-between text-xs sm:text-sm font-mono text-zinc-700 dark:text-zinc-300">
                   <span>Settlement Fee</span>
-                  <span className="text-emerald-700 font-semibold">1.5% Programmatic Escrow</span>
+                  <span className="text-emerald-700 dark:text-emerald-400 font-semibold">1.5% Programmatic Escrow</span>
                 </div>
 
                 {/* Tier 3 Special Perk Banner */}
                 {selectedPlanId === "tier_3" && (
-                  <div className="mt-2 pt-2 border-t border-zinc-200 flex items-center gap-2 text-[11px] font-mono text-cyan-800 bg-cyan-50/80 p-2 rounded-lg border border-cyan-200">
-                    <Sparkles className="w-3.5 h-3.5 text-cyan-600 shrink-0" />
-                    <span className="font-semibold">
+                  <div className="mt-2.5 pt-2.5 border-t border-zinc-200 dark:border-zinc-700 flex items-center gap-2 text-xs font-mono text-cyan-900 dark:text-cyan-200 bg-cyan-50 dark:bg-cyan-950/50 p-2.5 rounded-lg border border-cyan-200 dark:border-cyan-800">
+                    <Sparkles className="w-4 h-4 text-cyan-600 dark:text-cyan-400 shrink-0" />
+                    <span className="font-semibold leading-normal">
                       Digital Pass Card &amp; Verified Badge Included
                     </span>
                   </div>
                 )}
 
-                <div className="pt-2 border-t border-zinc-200 flex items-center justify-between text-sm font-bold text-zinc-950">
-                  <span>Total Amount Due</span>
-                  <span className="text-base font-mono text-blue-600">
+                <div className="pt-3 border-t border-zinc-200 dark:border-zinc-700 flex items-baseline justify-between">
+                  <span className="text-sm sm:text-base font-bold text-zinc-950 dark:text-zinc-100">Total Amount Due</span>
+                  <span className="text-3xl sm:text-4xl font-bold tracking-tight text-blue-600 font-sans">
                     ₹{selectedPlan.price_inr.toLocaleString()}
                   </span>
                 </div>
@@ -624,58 +626,64 @@ function CheckoutInner() {
               {/* Dynamic UPI Payment Scanner Section (Only for Paid Plans) */}
               {selectedPlan.is_paid ? (
                 <div className="space-y-4 pt-1">
-                  <div className="flex items-center justify-between text-xs font-mono font-semibold text-zinc-800">
+                  <div className="flex items-center justify-between text-xs font-mono font-bold uppercase tracking-wider text-zinc-800 dark:text-zinc-200">
                     <span className="flex items-center gap-1.5">
-                      <QrCode className="w-3.5 h-3.5 text-blue-600" />
+                      <QrCode className="w-4 h-4 text-blue-600" />
                       Dynamic UPI Payment Scanner
                     </span>
-                    <span className="text-[10px] text-zinc-500">Instant Verification</span>
+                    <span className="text-xs text-emerald-700 dark:text-emerald-400 font-semibold">Instant Verification</span>
                   </div>
 
                   {/* QR Image Box */}
-                  <div className="p-4 rounded-xl border border-zinc-200 bg-white flex flex-col items-center justify-center text-center shadow-xs">
+                  <div className="p-5 sm:p-6 rounded-2xl border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 flex flex-col items-center justify-center text-center shadow-xs">
                     {qrDataUrl ? (
-                      <div className="relative p-2 bg-white rounded-xl border border-zinc-200 shadow-inner">
+                      <div className="relative p-3 bg-white rounded-xl border border-zinc-300 shadow-sm inline-block">
                         <img
                           src={qrDataUrl}
                           alt="Verisett UPI QR Code"
-                          className="w-48 h-48 object-contain"
+                          className="w-56 h-56 sm:w-64 sm:h-64 object-contain mx-auto"
                         />
                       </div>
                     ) : (
-                      <div className="w-48 h-48 flex items-center justify-center bg-zinc-50 rounded-xl border border-dashed border-zinc-300">
-                        <Loader2 className="w-6 h-6 text-zinc-400 animate-spin" />
+                      <div className="w-56 h-56 sm:w-64 sm:h-64 flex items-center justify-center bg-zinc-50 dark:bg-zinc-800 rounded-xl border border-dashed border-zinc-300 dark:border-zinc-700 mx-auto">
+                        <Loader2 className="w-8 h-8 text-zinc-400 animate-spin" />
                       </div>
                     )}
 
                     {/* Designated UPI ID with Copy Button */}
-                    <div className="mt-3 flex items-center gap-2 text-xs font-mono">
-                      <span className="text-zinc-500">UPI ID:</span>
-                      <span className="font-bold text-zinc-900 bg-zinc-100 px-2 py-0.5 rounded border border-zinc-200">
+                    <div className="mt-4 flex items-center justify-center gap-2 flex-wrap text-sm font-mono">
+                      <span className="text-zinc-700 dark:text-zinc-300 font-semibold">UPI ID:</span>
+                      <span className="font-bold text-zinc-950 dark:text-zinc-50 bg-zinc-100 dark:bg-zinc-900 px-3 py-1.5 rounded-lg border border-zinc-300 dark:border-zinc-700 text-sm">
                         {UPI_DESIGNATED_ID}
                       </span>
                       <button
                         type="button"
                         onClick={handleCopyUpiId}
-                        className="p-1 rounded hover:bg-zinc-100 text-zinc-600 hover:text-zinc-950 transition-colors"
+                        className="min-h-[36px] px-3 py-1.5 rounded-lg border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 text-xs font-mono font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
                         title="Copy UPI ID"
                       >
                         {copiedUpi ? (
-                          <Check className="w-3.5 h-3.5 text-emerald-600" />
+                          <>
+                            <Check className="w-4 h-4 text-emerald-600" />
+                            <span className="text-emerald-700 dark:text-emerald-400 font-bold">Copied</span>
+                          </>
                         ) : (
-                          <Copy className="w-3.5 h-3.5" />
+                          <>
+                            <Copy className="w-4 h-4 text-zinc-600 dark:text-zinc-300" />
+                            <span>Copy UPI</span>
+                          </>
                         )}
                       </button>
                     </div>
 
-                    <p className="text-[10px] text-zinc-500 mt-2 font-mono">
+                    <p className="text-xs text-zinc-700 dark:text-zinc-300 mt-2.5 font-mono leading-normal text-center">
                       Scan using any UPI App (Google Pay, PhonePe, Paytm, CRED)
                     </p>
                   </div>
 
                   {/* 12-Digit UTR Transaction Input */}
                   <div>
-                    <label className="block text-xs font-semibold text-zinc-800 mb-1">
+                    <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-800 dark:text-zinc-200 mb-1.5">
                       12-Digit UPI Reference Number (UTR) <span className="text-rose-500">*</span>
                     </label>
                     <input
@@ -684,21 +692,21 @@ function CheckoutInner() {
                       onChange={(e) => setPaymentUtr(e.target.value.replace(/[^0-9A-Za-z]/g, ""))}
                       placeholder="e.g. 428910284729"
                       maxLength={16}
-                      className="w-full px-3 py-2.5 rounded-xl border border-zinc-300 bg-white font-mono text-xs sm:text-sm text-zinc-900 focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 focus:outline-hidden transition-all"
+                      className="w-full min-h-[48px] text-base px-4 py-3 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-950 dark:text-zinc-50 font-mono font-semibold focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 focus:outline-hidden transition-all placeholder:text-zinc-400 leading-normal"
                     />
-                    <p className="text-[10px] font-mono text-zinc-500 mt-1">
+                    <p className="text-xs font-mono text-zinc-700 dark:text-zinc-300 mt-1.5 leading-normal">
                       Enter the 12-digit UTR shown in your banking or UPI app after payment.
                     </p>
                   </div>
                 </div>
               ) : (
                 /* Free Community Box */
-                <div className="p-4 rounded-xl border border-emerald-200 bg-emerald-50/60 text-emerald-900 text-xs space-y-1 font-mono">
+                <div className="p-4 rounded-xl border border-emerald-300 bg-emerald-50/80 text-emerald-950 text-xs sm:text-sm space-y-1 font-mono">
                   <div className="font-bold flex items-center gap-1.5">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                     <span>Free Community Sandbox ($0.00)</span>
                   </div>
-                  <p className="text-[11px] text-emerald-700 font-sans">
+                  <p className="text-xs text-emerald-800 font-sans leading-normal">
                     No payment required. Unmetered sandbox node will be provisioned immediately.
                   </p>
                 </div>
@@ -709,11 +717,11 @@ function CheckoutInner() {
                 type="button"
                 disabled={isSubmitting || isTierFull || (selectedPlan.is_paid && isTotalPaidExhausted)}
                 onClick={handleSubmit}
-                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 w-full rounded-lg text-xs sm:text-sm tracking-wide flex items-center justify-center gap-2 transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                className="min-h-[52px] text-base font-semibold tracking-wide bg-blue-600 hover:bg-blue-700 text-white shadow-md rounded-lg w-full flex items-center justify-center gap-2.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
               >
                 {isSubmitting ? (
                   <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <Loader2 className="w-5 h-5 animate-spin" />
                     <span>Minting Node &amp; Verifying...</span>
                   </>
                 ) : (
@@ -721,12 +729,12 @@ function CheckoutInner() {
                     <span>
                       {selectedPlan.is_paid ? "Verify Payment & Mint Node" : "Provision Community Node"}
                     </span>
-                    <ArrowRight className="w-4 h-4" />
+                    <ArrowRight className="w-5 h-5" />
                   </>
                 )}
               </button>
 
-              <div className="flex items-center justify-center gap-4 text-[10px] font-mono text-zinc-400 pt-1">
+              <div className="flex items-center justify-center gap-4 text-xs font-mono text-zinc-600 dark:text-zinc-400 pt-1 flex-wrap">
                 <span>Instant Provisioning</span>
                 <span>•</span>
                 <span>Sub-20ms SLA</span>
@@ -743,46 +751,46 @@ function CheckoutInner() {
       {/* SUCCESS MODAL DIALOG */}
       {successData && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-200">
-          <div className="w-full max-w-lg rounded-2xl border border-zinc-200 bg-white p-6 sm:p-8 text-zinc-900 shadow-2xl space-y-6 animate-in zoom-in-95 duration-150">
+          <div className="w-full max-w-lg rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 sm:p-8 text-zinc-900 dark:text-zinc-50 shadow-2xl space-y-6 animate-in zoom-in-95 duration-150">
             
             <div className="text-center space-y-2">
               <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
                 <BadgeCheck className="w-8 h-8" />
               </div>
-              <h3 className="text-2xl font-bold text-zinc-950">
+              <h3 className="text-2xl font-bold text-zinc-950 dark:text-white">
                 Settlement Node Minted
               </h3>
-              <p className="text-xs sm:text-sm text-zinc-600">
+              <p className="text-xs sm:text-sm text-zinc-700 dark:text-zinc-300 leading-normal">
                 Your Verisett clearinghouse node has been provisioned and registered on the protocol.
               </p>
             </div>
 
             {/* Certificate Box */}
-            <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-4 space-y-2.5 text-xs font-mono">
-              <div className="flex items-center justify-between">
-                <span className="text-zinc-500">MINTED AGENT ID:</span>
-                <span className="font-bold text-zinc-950 bg-white px-2 py-0.5 rounded border border-zinc-200">
+            <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/80 p-5 space-y-3 text-xs sm:text-sm font-mono">
+              <div className="flex items-center justify-between gap-2 flex-wrap">
+                <span className="text-zinc-700 dark:text-zinc-300 font-semibold">MINTED AGENT ID:</span>
+                <span className="font-bold text-zinc-950 dark:text-zinc-50 bg-white dark:bg-zinc-900 px-2.5 py-1 rounded border border-zinc-300 dark:border-zinc-700">
                   {successData.agent_id}
                 </span>
               </div>
 
-              <div className="flex items-center justify-between">
-                <span className="text-zinc-500">PLAN TIER:</span>
-                <span className="font-bold text-blue-600 uppercase">
+              <div className="flex items-center justify-between gap-2 flex-wrap">
+                <span className="text-zinc-700 dark:text-zinc-300 font-semibold">PLAN TIER:</span>
+                <span className="font-bold text-blue-600 dark:text-blue-400 uppercase">
                   {successData.plan_id}
                 </span>
               </div>
 
-              <div className="flex items-center justify-between">
-                <span className="text-zinc-500">PAYMENT STATUS:</span>
-                <span className="font-bold text-emerald-700 uppercase">
+              <div className="flex items-center justify-between gap-2 flex-wrap">
+                <span className="text-zinc-700 dark:text-zinc-300 font-semibold">PAYMENT STATUS:</span>
+                <span className="font-bold text-emerald-700 dark:text-emerald-400 uppercase">
                   {successData.payment_status || "verified"}
                 </span>
               </div>
 
-              <div className="flex items-center justify-between">
-                <span className="text-zinc-500">ORGANIZATION:</span>
-                <span className="text-zinc-900 font-medium truncate max-w-[200px]">
+              <div className="flex items-center justify-between gap-2 flex-wrap">
+                <span className="text-zinc-700 dark:text-zinc-300 font-semibold">ORGANIZATION:</span>
+                <span className="text-zinc-950 dark:text-zinc-50 font-bold break-words text-right">
                   {orgName}
                 </span>
               </div>
@@ -791,7 +799,7 @@ function CheckoutInner() {
             <div className="flex flex-col sm:flex-row gap-3">
               <Link
                 href="/dashboard"
-                className="flex-1 py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs text-center flex items-center justify-center gap-1.5 transition-colors shadow-xs"
+                className="flex-1 min-h-[48px] px-4 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm text-center flex items-center justify-center gap-2 transition-colors shadow-xs"
               >
                 <span>Enter Agent Console</span>
                 <ArrowRight className="w-4 h-4" />
@@ -799,7 +807,7 @@ function CheckoutInner() {
               <button
                 type="button"
                 onClick={() => router.push("/")}
-                className="py-2.5 px-4 rounded-xl border border-zinc-200 hover:bg-zinc-50 text-zinc-700 text-xs font-medium transition-colors"
+                className="min-h-[48px] px-4 rounded-lg border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 text-sm font-semibold transition-colors"
               >
                 Return to Home
               </button>

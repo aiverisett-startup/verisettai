@@ -248,13 +248,13 @@ export function PricingSection({ initialPlans }: PricingSectionProps) {
             />
           </div>
 
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between text-[11px] font-mono text-zinc-500 gap-1">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between text-xs font-mono text-zinc-700 dark:text-zinc-300 gap-1.5 font-medium">
             <span>Builder: 800 • Pro: 500 • Enterprise: 200</span>
             <span>Free / Community Tier: Unlimited (Unmetered)</span>
           </div>
 
           {isTotalPaidExhausted && (
-            <div className="pt-2 flex items-center gap-2 text-rose-700 font-mono text-xs">
+            <div className="pt-2 flex items-center gap-2 text-rose-700 font-mono text-xs sm:text-sm">
               <AlertOctagon className="w-4 h-4 shrink-0" />
               <span className="font-bold">
                 [Registration Closed] All 1,500 institutional paid clearing seats are exhausted.
@@ -277,17 +277,17 @@ export function PricingSection({ initialPlans }: PricingSectionProps) {
             return (
               <div
                 key={plan.id}
-                className={`rounded-2xl p-6 flex flex-col justify-between h-full border transition-all duration-200 relative ${
+                className={`rounded-2xl p-6 sm:p-7 flex flex-col justify-between h-full border transition-all duration-200 relative ${
                   plan.id === "tier_2"
-                    ? "border-zinc-900 bg-white ring-1 ring-zinc-900"
-                    : "border-zinc-200 bg-white hover:border-zinc-300"
+                    ? "border-zinc-900 bg-white ring-2 ring-zinc-900 shadow-md"
+                    : "border-zinc-200 bg-white hover:border-zinc-300 shadow-xs"
                 }`}
               >
                 {/* Popular Badge for Tier 2 */}
                 {plan.id === "tier_2" && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-20 whitespace-nowrap">
-                    <span className="inline-flex items-center gap-1 px-3 py-0.5 rounded-full bg-zinc-900 text-white text-[10px] font-mono font-bold tracking-wider uppercase">
-                      <Sparkles className="w-3 h-3 text-white" />
+                    <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-zinc-900 text-white text-xs font-mono font-bold tracking-wider uppercase shadow-xs">
+                      <Sparkles className="w-3.5 h-3.5 text-white" />
                       MOST POPULAR
                     </span>
                   </div>
@@ -295,8 +295,8 @@ export function PricingSection({ initialPlans }: PricingSectionProps) {
 
                 <div className="space-y-5">
                   {/* Tier Header & Status Badge */}
-                  <div className="flex items-center justify-between gap-2 pt-1">
-                    <span className="text-[10px] font-mono font-bold tracking-wider uppercase px-2.5 py-1 rounded border border-zinc-200 bg-zinc-50 text-zinc-700">
+                  <div className="flex items-center justify-between gap-2 pt-1 flex-wrap">
+                    <span className="text-xs font-mono font-bold tracking-wider uppercase px-2.5 py-1 rounded border border-zinc-200 bg-zinc-50 text-zinc-800">
                       {plan.id === "community"
                         ? "FREE // UNMETERED"
                         : plan.id === "tier_1"
@@ -308,15 +308,15 @@ export function PricingSection({ initialPlans }: PricingSectionProps) {
 
                     {/* Status Pill */}
                     {isTierCapReached ? (
-                      <span className="px-2 py-0.5 rounded border border-rose-300 bg-rose-50 text-rose-700 text-[10px] font-mono font-bold">
+                      <span className="px-2.5 py-1 rounded border border-rose-300 bg-rose-50 text-rose-700 text-xs font-mono font-bold">
                         [Cap Reached]
                       </span>
                     ) : isTotalPaidExhausted && isPaid ? (
-                      <span className="px-2 py-0.5 rounded border border-rose-300 bg-rose-50 text-rose-700 text-[10px] font-mono font-bold">
-                        [Registration Closed]
+                      <span className="px-2.5 py-1 rounded border border-rose-300 bg-rose-50 text-rose-700 text-xs font-mono font-bold">
+                        [Closed]
                       </span>
                     ) : (
-                      <span className="text-xs font-mono font-bold text-emerald-700">
+                      <span className="text-xs sm:text-sm font-mono font-bold text-emerald-700">
                         {details.takeRate}
                       </span>
                     )}
@@ -324,35 +324,35 @@ export function PricingSection({ initialPlans }: PricingSectionProps) {
 
                   {/* Title & Tagline */}
                   <div>
-                    <h3 className="text-xl font-bold text-zinc-950">{plan.name}</h3>
-                    <p className="text-xs text-zinc-500 mt-1 leading-relaxed">
+                    <h3 className="text-2xl font-bold text-zinc-950 tracking-tight">{plan.name}</h3>
+                    <p className="text-xs sm:text-sm text-zinc-600 mt-1.5 leading-relaxed">
                       {details.tagline}
                     </p>
                   </div>
 
                   {/* Price Section */}
                   <div className="pt-3 border-t border-zinc-100">
-                    <div className="flex items-baseline gap-1">
-                      <span className="text-3xl font-bold text-zinc-950 font-sans">
+                    <div className="flex items-baseline gap-1.5 flex-wrap">
+                      <span className="text-3xl sm:text-4xl font-bold text-zinc-950 font-sans tracking-tight">
                         {isPaid ? `₹${plan.price_inr.toLocaleString()}` : "₹0"}
                       </span>
                       {isPaid && (
-                        <span className="text-xs font-mono text-zinc-500">
+                        <span className="text-xs sm:text-sm font-mono text-zinc-600 font-medium">
                           / month
                         </span>
                       )}
                     </div>
-                    <p className="text-[11px] font-mono text-zinc-500 mt-1">
+                    <p className="text-xs font-mono text-zinc-600 mt-1">
                       {isPaid ? "Fixed monthly node pass" : "Free / Unmetered developer sandbox"}
                     </p>
                   </div>
 
                   {/* Capacity Tracker */}
-                  <div className="p-3 rounded-xl border border-zinc-200 bg-[#FAFAFA] space-y-2 text-xs font-mono">
-                    <div className="flex items-center justify-between text-[11px]">
-                      <span className="text-zinc-500">Quota Allocation:</span>
+                  <div className="p-3.5 rounded-xl border border-zinc-200 bg-[#FAFAFA] space-y-2 text-xs font-mono">
+                    <div className="flex items-center justify-between text-xs flex-wrap gap-1">
+                      <span className="text-zinc-600 font-medium">Quota Allocation:</span>
                       {isPaid && plan.max_capacity !== null ? (
-                        <span className="font-semibold text-zinc-900">
+                        <span className="font-bold text-zinc-950">
                           {plan.claimed_count} / {plan.max_capacity} claimed
                         </span>
                       ) : (
@@ -362,7 +362,7 @@ export function PricingSection({ initialPlans }: PricingSectionProps) {
 
                     {isPaid && percentage !== null && (
                       <>
-                        <div className="w-full h-1.5 rounded-full bg-white border border-zinc-200 overflow-hidden">
+                        <div className="w-full h-2 rounded-full bg-white border border-zinc-200 overflow-hidden">
                           <div
                             className={`h-full rounded-full transition-all duration-500 ${
                               isTierCapReached ? "bg-rose-500" : "bg-zinc-900"
@@ -370,28 +370,28 @@ export function PricingSection({ initialPlans }: PricingSectionProps) {
                             style={{ width: `${percentage}%` }}
                           />
                         </div>
-                        <div className="text-[10px] text-right text-zinc-500">
+                        <div className="text-xs text-right text-zinc-600 font-medium">
                           {isTierCapReached ? "0 slots remaining" : `${remaining} slots remaining`}
                         </div>
                       </>
                     )}
 
                     {!isPaid && (
-                      <div className="text-[10px] text-zinc-500">
+                      <div className="text-xs text-zinc-600">
                         Ignored in the 1,500 total paid members pool.
                       </div>
                     )}
                   </div>
 
                   {/* Feature Bullets */}
-                  <div className="pt-3 border-t border-zinc-100 space-y-2">
-                    <div className="text-[11px] font-mono font-bold uppercase text-zinc-600">
+                  <div className="pt-3 border-t border-zinc-100 space-y-2.5">
+                    <div className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-700">
                       Protocol Capabilities
                     </div>
-                    <ul className="space-y-2 text-xs text-zinc-700">
+                    <ul className="space-y-2.5 text-xs sm:text-sm text-zinc-800">
                       {details.features.map((feat, idx) => (
-                        <li key={idx} className="flex items-start gap-2">
-                          <div className="h-4 w-4 rounded-full bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0 mt-0.5 border border-zinc-200">
+                        <li key={idx} className="flex items-start gap-2.5">
+                          <div className="h-4 w-4 rounded-full bg-zinc-100 text-zinc-800 flex items-center justify-center shrink-0 mt-0.5 border border-zinc-300">
                             <Check className="w-2.5 h-2.5 stroke-[2.5]" />
                           </div>
                           <span className="leading-snug">{feat}</span>
@@ -407,7 +407,7 @@ export function PricingSection({ initialPlans }: PricingSectionProps) {
                     <button
                       type="button"
                       disabled
-                      className="w-full py-2.5 px-4 rounded-xl text-xs font-mono font-bold tracking-wide flex items-center justify-center gap-1.5 bg-zinc-100 text-zinc-400 border border-zinc-200 cursor-not-allowed opacity-60"
+                      className="w-full min-h-[46px] py-2.5 px-4 rounded-lg text-xs sm:text-sm font-semibold tracking-wide flex items-center justify-center gap-1.5 bg-zinc-100 text-zinc-400 border border-zinc-200 cursor-not-allowed opacity-60"
                     >
                       <span>
                         {isTierCapReached
@@ -420,10 +420,10 @@ export function PricingSection({ initialPlans }: PricingSectionProps) {
                   ) : (
                     <Link
                       href={`/checkout?plan=${plan.id}`}
-                      className={`w-full py-2.5 px-4 rounded-xl text-xs font-mono font-bold tracking-wide flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                      className={`w-full min-h-[46px] py-2.5 px-4 rounded-lg text-xs sm:text-sm font-semibold tracking-wide flex items-center justify-center gap-2 transition-all cursor-pointer ${
                         plan.id === "tier_2"
-                          ? "bg-zinc-900 hover:bg-zinc-800 text-white border border-zinc-900 shadow-2xs"
-                          : "bg-white hover:bg-zinc-50 text-zinc-900 border border-zinc-200 hover:border-zinc-400"
+                          ? "bg-zinc-900 hover:bg-zinc-800 text-white border border-zinc-900 shadow-sm"
+                          : "bg-white hover:bg-zinc-50 text-zinc-950 border border-zinc-300 hover:border-zinc-400 shadow-2xs"
                       }`}
                     >
                       <span>
