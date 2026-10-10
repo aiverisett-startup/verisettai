@@ -72,7 +72,7 @@ export function TwitterSignInButton({
       >
         <div className="flex items-center gap-3">
           {isLoading ? (
-            <Loader2 className="w-4 h-4 animate-spin text-[#C59B5F]" />
+            <Loader2 className="w-4 h-4 animate-spin text-blue-500" />
           ) : (
             <XIcon className="w-4 h-4 shrink-0 text-white fill-current" />
           )}
@@ -85,7 +85,7 @@ export function TwitterSignInButton({
       </button>
 
       {notice && (
-        <p className="mt-2 text-center text-[11px] font-montserrat text-[#9E7A45] font-medium animate-in fade-in duration-200">
+        <p className="mt-2 text-center text-[11px] font-montserrat text-blue-700 font-medium animate-in fade-in duration-200">
           {notice}
         </p>
       )}

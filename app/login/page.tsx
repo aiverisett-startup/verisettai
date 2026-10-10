@@ -339,11 +339,11 @@ function LoginForm() {
   };
 
   return (
-    <div className="login-page-montserrat font-montserrat rounded-3xl border border-[#EAE3D2] bg-white p-7 sm:p-9 shadow-[0_16px_48px_rgba(197,155,95,0.12)] relative">
+    <div className="login-page-montserrat font-montserrat rounded-3xl border border-[#EAE3D2] bg-white p-7 sm:p-9 shadow-xl shadow-blue-900/5 relative">
       {/* Header */}
       <div className="text-center mb-7">
         <h1 className="font-montserrat text-2xl sm:text-3xl font-extrabold text-[#1C1A17] tracking-tight leading-snug">
-          Sign In to <span className="text-[#C59B5F]">VERISETT</span>
+          Sign In to <span className="text-blue-600">VERISETT</span>
         </h1>
         <p className="font-montserrat text-xs sm:text-sm text-[#6E675D] mt-2 leading-relaxed max-w-sm mx-auto font-medium">
           Access your programmatic escrow vault, milestone assertions, and agent clearinghouse.
@@ -359,7 +359,7 @@ function LoginForm() {
               ? "bg-rose-50 border-rose-200 text-rose-800"
               : feedback.type === "success"
               ? "bg-emerald-50 border-emerald-200 text-emerald-800"
-              : "bg-amber-50 border-amber-200 text-amber-800"
+              : "bg-blue-50 border-blue-200 text-blue-800"
           }`}
         >
           {feedback.type === "error" && (
@@ -369,7 +369,7 @@ function LoginForm() {
             <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
           )}
           {feedback.type === "info" && (
-            <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+            <AlertCircle className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
           )}
           <span>{feedback.message}</span>
         </div>
@@ -427,7 +427,7 @@ function LoginForm() {
           }}
           className={`py-2 px-3 rounded-lg text-xs font-montserrat font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
             authMode === "signin"
-              ? "bg-white text-[#9E7A45] shadow-xs border border-[#D4AF37]/30"
+              ? "bg-white text-blue-600 shadow-xs border border-blue-600/30"
               : "text-[#6E675D] hover:text-[#1C1A17]"
           }`}
         >
@@ -443,7 +443,7 @@ function LoginForm() {
           }}
           className={`py-2 px-3 rounded-lg text-xs font-montserrat font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
             authMode === "signup"
-              ? "bg-white text-[#9E7A45] shadow-xs border border-[#D4AF37]/30"
+              ? "bg-white text-blue-600 shadow-xs border border-blue-600/30"
               : "text-[#6E675D] hover:text-[#1C1A17]"
           }`}
         >
@@ -467,7 +467,7 @@ function LoginForm() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="operator@enterprise.com"
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#FDFCF9] border border-[#EAE3D2] focus:border-[#C59B5F] focus:ring-2 focus:ring-[#C59B5F]/20 focus:bg-white focus:outline-none text-xs sm:text-sm text-[#1C1A17] placeholder-[#9E9689] font-montserrat transition-all"
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#FDFCF9] border border-[#EAE3D2] focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 focus:bg-white focus:outline-none text-xs sm:text-sm text-[#1C1A17] placeholder-[#9E9689] font-montserrat transition-all"
             />
           </div>
         </div>
@@ -484,7 +484,7 @@ function LoginForm() {
                 <button
                   type="button"
                   onClick={handleForgotPassword}
-                  className="text-[11px] font-montserrat font-semibold text-[#9E7A45] hover:text-[#C59B5F] transition-colors cursor-pointer"
+                  className="text-[11px] font-montserrat font-semibold text-blue-600 hover:text-blue-700 transition-colors cursor-pointer"
                 >
                   Forgot Password?
                 </button>
@@ -499,7 +499,7 @@ function LoginForm() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••••••"
-                className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-[#FDFCF9] border border-[#EAE3D2] focus:border-[#C59B5F] focus:ring-2 focus:ring-[#C59B5F]/20 focus:bg-white focus:outline-none text-xs sm:text-sm text-[#1C1A17] placeholder-[#9E9689] font-montserrat transition-all"
+                className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-[#FDFCF9] border border-[#EAE3D2] focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 focus:bg-white focus:outline-none text-xs sm:text-sm text-[#1C1A17] placeholder-[#9E9689] font-montserrat transition-all"
               />
               <button
                 type="button"
@@ -527,7 +527,7 @@ function LoginForm() {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="••••••••••••"
-                className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-[#FDFCF9] border border-[#EAE3D2] focus:border-[#C59B5F] focus:ring-2 focus:ring-[#C59B5F]/20 focus:bg-white focus:outline-none text-xs sm:text-sm text-[#1C1A17] placeholder-[#9E9689] font-montserrat transition-all"
+                className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-[#FDFCF9] border border-[#EAE3D2] focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 focus:bg-white focus:outline-none text-xs sm:text-sm text-[#1C1A17] placeholder-[#9E9689] font-montserrat transition-all"
               />
               <button
                 type="button"
@@ -545,13 +545,13 @@ function LoginForm() {
         {authMode === "magic_link" && (
           <div className="p-3 bg-[#FAF8F5] border border-[#EAE3D2] rounded-xl text-xs font-montserrat text-[#6E675D] flex items-center justify-between">
             <span className="flex items-center gap-2">
-              <KeyRound className="w-4 h-4 text-[#9E7A45]" />
+              <KeyRound className="w-4 h-4 text-blue-600" />
               A secure 1-click magic link will be sent to your email.
             </span>
             <button
               type="button"
               onClick={() => setAuthMode("signin")}
-              className="text-[#9E7A45] hover:text-[#C59B5F] font-bold underline text-xs cursor-pointer"
+              className="text-blue-600 hover:text-blue-700 font-bold underline text-xs cursor-pointer"
             >
               Use Password
             </button>
@@ -562,7 +562,7 @@ function LoginForm() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full py-3 rounded-xl bg-[#C59B5F] hover:bg-[#B38A4F] active:bg-[#9E7A45] text-white font-montserrat font-bold text-xs sm:text-sm tracking-[0.1em] uppercase flex items-center justify-center gap-2 cursor-pointer transition-all shadow-[0_4px_14px_rgba(197,155,95,0.35)] hover:shadow-[0_6px_20px_rgba(197,155,95,0.45)] active:scale-[0.99] disabled:opacity-70 disabled:cursor-not-allowed"
+          className="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-montserrat font-semibold text-xs sm:text-sm tracking-wide uppercase flex items-center justify-center gap-2 cursor-pointer transition-all shadow-sm active:scale-[0.99] disabled:opacity-70 disabled:cursor-not-allowed"
         >
           {isSubmitting ? (
             <>
@@ -589,7 +589,7 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <div className="login-page-montserrat font-montserrat min-h-screen bg-[#FDFCF9] text-[#1C1A17] flex flex-col justify-between p-6 sm:p-8 relative selection:bg-[#C59B5F] selection:text-white overflow-hidden">
+    <div className="login-page-montserrat font-montserrat min-h-screen bg-[#FDFCF9] text-[#1C1A17] flex flex-col justify-between p-6 sm:p-8 relative selection:bg-blue-600 selection:text-white overflow-hidden">
       {/* Background Half-Shapes */}
       <GoldenBackgroundShapes />
 
@@ -630,7 +630,7 @@ export default function LoginPage() {
             href="https://www.instagram.com/ai.verisett/"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 lowercase tracking-normal text-[#9E7A45] hover:text-[#C59B5F] transition-colors font-bold"
+            className="inline-flex items-center gap-1.5 lowercase tracking-normal text-blue-600 hover:text-blue-700 transition-colors font-bold"
           >
             <span>follow us @ai.verisett</span>
             <ExternalLink className="w-3 h-3" />

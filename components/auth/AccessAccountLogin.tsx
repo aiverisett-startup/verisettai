@@ -141,16 +141,16 @@ export function AccessAccountLogin({
 
   return (
     <div
-      className={`login-page-montserrat font-montserrat w-full max-w-sm sm:w-[380px] rounded-3xl bg-white p-7 sm:p-9 border border-[#EFECE6] shadow-[0_16px_48px_-12px_rgba(197,155,95,0.14),0_6px_24px_-6px_rgba(0,0,0,0.03)] transition-all duration-300 ${className}`}
+      className={`login-page-montserrat font-montserrat w-full max-w-sm sm:w-[380px] rounded-3xl bg-white p-7 sm:p-9 border border-[#EFECE6] shadow-xl shadow-blue-900/5 transition-all duration-300 ${className}`}
     >
       {/* Refined Header */}
       <header className="text-center mb-7 font-montserrat">
-        {/* Subtle Decorative Golden Emblem */}
-        <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-2xl bg-[#F9F8F6] border border-[#D4AF37]/30 text-[#C59B5F] shadow-xs">
-          <Lock className="h-4 w-4 text-[#9E7A45]" strokeWidth={2.2} />
+        {/* Subtle Decorative Blue Emblem */}
+        <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-2xl bg-blue-50 border border-blue-200 text-blue-600 shadow-xs">
+          <Lock className="h-4 w-4 text-blue-600" strokeWidth={2.2} />
         </div>
 
-        <h1 className="font-montserrat text-2xl sm:text-3xl font-extrabold tracking-tight text-[#9E7A45]">
+        <h1 className="font-montserrat text-2xl sm:text-3xl font-extrabold tracking-tight text-zinc-950">
           LOGIN
         </h1>
         <p className="font-montserrat mt-1.5 text-xs sm:text-sm font-medium text-[#8C8275] tracking-normal">
@@ -173,9 +173,9 @@ export function AccessAccountLogin({
       {submitSuccess && (
         <div
           role="status"
-          className="mb-5 flex items-center gap-2 rounded-xl border border-[#D4AF37]/40 bg-[#FAF8F5] p-3 text-xs text-[#9E7A45] font-montserrat font-semibold animate-in fade-in duration-200"
+          className="mb-5 flex items-center gap-2 rounded-xl border border-blue-200 bg-blue-50 p-3 text-xs text-blue-800 font-montserrat font-semibold animate-in fade-in duration-200"
         >
-          <CheckCircle2 className="h-4 w-4 shrink-0 text-[#C59B5F]" />
+          <CheckCircle2 className="h-4 w-4 shrink-0 text-blue-600" />
           <span>Access verified. Redirecting to workspace...</span>
         </div>
       )}
@@ -211,7 +211,7 @@ export function AccessAccountLogin({
               className={`w-full rounded-xl bg-[#FAF9F7] pl-10 pr-3.5 py-2.5 text-xs sm:text-sm text-[#2C2925] placeholder:text-[#B5B0A6] font-montserrat border transition-all duration-200 focus:outline-none focus:bg-white ${
                 errors.email
                   ? "border-rose-300 focus:border-rose-400 focus:ring-2 focus:ring-rose-400/20 bg-rose-50/20"
-                  : "border-[#E5E0D8] hover:border-[#D4AF37]/50 focus:border-[#C59B5F] focus:ring-2 focus:ring-[#C59B5F]/25"
+                  : "border-[#E5E0D8] hover:border-blue-300 focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20"
               }`}
             />
           </div>
@@ -237,7 +237,7 @@ export function AccessAccountLogin({
               <button
                 type="button"
                 onClick={onForgotPasswordClick}
-                className="text-xs font-montserrat font-semibold text-[#9E7A45] hover:text-[#C59B5F] transition-colors cursor-pointer"
+                className="text-xs font-montserrat font-semibold text-blue-600 hover:text-blue-700 transition-colors cursor-pointer"
               >
                 Forgot?
               </button>
@@ -262,7 +262,7 @@ export function AccessAccountLogin({
               className={`w-full rounded-xl bg-[#FAF9F7] pl-10 pr-10 py-2.5 text-xs sm:text-sm text-[#2C2925] placeholder:text-[#B5B0A6] font-montserrat border transition-all duration-200 focus:outline-none focus:bg-white ${
                 errors.password
                   ? "border-rose-300 focus:border-rose-400 focus:ring-2 focus:ring-rose-400/20 bg-rose-50/20"
-                  : "border-[#E5E0D8] hover:border-[#D4AF37]/50 focus:border-[#C59B5F] focus:ring-2 focus:ring-[#C59B5F]/25"
+                  : "border-[#E5E0D8] hover:border-blue-300 focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20"
               }`}
             />
 
@@ -290,7 +290,7 @@ export function AccessAccountLogin({
               type="checkbox"
               checked={rememberMe}
               onChange={(e) => setRememberMe(e.target.checked)}
-              className="h-3.5 w-3.5 rounded border-[#D4AF37]/60 text-[#C59B5F] focus:ring-[#C59B5F]/30 focus:ring-offset-0 cursor-pointer accent-[#C59B5F]"
+              className="h-3.5 w-3.5 rounded border-zinc-300 text-blue-600 focus:ring-blue-500/30 focus:ring-offset-0 cursor-pointer accent-blue-600"
             />
             <span className="text-xs font-montserrat font-medium text-[#6E675D]">Remember this device</span>
           </label>
@@ -300,7 +300,7 @@ export function AccessAccountLogin({
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full mt-1.5 py-3 px-4 rounded-xl bg-[#C59B5F] hover:bg-[#B38A4F] active:bg-[#9E7A45] text-white font-montserrat font-bold text-xs sm:text-sm tracking-[0.1em] uppercase transition-all duration-200 shadow-[0_4px_14px_rgba(197,155,95,0.3)] hover:shadow-[0_6px_20px_rgba(197,155,95,0.4)] active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer disabled:opacity-75 disabled:cursor-not-allowed"
+          className="w-full mt-1.5 py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-montserrat font-semibold text-xs sm:text-sm tracking-wide uppercase transition-all duration-200 shadow-sm active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer disabled:opacity-75 disabled:cursor-not-allowed"
         >
           {isSubmitting ? (
             <>
@@ -317,10 +317,10 @@ export function AccessAccountLogin({
           <button
             type="button"
             onClick={onRegisterClick}
-            className="text-xs sm:text-sm font-montserrat font-semibold text-[#9E7A45] hover:text-[#C59B5F] transition-colors cursor-pointer inline-flex items-center gap-1 group"
+            className="text-xs sm:text-sm font-montserrat font-semibold text-blue-600 hover:text-blue-700 transition-colors cursor-pointer inline-flex items-center gap-1 group"
           >
             <span>Don&apos;t have an account?</span>
-            <span className="underline decoration-[#C59B5F]/40 underline-offset-4 group-hover:decoration-[#C59B5F]">
+            <span className="underline decoration-blue-600/40 underline-offset-4 group-hover:decoration-blue-600">
               Register Now
             </span>
           </button>
@@ -345,7 +345,7 @@ export function AccessAccountLogin({
           onClick={() => onSocialAuth?.("google")}
           aria-label="Sign in with Google"
           title="Sign in with Google"
-          className="h-10 rounded-xl bg-white border border-[#EAE6DF] hover:border-[#D4AF37] hover:bg-[#FAF8F5] flex items-center justify-center transition-all duration-200 cursor-pointer shadow-xs active:scale-[0.97]"
+          className="h-10 rounded-xl bg-white border border-[#EAE6DF] hover:border-blue-400 hover:bg-blue-50/20 flex items-center justify-center transition-all duration-200 cursor-pointer shadow-xs active:scale-[0.97]"
         >
           <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path
@@ -373,7 +373,7 @@ export function AccessAccountLogin({
           onClick={() => onSocialAuth?.("github")}
           aria-label="Sign in with GitHub"
           title="Sign in with GitHub"
-          className="h-10 rounded-xl bg-white border border-[#EAE6DF] hover:border-[#D4AF37] hover:bg-[#FAF8F5] flex items-center justify-center transition-all duration-200 cursor-pointer shadow-xs active:scale-[0.97]"
+          className="h-10 rounded-xl bg-white border border-[#EAE6DF] hover:border-blue-400 hover:bg-blue-50/20 flex items-center justify-center transition-all duration-200 cursor-pointer shadow-xs active:scale-[0.97]"
         >
           <svg className="h-4 w-4 fill-[#18181B]" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path
@@ -390,7 +390,7 @@ export function AccessAccountLogin({
           onClick={() => onSocialAuth?.("apple")}
           aria-label="Sign in with Apple"
           title="Sign in with Apple"
-          className="h-10 rounded-xl bg-white border border-[#EAE6DF] hover:border-[#D4AF37] hover:bg-[#FAF8F5] flex items-center justify-center transition-all duration-200 cursor-pointer shadow-xs active:scale-[0.97]"
+          className="h-10 rounded-xl bg-white border border-[#EAE6DF] hover:border-blue-400 hover:bg-blue-50/20 flex items-center justify-center transition-all duration-200 cursor-pointer shadow-xs active:scale-[0.97]"
         >
           <svg className="h-4 w-4 fill-[#111317]" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.37c.62-.75 1.04-1.8 0.92-2.85-.9.04-1.98.6-2.61 1.34-.56.64-1.04 1.71-.91 2.73 1 .08 2.02-.51 2.6-1.22z" />
@@ -403,7 +403,7 @@ export function AccessAccountLogin({
           onClick={() => onSocialAuth?.("microsoft")}
           aria-label="Sign in with Microsoft"
           title="Sign in with Microsoft"
-          className="h-10 rounded-xl bg-white border border-[#EAE6DF] hover:border-[#D4AF37] hover:bg-[#FAF8F5] flex items-center justify-center transition-all duration-200 cursor-pointer shadow-xs active:scale-[0.97]"
+          className="h-10 rounded-xl bg-white border border-[#EAE6DF] hover:border-blue-400 hover:bg-blue-50/20 flex items-center justify-center transition-all duration-200 cursor-pointer shadow-xs active:scale-[0.97]"
         >
           <svg className="h-4 w-4" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <rect x="1" y="1" width="10" height="10" fill="#F25022" />
@@ -416,8 +416,8 @@ export function AccessAccountLogin({
 
       {/* Subtle Bottom Accent Tag */}
       <div className="mt-6 pt-4 border-t border-[#F0ECE4] flex items-center justify-between text-[10px] text-[#A8A196] font-mono">
-        <span className="flex items-center gap-1 text-[#9E7A45]">
-          <span className="h-1.5 w-1.5 rounded-full bg-[#C59B5F]" />
+        <span className="flex items-center gap-1 text-blue-700">
+          <span className="h-1.5 w-1.5 rounded-full bg-blue-600" />
           TLS 1.3 ENCRYPTED
         </span>
         <span>SECURE VAULT ACCESS</span>

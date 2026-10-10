@@ -175,10 +175,10 @@ export function GoogleSignInButton({
         type="button"
         onClick={handleGoogleClick}
         disabled={isLoading}
-        className="w-full h-11 px-4 rounded-xl border border-[#EAE3D2] bg-white hover:bg-[#FAF8F5] active:bg-[#F5EEDB]/40 text-[#1C1A17] font-montserrat text-xs sm:text-sm font-semibold transition-colors flex items-center justify-center gap-2.5 cursor-pointer shadow-xs hover:border-[#C59B5F]/40 disabled:opacity-60"
+        className="w-full h-11 px-4 rounded-xl border border-[#EAE3D2] bg-white hover:bg-[#FAF8F5] text-[#1C1A17] font-montserrat text-xs sm:text-sm font-semibold transition-colors flex items-center justify-center gap-2.5 cursor-pointer shadow-xs hover:border-blue-400 disabled:opacity-60"
       >
         {isLoading ? (
-          <Loader2 className="w-4 h-4 animate-spin text-[#C59B5F]" />
+          <Loader2 className="w-4 h-4 animate-spin text-blue-600" />
         ) : (
           <GoogleIcon className="w-4 h-4 shrink-0" />
         )}
@@ -186,7 +186,7 @@ export function GoogleSignInButton({
       </button>
 
       {statusNotice && (
-        <p className="mt-2 text-center text-[11px] font-montserrat text-[#9E7A45] font-medium animate-in fade-in duration-200">
+        <p className="mt-2 text-center text-[11px] font-montserrat text-blue-700 font-medium animate-in fade-in duration-200">
           {statusNotice}
         </p>
       )}
