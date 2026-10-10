@@ -86,17 +86,6 @@ export function HeroSection({
           animate="visible"
           className="flex flex-col items-center text-center space-y-6 md:space-y-8 will-change-transform"
         >
-          {/* 1. High-contrast Protocol Status Badge */}
-          <motion.div
-            variants={itemVariants}
-            className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-zinc-900 border border-zinc-800 text-xs font-mono font-medium text-zinc-100 shadow-sm"
-          >
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-            </span>
-            <span>● Protocol Active • FastMCP Native</span>
-          </motion.div>
 
           {/* 2. Refined Headline adhering to #FAFAFA and Zinc Design System */}
           <motion.h1
