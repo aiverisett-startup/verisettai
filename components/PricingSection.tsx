@@ -1,9 +1,11 @@
 "use client";
 
 import React, { useState, useEffect, useMemo, useTransition } from "react";
+import Link from "next/link";
 import { Check, ShieldCheck, Zap, Users, ArrowRight, Sparkles, AlertOctagon } from "lucide-react";
 import { RegisterModal } from "@/components/RegisterModal";
-import { PlanRecord, getPlans } from "@/app/actions/register";
+import { getPlans } from "@/app/actions/register";
+import { PlanRecord } from "@/lib/plans";
 import { supabase } from "@/lib/supabase";
 
 interface PricingSectionProps {
@@ -22,7 +24,7 @@ const DEFAULT_PLANS: PlanRecord[] = [
   {
     id: "tier_1",
     name: "Builder Node",
-    price_inr: 3999,
+    price_inr: 2499,
     is_paid: true,
     max_capacity: 800,
     claimed_count: 0,
@@ -30,7 +32,7 @@ const DEFAULT_PLANS: PlanRecord[] = [
   {
     id: "tier_2",
     name: "Protocol Pro",
-    price_inr: 15999,
+    price_inr: 7999,
     is_paid: true,
     max_capacity: 500,
     claimed_count: 0,
@@ -38,7 +40,7 @@ const DEFAULT_PLANS: PlanRecord[] = [
   {
     id: "tier_3",
     name: "Enterprise Settlement Node",
-    price_inr: 49999,
+    price_inr: 29999,
     is_paid: true,
     max_capacity: 200,
     claimed_count: 0,
@@ -100,7 +102,24 @@ export function PricingSection({ initialPlans }: PricingSectionProps) {
   const [selectedPlanId, setSelectedPlanId] = useState<
     "community" | "tier_1" | "tier_2" | "tier_3"
   >("tier_2");
+  const [capacityNotice, setCapacityNotice] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+
+  // Read URL notice on mount if redirected from checkout
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const notice = params.get("notice");
+      const plan = params.get("plan");
+      if (notice === "capacity_exhausted" || notice === "tier_full") {
+        setCapacityNotice(
+          plan
+            ? `The requested tier (${plan.toUpperCase().replace("_", " ")}) has reached its maximum capacity. Please select an available node tier below.`
+            : "The selected settlement tier has reached maximum capacity allocation."
+        );
+      }
+    }
+  }, []);
 
   // Load live plan stats from Supabase on mount or refresh
   useEffect(() => {
@@ -188,6 +207,17 @@ export function PricingSection({ initialPlans }: PricingSectionProps) {
             Strict capacity quotas. Total institutional clearing seats capped at 1,500 nodes to preserve sub-20ms programmatic clearing guarantees.
           </p>
         </div>
+
+        {/* Dynamic Capacity Exhaustion Notice if redirected from checkout */}
+        {capacityNotice && (
+          <div className="max-w-4xl mx-auto p-4 rounded-xl border border-rose-300 bg-rose-50 text-rose-800 text-xs font-mono flex items-start gap-3 animate-in fade-in slide-in-from-top-2">
+            <AlertOctagon className="w-4 h-4 shrink-0 text-rose-600 mt-0.5" />
+            <div>
+              <span className="font-bold">Capacity Notice: </span>
+              <span>{capacityNotice}</span>
+            </div>
+          </div>
+        )}
 
         {/* Global Paid Capacity Tracker Banner */}
         <div className="max-w-4xl mx-auto rounded-2xl border border-zinc-200 bg-white p-5 sm:p-6 space-y-3">
@@ -373,29 +403,37 @@ export function PricingSection({ initialPlans }: PricingSectionProps) {
 
                 {/* Card CTA Action */}
                 <div className="pt-6 mt-auto">
-                  <button
-                    type="button"
-                    disabled={isBlocked}
-                    onClick={() => handleOpenRegister(plan.id)}
-                    className={`w-full py-2.5 px-4 rounded-xl text-xs font-mono font-bold tracking-wide flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
-                      isBlocked
-                        ? "bg-zinc-100 text-zinc-400 border border-zinc-200 cursor-not-allowed opacity-60"
-                        : plan.id === "tier_2"
-                        ? "bg-zinc-900 hover:bg-zinc-800 text-white border border-zinc-900 shadow-2xs"
-                        : "bg-white hover:bg-zinc-50 text-zinc-900 border border-zinc-200 hover:border-zinc-400"
-                    }`}
-                  >
-                    <span>
-                      {isTierCapReached
-                        ? "[Cap Reached]"
-                        : isTotalPaidExhausted && isPaid
-                        ? "[Registration Closed]"
-                        : plan.id === "community"
-                        ? "Access Free Sandbox"
-                        : `Claim ${plan.name}`}
-                    </span>
-                    {!isBlocked && <ArrowRight className="w-3.5 h-3.5" />}
-                  </button>
+                  {isBlocked ? (
+                    <button
+                      type="button"
+                      disabled
+                      className="w-full py-2.5 px-4 rounded-xl text-xs font-mono font-bold tracking-wide flex items-center justify-center gap-1.5 bg-zinc-100 text-zinc-400 border border-zinc-200 cursor-not-allowed opacity-60"
+                    >
+                      <span>
+                        {isTierCapReached
+                          ? "[Cap Reached]"
+                          : isTotalPaidExhausted && isPaid
+                          ? "[Registration Closed]"
+                          : "Plan Unavailable"}
+                      </span>
+                    </button>
+                  ) : (
+                    <Link
+                      href={`/checkout?plan=${plan.id}`}
+                      className={`w-full py-2.5 px-4 rounded-xl text-xs font-mono font-bold tracking-wide flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                        plan.id === "tier_2"
+                          ? "bg-zinc-900 hover:bg-zinc-800 text-white border border-zinc-900 shadow-2xs"
+                          : "bg-white hover:bg-zinc-50 text-zinc-900 border border-zinc-200 hover:border-zinc-400"
+                      }`}
+                    >
+                      <span>
+                        {plan.id === "community"
+                          ? "Access Free Sandbox"
+                          : `Claim ${plan.name}`}
+                      </span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </Link>
+                  )}
                 </div>
               </div>
             );

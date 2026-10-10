@@ -1,23 +1,24 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import crypto from "crypto";
 import { createServerSupabaseClient } from "@/lib/supabaseServer";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { PlanRecord, fallbackPlans, normalizePlanId } from "@/lib/plans";
+
+export type { PlanRecord };
 
 export interface RegisterInput {
   orgName: string;
   email: string;
-  agentId: string;
+  agentId?: string;
   planId: "community" | "tier_1" | "tier_2" | "tier_3" | "builder" | "pro" | "enterprise";
-}
-
-export interface PlanRecord {
-  id: "community" | "tier_1" | "tier_2" | "tier_3";
-  name: string;
-  price_inr: number;
-  is_paid: boolean;
-  max_capacity: number | null;
-  claimed_count: number;
+  operatorName?: string;
+  countryState?: string;
+  gstin?: string;
+  protocolPurpose?: string;
+  paymentUtr?: string;
+  paymentStatus?: "verified" | "pending_reconciliation";
 }
 
 export interface RegisterActionState {
@@ -28,74 +29,25 @@ export interface RegisterActionState {
   data?: {
     registration_id?: string;
     plan_id?: string;
+    agent_id?: string;
     claimed_count?: number;
     max_capacity?: number | null;
     total_paid?: number;
     is_paid?: boolean;
+    payment_status?: string;
   };
 }
 
 /**
- * Normalizes input plan IDs to canonical DB keys ('community', 'tier_1', 'tier_2', 'tier_3')
+ * Generates an authentic cryptographically formatted Verisett Agent ID:
+ * Format: VSET-AGT-XXXX-XXXX (e.g. VSET-AGT-9E4B-88F2)
  */
-function normalizePlanId(id: string): "community" | "tier_1" | "tier_2" | "tier_3" {
-  switch (id.toLowerCase().trim()) {
-    case "tier_1":
-    case "tier1":
-    case "builder":
-      return "tier_1";
-    case "tier_2":
-    case "tier2":
-    case "pro":
-      return "tier_2";
-    case "tier_3":
-    case "tier3":
-    case "enterprise":
-      return "tier_3";
-    case "community":
-    case "free":
-    default:
-      return "community";
-  }
+export async function generateAgentId(): Promise<string> {
+  const bytes = crypto.randomBytes(4).toString("hex").toUpperCase();
+  const seg1 = bytes.slice(0, 4);
+  const seg2 = bytes.slice(4, 8);
+  return `VSET-AGT-${seg1}-${seg2}`;
 }
-
-/**
- * In-memory fallback state in case database migration is pending execution in local dev/sandbox
- */
-const fallbackPlans: Record<string, PlanRecord> = {
-  community: {
-    id: "community",
-    name: "Community Fleet",
-    price_inr: 0,
-    is_paid: false,
-    max_capacity: null,
-    claimed_count: 0,
-  },
-  tier_1: {
-    id: "tier_1",
-    name: "Builder Node",
-    price_inr: 3999,
-    is_paid: true,
-    max_capacity: 800,
-    claimed_count: 0,
-  },
-  tier_2: {
-    id: "tier_2",
-    name: "Protocol Pro",
-    price_inr: 15999,
-    is_paid: true,
-    max_capacity: 500,
-    claimed_count: 0,
-  },
-  tier_3: {
-    id: "tier_3",
-    name: "Enterprise Settlement Node",
-    price_inr: 49999,
-    is_paid: true,
-    max_capacity: 200,
-    claimed_count: 0,
-  },
-};
 
 /**
  * Fetches the current live plan capacities and claim counts directly from Supabase.
@@ -128,32 +80,55 @@ export async function registerAction(
 ): Promise<RegisterActionState> {
   let orgName = "";
   let email = "";
-  let agentId = "";
+  let clientAgentId = "";
   let rawPlanId = "community";
+  let operatorName = "";
+  let countryState = "";
+  let gstin = "";
+  let protocolPurpose = "Autonomous Escrow Clearing";
+  let paymentUtr = "";
 
   if (formDataOrInput instanceof FormData) {
     orgName = (formDataOrInput.get("orgName") as string) || "";
     email = (formDataOrInput.get("email") as string) || "";
-    agentId = (formDataOrInput.get("agentId") as string) || "";
+    clientAgentId = (formDataOrInput.get("agentId") as string) || "";
     rawPlanId = (formDataOrInput.get("planId") as string) || "community";
+    operatorName = (formDataOrInput.get("operatorName") as string) || "";
+    countryState = (formDataOrInput.get("countryState") as string) || "";
+    gstin = (formDataOrInput.get("gstin") as string) || "";
+    protocolPurpose = (formDataOrInput.get("protocolPurpose") as string) || "Autonomous Escrow Clearing";
+    paymentUtr = (formDataOrInput.get("paymentUtr") as string) || "";
   } else {
     orgName = formDataOrInput.orgName || "";
     email = formDataOrInput.email || "";
-    agentId = formDataOrInput.agentId || "";
+    clientAgentId = formDataOrInput.agentId || "";
     rawPlanId = formDataOrInput.planId || "community";
+    operatorName = formDataOrInput.operatorName || "";
+    countryState = formDataOrInput.countryState || "";
+    gstin = formDataOrInput.gstin || "";
+    protocolPurpose = formDataOrInput.protocolPurpose || "Autonomous Escrow Clearing";
+    paymentUtr = formDataOrInput.paymentUtr || "";
   }
 
-  // 1. Validation
+  // 1. Validation & Server-side Agent ID Generation (Prevent Tampering)
   orgName = orgName.trim();
   email = email.trim().toLowerCase();
-  agentId = agentId.trim();
   const canonicalPlanId = normalizePlanId(rawPlanId);
+
+  // Validate or mint authentic Agent ID
+  let finalAgentId = clientAgentId.trim();
+  const validAgentIdRegex = /^VSET-AGT-[A-F0-9]{4}-[A-F0-9]{4}$/i;
+  if (!finalAgentId || !validAgentIdRegex.test(finalAgentId)) {
+    finalAgentId = await generateAgentId();
+  } else {
+    finalAgentId = finalAgentId.toUpperCase();
+  }
 
   if (!orgName || orgName.length < 2) {
     return {
       success: false,
       code: "INVALID_DATA",
-      error: "Please provide a valid Organization or Developer Name.",
+      error: "Please provide a valid Organization or Entity Name.",
     };
   }
 
@@ -166,12 +141,12 @@ export async function registerAction(
     };
   }
 
-  if (!agentId || agentId.length < 2) {
-    return {
-      success: false,
-      code: "INVALID_DATA",
-      error: "Please specify your Agent ID or node handle (e.g. AGT-NODE-01).",
-    };
+  const planIsPaid = canonicalPlanId !== "community";
+  const paymentStatus = planIsPaid ? "pending_reconciliation" : "verified";
+
+  // If paid tier, validate UTR if provided
+  if (planIsPaid && paymentUtr) {
+    paymentUtr = paymentUtr.trim();
   }
 
   // 2. Execute Atomic Concurrency-Safe RPC via Supabase SSR Client
@@ -182,7 +157,13 @@ export async function registerAction(
       p_plan_id: canonicalPlanId,
       p_org_name: orgName,
       p_email: email,
-      p_agent_id: agentId,
+      p_agent_id: finalAgentId,
+      p_operator_name: operatorName || null,
+      p_country_state: countryState || null,
+      p_gstin: gstin || null,
+      p_protocol_purpose: protocolPurpose || null,
+      p_payment_utr: paymentUtr || null,
+      p_payment_status: paymentStatus,
     });
 
     if (error) {
@@ -215,7 +196,18 @@ export async function registerAction(
 
       // Check if function does not exist in remote DB yet -> local fallback handler
       if (errMsg.includes("does not exist") || errMsg.includes("not found")) {
-        return executeLocalFallback(canonicalPlanId, orgName, email, agentId);
+        return executeLocalFallback(
+          canonicalPlanId,
+          orgName,
+          email,
+          finalAgentId,
+          operatorName,
+          countryState,
+          gstin,
+          protocolPurpose,
+          paymentUtr,
+          paymentStatus
+        );
       }
 
       return {
@@ -228,6 +220,7 @@ export async function registerAction(
     // 3. Success
     revalidatePath("/");
     revalidatePath("/pricing");
+    revalidatePath("/checkout");
 
     return {
       success: true,
@@ -236,15 +229,28 @@ export async function registerAction(
       data: {
         registration_id: data?.registration_id,
         plan_id: data?.plan_id || canonicalPlanId,
+        agent_id: finalAgentId,
         claimed_count: data?.claimed_count,
         max_capacity: data?.max_capacity,
         total_paid: data?.total_paid,
         is_paid: data?.is_paid,
+        payment_status: data?.payment_status || paymentStatus,
       },
     };
   } catch (err: any) {
     console.error("[REGISTER-ACTION-EXCEPTION]", err);
-    return executeLocalFallback(canonicalPlanId, orgName, email, agentId);
+    return executeLocalFallback(
+      canonicalPlanId,
+      orgName,
+      email,
+      finalAgentId,
+      operatorName,
+      countryState,
+      gstin,
+      protocolPurpose,
+      paymentUtr,
+      paymentStatus
+    );
   }
 }
 
@@ -256,7 +262,13 @@ async function executeLocalFallback(
   planId: "community" | "tier_1" | "tier_2" | "tier_3",
   orgName: string,
   email: string,
-  agentId: string
+  agentId: string,
+  operatorName?: string,
+  countryState?: string,
+  gstin?: string,
+  protocolPurpose?: string,
+  paymentUtr?: string,
+  paymentStatus?: string
 ): Promise<RegisterActionState> {
   const plan = fallbackPlans[planId];
   if (!plan) {
@@ -300,6 +312,12 @@ async function executeLocalFallback(
       org_name: orgName,
       email,
       agent_id: agentId,
+      operator_name: operatorName || null,
+      country_state: countryState || null,
+      gstin: gstin || null,
+      protocol_purpose: protocolPurpose || null,
+      payment_utr: paymentUtr || null,
+      payment_status: paymentStatus || (plan.is_paid ? "pending_reconciliation" : "verified"),
     });
   } catch {
     // Non-fatal in fallback
@@ -307,6 +325,7 @@ async function executeLocalFallback(
 
   revalidatePath("/");
   revalidatePath("/pricing");
+  revalidatePath("/checkout");
 
   const totalPaid = Object.values(fallbackPlans)
     .filter((p) => p.is_paid)
@@ -319,10 +338,12 @@ async function executeLocalFallback(
     data: {
       registration_id: "res-" + Math.random().toString(36).slice(2, 10),
       plan_id: planId,
+      agent_id: agentId,
       claimed_count: plan.claimed_count,
       max_capacity: plan.max_capacity,
       total_paid: totalPaid,
       is_paid: plan.is_paid,
+      payment_status: paymentStatus || (plan.is_paid ? "pending_reconciliation" : "verified"),
     },
   };
 }

@@ -197,11 +197,10 @@ async function updateSession(request: NextRequest) {
 
   // 5. Route Protection Rules
   const isDashboardRoute = pathname === "/dashboard" || pathname.startsWith("/dashboard/");
-  const isCheckoutRoute = pathname === "/checkout" || pathname.startsWith("/checkout/");
   const isAuthRoute = pathname === "/login" || pathname === "/signup";
 
-  // If unauthenticated user requests /dashboard or /checkout, redirect to /login
-  if ((isDashboardRoute || isCheckoutRoute) && !user) {
+  // If unauthenticated user requests /dashboard, redirect to /login
+  if (isDashboardRoute && !user) {
     const redirectPath = `${pathname}${search}`;
     const loginUrl = new URL(`/login?redirect=${encodeURIComponent(redirectPath)}`, request.url);
     const redirectResponse = NextResponse.redirect(loginUrl);

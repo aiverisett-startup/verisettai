@@ -1,384 +1,827 @@
 "use client";
 
-import React, { useState, useEffect, Suspense } from "react";
+import React, { useState, useEffect, useMemo, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import QRCode from "qrcode";
 import {
   ShieldCheck,
-  Sparkles,
-  ArrowRight,
-  CheckCircle2,
   Lock,
   Building2,
-  CreditCard,
-  ArrowLeft,
-  Loader2,
-  Zap,
-  Receipt,
+  Mail,
+  User,
+  MapPin,
+  FileText,
+  Copy,
   Check,
+  Zap,
+  Sparkles,
+  ArrowRight,
+  ArrowLeft,
+  QrCode,
+  AlertCircle,
+  CheckCircle2,
+  Loader2,
+  ExternalLink,
+  Cpu,
+  BadgeCheck,
 } from "lucide-react";
 import { VerisettLogo } from "@/components/VerisettLogo";
-import { GoldenBackgroundShapes } from "@/components/ui/GoldenBackgroundShapes";
+import { getPlans, registerAction } from "@/app/actions/register";
+import {
+  PlanRecord,
+  fallbackPlans,
+  normalizePlanId,
+} from "@/lib/plans";
 import { supabase } from "@/lib/supabase";
 
-declare global {
-  interface Window {
-    Razorpay?: any;
+const PROTOCOL_PURPOSES = [
+  "Autonomous Escrow Clearing",
+  "Multi-Agent Arbitrage",
+  "Milestone Task Verification",
+  "Dedicated Node Infrastructure",
+];
+
+const UPI_DESIGNATED_ID = "verisett@icici";
+const UPI_MERCHANT_NAME = "Verisett AI Settlement";
+
+function generateClientAgentId(): string {
+  const chars = "0123456789ABCDEF";
+  let seg1 = "";
+  let seg2 = "";
+  for (let i = 0; i < 4; i++) {
+    seg1 += chars[Math.floor(Math.random() * chars.length)];
+    seg2 += chars[Math.floor(Math.random() * chars.length)];
   }
+  return `VSET-AGT-${seg1}-${seg2}`;
 }
 
-function CheckoutContent() {
+function CheckoutInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const plan = searchParams.get("plan") || "founder-pass";
+  const rawPlanParam = searchParams.get("plan") || "tier_2";
 
-  const [user, setUser] = useState<{ id: string; email: string } | null>(null);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [isActivated, setIsActivated] = useState(false);
-  const [razorpayLoaded, setRazorpayLoaded] = useState(false);
+  // Plan State
+  const [plans, setPlans] = useState<PlanRecord[]>(Object.values(fallbackPlans));
+  const [selectedPlanId, setSelectedPlanId] = useState<"community" | "tier_1" | "tier_2" | "tier_3">(
+    normalizePlanId(rawPlanParam)
+  );
 
-  // 1. Check authenticated session
+  // Form State
+  const [agentId, setAgentId] = useState<string>("");
+  const [copiedId, setCopiedId] = useState(false);
+  const [copiedUpi, setCopiedUpi] = useState(false);
+
+  const [orgName, setOrgName] = useState("");
+  const [email, setEmail] = useState("");
+  const [operatorName, setOperatorName] = useState("");
+  const [countryState, setCountryState] = useState("India — Karnataka");
+  const [gstin, setGstin] = useState("");
+  const [protocolPurpose, setProtocolPurpose] = useState(PROTOCOL_PURPOSES[0]);
+  const [paymentUtr, setPaymentUtr] = useState("");
+
+  // Processing & Success State
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [successData, setSuccessData] = useState<{
+    registration_id?: string;
+    agent_id?: string;
+    plan_id?: string;
+    payment_status?: string;
+  } | null>(null);
+
+  // QR Code Data URL
+  const [qrDataUrl, setQrDataUrl] = useState<string>("");
+
+  // Mint Auto-Generated Agent ID once on mount
   useEffect(() => {
-    const checkSession = async () => {
+    setAgentId(generateClientAgentId());
+  }, []);
+
+  // Update selected plan if URL param changes
+  useEffect(() => {
+    if (rawPlanParam) {
+      setSelectedPlanId(normalizePlanId(rawPlanParam));
+    }
+  }, [rawPlanParam]);
+
+  // Load plans & check current session
+  useEffect(() => {
+    async function loadData() {
       try {
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
-        if (!session?.user) {
-          router.replace(
-            `/login?redirect=${encodeURIComponent(`/checkout?plan=${plan}`)}`
-          );
-        } else {
-          setUser({
-            id: session.user.id,
-            email: session.user.email || "operator@verisett.ai",
-          });
+        const livePlans = await getPlans();
+        if (livePlans && livePlans.length > 0) {
+          setPlans(livePlans);
+        }
+      } catch (err) {
+        console.warn("Could not fetch live plans:", err);
+      }
+
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user?.email) {
+          setEmail((prev) => prev || session.user.email || "");
+          const nameMeta = session.user.user_metadata?.full_name || session.user.user_metadata?.name;
+          if (nameMeta) {
+            setOperatorName((prev) => prev || nameMeta);
+          }
         }
       } catch {
-        router.replace(
-          `/login?redirect=${encodeURIComponent(`/checkout?plan=${plan}`)}`
-        );
+        // Non-fatal
       }
-    };
-    checkSession();
-  }, [router, plan]);
+    }
+    loadData();
+  }, []);
 
-  // 2. Load Razorpay script dynamically
+  const selectedPlan = useMemo(() => {
+    return plans.find((p) => p.id === selectedPlanId) || fallbackPlans[selectedPlanId] || fallbackPlans.tier_2;
+  }, [plans, selectedPlanId]);
+
+  const totalPaidClaimed = useMemo(() => {
+    return plans
+      .filter((p) => p.is_paid)
+      .reduce((sum, p) => sum + (p.claimed_count || 0), 0);
+  }, [plans]);
+
+  const isTotalPaidExhausted = totalPaidClaimed >= 1500;
+  const isTierFull =
+    selectedPlan.is_paid &&
+    selectedPlan.max_capacity !== null &&
+    selectedPlan.claimed_count >= selectedPlan.max_capacity;
+
+  // Fallback check: if tier is full, redirect back to /pricing with capacity notice
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    if (isTierFull || (selectedPlan.is_paid && isTotalPaidExhausted)) {
+      const timer = setTimeout(() => {
+        router.push(`/pricing?notice=capacity_exhausted&plan=${selectedPlanId}`);
+      }, 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [isTierFull, isTotalPaidExhausted, selectedPlan.is_paid, selectedPlanId, router]);
 
-    if (window.Razorpay) {
-      setRazorpayLoaded(true);
+  // Generate Authentic UPI Payment URI & QR Code
+  useEffect(() => {
+    if (!agentId) return;
+
+    if (!selectedPlan.is_paid) {
+      setQrDataUrl("");
       return;
     }
 
-    const script = document.createElement("script");
-    script.src = "https://checkout.razorpay.com/v1/checkout.js";
-    script.async = true;
-    script.onload = () => setRazorpayLoaded(true);
-    script.onerror = () => setRazorpayLoaded(false);
-    document.body.appendChild(script);
+    const upiUri = `upi://pay?pa=${encodeURIComponent(UPI_DESIGNATED_ID)}&pn=${encodeURIComponent(
+      UPI_MERCHANT_NAME
+    )}&am=${selectedPlan.price_inr}&cu=INR&tn=${encodeURIComponent(agentId)}`;
 
-    return () => {
-      // Keep script in DOM
-    };
-  }, []);
+    QRCode.toDataURL(upiUri, {
+      width: 280,
+      margin: 1,
+      color: {
+        dark: "#09090b",
+        light: "#ffffff",
+      },
+    })
+      .then((url) => setQrDataUrl(url))
+      .catch((err) => console.error("Error generating UPI QR code:", err));
+  }, [selectedPlan, agentId]);
 
-  // 3. Initiate Checkout Order & Modal
-  const handleInitiatePayment = async () => {
-    if (!user?.id) return;
-    setIsProcessing(true);
-
-    try {
-      // Call backend checkout order session generator
-      const res = await fetch("/api/checkout", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          plan: "founder-pass",
-          amount: 2999900,
-        }),
-      });
-
-      const orderData = await res.json();
-
-      if (!res.ok) {
-        throw new Error(orderData.error || "Order generation failed");
-      }
-
-      // If live Razorpay checkout is available and key is configured
-      if (
-        window.Razorpay &&
-        orderData.key &&
-        !orderData.key.includes("placeholder") &&
-        !orderData.isSandbox
-      ) {
-        const options = {
-          key: orderData.key,
-          amount: orderData.amount,
-          currency: orderData.currency || "INR",
-          name: "Verisett Autonomous Protocol",
-          description: "Founder Node Pass — Lifetime Protocol License",
-          order_id: orderData.order_id,
-          prefill: {
-            email: user.email,
-          },
-          theme: {
-            color: "#2563EB",
-          },
-          handler: async function (response: any) {
-            // Instant database grant
-            await completeEntitlementActivation(response.razorpay_payment_id || orderData.order_id);
-          },
-          modal: {
-            ondismiss: function () {
-              setIsProcessing(false);
-            },
-          },
-        };
-
-        const rzp = new window.Razorpay(options);
-        rzp.open();
-        return;
-      }
-
-      // Sandbox / Testnet Instant Activation Flow
-      await completeEntitlementActivation(orderData.order_id);
-    } catch (err) {
-      console.warn("Payment checkout notice:", err);
-      // Fallback entitlement completion for testnet
-      await completeEntitlementActivation(`test_${Date.now()}`);
-    }
+  const handleCopyAgentId = () => {
+    if (!agentId) return;
+    navigator.clipboard.writeText(agentId);
+    setCopiedId(true);
+    setTimeout(() => setCopiedId(false), 2000);
   };
 
-  const completeEntitlementActivation = async (paymentId: string) => {
+  const handleCopyUpiId = () => {
+    navigator.clipboard.writeText(UPI_DESIGNATED_ID);
+    setCopiedUpi(true);
+    setTimeout(() => setCopiedUpi(false), 2000);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorMessage(null);
+
+    if (isTierFull || (selectedPlan.is_paid && isTotalPaidExhausted)) {
+      setErrorMessage("Selected plan has reached maximum capacity limits. Please select another tier.");
+      return;
+    }
+
+    if (!orgName.trim() || orgName.trim().length < 2) {
+      setErrorMessage("Please enter a valid Legal Entity or Developer Organization Name.");
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email.trim() || !emailRegex.test(email.trim())) {
+      setErrorMessage("Please provide a valid corporate work email address.");
+      return;
+    }
+
+    if (selectedPlan.is_paid && paymentUtr.trim()) {
+      const utrClean = paymentUtr.trim().replace(/\s+/g, "");
+      if (utrClean.length < 8) {
+        setErrorMessage("Please enter a valid 12-digit UPI Transaction Reference (UTR) Number.");
+        return;
+      }
+    }
+
+    setIsSubmitting(true);
+
     try {
-      if (!user?.id) return;
-
-      // 1. Update user profile to active Founder Node Pass
-      await supabase.from("profiles").upsert({
-        id: user.id,
-        email: user.email,
-        founder_pass: true,
-        plan_tier: "founder_pass",
-        take_rate: 0.0075,
-        updated_at: new Date().toISOString(),
+      const res = await registerAction(null, {
+        orgName: orgName.trim(),
+        email: email.trim().toLowerCase(),
+        agentId: agentId,
+        planId: selectedPlanId,
+        operatorName: operatorName.trim(),
+        countryState: countryState.trim(),
+        gstin: gstin.trim(),
+        protocolPurpose: protocolPurpose,
+        paymentUtr: paymentUtr.trim(),
       });
 
-      // 2. Insert verified double-entry ledger entry
-      await supabase.from("ledger_entries").insert({
-        user_id: user.id,
-        transaction_id: crypto.randomUUID(),
-        entry_type: "CREDIT",
-        amount: 2999900, // in paise (₹29,999.00)
-        currency: "INR",
-        description: `Founder Node Pass Lifetime License Activation (${paymentId})`,
-      });
-
-      setIsActivated(true);
-      setTimeout(() => {
-        router.push("/dashboard?payment=success");
-      }, 1000);
-    } catch {
-      router.push("/dashboard?payment=success");
+      if (!res.success) {
+        setErrorMessage(res.error || "Unable to complete registration. Please check your details.");
+      } else {
+        setSuccessData({
+          registration_id: res.data?.registration_id,
+          agent_id: res.data?.agent_id || agentId,
+          plan_id: res.data?.plan_id || selectedPlanId,
+          payment_status: res.data?.payment_status,
+        });
+      }
+    } catch (err: any) {
+      setErrorMessage(err?.message || "An unexpected error occurred during node provisioning.");
     } finally {
-      setIsProcessing(false);
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="relative z-10 max-w-4xl mx-auto space-y-8 my-auto font-sans">
-      <div className="flex items-center justify-between">
-        <Link
-          href="/pricing"
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#6E675D] hover:text-[#1C1A17] transition-colors"
-        >
-          <ArrowLeft className="w-3.5 h-3.5" />
-          <span>Back to Protocol Tiers</span>
-        </Link>
-        <div className="flex items-center gap-2 text-xs font-mono text-blue-700 bg-blue-50 px-3 py-1 rounded-full border border-blue-200">
-          <ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
-          <span>Level 9 Institutional Settlement Rail</span>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-8 items-start">
-        {/* Left 3 cols: Plan Details & Institutional Privileges */}
-        <div className="md:col-span-3 rounded-3xl border border-[#EAE3D2] bg-white p-7 sm:p-9 shadow-lg space-y-6">
-          <div className="space-y-2">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-bold font-mono border border-blue-200">
-              <Sparkles className="w-3.5 h-3.5 text-blue-600" />
-              LIFETIME PROTOCOL LICENSE
-            </span>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-[#1C1A17] tracking-tight">
-              Verisett Founder Node Pass
-            </h1>
-            <p className="text-xs sm:text-sm text-[#6E675D] leading-relaxed">
-              Institutional clearinghouse node with pinned 0.75% take-rate,
-              uncapped FastMCP agent concurrency, and permanent double-entry
-              ledger conservation.
-            </p>
+    <div className="min-h-screen bg-[#FAFAFA] text-zinc-900 font-sans selection:bg-blue-600 selection:text-white">
+      {/* Top Header */}
+      <header className="sticky top-0 z-40 w-full border-b border-zinc-200 bg-white/95 backdrop-blur-md">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Link
+              href="/pricing"
+              className="inline-flex items-center gap-1.5 text-xs font-mono font-medium text-zinc-600 hover:text-zinc-950 transition-colors py-1 px-2.5 rounded-lg border border-zinc-200 hover:border-zinc-300 bg-zinc-50"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Back to Pricing</span>
+            </Link>
+            <div className="h-4 w-px bg-zinc-200 hidden sm:block" />
+            <Link href="/" className="flex items-center gap-2">
+              <VerisettLogo size={22} />
+              <span className="font-bold text-sm tracking-tight text-zinc-950">
+                Verisett AI
+              </span>
+              <span className="text-[10px] font-mono text-zinc-500 uppercase px-2 py-0.5 rounded bg-zinc-100 border border-zinc-200 hidden md:inline-block">
+                Node Checkout
+              </span>
+            </Link>
           </div>
 
-          <div className="pt-4 border-t border-[#F0E9DC] space-y-3">
-            <h3 className="text-xs font-mono uppercase font-bold text-[#4A453E]">
-              Privileges Unlocked Instantly:
-            </h3>
-            <ul className="space-y-2.5 text-xs text-[#1C1A17]">
-              <li className="flex items-start gap-2.5">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                <span>
-                  <strong>0.75% Protocol Take-Rate</strong> (Lowest institutional tier for life, vs 2.0% standard)
-                </span>
-              </li>
-              <li className="flex items-start gap-2.5">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                <span>
-                  <strong>Institutional SLA: 99.99%</strong> (Guaranteed sub-50ms deterministic settlement consensus)
-                </span>
-              </li>
-              <li className="flex items-start gap-2.5">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                <span>
-                  <strong>Unlimited Escrow Vaults</strong> with anti-race locks (`SELECT ... FOR UPDATE`)
-                </span>
-              </li>
-              <li className="flex items-start gap-2.5">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                <span>
-                  <strong>Uncapped FastMCP Telemetry</strong> with scoped bearer tokens
-                </span>
-              </li>
-              <li className="flex items-start gap-2.5">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                <span>
-                  <strong>HDFC Commercial Banking Rails</strong> (Automated daily payout disbursement)
-                </span>
-              </li>
-            </ul>
-          </div>
-
-          <div className="pt-4 border-t border-[#F0E9DC] text-[11px] font-mono text-[#8C8275] flex items-center justify-between">
-            <span>Tenant Email: {user?.email}</span>
-            <span>RLS Multi-Tenant Enforced</span>
+          <div className="flex items-center gap-2.5">
+            <div className="flex items-center gap-1.5 text-[11px] font-mono font-medium text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span>256-Bit Encrypted Gateway</span>
+            </div>
           </div>
         </div>
+      </header>
 
-        {/* Right 2 cols: Minimalist Linear-Style Order Confirmation Card */}
-        <div className="md:col-span-2 rounded-3xl border-2 border-blue-500/40 bg-white p-7 shadow-xl space-y-6">
-          <div className="flex items-center justify-between pb-3 border-b border-[#F0E9DC]">
-            <h2 className="text-base font-bold text-[#1C1A17]">
-              Order Confirmation
-            </h2>
-            <span className="text-[10px] font-mono font-bold bg-blue-50 text-blue-700 px-2 py-0.5 rounded border border-blue-200">
-              One-Time
-            </span>
+      {/* Main Two-Column Container */}
+      <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10 md:py-14">
+        {/* Breadcrumb & Section Title */}
+        <div className="mb-8">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-zinc-200 bg-white text-xs font-mono font-medium text-zinc-700 shadow-2xs mb-2">
+            <ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
+            <span>HOSTINGER-STYLE DEDICATED PROVISIONING &amp; BILLING</span>
           </div>
-
-          {/* Detailed Pricing & GST Breakdown */}
-          <div className="space-y-3 text-xs">
-            <div className="flex justify-between text-[#6E675D]">
-              <span>Base Protocol License</span>
-              <span className="font-mono font-bold text-[#1C1A17]">₹25,422.88</span>
-            </div>
-            <div className="flex justify-between text-[#6E675D]">
-              <span>Goods &amp; Services Tax (18% IGST)</span>
-              <span className="font-mono font-bold text-[#1C1A17]">₹4,576.12</span>
-            </div>
-            <div className="flex justify-between text-[#6E675D]">
-              <span>Recurring Maintenance</span>
-              <span className="font-mono font-bold text-emerald-600">₹0.00 (Free Forever)</span>
-            </div>
-            <div className="flex justify-between text-[#6E675D]">
-              <span>Institutional Settlement SLA</span>
-              <span className="font-mono font-bold text-blue-600">Included</span>
-            </div>
-
-            <div className="pt-3 border-t border-[#F0E9DC] flex justify-between items-baseline text-sm font-bold text-[#1C1A17]">
-              <span>Total Amount (Inc. GST)</span>
-              <span className="font-mono text-lg text-blue-900 font-extrabold">₹29,999.00</span>
-            </div>
-          </div>
-
-          {/* Clearinghouse Payout Rail info */}
-          <div className="p-3.5 rounded-2xl bg-[#FAF8F5] border border-[#EAE3D2] space-y-2 text-xs">
-            <span className="font-mono text-[10px] uppercase font-bold text-[#8C8275] block">
-              Dual Payment Rail Gateway
-            </span>
-            <div className="flex items-center gap-2 font-medium text-[#1C1A17]">
-              <Building2 className="w-4 h-4 text-blue-600 shrink-0" />
-              <span>Razorpay / HDFC / UPI / NetBanking / Cards</span>
-            </div>
-            <p className="text-[10px] text-[#8C8275] font-mono">
-              Secured with 256-bit TLS and cryptographic webhook idempotency.
-            </p>
-          </div>
-
-          {/* Pay Button */}
-          <button
-            type="button"
-            onClick={handleInitiatePayment}
-            disabled={isProcessing || isActivated}
-            className="w-full py-4 px-4 rounded-2xl bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white font-bold text-xs sm:text-sm tracking-wide shadow-lg shadow-blue-500/25 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-70"
-          >
-            {isProcessing ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin text-white" />
-                <span>Launching Secure Checkout...</span>
-              </>
-            ) : isActivated ? (
-              <>
-                <Check className="w-4 h-4 text-emerald-300" />
-                <span>Payment Verified! Redirecting...</span>
-              </>
-            ) : (
-              <>
-                <span>Pay ₹29,999.00 &amp; Activate</span>
-                <ArrowRight className="w-4 h-4" />
-              </>
-            )}
-          </button>
-
-          <p className="text-[10px] text-center text-[#8C8275] font-mono">
-            Cryptographic ledger entitlement automatically written to your tenant node.
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-950">
+            Node Activation &amp; Clearinghouse Checkout
+          </h1>
+          <p className="text-xs sm:text-sm text-zinc-600 mt-1">
+            Provision your deterministic settlement node, bind cryptographic keys, and complete instant UPI verification.
           </p>
         </div>
-      </div>
+
+        {/* Capacity Warning Banner if blocked */}
+        {(isTierFull || (selectedPlan.is_paid && isTotalPaidExhausted)) && (
+          <div className="mb-8 p-4 rounded-xl border border-rose-300 bg-rose-50 text-rose-800 flex items-start gap-3 text-xs font-mono">
+            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-rose-600" />
+            <div>
+              <div className="font-bold">Capacity Allocation Limit Reached</div>
+              <p className="mt-0.5 text-rose-700">
+                {isTotalPaidExhausted
+                  ? "The global cap of 1,500 paid settlement clearinghouse seats has been completely reached."
+                  : `All ${selectedPlan.max_capacity} slots for ${selectedPlan.name} are claimed.`}{" "}
+                Please select another available tier or contact enterprise allocations.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Split Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
+          
+          {/* LEFT COLUMN: Registration & Agent Provisioning (7 Cols) */}
+          <div className="lg:col-span-7 space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-6">
+              
+              {/* Box 1: Auto-Generated Agent ID (Locked) */}
+              <div className="rounded-2xl border border-zinc-200 bg-white p-5 sm:p-6 shadow-xs space-y-4">
+                <div className="flex items-center justify-between pb-3 border-b border-zinc-100">
+                  <div className="flex items-center gap-2">
+                    <Cpu className="w-4 h-4 text-blue-600" />
+                    <span className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-900">
+                      Step 1: Minted Agent Node Identifier
+                    </span>
+                  </div>
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 font-semibold uppercase">
+                    Auto-Provisioned
+                  </span>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-zinc-700 mb-1.5">
+                    Cryptographic Node Agent ID (Read-Only)
+                  </label>
+                  <div className="relative flex items-center">
+                    <div className="absolute left-3.5 text-zinc-400">
+                      <Lock className="w-4 h-4" />
+                    </div>
+                    <input
+                      type="text"
+                      readOnly
+                      value={agentId}
+                      className="w-full pl-10 pr-24 py-2.5 rounded-xl border border-zinc-300 bg-zinc-50/80 font-mono text-sm font-bold text-zinc-900 select-all cursor-not-allowed focus:outline-hidden"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleCopyAgentId}
+                      className="absolute right-2 px-3 py-1 rounded-lg bg-white hover:bg-zinc-100 border border-zinc-200 text-xs font-mono font-medium text-zinc-700 hover:text-zinc-950 flex items-center gap-1.5 transition-colors shadow-2xs cursor-pointer"
+                      title="Copy Agent ID"
+                    >
+                      {copiedId ? (
+                        <>
+                          <Check className="w-3 h-3 text-emerald-600" />
+                          <span className="text-emerald-700 font-bold">Copied</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-3 h-3 text-zinc-500" />
+                          <span>Copy ID</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                  <p className="text-[11px] font-mono text-zinc-500 mt-1.5">
+                    Unique hardware-attested node handle. Automatically minted to prevent tampering.
+                  </p>
+                </div>
+              </div>
+
+              {/* Box 2: Organization & Operator Information */}
+              <div className="rounded-2xl border border-zinc-200 bg-white p-5 sm:p-6 shadow-xs space-y-4">
+                <div className="flex items-center justify-between pb-3 border-b border-zinc-100">
+                  <div className="flex items-center gap-2">
+                    <Building2 className="w-4 h-4 text-blue-600" />
+                    <span className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-900">
+                      Step 2: Organization &amp; Operator Details
+                    </span>
+                  </div>
+                  <span className="text-[10px] font-mono text-zinc-500">
+                    Hostinger Protocol Standard
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {/* Org Name */}
+                  <div className="sm:col-span-2">
+                    <label className="block text-xs font-semibold text-zinc-800 mb-1">
+                      Legal Entity / Developer Organization Name <span className="text-rose-500">*</span>
+                    </label>
+                    <div className="relative flex items-center">
+                      <div className="absolute left-3 text-zinc-400">
+                        <Building2 className="w-4 h-4" />
+                      </div>
+                      <input
+                        type="text"
+                        required
+                        value={orgName}
+                        onChange={(e) => setOrgName(e.target.value)}
+                        placeholder="e.g. Apex Autonomous Labs Pvt Ltd"
+                        className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-zinc-300 bg-white text-xs sm:text-sm text-zinc-900 focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 focus:outline-hidden transition-all placeholder:text-zinc-400"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Corporate Work Email */}
+                  <div>
+                    <label className="block text-xs font-semibold text-zinc-800 mb-1">
+                      Corporate Work Email <span className="text-rose-500">*</span>
+                    </label>
+                    <div className="relative flex items-center">
+                      <div className="absolute left-3 text-zinc-400">
+                        <Mail className="w-4 h-4" />
+                      </div>
+                      <input
+                        type="email"
+                        required
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="operator@company.com"
+                        className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-zinc-300 bg-white text-xs sm:text-sm text-zinc-900 focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 focus:outline-hidden transition-all placeholder:text-zinc-400"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Operator Full Name */}
+                  <div>
+                    <label className="block text-xs font-semibold text-zinc-800 mb-1">
+                      Operator Full Name
+                    </label>
+                    <div className="relative flex items-center">
+                      <div className="absolute left-3 text-zinc-400">
+                        <User className="w-4 h-4" />
+                      </div>
+                      <input
+                        type="text"
+                        value={operatorName}
+                        onChange={(e) => setOperatorName(e.target.value)}
+                        placeholder="e.g. Manoj S.M."
+                        className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-zinc-300 bg-white text-xs sm:text-sm text-zinc-900 focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 focus:outline-hidden transition-all placeholder:text-zinc-400"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Billing Region / Country & State */}
+                  <div>
+                    <label className="block text-xs font-semibold text-zinc-800 mb-1">
+                      Billing Region / Country &amp; State
+                    </label>
+                    <div className="relative flex items-center">
+                      <div className="absolute left-3 text-zinc-400">
+                        <MapPin className="w-4 h-4" />
+                      </div>
+                      <input
+                        type="text"
+                        value={countryState}
+                        onChange={(e) => setCountryState(e.target.value)}
+                        placeholder="e.g. India — Karnataka"
+                        className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-zinc-300 bg-white text-xs sm:text-sm text-zinc-900 focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 focus:outline-hidden transition-all placeholder:text-zinc-400"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Optional GSTIN */}
+                  <div>
+                    <label className="block text-xs font-semibold text-zinc-800 mb-1">
+                      GSTIN / Tax ID <span className="text-zinc-400 font-normal">(Optional)</span>
+                    </label>
+                    <div className="relative flex items-center">
+                      <div className="absolute left-3 text-zinc-400">
+                        <FileText className="w-4 h-4" />
+                      </div>
+                      <input
+                        type="text"
+                        value={gstin}
+                        onChange={(e) => setGstin(e.target.value.toUpperCase())}
+                        placeholder="29AAAAA0000A1Z5"
+                        maxLength={15}
+                        className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-zinc-300 bg-white text-xs sm:text-sm font-mono text-zinc-900 focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 focus:outline-hidden transition-all placeholder:text-zinc-400 uppercase"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Settlement Protocol Purpose */}
+                  <div className="sm:col-span-2">
+                    <label className="block text-xs font-semibold text-zinc-800 mb-1">
+                      Settlement Protocol Purpose
+                    </label>
+                    <select
+                      value={protocolPurpose}
+                      onChange={(e) => setProtocolPurpose(e.target.value)}
+                      className="w-full px-3 py-2.5 rounded-xl border border-zinc-300 bg-white text-xs sm:text-sm text-zinc-900 focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 focus:outline-hidden transition-all"
+                    >
+                      {PROTOCOL_PURPOSES.map((purpose) => (
+                        <option key={purpose} value={purpose}>
+                          {purpose}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Error Alert */}
+              {errorMessage && (
+                <div className="p-3.5 rounded-xl border border-rose-300 bg-rose-50 text-rose-800 text-xs font-mono flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
+                  <span>{errorMessage}</span>
+                </div>
+              )}
+
+              {/* Desktop Notice */}
+              <div className="text-[11px] font-mono text-zinc-500 flex items-center gap-2">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                <span>Deterministic FastMCP clearinghouse registration under Verisett Protocol v1.4.</span>
+              </div>
+            </form>
+          </div>
+
+          {/* RIGHT COLUMN: Order Summary & Side-by-Side UPI Scanner (5 Cols) */}
+          <div className="lg:col-span-5 space-y-6 lg:sticky lg:top-24">
+            
+            {/* Box 3: Plan Selector & Summary */}
+            <div className="rounded-2xl border border-zinc-200 bg-white p-5 sm:p-6 shadow-xs space-y-5">
+              
+              <div className="flex items-center justify-between pb-3 border-b border-zinc-100">
+                <div className="flex items-center gap-2">
+                  <Zap className="w-4 h-4 text-blue-600" />
+                  <span className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-900">
+                    Order Summary
+                  </span>
+                </div>
+                <span className="text-[10px] font-mono font-bold text-zinc-500">
+                  {totalPaidClaimed} / 1,500 Paid Claimed
+                </span>
+              </div>
+
+              {/* Quick Plan Switcher Pills */}
+              <div>
+                <label className="block text-[11px] font-mono text-zinc-500 uppercase mb-2">
+                  Select Clearing Tier
+                </label>
+                <div className="grid grid-cols-2 gap-2 text-xs font-mono">
+                  {plans.map((p) => {
+                    const active = p.id === selectedPlanId;
+                    return (
+                      <button
+                        key={p.id}
+                        type="button"
+                        onClick={() => setSelectedPlanId(p.id)}
+                        className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${
+                          active
+                            ? "border-blue-600 bg-blue-50/60 ring-1 ring-blue-600 text-blue-900 font-bold"
+                            : "border-zinc-200 hover:border-zinc-300 bg-white text-zinc-700"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="truncate">{p.name.replace(" Node", "").replace(" Settlement", "")}</span>
+                          {active && <Check className="w-3 h-3 text-blue-600 shrink-0" />}
+                        </div>
+                        <div className="text-[11px] text-zinc-500 mt-0.5">
+                          {p.price_inr === 0 ? "₹0" : `₹${p.price_inr.toLocaleString()}`}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Selected Plan Details & Pricing Breakdown */}
+              <div className="p-4 rounded-xl border border-zinc-200 bg-zinc-50/80 space-y-2.5">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-semibold text-zinc-900">{selectedPlan.name}</span>
+                  <span className="font-mono font-bold text-zinc-950">
+                    ₹{selectedPlan.price_inr.toLocaleString()}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between text-[11px] font-mono text-zinc-500">
+                  <span>Capacity Allocation</span>
+                  <span>
+                    {selectedPlan.max_capacity ? `${selectedPlan.max_capacity} Seats Pool` : "Unmetered Sandbox"}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between text-[11px] font-mono text-zinc-500">
+                  <span>Settlement Fee</span>
+                  <span className="text-emerald-700 font-semibold">1.5% Programmatic Escrow</span>
+                </div>
+
+                {/* Tier 3 Special Perk Banner */}
+                {selectedPlanId === "tier_3" && (
+                  <div className="mt-2 pt-2 border-t border-zinc-200 flex items-center gap-2 text-[11px] font-mono text-cyan-800 bg-cyan-50/80 p-2 rounded-lg border border-cyan-200">
+                    <Sparkles className="w-3.5 h-3.5 text-cyan-600 shrink-0" />
+                    <span className="font-semibold">
+                      Digital Pass Card &amp; Verified Badge Included
+                    </span>
+                  </div>
+                )}
+
+                <div className="pt-2 border-t border-zinc-200 flex items-center justify-between text-sm font-bold text-zinc-950">
+                  <span>Total Amount Due</span>
+                  <span className="text-base font-mono text-blue-600">
+                    ₹{selectedPlan.price_inr.toLocaleString()}
+                  </span>
+                </div>
+              </div>
+
+              {/* Dynamic UPI Payment Scanner Section (Only for Paid Plans) */}
+              {selectedPlan.is_paid ? (
+                <div className="space-y-4 pt-1">
+                  <div className="flex items-center justify-between text-xs font-mono font-semibold text-zinc-800">
+                    <span className="flex items-center gap-1.5">
+                      <QrCode className="w-3.5 h-3.5 text-blue-600" />
+                      Dynamic UPI Payment Scanner
+                    </span>
+                    <span className="text-[10px] text-zinc-500">Instant Verification</span>
+                  </div>
+
+                  {/* QR Image Box */}
+                  <div className="p-4 rounded-xl border border-zinc-200 bg-white flex flex-col items-center justify-center text-center shadow-xs">
+                    {qrDataUrl ? (
+                      <div className="relative p-2 bg-white rounded-xl border border-zinc-200 shadow-inner">
+                        <img
+                          src={qrDataUrl}
+                          alt="Verisett UPI QR Code"
+                          className="w-48 h-48 object-contain"
+                        />
+                      </div>
+                    ) : (
+                      <div className="w-48 h-48 flex items-center justify-center bg-zinc-50 rounded-xl border border-dashed border-zinc-300">
+                        <Loader2 className="w-6 h-6 text-zinc-400 animate-spin" />
+                      </div>
+                    )}
+
+                    {/* Designated UPI ID with Copy Button */}
+                    <div className="mt-3 flex items-center gap-2 text-xs font-mono">
+                      <span className="text-zinc-500">UPI ID:</span>
+                      <span className="font-bold text-zinc-900 bg-zinc-100 px-2 py-0.5 rounded border border-zinc-200">
+                        {UPI_DESIGNATED_ID}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={handleCopyUpiId}
+                        className="p-1 rounded hover:bg-zinc-100 text-zinc-600 hover:text-zinc-950 transition-colors"
+                        title="Copy UPI ID"
+                      >
+                        {copiedUpi ? (
+                          <Check className="w-3.5 h-3.5 text-emerald-600" />
+                        ) : (
+                          <Copy className="w-3.5 h-3.5" />
+                        )}
+                      </button>
+                    </div>
+
+                    <p className="text-[10px] text-zinc-500 mt-2 font-mono">
+                      Scan using any UPI App (Google Pay, PhonePe, Paytm, CRED)
+                    </p>
+                  </div>
+
+                  {/* 12-Digit UTR Transaction Input */}
+                  <div>
+                    <label className="block text-xs font-semibold text-zinc-800 mb-1">
+                      12-Digit UPI Reference Number (UTR) <span className="text-rose-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={paymentUtr}
+                      onChange={(e) => setPaymentUtr(e.target.value.replace(/[^0-9A-Za-z]/g, ""))}
+                      placeholder="e.g. 428910284729"
+                      maxLength={16}
+                      className="w-full px-3 py-2.5 rounded-xl border border-zinc-300 bg-white font-mono text-xs sm:text-sm text-zinc-900 focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 focus:outline-hidden transition-all"
+                    />
+                    <p className="text-[10px] font-mono text-zinc-500 mt-1">
+                      Enter the 12-digit UTR shown in your banking or UPI app after payment.
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                /* Free Community Box */
+                <div className="p-4 rounded-xl border border-emerald-200 bg-emerald-50/60 text-emerald-900 text-xs space-y-1 font-mono">
+                  <div className="font-bold flex items-center gap-1.5">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                    <span>Free Community Sandbox ($0.00)</span>
+                  </div>
+                  <p className="text-[11px] text-emerald-700 font-sans">
+                    No payment required. Unmetered sandbox node will be provisioned immediately.
+                  </p>
+                </div>
+              )}
+
+              {/* Submit CTA Button */}
+              <button
+                type="button"
+                disabled={isSubmitting || isTierFull || (selectedPlan.is_paid && isTotalPaidExhausted)}
+                onClick={handleSubmit}
+                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 w-full rounded-lg text-xs sm:text-sm tracking-wide flex items-center justify-center gap-2 transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>Minting Node &amp; Verifying...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>
+                      {selectedPlan.is_paid ? "Verify Payment & Mint Node" : "Provision Community Node"}
+                    </span>
+                    <ArrowRight className="w-4 h-4" />
+                  </>
+                )}
+              </button>
+
+              <div className="flex items-center justify-center gap-4 text-[10px] font-mono text-zinc-400 pt-1">
+                <span>Instant Provisioning</span>
+                <span>•</span>
+                <span>Sub-20ms SLA</span>
+                <span>•</span>
+                <span>Non-Custodial</span>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </main>
+
+      {/* SUCCESS MODAL DIALOG */}
+      {successData && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-200">
+          <div className="w-full max-w-lg rounded-2xl border border-zinc-200 bg-white p-6 sm:p-8 text-zinc-900 shadow-2xl space-y-6 animate-in zoom-in-95 duration-150">
+            
+            <div className="text-center space-y-2">
+              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
+                <BadgeCheck className="w-8 h-8" />
+              </div>
+              <h3 className="text-2xl font-bold text-zinc-950">
+                Settlement Node Minted
+              </h3>
+              <p className="text-xs sm:text-sm text-zinc-600">
+                Your Verisett clearinghouse node has been provisioned and registered on the protocol.
+              </p>
+            </div>
+
+            {/* Certificate Box */}
+            <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-4 space-y-2.5 text-xs font-mono">
+              <div className="flex items-center justify-between">
+                <span className="text-zinc-500">MINTED AGENT ID:</span>
+                <span className="font-bold text-zinc-950 bg-white px-2 py-0.5 rounded border border-zinc-200">
+                  {successData.agent_id}
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <span className="text-zinc-500">PLAN TIER:</span>
+                <span className="font-bold text-blue-600 uppercase">
+                  {successData.plan_id}
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <span className="text-zinc-500">PAYMENT STATUS:</span>
+                <span className="font-bold text-emerald-700 uppercase">
+                  {successData.payment_status || "verified"}
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <span className="text-zinc-500">ORGANIZATION:</span>
+                <span className="text-zinc-900 font-medium truncate max-w-[200px]">
+                  {orgName}
+                </span>
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Link
+                href="/dashboard"
+                className="flex-1 py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs text-center flex items-center justify-center gap-1.5 transition-colors shadow-xs"
+              >
+                <span>Enter Agent Console</span>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+              <button
+                type="button"
+                onClick={() => router.push("/")}
+                className="py-2.5 px-4 rounded-xl border border-zinc-200 hover:bg-zinc-50 text-zinc-700 text-xs font-medium transition-colors"
+              >
+                Return to Home
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
 export default function CheckoutPage() {
   return (
-    <div className="relative min-h-screen bg-[#FDFCF9] text-[#1C1A17] p-6 sm:p-10 font-sans flex flex-col justify-between overflow-hidden">
-      <GoldenBackgroundShapes variant="subtle" density="dense" />
-
-      {/* Header */}
-      <header className="relative z-10 max-w-4xl mx-auto w-full flex items-center justify-between pb-6">
-        <Link href="/" className="hover:opacity-85 transition-opacity">
-          <VerisettLogo size={30} />
-        </Link>
-      </header>
-
-      {/* Main Checkout with Suspense boundary */}
-      <main className="relative z-10 w-full my-auto">
-        <Suspense
-          fallback={
-            <div className="max-w-md mx-auto rounded-3xl border border-[#EAE3D2] bg-white p-10 text-center font-mono text-xs text-[#8C8275]">
-              INITIALIZING_CHECKOUT_RAIL...
-            </div>
-          }
-        >
-          <CheckoutContent />
-        </Suspense>
-      </main>
-
-      {/* Footer */}
-      <footer className="relative z-10 max-w-4xl mx-auto w-full pt-8 text-center text-[11px] font-mono text-[#8C8275]">
-        VERISETT AI · DETERMINISTIC ESCROW &amp; PROTOCOL SETTLEMENT CORE
-      </footer>
-    </div>
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-[#FAFAFA]">
+          <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
+        </div>
+      }
+    >
+      <CheckoutInner />
+    </Suspense>
   );
 }
