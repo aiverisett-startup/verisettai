@@ -1083,19 +1083,19 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
                     <button
                       onClick={() => handleSimulateHeartbeat(selectedAgent.id)}
                       disabled={isPinging}
-                      className="text-xs font-semibold text-blue-600 bg-blue-50/60 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800/50 px-4 py-2 rounded-full inline-flex items-center gap-2 hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors cursor-pointer disabled:opacity-60 font-sans"
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-zinc-900 border border-zinc-800 text-xs font-medium text-zinc-200 shadow-sm transition-all duration-200 hover:bg-zinc-800 hover:border-blue-500/60 hover:text-white cursor-pointer disabled:opacity-60 font-sans"
                       title="Transmit heartbeat ping to trigger verified status"
                     >
-                      <Activity className={`w-3.5 h-3.5 ${isPinging ? "animate-spin" : ""}`} />
+                      <Activity className={`text-blue-500 w-3.5 h-3.5 ${isPinging ? "animate-spin" : ""}`} />
                       <span>{isPinging ? "Transmitting..." : `Transmit Heartbeat for ${selectedAgent.name}`}</span>
                     </button>
 
                     <button
                       onClick={() => loadTenantData(user.id)}
-                      className="p-2 rounded-xl border border-[#EAE3D2] bg-white hover:bg-neutral-50 text-[#6E675D] transition cursor-pointer"
+                      className="w-8 h-8 rounded-full bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-700 flex items-center justify-center transition-colors cursor-pointer"
                       title="Refresh Telemetry"
                     >
-                      <RefreshCw className={`w-4 h-4 ${isRefreshing ? "animate-spin" : ""}`} />
+                      <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? "animate-spin" : ""}`} />
                     </button>
                   </div>
                 )}
@@ -1228,9 +1228,9 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
                     <button
                       onClick={() => handleSimulateHeartbeat(selectedAgent.id)}
                       disabled={isPinging}
-                      className="text-xs font-semibold text-blue-600 bg-blue-50/60 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800/50 px-4 py-2 rounded-full inline-flex items-center gap-2 hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors cursor-pointer disabled:opacity-60 font-sans"
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-zinc-900 border border-zinc-800 text-xs font-medium text-zinc-200 shadow-sm transition-all duration-200 hover:bg-zinc-800 hover:border-blue-500/60 hover:text-white cursor-pointer disabled:opacity-60 font-sans"
                     >
-                      <Zap className={`w-3.5 h-3.5 text-blue-600 ${isPinging ? "animate-spin" : ""}`} />
+                      <Activity className={`text-blue-500 w-3.5 h-3.5 ${isPinging ? "animate-spin" : ""}`} />
                       <span>
                         {isPinging ? "Transmitting..." : `Transmit Heartbeat for ${selectedAgent.name}`}
                       </span>
@@ -1406,15 +1406,15 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
           {/* ========================================================================= */}
           <div className="lg:col-span-3 space-y-6">
             {/* Watchlist Main Container */}
-            <div className="rounded-3xl border border-[#EAE3D2] bg-white shadow-xs overflow-hidden flex flex-col font-sans">
+            <div className="rounded-2xl border border-zinc-800/80 bg-zinc-950 shadow-xs overflow-hidden flex flex-col font-sans">
               {/* Watchlist Top Header */}
-              <div className="p-4 border-b border-[#EAE3D2] bg-[#FAF8F5] flex items-center justify-between gap-2">
+              <div className="p-4 border-b border-zinc-800/80 bg-zinc-900/60 flex items-center justify-between gap-2">
                 <div className="flex items-center gap-1.5">
-                  <button className="flex items-center gap-1 font-mono font-bold text-xs text-[#1C1A17] bg-white px-2.5 py-1 rounded-lg border border-[#EAE3D2] shadow-2xs">
+                  <button className="flex items-center gap-1 font-mono font-bold text-xs text-zinc-200 bg-zinc-900 px-2.5 py-1 rounded-lg border border-zinc-800 shadow-2xs">
                     <span>{watchlistGroup}</span>
-                    <ChevronDown className="w-3 h-3 text-[#8C8275]" />
+                    <ChevronDown className="w-3 h-3 text-zinc-400" />
                   </button>
-                  <span className="text-[11px] font-mono text-[#8C8275]">
+                  <span className="text-[11px] font-mono text-zinc-500">
                     ({agents.length})
                   </span>
                 </div>
@@ -1422,7 +1422,7 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
                 <div className="flex items-center gap-1">
                   <button
                     onClick={() => setIsRegisterAgentModalOpen(true)}
-                    className="p-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-600 transition cursor-pointer"
+                    className="p-1.5 rounded-lg bg-blue-950/60 border border-blue-800/60 hover:bg-blue-900/60 text-blue-400 transition cursor-pointer"
                     title="+ Add Agent"
                   >
                     <Plus className="w-3.5 h-3.5" />
@@ -1430,7 +1430,7 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
 
                   <button
                     onClick={handleGenerateFastMcpKey}
-                    className="p-1.5 rounded-lg hover:bg-neutral-100 text-[#8C8275] transition cursor-pointer"
+                    className="p-1.5 rounded-lg hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 transition cursor-pointer"
                     title="Quick Connect FastMCP"
                   >
                     <Grid className="w-3.5 h-3.5" />
@@ -1438,7 +1438,7 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
 
                   <button
                     onClick={() => loadTenantData(user.id)}
-                    className="p-1.5 rounded-lg hover:bg-neutral-100 text-[#8C8275] transition cursor-pointer"
+                    className="p-1.5 rounded-lg hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 transition cursor-pointer"
                     title="Options Menu"
                   >
                     <MoreVertical className="w-3.5 h-3.5" />
@@ -1447,25 +1447,25 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
               </div>
 
               {/* Watchlist Column Subheader */}
-              <div className="px-3.5 py-2.5 bg-neutral-50 dark:bg-neutral-800/80 border-b border-[#EAE3D2] dark:border-neutral-700/80 flex items-center justify-between text-[11px] font-semibold uppercase tracking-wider text-zinc-500 font-sans">
-                <span className="flex-1 min-w-0">Agent / Node</span>
+              <div className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400 bg-transparent px-4 py-2 border-b border-zinc-800/60 flex items-center justify-between font-sans">
+                <span className="min-w-[180px] flex-1">Agent / Node</span>
                 <span className="w-24 text-right">Throughput</span>
                 <span className="w-20 text-right">24h Chg%</span>
               </div>
 
               {/* Categorized Rows List */}
-              <div className="divide-y divide-[#F0E9DC] dark:divide-neutral-800 max-h-[580px] overflow-y-auto custom-dark-scrollbar">
+              <div className="divide-y divide-zinc-800/40 max-h-[580px] overflow-y-auto custom-dark-scrollbar bg-zinc-950">
                 {/* 1. Group: CONNECTED AGENTS */}
-                <div className="bg-[#FAF8F5] dark:bg-neutral-800/60 px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-zinc-500 flex items-center justify-between font-sans">
-                  <span className="flex items-center gap-1.5">
+                <div className="text-[10px] font-mono tracking-widest text-zinc-400 uppercase py-1.5 px-4 bg-zinc-900/50 border-y border-zinc-800/50 flex items-center justify-between">
+                  <span className="flex items-center gap-1.5 text-emerald-400 font-semibold">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                     CONNECTED AGENTS
                   </span>
-                  <span className="text-zinc-400">({connectedAgents.length})</span>
+                  <span className="text-zinc-500">({connectedAgents.length})</span>
                 </div>
 
                 {connectedAgents.length === 0 ? (
-                  <div className="p-4 text-center text-[11px] font-sans text-zinc-500">
+                  <div className="p-4 text-center text-xs font-sans text-zinc-500">
                     No agents actively streaming.
                   </div>
                 ) : (
@@ -1479,41 +1479,43 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
                       <div
                         key={agent.id}
                         onClick={() => setSelectedAgentId(agent.id)}
-                        className={`p-3 transition-colors cursor-pointer flex items-center justify-between gap-3 ${
-                          isSelected ? "bg-blue-50/70 border-l-4 border-blue-600" : "hover:bg-[#FAF8F5] dark:hover:bg-neutral-800/40"
+                        className={`border-b border-zinc-800/40 px-4 py-3 text-zinc-300 transition-colors duration-150 flex items-center justify-between gap-3 group ${
+                          isSelected
+                            ? "bg-zinc-900 border-l-2 border-l-blue-500 text-white"
+                            : "bg-transparent hover:bg-zinc-900 hover:text-white cursor-pointer hover:border-l-2 hover:border-l-blue-500"
                         }`}
                       >
-                        {/* Agent Avatar / ID / Name (Expanded width without aggressive truncation) */}
-                        <div className="flex items-center gap-2.5 flex-1 min-w-0">
+                        {/* Agent Avatar / ID / Name (min-w-[180px] preventing line breaks) */}
+                        <div className="flex items-center gap-2.5 min-w-[180px] flex-1">
                           {agent.avatar_url ? (
                             <img
                               src={agent.avatar_url}
                               alt={agent.name}
-                              className="w-7 h-7 rounded-full object-cover shrink-0 border border-blue-300"
+                              className="w-7 h-7 rounded-full object-cover shrink-0 border border-blue-500/50"
                             />
                           ) : (
-                            <div className="w-7 h-7 rounded-full bg-blue-100 text-blue-700 font-semibold text-xs flex items-center justify-center shrink-0">
+                            <div className="w-7 h-7 rounded-full bg-blue-950/70 text-blue-400 border border-blue-800/60 font-semibold text-xs flex items-center justify-center shrink-0">
                               {agent.name.slice(0, 1).toUpperCase()}
                             </div>
                           )}
                           <div className="min-w-0 flex-1">
-                            <span className="font-mono text-xs font-bold text-[#1C1A17] dark:text-zinc-100 block truncate">
+                            <span className="font-mono text-xs font-bold text-zinc-100 group-hover:text-white block truncate">
                               {code}
                             </span>
-                            <span className="text-xs text-zinc-600 dark:text-zinc-400 block break-words font-sans">
+                            <span className="text-xs text-zinc-400 group-hover:text-zinc-200 block whitespace-nowrap truncate font-sans">
                               {agent.name}
                             </span>
                           </div>
                         </div>
 
                         {/* Throughput */}
-                        <div className="w-24 text-right font-medium text-xs text-zinc-700 dark:text-zinc-300 font-mono">
+                        <div className="w-24 text-right font-mono text-xs font-medium text-zinc-300 group-hover:text-white">
                           {(agent.throughput_tps || 1259.1).toFixed(1)}{" "}
-                          <span className="text-[10px] text-zinc-400 font-sans">TPS</span>
+                          <span className="text-[10px] text-zinc-500 font-sans">TPS</span>
                         </div>
 
                         {/* Real-time Rate Indicator */}
-                        <div className="w-20 text-right font-medium text-xs text-emerald-600 font-mono">
+                        <div className="w-20 text-right font-mono text-xs font-medium text-emerald-400 group-hover:text-emerald-300">
                           +14.1%
                         </div>
                       </div>
@@ -1522,16 +1524,16 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
                 )}
 
                 {/* 2. Group: STANDBY NODES */}
-                <div className="bg-[#FAF8F5] dark:bg-neutral-800/60 px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-zinc-500 flex items-center justify-between border-t border-[#EAE3D2] dark:border-neutral-700/80 font-sans">
-                  <span className="flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-neutral-400" />
+                <div className="text-[10px] font-mono tracking-widest text-zinc-400 uppercase py-1.5 px-4 bg-zinc-900/50 border-y border-zinc-800/50 flex items-center justify-between">
+                  <span className="flex items-center gap-1.5 text-zinc-400 font-semibold">
+                    <span className="w-1.5 h-1.5 rounded-full bg-zinc-500" />
                     STANDBY NODES
                   </span>
-                  <span className="text-zinc-400">({standbyNodes.length})</span>
+                  <span className="text-zinc-500">({standbyNodes.length})</span>
                 </div>
 
                 {standbyNodes.length === 0 ? (
-                  <div className="p-4 text-center text-[11px] font-sans text-zinc-500">
+                  <div className="p-4 text-center text-xs font-sans text-zinc-500">
                     No standby nodes.
                   </div>
                 ) : (
@@ -1546,44 +1548,46 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
                       <div
                         key={agent.id}
                         onClick={() => setSelectedAgentId(agent.id)}
-                        className={`p-3 transition-colors cursor-pointer flex items-center justify-between gap-3 ${
-                          isSelected ? "bg-neutral-100/80 border-l-4 border-neutral-500" : "hover:bg-[#FAF8F5] dark:hover:bg-neutral-800/40"
+                        className={`border-b border-zinc-800/40 px-4 py-3 text-zinc-300 transition-colors duration-150 flex items-center justify-between gap-3 group ${
+                          isSelected
+                            ? "bg-zinc-900 border-l-2 border-l-blue-500 text-white"
+                            : "bg-transparent hover:bg-zinc-900 hover:text-white cursor-pointer hover:border-l-2 hover:border-l-blue-500"
                         }`}
                       >
                         {/* Agent Avatar / ID / Name */}
-                        <div className="flex items-center gap-2.5 flex-1 min-w-0">
+                        <div className="flex items-center gap-2.5 min-w-[180px] flex-1">
                           {agent.avatar_url ? (
                             <img
                               src={agent.avatar_url}
                               alt={agent.name}
-                              className="w-7 h-7 rounded-full object-cover shrink-0 grayscale opacity-70"
+                              className="w-7 h-7 rounded-full object-cover shrink-0 grayscale opacity-60 border border-zinc-800"
                             />
                           ) : (
-                            <div className="w-7 h-7 rounded-full bg-neutral-100 text-neutral-600 font-semibold text-xs flex items-center justify-center shrink-0">
+                            <div className="w-7 h-7 rounded-full bg-zinc-900 text-zinc-500 border border-zinc-800 font-semibold text-xs flex items-center justify-center shrink-0">
                               {agent.name.slice(0, 1).toUpperCase()}
                             </div>
                           )}
                           <div className="min-w-0 flex-1">
-                            <span className="font-mono text-xs font-semibold text-zinc-600 dark:text-zinc-400 block truncate">
+                            <span className="font-mono text-xs font-semibold text-zinc-400 group-hover:text-zinc-200 block truncate">
                               {code}
                             </span>
-                            <span className="text-xs text-zinc-500 dark:text-zinc-400 block break-words font-sans">
+                            <span className="text-xs text-zinc-500 group-hover:text-zinc-300 block whitespace-nowrap truncate font-sans">
                               {agent.name}
                             </span>
                           </div>
                         </div>
 
                         {/* Throughput */}
-                        <div className="w-24 text-right font-medium text-xs text-zinc-700 dark:text-zinc-300 font-mono">
-                          0.0 <span className="text-[10px] text-zinc-400 font-sans">TPS</span>
+                        <div className="w-24 text-right font-mono text-xs text-zinc-500 group-hover:text-zinc-400">
+                          0.0 <span className="text-[10px]">TPS</span>
                         </div>
 
                         {/* Rate Indicator / Status */}
-                        <div className="w-20 text-right font-medium text-xs text-zinc-700 dark:text-zinc-300 font-sans">
+                        <div className="w-20 text-right font-mono text-xs">
                           {isRevoked ? (
-                            <span className="font-medium text-xs text-rose-600 dark:text-rose-400">REV</span>
+                            <span className="font-semibold text-rose-500 group-hover:text-rose-400">REV</span>
                           ) : (
-                            <span className="font-medium text-xs text-zinc-700 dark:text-zinc-300 font-mono">-2.4%</span>
+                            <span className="text-zinc-500 group-hover:text-zinc-400">-2.4%</span>
                           )}
                         </div>
                       </div>
@@ -1595,54 +1599,54 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
 
             {/* Bottom Panel: Quick Summary Card of Selected Active Agent */}
             {selectedAgent && (
-              <div className="rounded-3xl border border-[#EAE3D2] dark:border-neutral-800 bg-white dark:bg-neutral-900 p-5 shadow-xs space-y-4 font-sans">
+              <div className="rounded-2xl border border-zinc-800/80 bg-zinc-950 p-5 shadow-xs space-y-4 font-sans text-zinc-200">
                 <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500 font-sans">
+                  <span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400 font-sans">
                     Agent Summary
                   </span>
-                  <span className="text-xs text-blue-600 dark:text-blue-400 font-semibold font-sans">
+                  <span className="text-xs text-blue-400 font-semibold font-sans">
                     {selectedAgent.framework || "FastMCP"}
                   </span>
                 </div>
 
                 <div className="space-y-2.5 text-xs font-sans">
-                  <div className="flex items-center justify-between py-1 border-b border-[#F0E9DC] dark:border-neutral-800">
-                    <span className="text-zinc-500 dark:text-zinc-400 font-sans">Latency:</span>
-                    <span className="font-medium text-xs text-zinc-700 dark:text-zinc-300 font-mono">
+                  <div className="flex items-center justify-between py-1 border-b border-zinc-800/60">
+                    <span className="text-zinc-400 font-sans">Latency:</span>
+                    <span className="font-mono font-medium text-xs text-zinc-200">
                       {isTelemetryLive && selectedAgent.ping_latency_ms
                         ? `${selectedAgent.ping_latency_ms}ms`
                         : "—"}
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-between py-1 border-b border-[#F0E9DC] dark:border-neutral-800">
-                    <span className="text-zinc-500 dark:text-zinc-400 font-sans">Settled Vol:</span>
-                    <span className="font-medium text-xs text-zinc-700 dark:text-zinc-300 font-mono">
+                  <div className="flex items-center justify-between py-1 border-b border-zinc-800/60">
+                    <span className="text-zinc-400 font-sans">Settled Vol:</span>
+                    <span className="font-mono font-medium text-xs text-zinc-200">
                       ₹{metrics.totalVolumeINR.toLocaleString("en-IN", { maximumFractionDigits: 0 })}
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-between py-1 border-b border-[#F0E9DC] dark:border-neutral-800">
-                    <span className="text-zinc-500 dark:text-zinc-400 font-sans">Uptime State:</span>
-                    <span className="font-medium text-xs text-zinc-700 dark:text-zinc-300 font-sans">
+                  <div className="flex items-center justify-between py-1 border-b border-zinc-800/60">
+                    <span className="text-zinc-400 font-sans">Uptime State:</span>
+                    <span className="font-sans font-medium text-xs text-zinc-200">
                       {isTelemetryLive ? "Connected (Live)" : "Standby / Dormant"}
                     </span>
                   </div>
 
                   <div className="flex items-center justify-between py-1">
-                    <span className="text-zinc-500 dark:text-zinc-400 font-sans">Webhook:</span>
-                    <span className="font-medium text-xs text-zinc-700 dark:text-zinc-300 font-sans truncate max-w-[120px]">
+                    <span className="text-zinc-400 font-sans">Webhook:</span>
+                    <span className="font-sans font-medium text-xs text-zinc-200 truncate max-w-[120px]">
                       {selectedAgent.webhook_url ? "Configured" : "None"}
                     </span>
                   </div>
                 </div>
 
                 {/* Agent Actions: Modernized Ping Button */}
-                <div className="pt-2 border-t border-[#F0E9DC] dark:border-neutral-800 flex items-center justify-between gap-2 font-sans">
+                <div className="pt-2 border-t border-zinc-800/60 flex items-center justify-between gap-2 font-sans">
                   <button
                     onClick={() => handleSimulateHeartbeat(selectedAgent.id)}
                     disabled={isPinging}
-                    className="flex-1 font-medium text-sm text-blue-600 bg-blue-50/80 hover:bg-blue-100 py-2.5 rounded-xl border border-blue-100 transition-colors text-center cursor-pointer disabled:opacity-60 font-sans"
+                    className="flex-1 font-medium text-sm text-blue-400 bg-blue-950/60 hover:bg-blue-900/60 py-2.5 rounded-xl border border-blue-800/60 transition-colors text-center cursor-pointer disabled:opacity-60 font-sans shadow-2xs"
                     title="Send Heartbeat"
                   >
                     {isPinging ? "Pinging..." : "Ping"}
@@ -1651,7 +1655,7 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
                   {(selectedAgent.status || "").toUpperCase() !== "REVOKED" && (
                     <button
                       onClick={() => handleRevokeAgent(selectedAgent.id)}
-                      className="py-2.5 px-3 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 hover:bg-rose-50 hover:text-rose-600 text-zinc-600 dark:text-zinc-300 text-xs font-medium font-sans transition cursor-pointer"
+                      className="py-2.5 px-3 rounded-xl border border-zinc-800 bg-zinc-900 hover:bg-rose-950/40 hover:text-rose-400 hover:border-rose-900/60 text-zinc-300 text-xs font-medium font-sans transition cursor-pointer"
                       title="Revoke Credentials"
                     >
                       Revoke
@@ -1660,7 +1664,7 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
 
                   <button
                     onClick={() => handleDeleteAgent(selectedAgent.id, selectedAgent.name)}
-                    className="p-2.5 rounded-xl border border-rose-200 dark:border-rose-900 bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 text-rose-600 transition cursor-pointer"
+                    className="p-2.5 rounded-xl border border-rose-900/50 bg-rose-950/40 hover:bg-rose-900/60 text-rose-400 transition cursor-pointer"
                     title="Delete Agent Row"
                   >
                     <Trash2 className="w-4 h-4" />
