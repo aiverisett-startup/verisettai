@@ -801,6 +801,35 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
     }
   };
 
+  // Generate sample FastMCP test escrow settlement for sandbox testing
+  const handleGenerateTestEscrow = useCallback(async () => {
+    try {
+      if (user?.id) {
+        await supabase.from("ledger_entries").insert({
+          user_id: user.id,
+          transaction_id: crypto.randomUUID(),
+          entry_type: "CREDIT",
+          amount: 250000,
+          currency: "INR",
+          description: "FastMCP Deterministic Settlement: Testnet Escrow Cleared",
+        });
+        await loadTenantData(user.id);
+      }
+      await fetch("/api/contracts/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          amount_inr: 2500,
+          agentName: "FastMCP Autonomous Node",
+          beneficiary_name: "Verisett Worker Agent",
+          milestone_title: "FastMCP Escrow Sandbox Testnet Assertion",
+        }),
+      }).catch(() => {});
+    } catch (err) {
+      console.warn("Failed to generate test escrow:", err);
+    }
+  }, [user?.id, loadTenantData]);
+
   // Sign out
   const handleSignOut = async () => {
     try {
@@ -1054,11 +1083,11 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
                     <button
                       onClick={() => handleSimulateHeartbeat(selectedAgent.id)}
                       disabled={isPinging}
-                      className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-blue-200 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-mono font-semibold transition cursor-pointer disabled:opacity-60"
+                      className="text-xs font-semibold text-blue-600 bg-blue-50/60 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800/50 px-4 py-2 rounded-full inline-flex items-center gap-2 hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors cursor-pointer disabled:opacity-60 font-sans"
                       title="Transmit heartbeat ping to trigger verified status"
                     >
                       <Activity className={`w-3.5 h-3.5 ${isPinging ? "animate-spin" : ""}`} />
-                      <span>{isPinging ? "Transmitting..." : "Send Heartbeat Ping"}</span>
+                      <span>{isPinging ? "Transmitting..." : `Transmit Heartbeat for ${selectedAgent.name}`}</span>
                     </button>
 
                     <button
@@ -1076,7 +1105,7 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
               <div className="pt-4 border-t border-[#F0E9DC] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {/* Metric 1: Big Number Display with colored delta pill */}
                 <div className="p-4 rounded-2xl bg-[#FAF8F5] border border-[#EAE3D2]">
-                  <span className="text-xs font-mono text-[#8C8275] block uppercase">
+                  <span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500 block font-sans">
                     Throughput Rate
                   </span>
                   <div className="flex items-baseline gap-2.5 mt-1 flex-wrap">
@@ -1104,7 +1133,7 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
 
                 {/* Metric 2: Primary Vault Balance */}
                 <div className="p-4 rounded-2xl bg-[#FAF8F5] border border-[#EAE3D2]">
-                  <span className="text-xs font-mono text-[#8C8275] block uppercase">
+                  <span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500 block font-sans">
                     Escrow Custody Vault
                   </span>
                   <div className="text-2xl sm:text-3xl font-black text-[#1C1A17] font-sans tracking-tight mt-1 truncate">
@@ -1117,7 +1146,7 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
 
                 {/* Metric 3: Cleared Volume */}
                 <div className="p-4 rounded-2xl bg-[#FAF8F5] border border-[#EAE3D2]">
-                  <span className="text-xs font-mono text-[#8C8275] block uppercase">
+                  <span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500 block font-sans">
                     Total Cleared Volume
                   </span>
                   <div className="text-2xl sm:text-3xl font-black text-[#1C1A17] font-mono tracking-tight mt-1 truncate">
@@ -1130,7 +1159,7 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
 
                 {/* Metric 4: Spending Limit / Protocol Cap */}
                 <div className="p-4 rounded-2xl bg-[#FAF8F5] border border-[#EAE3D2]">
-                  <span className="text-xs font-mono text-[#8C8275] block uppercase">
+                  <span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500 block font-sans">
                     Escrow Spending Cap
                   </span>
                   <div className="text-2xl sm:text-3xl font-black text-[#1C1A17] font-mono tracking-tight mt-1 truncate">
@@ -1199,9 +1228,9 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
                     <button
                       onClick={() => handleSimulateHeartbeat(selectedAgent.id)}
                       disabled={isPinging}
-                      className="w-full sm:w-auto px-6 py-3 rounded-xl border border-blue-300 bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold text-xs sm:text-sm font-mono transition cursor-pointer flex items-center justify-center gap-2 disabled:opacity-60"
+                      className="text-xs font-semibold text-blue-600 bg-blue-50/60 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800/50 px-4 py-2 rounded-full inline-flex items-center gap-2 hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors cursor-pointer disabled:opacity-60 font-sans"
                     >
-                      <Zap className="w-4 h-4 text-blue-600" />
+                      <Zap className={`w-3.5 h-3.5 text-blue-600 ${isPinging ? "animate-spin" : ""}`} />
                       <span>
                         {isPinging ? "Transmitting..." : `Transmit Heartbeat for ${selectedAgent.name}`}
                       </span>
@@ -1227,13 +1256,16 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
             {/* TAB CONTENT VIEWS */}
             {activeTab === "overview" && (
               <div className="space-y-6">
-                <TransactionChart data={velocityChartData} />
+                <TransactionChart
+                  data={velocityChartData}
+                  onGenerateTestTransaction={handleGenerateTestEscrow}
+                />
               </div>
             )}
 
             {activeTab === "telemetry" && (
               <div className="rounded-3xl border border-[#EAE3D2] bg-white p-6 sm:p-8 space-y-4">
-                <h3 className="text-base font-bold text-[#1C1A17] font-mono uppercase tracking-wider flex items-center gap-2">
+                <h3 className="text-base font-bold text-[#1C1A17] font-sans tracking-tight flex items-center gap-2">
                   <Activity className="w-4 h-4 text-blue-600" />
                   Realtime Packet &amp; Heartbeat Stream
                 </h3>
@@ -1254,19 +1286,19 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
 
             {activeTab === "transactions" && (
               <div className="rounded-3xl border border-[#EAE3D2] bg-white p-6 sm:p-8 space-y-4">
-                <h3 className="text-base font-bold text-[#1C1A17] font-mono uppercase tracking-wider flex items-center gap-2">
+                <h3 className="text-base font-bold text-[#1C1A17] font-sans tracking-tight flex items-center gap-2">
                   <ShieldCheck className="w-4 h-4 text-emerald-600" />
                   Settlement History &amp; Cryptographic Proofs
                 </h3>
                 {transactions.length === 0 ? (
-                  <div className="p-8 text-center text-xs font-mono text-[#8C8275] bg-[#FAF8F5] rounded-2xl border border-[#EAE3D2]">
+                  <div className="p-8 text-center text-xs font-sans text-zinc-500 bg-[#FAF8F5] rounded-2xl border border-[#EAE3D2]">
                     No escrow settlements recorded for this tenant yet.
                   </div>
                 ) : (
                   <div className="overflow-x-auto">
-                    <table className="w-full text-left text-xs font-mono">
+                    <table className="w-full text-left text-xs font-sans">
                       <thead>
-                        <tr className="border-b border-[#EAE3D2] text-[#8C8275]">
+                        <tr className="border-b border-[#EAE3D2] text-[11px] font-semibold uppercase tracking-wider text-zinc-500 font-sans">
                           <th className="py-3 px-3">Settlement ID</th>
                           <th className="py-3 px-3">Title</th>
                           <th className="py-3 px-3">Amount</th>
@@ -1277,15 +1309,15 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
                       <tbody className="divide-y divide-[#F0E9DC]">
                         {transactions.map((tx) => (
                           <tr key={tx.id} className="hover:bg-[#FAF8F5]">
-                            <td className="py-3 px-3 font-bold text-[#1C1A17]">{tx.id.slice(0, 8)}...</td>
+                            <td className="py-3 px-3 font-mono font-bold text-[#1C1A17]">{tx.id.slice(0, 8)}...</td>
                             <td className="py-3 px-3 text-[#4A453E]">{tx.milestoneTitle}</td>
-                            <td className="py-3 px-3 font-bold text-[#1C1A17]">₹{tx.amountINR.toLocaleString("en-IN")}</td>
+                            <td className="py-3 px-3 font-mono font-bold text-[#1C1A17]">₹{tx.amountINR.toLocaleString("en-IN")}</td>
                             <td className="py-3 px-3">
-                              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
+                              <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-800">
                                 {tx.status}
                               </span>
                             </td>
-                            <td className="py-3 px-3 text-[#8C8275]">{tx.sha256Proof.slice(0, 16)}...</td>
+                            <td className="py-3 px-3 font-mono text-zinc-500">{tx.sha256Proof.slice(0, 16)}...</td>
                           </tr>
                         ))}
                       </tbody>
@@ -1320,7 +1352,7 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
 
             {activeTab === "webhooks" && (
               <div className="rounded-3xl border border-[#EAE3D2] bg-white p-6 sm:p-8 space-y-4">
-                <h3 className="text-base font-bold text-[#1C1A17] font-mono uppercase tracking-wider flex items-center gap-2">
+                <h3 className="text-base font-bold text-[#1C1A17] font-sans tracking-tight flex items-center gap-2">
                   <Webhook className="w-4 h-4 text-purple-600" />
                   Webhook Callback Endpoint &amp; Verification
                 </h3>
@@ -1343,7 +1375,7 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
 
             {activeTab === "escrow" && (
               <div className="rounded-3xl border border-[#EAE3D2] bg-white p-6 sm:p-8 space-y-4">
-                <h3 className="text-base font-bold text-[#1C1A17] font-mono uppercase tracking-wider flex items-center gap-2">
+                <h3 className="text-base font-bold text-[#1C1A17] font-sans tracking-tight flex items-center gap-2">
                   <Lock className="w-4 h-4 text-blue-600" />
                   Escrow Locks &amp; Automated Release Parameters
                 </h3>
@@ -1415,25 +1447,25 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
               </div>
 
               {/* Watchlist Column Subheader */}
-              <div className="px-3 py-2 bg-[#F7F4EE] border-b border-[#EAE3D2] flex items-center justify-between text-[10px] font-mono uppercase text-[#8C8275]">
-                <span className="w-2/5">Agent / Node</span>
-                <span className="w-2/5 text-right">Throughput</span>
-                <span className="w-1/5 text-right">24h Chg%</span>
+              <div className="px-3.5 py-2.5 bg-neutral-50 dark:bg-neutral-800/80 border-b border-[#EAE3D2] dark:border-neutral-700/80 flex items-center justify-between text-[11px] font-semibold uppercase tracking-wider text-zinc-500 font-sans">
+                <span className="flex-1 min-w-0">Agent / Node</span>
+                <span className="w-24 text-right">Throughput</span>
+                <span className="w-20 text-right">24h Chg%</span>
               </div>
 
               {/* Categorized Rows List */}
-              <div className="divide-y divide-[#F0E9DC] max-h-[580px] overflow-y-auto">
+              <div className="divide-y divide-[#F0E9DC] dark:divide-neutral-800 max-h-[580px] overflow-y-auto custom-dark-scrollbar">
                 {/* 1. Group: CONNECTED AGENTS */}
-                <div className="bg-[#FAF8F5] px-3 py-1.5 text-[10px] font-mono font-bold text-emerald-800 uppercase tracking-wider flex items-center justify-between">
-                  <span className="flex items-center gap-1">
+                <div className="bg-[#FAF8F5] dark:bg-neutral-800/60 px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-zinc-500 flex items-center justify-between font-sans">
+                  <span className="flex items-center gap-1.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                     CONNECTED AGENTS
                   </span>
-                  <span>({connectedAgents.length})</span>
+                  <span className="text-zinc-400">({connectedAgents.length})</span>
                 </div>
 
                 {connectedAgents.length === 0 ? (
-                  <div className="p-4 text-center text-[11px] font-mono text-[#8C8275]">
+                  <div className="p-4 text-center text-[11px] font-sans text-zinc-500">
                     No agents actively streaming.
                   </div>
                 ) : (
@@ -1447,12 +1479,12 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
                       <div
                         key={agent.id}
                         onClick={() => setSelectedAgentId(agent.id)}
-                        className={`p-3 transition-colors cursor-pointer flex items-center justify-between gap-2 ${
-                          isSelected ? "bg-blue-50/70 border-l-4 border-blue-600" : "hover:bg-[#FAF8F5]"
+                        className={`p-3 transition-colors cursor-pointer flex items-center justify-between gap-3 ${
+                          isSelected ? "bg-blue-50/70 border-l-4 border-blue-600" : "hover:bg-[#FAF8F5] dark:hover:bg-neutral-800/40"
                         }`}
                       >
-                        {/* Agent Avatar / ID / Name */}
-                        <div className="flex items-center gap-2 w-2/5 min-w-0">
+                        {/* Agent Avatar / ID / Name (Expanded width without aggressive truncation) */}
+                        <div className="flex items-center gap-2.5 flex-1 min-w-0">
                           {agent.avatar_url ? (
                             <img
                               src={agent.avatar_url}
@@ -1460,28 +1492,28 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
                               className="w-7 h-7 rounded-full object-cover shrink-0 border border-blue-300"
                             />
                           ) : (
-                            <div className="w-7 h-7 rounded-full bg-blue-100 text-blue-700 font-bold text-xs flex items-center justify-center shrink-0">
+                            <div className="w-7 h-7 rounded-full bg-blue-100 text-blue-700 font-semibold text-xs flex items-center justify-center shrink-0">
                               {agent.name.slice(0, 1).toUpperCase()}
                             </div>
                           )}
-                          <div className="min-w-0">
-                            <span className="font-mono text-xs font-bold text-[#1C1A17] block truncate">
+                          <div className="min-w-0 flex-1">
+                            <span className="font-mono text-xs font-bold text-[#1C1A17] dark:text-zinc-100 block truncate">
                               {code}
                             </span>
-                            <span className="text-[10px] text-[#8C8275] block truncate">
+                            <span className="text-xs text-zinc-600 dark:text-zinc-400 block break-words font-sans">
                               {agent.name}
                             </span>
                           </div>
                         </div>
 
                         {/* Throughput */}
-                        <div className="w-2/5 text-right font-mono text-xs font-bold text-[#1C1A17]">
+                        <div className="w-24 text-right font-medium text-xs text-zinc-700 dark:text-zinc-300 font-mono">
                           {(agent.throughput_tps || 1259.1).toFixed(1)}{" "}
-                          <span className="text-[10px] text-[#8C8275] font-normal">TPS</span>
+                          <span className="text-[10px] text-zinc-400 font-sans">TPS</span>
                         </div>
 
                         {/* Real-time Rate Indicator */}
-                        <div className="w-1/5 text-right font-mono text-xs font-bold text-emerald-600">
+                        <div className="w-20 text-right font-medium text-xs text-emerald-600 font-mono">
                           +14.1%
                         </div>
                       </div>
@@ -1490,16 +1522,16 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
                 )}
 
                 {/* 2. Group: STANDBY NODES */}
-                <div className="bg-[#FAF8F5] px-3 py-1.5 text-[10px] font-mono font-bold text-[#6E675D] uppercase tracking-wider flex items-center justify-between border-t border-[#EAE3D2]">
-                  <span className="flex items-center gap-1">
+                <div className="bg-[#FAF8F5] dark:bg-neutral-800/60 px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-zinc-500 flex items-center justify-between border-t border-[#EAE3D2] dark:border-neutral-700/80 font-sans">
+                  <span className="flex items-center gap-1.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-neutral-400" />
                     STANDBY NODES
                   </span>
-                  <span>({standbyNodes.length})</span>
+                  <span className="text-zinc-400">({standbyNodes.length})</span>
                 </div>
 
                 {standbyNodes.length === 0 ? (
-                  <div className="p-4 text-center text-[11px] font-mono text-[#8C8275]">
+                  <div className="p-4 text-center text-[11px] font-sans text-zinc-500">
                     No standby nodes.
                   </div>
                 ) : (
@@ -1514,12 +1546,12 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
                       <div
                         key={agent.id}
                         onClick={() => setSelectedAgentId(agent.id)}
-                        className={`p-3 transition-colors cursor-pointer flex items-center justify-between gap-2 ${
-                          isSelected ? "bg-neutral-100/80 border-l-4 border-neutral-500" : "hover:bg-[#FAF8F5]"
+                        className={`p-3 transition-colors cursor-pointer flex items-center justify-between gap-3 ${
+                          isSelected ? "bg-neutral-100/80 border-l-4 border-neutral-500" : "hover:bg-[#FAF8F5] dark:hover:bg-neutral-800/40"
                         }`}
                       >
                         {/* Agent Avatar / ID / Name */}
-                        <div className="flex items-center gap-2 w-2/5 min-w-0">
+                        <div className="flex items-center gap-2.5 flex-1 min-w-0">
                           {agent.avatar_url ? (
                             <img
                               src={agent.avatar_url}
@@ -1527,31 +1559,31 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
                               className="w-7 h-7 rounded-full object-cover shrink-0 grayscale opacity-70"
                             />
                           ) : (
-                            <div className="w-7 h-7 rounded-full bg-neutral-100 text-neutral-600 font-bold text-xs flex items-center justify-center shrink-0">
+                            <div className="w-7 h-7 rounded-full bg-neutral-100 text-neutral-600 font-semibold text-xs flex items-center justify-center shrink-0">
                               {agent.name.slice(0, 1).toUpperCase()}
                             </div>
                           )}
-                          <div className="min-w-0">
-                            <span className="font-mono text-xs font-semibold text-[#6E675D] block truncate">
+                          <div className="min-w-0 flex-1">
+                            <span className="font-mono text-xs font-semibold text-zinc-600 dark:text-zinc-400 block truncate">
                               {code}
                             </span>
-                            <span className="text-[10px] text-[#8C8275] block truncate">
+                            <span className="text-xs text-zinc-500 dark:text-zinc-400 block break-words font-sans">
                               {agent.name}
                             </span>
                           </div>
                         </div>
 
                         {/* Throughput */}
-                        <div className="w-2/5 text-right font-mono text-xs text-[#8C8275]">
-                          0.0 <span className="text-[10px]">TPS</span>
+                        <div className="w-24 text-right font-medium text-xs text-zinc-700 dark:text-zinc-300 font-mono">
+                          0.0 <span className="text-[10px] text-zinc-400 font-sans">TPS</span>
                         </div>
 
                         {/* Rate Indicator / Status */}
-                        <div className="w-1/5 text-right font-mono text-xs font-semibold text-[#8C8275]">
+                        <div className="w-20 text-right font-medium text-xs text-zinc-700 dark:text-zinc-300 font-sans">
                           {isRevoked ? (
-                            <span className="text-rose-600">REV</span>
+                            <span className="font-medium text-xs text-rose-600 dark:text-rose-400">REV</span>
                           ) : (
-                            <span>-2.4%</span>
+                            <span className="font-medium text-xs text-zinc-700 dark:text-zinc-300 font-mono">-2.4%</span>
                           )}
                         </div>
                       </div>
@@ -1563,63 +1595,63 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
 
             {/* Bottom Panel: Quick Summary Card of Selected Active Agent */}
             {selectedAgent && (
-              <div className="rounded-3xl border border-[#EAE3D2] bg-white p-5 shadow-xs space-y-4">
+              <div className="rounded-3xl border border-[#EAE3D2] dark:border-neutral-800 bg-white dark:bg-neutral-900 p-5 shadow-xs space-y-4 font-sans">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-mono font-bold uppercase text-[#8C8275]">
+                  <span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500 font-sans">
                     Agent Summary
                   </span>
-                  <span className="font-mono text-xs text-blue-600 font-semibold">
+                  <span className="text-xs text-blue-600 dark:text-blue-400 font-semibold font-sans">
                     {selectedAgent.framework || "FastMCP"}
                   </span>
                 </div>
 
-                <div className="space-y-2.5 text-xs font-mono">
-                  <div className="flex items-center justify-between py-1 border-b border-[#F0E9DC]">
-                    <span className="text-[#8C8275]">Latency:</span>
-                    <span className="font-bold text-[#1C1A17]">
+                <div className="space-y-2.5 text-xs font-sans">
+                  <div className="flex items-center justify-between py-1 border-b border-[#F0E9DC] dark:border-neutral-800">
+                    <span className="text-zinc-500 dark:text-zinc-400 font-sans">Latency:</span>
+                    <span className="font-medium text-xs text-zinc-700 dark:text-zinc-300 font-mono">
                       {isTelemetryLive && selectedAgent.ping_latency_ms
                         ? `${selectedAgent.ping_latency_ms}ms`
                         : "—"}
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-between py-1 border-b border-[#F0E9DC]">
-                    <span className="text-[#8C8275]">Settled Vol:</span>
-                    <span className="font-bold text-[#1C1A17]">
+                  <div className="flex items-center justify-between py-1 border-b border-[#F0E9DC] dark:border-neutral-800">
+                    <span className="text-zinc-500 dark:text-zinc-400 font-sans">Settled Vol:</span>
+                    <span className="font-medium text-xs text-zinc-700 dark:text-zinc-300 font-mono">
                       ₹{metrics.totalVolumeINR.toLocaleString("en-IN", { maximumFractionDigits: 0 })}
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-between py-1 border-b border-[#F0E9DC]">
-                    <span className="text-[#8C8275]">Uptime State:</span>
-                    <span className="font-bold text-[#1C1A17]">
+                  <div className="flex items-center justify-between py-1 border-b border-[#F0E9DC] dark:border-neutral-800">
+                    <span className="text-zinc-500 dark:text-zinc-400 font-sans">Uptime State:</span>
+                    <span className="font-medium text-xs text-zinc-700 dark:text-zinc-300 font-sans">
                       {isTelemetryLive ? "Connected (Live)" : "Standby / Dormant"}
                     </span>
                   </div>
 
                   <div className="flex items-center justify-between py-1">
-                    <span className="text-[#8C8275]">Webhook:</span>
-                    <span className="font-bold text-[#1C1A17] truncate max-w-[120px]">
+                    <span className="text-zinc-500 dark:text-zinc-400 font-sans">Webhook:</span>
+                    <span className="font-medium text-xs text-zinc-700 dark:text-zinc-300 font-sans truncate max-w-[120px]">
                       {selectedAgent.webhook_url ? "Configured" : "None"}
                     </span>
                   </div>
                 </div>
 
-                {/* Agent Actions: Heartbeat Ping, Revoke, Delete */}
-                <div className="pt-2 border-t border-[#F0E9DC] flex items-center justify-between gap-2">
+                {/* Agent Actions: Modernized Ping Button */}
+                <div className="pt-2 border-t border-[#F0E9DC] dark:border-neutral-800 flex items-center justify-between gap-2 font-sans">
                   <button
                     onClick={() => handleSimulateHeartbeat(selectedAgent.id)}
                     disabled={isPinging}
-                    className="flex-1 py-1.5 px-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-mono font-semibold transition cursor-pointer text-center"
+                    className="flex-1 font-medium text-sm text-blue-600 bg-blue-50/80 hover:bg-blue-100 py-2.5 rounded-xl border border-blue-100 transition-colors text-center cursor-pointer disabled:opacity-60 font-sans"
                     title="Send Heartbeat"
                   >
-                    Ping
+                    {isPinging ? "Pinging..." : "Ping"}
                   </button>
 
                   {(selectedAgent.status || "").toUpperCase() !== "REVOKED" && (
                     <button
                       onClick={() => handleRevokeAgent(selectedAgent.id)}
-                      className="py-1.5 px-2 rounded-xl border border-zinc-200 bg-zinc-50 hover:bg-rose-50 hover:text-rose-600 text-zinc-600 text-xs font-mono transition cursor-pointer"
+                      className="py-2.5 px-3 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 hover:bg-rose-50 hover:text-rose-600 text-zinc-600 dark:text-zinc-300 text-xs font-medium font-sans transition cursor-pointer"
                       title="Revoke Credentials"
                     >
                       Revoke
@@ -1628,10 +1660,10 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
 
                   <button
                     onClick={() => handleDeleteAgent(selectedAgent.id, selectedAgent.name)}
-                    className="p-1.5 rounded-xl border border-rose-200 bg-rose-50 hover:bg-rose-100 text-rose-600 transition cursor-pointer"
+                    className="p-2.5 rounded-xl border border-rose-200 dark:border-rose-900 bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 text-rose-600 transition cursor-pointer"
                     title="Delete Agent Row"
                   >
-                    <Trash2 className="w-3.5 h-3.5" />
+                    <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
               </div>

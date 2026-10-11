@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
+import { Zap, RefreshCw, Check, ArrowRight } from "lucide-react";
 
 export interface VelocityDataPoint {
   date: string;
@@ -10,10 +11,15 @@ export interface VelocityDataPoint {
 
 export interface TransactionChartProps {
   data?: VelocityDataPoint[];
+  onGenerateTestTransaction?: () => Promise<void> | void;
 }
 
-export function TransactionChart({ data }: TransactionChartProps) {
+export function TransactionChart({ data, onGenerateTestTransaction }: TransactionChartProps) {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const [mode, setMode] = useState<"live" | "preview">("live");
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [optimisticCompleted, setOptimisticCompleted] = useState(0);
+  const [showSuccessToast, setShowSuccessToast] = useState(false);
 
   // Default last 7 days window if no data is provided
   const fallbackDays: VelocityDataPoint[] = useMemo(() => {
@@ -31,7 +37,53 @@ export function TransactionChart({ data }: TransactionChartProps) {
     return list;
   }, []);
 
-  const chartData = data && data.length > 0 ? data : fallbackDays;
+  // Realistic 7-day preview simulation curve for demos and video recordings
+  const previewSimulationData: VelocityDataPoint[] = useMemo(() => {
+    const list: VelocityDataPoint[] = [];
+    const now = new Date();
+    const curve = [
+      { completed: 6, incomplete: 2 },
+      { completed: 11, incomplete: 4 },
+      { completed: 19, incomplete: 3 },
+      { completed: 16, incomplete: 6 },
+      { completed: 27, incomplete: 5 },
+      { completed: 33, incomplete: 8 },
+      { completed: 41, incomplete: 9 },
+    ];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(now);
+      d.setDate(d.getDate() - i);
+      const c = curve[6 - i];
+      list.push({
+        date: d.toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+        completed: c.completed,
+        incomplete: c.incomplete,
+      });
+    }
+    return list;
+  }, []);
+
+  const baseData = useMemo(() => {
+    if (mode === "preview") {
+      return previewSimulationData;
+    }
+    return data && data.length > 0 ? data : fallbackDays;
+  }, [mode, previewSimulationData, data, fallbackDays]);
+
+  const chartData = useMemo(() => {
+    if (optimisticCompleted > 0 && mode === "live") {
+      return baseData.map((item, idx) => {
+        if (idx === baseData.length - 1) {
+          return {
+            ...item,
+            completed: item.completed + optimisticCompleted,
+          };
+        }
+        return item;
+      });
+    }
+    return baseData;
+  }, [baseData, optimisticCompleted, mode]);
 
   // Big, expansive canvas geometry
   const SVG_WIDTH = 960;
@@ -45,10 +97,20 @@ export function TransactionChart({ data }: TransactionChartProps) {
     0,
     ...chartData.map((d) => Math.max(d.completed, d.incomplete))
   );
-  const allZero = rawMax === 0;
+
+  const totalCompleted = useMemo(
+    () => chartData.reduce((acc, curr) => acc + curr.completed, 0),
+    [chartData]
+  );
+  const totalInFlight = useMemo(
+    () => chartData.reduce((acc, curr) => acc + curr.incomplete, 0),
+    [chartData]
+  );
+
+  const allZero = totalCompleted === 0 && totalInFlight === 0;
   const maxVal = allZero ? 4 : Math.max(4, Math.ceil(rawMax * 1.25));
 
-  // Subtle Horizontal Gridlines
+  // Subtle Horizontal Gridlines (kept visible at all times, even in empty state)
   const gridLines = useMemo(() => {
     const steps = 4;
     return Array.from({ length: steps + 1 }, (_, i) => {
@@ -116,45 +178,102 @@ export function TransactionChart({ data }: TransactionChartProps) {
     return buildSmoothPath(points.map((p) => ({ x: p.x, y: p.incompleteY })));
   }, [points]);
 
-  const totalCompleted = useMemo(
-    () => chartData.reduce((acc, curr) => acc + curr.completed, 0),
-    [chartData]
-  );
-  const totalInFlight = useMemo(
-    () => chartData.reduce((acc, curr) => acc + curr.incomplete, 0),
-    [chartData]
-  );
+  const handleGenerateTest = async () => {
+    setIsGenerating(true);
+    try {
+      if (onGenerateTestTransaction) {
+        await onGenerateTestTransaction();
+      } else {
+        await fetch("/api/contracts/create", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            amount_inr: 2500,
+            agentName: "FastMCP Autonomous Node",
+            beneficiary_name: "Verisett Worker Agent",
+            milestone_title: "FastMCP Escrow Sandbox Testnet Assertion",
+          }),
+        }).catch(() => {});
+      }
+
+      setOptimisticCompleted((prev) => prev + 1);
+      setShowSuccessToast(true);
+      setTimeout(() => setShowSuccessToast(false), 4500);
+    } catch (err) {
+      console.warn("Failed to generate test settlement:", err);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   return (
-    <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-3xl p-6 sm:p-8 lg:p-9 shadow-sm font-sans">
+    <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-3xl p-6 sm:p-8 lg:p-9 shadow-sm font-sans transition-colors">
       {/* Expansive Header & Linear Pill Legend */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-neutral-100 dark:border-neutral-800/80 mb-2">
         <div>
-          <h3 className="text-base sm:text-lg font-semibold text-neutral-900 dark:text-neutral-100 tracking-tight">
-            Settlement Velocity
-          </h3>
+          <div className="flex items-center gap-2.5">
+            <h3 className="text-base sm:text-lg font-semibold text-neutral-900 dark:text-neutral-100 tracking-tight">
+              Settlement Velocity
+            </h3>
+            {mode === "preview" && (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-mono uppercase tracking-wider font-semibold bg-blue-100 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
+                Simulation Active
+              </span>
+            )}
+          </div>
           <p className="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 mt-1">
-            Past 7 days cleared vs pending volume
+            {mode === "preview"
+              ? "Rendering synthetic 7-day FastMCP transaction velocity curves for demo recordings"
+              : "Past 7 days cleared vs pending volume"}
           </p>
         </div>
 
-        {/* Clean Pill Legend */}
-        <div className="flex items-center gap-2.5">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-neutral-50 dark:bg-neutral-800/60 border border-neutral-200/80 dark:border-neutral-800 text-xs sm:text-sm font-medium text-neutral-700 dark:text-neutral-200">
-            <span className="w-2 h-2 rounded-full bg-[#059669]" />
-            <span>Cleared</span>
-            <span className="text-xs font-mono text-neutral-400 ml-1">({totalCompleted})</span>
+        {/* Header Controls: Live/Preview Switcher & Pill Legend */}
+        <div className="flex flex-wrap items-center gap-3">
+          {/* Subtle Mode Switcher: Live Data | Preview Simulation */}
+          <div className="inline-flex items-center p-1 rounded-xl bg-neutral-100 dark:bg-neutral-800 border border-neutral-200/90 dark:border-neutral-700/80 text-xs">
+            <button
+              type="button"
+              onClick={() => setMode("live")}
+              className={`px-3 py-1 rounded-lg font-medium transition-all cursor-pointer ${
+                mode === "live"
+                  ? "bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white shadow-2xs font-semibold"
+                  : "text-neutral-500 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200"
+              }`}
+            >
+              Live Data
+            </button>
+            <button
+              type="button"
+              onClick={() => setMode("preview")}
+              className={`px-3 py-1 rounded-lg font-medium transition-all cursor-pointer flex items-center gap-1.5 ${
+                mode === "preview"
+                  ? "bg-blue-600 text-white shadow-2xs font-semibold"
+                  : "text-neutral-500 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200"
+              }`}
+            >
+              <span>Preview Simulation</span>
+            </button>
           </div>
 
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-neutral-50 dark:bg-neutral-800/60 border border-neutral-200/80 dark:border-neutral-800 text-xs sm:text-sm font-medium text-neutral-700 dark:text-neutral-200">
-            <span className="w-2 h-2 rounded-full bg-[#64748b]" />
-            <span>Pending</span>
-            <span className="text-xs font-mono text-neutral-400 ml-1">({totalInFlight})</span>
+          {/* Clean Pill Legend */}
+          <div className="flex items-center gap-2">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-neutral-50 dark:bg-neutral-800/60 border border-neutral-200/80 dark:border-neutral-800 text-xs sm:text-sm font-medium text-neutral-700 dark:text-neutral-200">
+              <span className="w-2 h-2 rounded-full bg-[#059669]" />
+              <span>Cleared</span>
+              <span className="text-xs font-mono text-neutral-400 ml-1">({totalCompleted})</span>
+            </div>
+
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-neutral-50 dark:bg-neutral-800/60 border border-neutral-200/80 dark:border-neutral-800 text-xs sm:text-sm font-medium text-neutral-700 dark:text-neutral-200">
+              <span className="w-2 h-2 rounded-full bg-[#64748b]" />
+              <span>Pending</span>
+              <span className="text-xs font-mono text-neutral-400 ml-1">({totalInFlight})</span>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Large SVG Canvas */}
+      {/* Large SVG Canvas & Empty State Container */}
       <div className="relative w-full overflow-hidden pt-2">
         <svg
           viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`}
@@ -170,7 +289,7 @@ export function TransactionChart({ data }: TransactionChartProps) {
             </linearGradient>
           </defs>
 
-          {/* Thin Horizontal Dashed Gridlines (No vertical clutter lines) */}
+          {/* Thin Horizontal Dashed Gridlines (Retained visible even in empty state) */}
           {gridLines.map(({ y, val, isBaseline }, idx) => (
             <g key={idx}>
               <line
@@ -200,7 +319,7 @@ export function TransactionChart({ data }: TransactionChartProps) {
             </g>
           ))}
 
-          {/* Subtle Area Fill (Opacity 0.04) */}
+          {/* Subtle Area Fill */}
           {!allZero && (
             <path
               d={completedAreaPath}
@@ -236,14 +355,14 @@ export function TransactionChart({ data }: TransactionChartProps) {
             />
           )}
 
-          {/* Minimalist Data Nodes and Hitboxes */}
+          {/* Minimalist Data Nodes, Hitboxes and X-Axis Dates */}
           {points.map((pt, idx) => {
             const isHovered = hoveredIndex === idx;
 
             return (
               <g key={idx}>
                 {/* Thin hover column vertical guide line */}
-                {isHovered && (
+                {isHovered && !allZero && (
                   <line
                     x1={pt.x}
                     y1={PADDING.top}
@@ -256,7 +375,7 @@ export function TransactionChart({ data }: TransactionChartProps) {
                   />
                 )}
 
-                {/* Incomplete / Pending Dot (r="3" with white border, highlighting when hovered) */}
+                {/* Incomplete / Pending Dot */}
                 {!allZero && pt.data.incomplete > 0 && (
                   <circle
                     cx={pt.x}
@@ -269,7 +388,7 @@ export function TransactionChart({ data }: TransactionChartProps) {
                   />
                 )}
 
-                {/* Completed / Cleared Dot (r="3" with white border, highlighting when hovered) */}
+                {/* Completed / Cleared Dot */}
                 {!allZero && pt.data.completed > 0 && (
                   <circle
                     cx={pt.x}
@@ -282,18 +401,20 @@ export function TransactionChart({ data }: TransactionChartProps) {
                   />
                 )}
 
-                {/* Clean Transparent Hitbox for Hover */}
-                <rect
-                  x={pt.x - 30}
-                  y={PADDING.top}
-                  width={60}
-                  height={PLOT_H + 20}
-                  fill="transparent"
-                  className="cursor-pointer"
-                  onMouseEnter={() => setHoveredIndex(idx)}
-                />
+                {/* Hitbox for Hover */}
+                {!allZero && (
+                  <rect
+                    x={pt.x - 30}
+                    y={PADDING.top}
+                    width={60}
+                    height={PLOT_H + 20}
+                    fill="transparent"
+                    className="cursor-pointer"
+                    onMouseEnter={() => setHoveredIndex(idx)}
+                  />
+                )}
 
-                {/* Subtle uppercase date labels along X-axis */}
+                {/* Subtle uppercase date labels along X-axis (Always visible!) */}
                 <text
                   x={pt.x}
                   y={SVG_HEIGHT - 8}
@@ -311,8 +432,74 @@ export function TransactionChart({ data }: TransactionChartProps) {
           })}
         </svg>
 
+        {/* 1. Empty State UI Overlay (Rendered when Cleared and Pending counts are both zero) */}
+        {allZero && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center p-4 pointer-events-none z-10">
+            <div className="pointer-events-auto flex flex-col items-center text-center max-w-md w-full mx-auto p-5 sm:p-6 rounded-2xl bg-white/90 dark:bg-neutral-900/90 backdrop-blur-md border border-neutral-200/90 dark:border-neutral-800 shadow-xl space-y-3.5 transition-all">
+              {/* Live green pulse beacon badge */}
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/90 dark:border-emerald-800/80">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+                </span>
+                <span className="text-[11px] font-mono uppercase tracking-wider font-semibold text-emerald-700 dark:text-emerald-300">
+                  Protocol Sandbox Active
+                </span>
+              </div>
+
+              {/* Status Title & Description */}
+              <div className="space-y-1">
+                <h4 className="text-sm sm:text-base font-semibold text-neutral-900 dark:text-neutral-100 tracking-tight">
+                  Awaiting Node Settlements — Protocol Sandbox Active
+                </h4>
+                <p className="text-xs text-neutral-500 dark:text-neutral-400 max-w-xs sm:max-w-sm mx-auto leading-relaxed">
+                  No cleared or pending transactions in this 7-day epoch. FastMCP settlement daemon is listening on port 8080.
+                </p>
+              </div>
+
+              {/* Micro-CTA Button */}
+              <div className="pt-1 flex flex-col sm:flex-row items-center justify-center gap-2.5 w-full">
+                <button
+                  type="button"
+                  onClick={handleGenerateTest}
+                  disabled={isGenerating}
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold tracking-wide bg-blue-600 hover:bg-blue-700 text-white shadow-sm hover:shadow active:scale-[0.98] transition-all disabled:opacity-60 cursor-pointer"
+                >
+                  {isGenerating ? (
+                    <>
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                      <span>Settling FastMCP Escrow...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Zap className="w-3.5 h-3.5 fill-current" />
+                      <span>Generate Test Escrow Transaction</span>
+                    </>
+                  )}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setMode("preview")}
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium text-neutral-600 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 border border-neutral-200/80 dark:border-neutral-700/60 transition-colors cursor-pointer"
+                >
+                  <span>Preview Simulation</span>
+                  <ArrowRight className="w-3 h-3" />
+                </button>
+              </div>
+
+              {showSuccessToast && (
+                <div className="inline-flex items-center gap-1.5 text-[11px] font-mono text-emerald-600 dark:text-emerald-400 animate-in fade-in slide-in-from-bottom-1 duration-200">
+                  <Check className="w-3.5 h-3.5 text-emerald-500" />
+                  <span>Sample FastMCP Escrow Created &amp; Cleared</span>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Minimalist Linear Tooltip Card */}
-        {hoveredIndex !== null && points[hoveredIndex] && (
+        {hoveredIndex !== null && points[hoveredIndex] && !allZero && (
           <div
             className="absolute z-20 pointer-events-none transition-all duration-100 -translate-x-1/2 top-0"
             style={{

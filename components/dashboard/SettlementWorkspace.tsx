@@ -110,7 +110,7 @@ export function SettlementWorkspace({
         {/* 1. Vault Testnet Balance */}
         <div className="group relative rounded-2xl border border-[#EAE3D2] bg-white p-6 shadow-[0_4px_20px_rgba(37,99,235,0.04)] hover:border-blue-500/40 transition-all">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-[#8C8275] uppercase tracking-wider font-mono">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500 font-sans">
               Vault Testnet Balance
             </span>
             <div className="w-7 h-7 rounded-lg bg-blue-50 border border-blue-200/80 flex items-center justify-center text-blue-600">
@@ -139,7 +139,7 @@ export function SettlementWorkspace({
         {/* 2. Pending Settlements with Correct Pluralization */}
         <div className="group relative rounded-2xl border border-[#EAE3D2] bg-white p-6 shadow-[0_4px_20px_rgba(37,99,235,0.04)] hover:border-blue-500/40 transition-all">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-[#8C8275] uppercase tracking-wider font-mono">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500 font-sans">
               Pending Settlements
             </span>
             <div className="w-7 h-7 rounded-lg bg-blue-50 border border-blue-200/80 flex items-center justify-center text-blue-600">
@@ -158,7 +158,7 @@ export function SettlementWorkspace({
         {/* 3. Agent Handshake Status */}
         <div className="group relative rounded-2xl border border-[#EAE3D2] bg-white p-6 shadow-[0_4px_20px_rgba(37,99,235,0.04)] hover:border-blue-500/40 transition-all">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-[#8C8275] uppercase tracking-wider font-mono">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500 font-sans">
               Agent Handshake Status
             </span>
             <div

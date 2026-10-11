@@ -8,6 +8,7 @@ export interface AgentTransactionChartProps {
   transactions?: any[];
   onConnectAgent?: () => void;
   data?: TransactionChartProps["data"];
+  onGenerateTestTransaction?: TransactionChartProps["onGenerateTestTransaction"];
 }
 
 /**
@@ -15,7 +16,12 @@ export interface AgentTransactionChartProps {
  * bound strictly to live database state (vaults & ledger_entries).
  */
 export function AgentTransactionChart(props: AgentTransactionChartProps) {
-  return <TransactionChart data={props.data} />;
+  return (
+    <TransactionChart
+      data={props.data}
+      onGenerateTestTransaction={props.onGenerateTestTransaction}
+    />
+  );
 }
 
 export default AgentTransactionChart;
