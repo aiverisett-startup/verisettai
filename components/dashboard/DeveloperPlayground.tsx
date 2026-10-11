@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Check, ShieldCheck, ArrowRight, Play, CheckCircle2, Lock, Sparkles, Building2, RefreshCw } from "lucide-react";
+import { Check, ShieldCheck, ArrowRight, Play, CheckCircle2, Lock, Sparkles, RefreshCw } from "lucide-react";
 import { ContractRecord } from "./types";
 
 export interface WorkerConfig {
@@ -160,144 +160,189 @@ export const DeveloperPlayground: React.FC<DeveloperPlaygroundProps> = ({
   };
 
   return (
-    <div id="sandbox" className="rounded-2xl bg-white border border-slate-200 shadow-[0_4px_24px_rgba(37,99,235,0.06)] overflow-hidden">
-      
-      {/* Sandbox Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-6 sm:p-7 border-b border-slate-200 bg-slate-50">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="h-2 w-2 rounded-full bg-blue-500 animate-pulse" />
-            <span className="text-[11px] font-mono uppercase tracking-wider text-blue-600 font-semibold">
-              Interactive Escrow Sandbox
-            </span>
+    <div
+      id="sandbox"
+      className="rounded-2xl bg-white dark:bg-zinc-950 border border-zinc-200/90 dark:border-zinc-800 shadow-[0_4px_24px_rgba(37,99,235,0.06)] overflow-hidden font-sans"
+    >
+      {/* 1. Header & Scenario Switcher */}
+      <div className="p-6 sm:p-7 border-b border-zinc-200/90 dark:border-zinc-800 bg-zinc-50/70 dark:bg-zinc-900/60">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div>
+            {/* Clean Pill Badge */}
+            <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-600 border border-blue-200/60 dark:bg-blue-950/40 dark:text-blue-400 px-3 py-1 rounded-full text-xs font-semibold mb-2 font-sans">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-600 dark:bg-blue-400" />
+              </span>
+              <span>Interactive Escrow Sandbox</span>
+            </div>
+            <h2 className="text-xl sm:text-2xl font-bold text-zinc-900 dark:text-zinc-50 tracking-tight font-sans">
+              Visual Milestone Verification Simulator
+            </h2>
+            <p className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 mt-1 font-sans">
+              Test how Verisett secures funds in neutral vault custody and executes instant auto-release upon deliverable acceptance.
+            </p>
           </div>
-          <h2 className="text-xl sm:text-2xl font-bold text-[#09090B] tracking-tight">
-            Visual Milestone Verification Simulator
-          </h2>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            Test how Verisett secures funds in neutral vault custody and executes instant auto-release upon deliverable acceptance.
-          </p>
+
+          {/* Reset Button */}
+          {simulationState === "settled" && (
+            <button
+              onClick={handleReset}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 text-xs font-medium transition-colors cursor-pointer shadow-2xs font-sans"
+            >
+              <RefreshCw className="w-3.5 h-3.5" />
+              <span>Reset Simulation</span>
+            </button>
+          )}
         </div>
 
-        {/* Reset Button */}
-        {simulationState === "settled" && (
-          <button
-            onClick={handleReset}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white hover:bg-blue-50 border border-slate-200 text-blue-600 text-xs font-mono transition-colors cursor-pointer shadow-xs"
-          >
-            <RefreshCw className="w-3 h-3" />
-            <span>Reset Test</span>
-          </button>
-        )}
+        {/* Horizontal Segmented Control / Modern Tab Group */}
+        <div className="mt-5 pt-4 border-t border-zinc-200/80 dark:border-zinc-800 flex flex-col sm:flex-row sm:items-center gap-2.5">
+          <span className="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 shrink-0 font-sans">
+            Select Scenario:
+          </span>
+          <div className="inline-flex p-1 rounded-xl bg-zinc-100 dark:bg-zinc-800 border border-zinc-200/80 dark:border-zinc-700/80 gap-1 overflow-x-auto no-scrollbar max-w-full">
+            {SCENARIOS.map((sc, i) => {
+              const isActive = selectedScenarioIndex === i;
+              return (
+                <button
+                  key={sc.id}
+                  onClick={() => {
+                    setSelectedScenarioIndex(i);
+                    handleReset();
+                  }}
+                  className={`px-3.5 py-1.5 rounded-lg text-xs transition-all whitespace-nowrap cursor-pointer font-sans ${
+                    isActive
+                      ? "bg-blue-600 text-white font-medium shadow-sm"
+                      : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-200/60 dark:hover:bg-zinc-700/60 font-normal"
+                  }`}
+                >
+                  <span>{sc.name.split("&")[0].trim()}</span>{" "}
+                  <span
+                    className={
+                      isActive
+                        ? "text-blue-100 font-mono font-medium"
+                        : "text-zinc-400 dark:text-zinc-500 font-mono"
+                    }
+                  >
+                    (${sc.amountUSD.toLocaleString("en-US", { minimumFractionDigits: 2 })})
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
       </div>
 
-      {/* Scenario Selector Pills */}
-      <div className="px-6 py-3.5 border-b border-slate-200 bg-white flex items-center gap-2 overflow-x-auto no-scrollbar">
-        <span className="text-xs font-mono text-slate-500 shrink-0 mr-1">Select Scenario:</span>
-        {SCENARIOS.map((sc, i) => (
-          <button
-            key={sc.id}
-            onClick={() => {
-              setSelectedScenarioIndex(i);
-              handleReset();
-            }}
-            className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all shrink-0 cursor-pointer ${
-              selectedScenarioIndex === i
-                ? "bg-blue-600 text-white border border-blue-500 shadow-xs font-semibold"
-                : "bg-slate-50 text-slate-600 border border-slate-200 hover:text-[#09090B] hover:bg-blue-50"
-            }`}
-          >
-            {sc.name.split("&")[0]} (${sc.amountUSD.toLocaleString("en-US", { minimumFractionDigits: 2 })})
-          </button>
-        ))}
-      </div>
-
-      {/* Dual Visual Card Workspace */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 divide-y lg:divide-y-0 lg:divide-x divide-slate-200 bg-white">
+      {/* 2. Balanced 2-Column Execution Grid */}
+      <div className="p-6 sm:p-7 grid grid-cols-1 lg:grid-cols-2 gap-6 bg-white dark:bg-zinc-950">
         
-        {/* Left Pane: Milestone Terms & Vault Security */}
-        <div className="lg:col-span-6 p-6 sm:p-7 space-y-5 bg-slate-50">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-mono font-semibold text-[#09090B] uppercase tracking-wider flex items-center gap-2">
-              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-600 text-[10px] text-white font-mono">
+        {/* Left Column (Step 1: Milestone Escrow Terms) */}
+        <div className="space-y-4">
+          {/* Step Header */}
+          <div className="flex items-center justify-between pb-1">
+            <div className="flex items-center gap-2.5">
+              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-600 text-xs text-white font-semibold shadow-xs font-sans">
                 1
               </span>
-              Milestone Escrow Terms
-            </span>
+              <span className="text-sm font-bold text-zinc-900 dark:text-zinc-50 tracking-tight font-sans">
+                Milestone Escrow Terms
+              </span>
+            </div>
 
-            <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 font-medium">
-              FUNDS PRE-LOCKED
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800/80 text-[11px] font-semibold font-sans">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+              Funds Pre-Locked
             </span>
           </div>
 
-          {/* Value Card */}
-          <div className="rounded-xl bg-white border border-slate-200 p-4 flex items-center justify-between shadow-xs">
-            <div>
-              <div className="text-xs text-slate-500 font-medium">Milestone Escrow Value</div>
-              <div className="text-2xl font-bold font-mono text-[#09090B] mt-0.5">
-                ${scenario.amountUSD.toLocaleString("en-US", { minimumFractionDigits: 2 })} USD
+          {/* Escrow Value Card */}
+          <div className="rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-zinc-50/70 dark:bg-zinc-900/60 p-4 flex items-center justify-between shadow-2xs">
+            <div className="space-y-1">
+              <div className="text-xs text-zinc-500 dark:text-zinc-400 font-medium font-sans">
+                Milestone Escrow Value
               </div>
-              <div className="text-[11px] text-slate-500 font-mono mt-0.5">
-                Buyer: Agent_Alpha_Buyer ➔ Worker: {scenario.contractor}
+              <div className="text-2xl sm:text-3xl font-bold font-mono text-zinc-950 dark:text-zinc-50 tracking-tight">
+                ${scenario.amountUSD.toLocaleString("en-US", { minimumFractionDigits: 2 })}{" "}
+                <span className="text-sm font-semibold text-blue-600">USD</span>
+              </div>
+              <div className="text-xs text-zinc-500 dark:text-zinc-400 font-mono flex items-center gap-1.5 pt-0.5">
+                <span>Agent_Alpha_Buyer</span>
+                <ArrowRight className="w-3 h-3 text-zinc-400 shrink-0" />
+                <span className="text-zinc-700 dark:text-zinc-300 font-semibold">{scenario.contractor}</span>
               </div>
             </div>
 
-            <div className="h-10 w-10 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600">
+            <div className="h-11 w-11 rounded-xl bg-blue-50 dark:bg-blue-950/60 border border-blue-200/80 dark:border-blue-800/80 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0">
               <Lock className="w-5 h-5" />
             </div>
           </div>
 
-          {/* Deliverable Acceptance Criteria Checklist */}
+          {/* Acceptance Criteria Checklist */}
           <div className="space-y-2">
-            <div className="text-xs font-semibold text-[#09090B]">
+            <div className="text-xs font-semibold uppercase tracking-wider text-zinc-600 dark:text-zinc-400 font-sans">
               Pre-Agreed Acceptance Criteria:
             </div>
-            {scenario.criteria.map((c, i) => (
-              <div
-                key={i}
-                className="flex items-center gap-2.5 p-2.5 rounded-lg bg-white border border-slate-200 text-xs text-[#09090B] shadow-xs"
-              >
-                <div className="h-4 w-4 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700 shrink-0">
-                  <Check className="w-2.5 h-2.5 stroke-[2.5]" />
+            <div className="space-y-2">
+              {scenario.criteria.map((c, i) => (
+                <div
+                  key={i}
+                  className="flex items-center gap-3 rounded-lg bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 px-3.5 py-2.5 text-xs font-medium text-zinc-700 dark:text-zinc-300 shadow-2xs font-sans"
+                >
+                  <div className="h-4 w-4 rounded-full bg-emerald-100 dark:bg-emerald-950/80 border border-emerald-300 dark:border-emerald-700 flex items-center justify-center text-emerald-700 dark:text-emerald-300 shrink-0">
+                    <Check className="w-2.5 h-2.5 stroke-[2.5]" />
+                  </div>
+                  <span className="leading-snug">{c}</span>
                 </div>
-                <span>{c}</span>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
 
-          {/* Status Badge */}
-          <div className="p-3 rounded-xl bg-white border border-slate-200 flex items-center justify-between text-xs shadow-xs">
+          {/* Bottom Summary: Locked Funds & Protocol Fee */}
+          <div className="p-3.5 rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 flex items-center justify-between text-xs shadow-2xs font-sans">
             <div className="flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
-              <span className="text-[#09090B] font-medium">Funds Locked in Escrow: ${scenario.amountUSD.toLocaleString("en-US", { minimumFractionDigits: 2 })} USD</span>
+              <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+              <span className="text-zinc-800 dark:text-zinc-200 font-medium">
+                Total Locked in Custody:{" "}
+                <span className="font-mono font-semibold">
+                  ${scenario.amountUSD.toLocaleString("en-US", { minimumFractionDigits: 2 })} USD
+                </span>
+              </span>
             </div>
-            <span className="text-[11px] font-mono text-slate-500">1.5% Fee</span>
+            <span className="text-[11px] font-mono text-zinc-500 dark:text-zinc-400 font-medium">
+              1.5% Protocol Escrow Fee
+            </span>
           </div>
         </div>
 
-        {/* Right Pane: Live Deliverable Verification & Payout Release */}
-        <div className="lg:col-span-6 p-6 sm:p-7 space-y-5 flex flex-col justify-between bg-white">
-          <div>
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-xs font-mono font-semibold text-[#09090B] uppercase tracking-wider flex items-center gap-2">
-                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-600 text-[10px] text-white font-mono">
+        {/* Right Column (Step 2: Automated Verification Gate) */}
+        <div className="space-y-4 flex flex-col justify-between">
+          <div className="space-y-4">
+            {/* Step Header & CTA Button */}
+            <div className="flex items-center justify-between pb-1 flex-wrap gap-2">
+              <div className="flex items-center gap-2.5">
+                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-600 text-xs text-white font-semibold shadow-xs font-sans">
                   2
                 </span>
-                Automated Verification Gate
-              </span>
+                <span className="text-sm font-bold text-zinc-900 dark:text-zinc-50 tracking-tight font-sans">
+                  Automated Verification Gate
+                </span>
+              </div>
 
-              {/* Action Button */}
+              {/* Simulate Milestone Release CTA */}
               <button
                 onClick={handleSimulate}
                 disabled={simulationState === "evaluating"}
-                className={`minimal-btn-primary flex items-center gap-2 text-xs font-semibold cursor-pointer disabled:opacity-50 ${
-                  simulationState === "settled" ? "bg-emerald-700 hover:bg-emerald-800 border-emerald-700 text-white" : ""
+                className={`h-10 px-5 text-sm font-semibold rounded-lg shadow-sm transition-all flex items-center gap-2 cursor-pointer disabled:opacity-60 font-sans ${
+                  simulationState === "settled"
+                    ? "bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-500/20"
+                    : "bg-blue-600 hover:bg-blue-700 text-white shadow-blue-500/20 active:scale-[0.98]"
                 }`}
               >
                 {simulationState === "evaluating" ? (
                   <>
                     <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                    <span>Evaluating Deliverables...</span>
+                    <span>Verifying Deliverables...</span>
                   </>
                 ) : simulationState === "settled" ? (
                   <>
@@ -313,85 +358,109 @@ export const DeveloperPlayground: React.FC<DeveloperPlaygroundProps> = ({
               </button>
             </div>
 
-            {/* Deliverable Submission Box */}
-            <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-slate-500">Delivered Artifact:</span>
-                <span className="font-mono text-[#09090B] font-semibold">Production Ready Build</span>
+            {/* Artifact & Metric Box */}
+            <div className="p-4 rounded-xl bg-zinc-50/70 dark:bg-zinc-900/60 border border-zinc-200/80 dark:border-zinc-800 space-y-3.5">
+              <div className="flex items-center justify-between text-xs font-sans">
+                <span className="text-zinc-500 dark:text-zinc-400">Delivered Artifact:</span>
+                <span className="font-mono text-zinc-900 dark:text-zinc-100 font-semibold">
+                  Production Ready Build
+                </span>
               </div>
 
-              <div className="p-3 rounded-lg bg-white border border-slate-200 text-xs font-mono space-y-1 shadow-xs">
-                <div className="flex justify-between text-slate-500">
+              <div className="p-3 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 text-xs space-y-1.5 shadow-2xs font-sans">
+                <div className="flex justify-between items-center text-zinc-500 dark:text-zinc-400">
                   <span>Deliverable:</span>
-                  <span className="text-[#09090B] font-medium">{scenario.name}</span>
+                  <span className="text-zinc-900 dark:text-zinc-100 font-medium truncate max-w-[240px]">
+                    {scenario.name}
+                  </span>
                 </div>
-                <div className="flex justify-between text-slate-500">
+                <div className="flex justify-between items-center text-zinc-500 dark:text-zinc-400">
                   <span>Evaluation Metric:</span>
-                  <span className="text-emerald-700 font-medium">{scenario.testMetric}</span>
+                  <span className="text-emerald-600 dark:text-emerald-400 font-mono font-semibold">
+                    {scenario.testMetric}
+                  </span>
                 </div>
               </div>
 
               {/* Progress Bar */}
               <div className="space-y-1.5 pt-1">
-                <div className="flex justify-between text-[11px] font-mono">
-                  <span className="text-slate-500">Verification Progress:</span>
-                  <span className={`font-bold ${simulationState === "settled" ? "text-emerald-700" : "text-blue-600"}`}>
+                <div className="flex justify-between text-xs font-sans">
+                  <span className="text-zinc-500 dark:text-zinc-400">Verification Progress:</span>
+                  <span
+                    className={`font-mono font-bold ${
+                      simulationState === "settled" ? "text-emerald-600" : "text-blue-600"
+                    }`}
+                  >
                     {progressPercent}%
                   </span>
                 </div>
-                <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden p-0.5 border border-slate-200">
+                <div className="w-full bg-zinc-100 dark:bg-zinc-800 h-2 rounded-full overflow-hidden border border-zinc-200/60 dark:border-zinc-700/60">
                   <div
-                    className="h-full rounded-full bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-400 transition-all duration-500"
+                    className="h-full rounded-full bg-blue-600 transition-all duration-500"
                     style={{ width: `${progressPercent}%` }}
                   />
                 </div>
               </div>
             </div>
 
-            {/* Status Badges */}
-            <div className="space-y-2 mt-4">
+            {/* Dynamic State Badges */}
+            <div className="space-y-2">
               {simulationState === "settled" ? (
                 <>
-                  <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-between text-xs text-emerald-800">
+                  <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/80 dark:border-emerald-800/80 flex items-center justify-between text-xs text-emerald-800 dark:text-emerald-200 font-sans">
                     <div className="flex items-center gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                       <span className="font-semibold">Condition Verified: Milestone Deliverable Accepted</span>
                     </div>
-                    <span className="font-mono font-bold text-emerald-700">PASSED</span>
+                    <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">PASSED</span>
                   </div>
 
-                  <div className="p-3 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-between text-xs text-blue-700">
+                  <div className="p-3 rounded-xl bg-blue-50 dark:bg-blue-950/60 border border-blue-200/80 dark:border-blue-800/80 flex items-center justify-between text-xs text-blue-700 dark:text-blue-300 font-sans">
                     <div className="flex items-center gap-2">
-                      <Sparkles className="w-4 h-4 text-blue-600 shrink-0" />
+                      <Sparkles className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" />
                       <span className="font-semibold">Auto-Release Complete: 100%</span>
                     </div>
-                    <span className="font-mono font-bold text-[#09090B]">${scenario.amountUSD.toLocaleString("en-US", { minimumFractionDigits: 2 })} USD Disbursed</span>
+                    <span className="font-mono font-bold text-zinc-900 dark:text-zinc-100">
+                      ${scenario.amountUSD.toLocaleString("en-US", { minimumFractionDigits: 2 })} USD Disbursed
+                    </span>
                   </div>
                 </>
               ) : simulationState === "evaluating" ? (
-                <div className="p-3 rounded-xl bg-blue-50 border border-blue-200 flex items-center gap-2.5 text-xs text-blue-700 animate-pulse">
+                <div className="p-3 rounded-xl bg-blue-50 dark:bg-blue-950/60 border border-blue-200/80 dark:border-blue-800/80 flex items-center gap-2.5 text-xs text-blue-700 dark:text-blue-300 font-sans animate-pulse">
                   <RefreshCw className="w-4 h-4 animate-spin shrink-0 text-blue-600" />
-                  <span>Checking Acceptance Invariants & Automated Test Results...</span>
+                  <span>Checking Acceptance Invariants &amp; Automated Test Results...</span>
                 </div>
               ) : (
-                <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between text-xs text-slate-500">
+                <div className="p-3 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400 font-sans">
                   <span>Status: Ready to Verify Milestone</span>
-                  <span className="font-mono text-blue-600 font-semibold">Click button to test</span>
+                  <span className="text-blue-600 dark:text-blue-400 font-semibold">
+                    Click simulate to test execution gate
+                  </span>
                 </div>
               )}
             </div>
           </div>
 
-          {/* Programmatic Guarantee Receipt */}
-          <div className="mt-4 pt-3 border-t border-slate-200 flex items-center justify-between text-[11px] text-slate-500">
-            <span>Instant Auto-Release Settlement Speed:</span>
-            <span className="font-mono text-emerald-700 font-semibold">38ms Guaranteed</span>
+          {/* Footer Banner: Full-width status strip */}
+          <div className="p-3 rounded-xl bg-zinc-50/80 dark:bg-zinc-900/80 border border-zinc-200/80 dark:border-zinc-800 flex items-center justify-between text-xs font-sans">
+            <div className="flex items-center gap-2 text-zinc-700 dark:text-zinc-300 font-medium">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+              </span>
+              <span>
+                Execution Guarantee:{" "}
+                <strong className="font-mono font-bold text-emerald-600 dark:text-emerald-400">
+                  38ms Sub-Second Release
+                </strong>
+              </span>
+            </div>
+            <span className="text-[11px] font-mono text-zinc-400 font-medium">FastMCP Native</span>
           </div>
 
         </div>
 
       </div>
-
     </div>
   );
 };

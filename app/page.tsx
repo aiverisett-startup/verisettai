@@ -305,6 +305,27 @@ export default function Home() {
           <ContractLedger
             contracts={contracts}
             onSelectContract={(contract) => setSelectedContract(contract)}
+            onTriggerSampleEscrow={() => {
+              const now = new Date().toISOString();
+              const sampleRecord: ContractRecord = {
+                id: `TX-${Math.random().toString(36).substring(2, 9).toUpperCase()}`,
+                payer_id: "acct_payer_buyer",
+                payer_name: "Agent_Alpha_Buyer",
+                worker_id: "acct_worker_theta",
+                worker_name: "Agent_Theta_Worker",
+                amount_cents: 25000,
+                fee_cents: 375,
+                status: "SETTLED",
+                assertion_type: "JSON_SCHEMA",
+                created_at: now,
+                expires_at: now,
+                settled_at: now,
+                timeout_seconds: 604800,
+                assertion_payload: { deliverable: "Autonomous Agent Swarm Orchestration" },
+                result_payload: { verified: true, metrics: "99.4% Automated Test Suite Passed" },
+              };
+              handleSimulateSettlement(sampleRecord, true);
+            }}
           />
 
         </div>
