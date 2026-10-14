@@ -14,8 +14,8 @@ interface MinimalNavProps {
   envMode: EnvironmentMode;
   onToggleEnv: (mode: EnvironmentMode) => void;
   vaultBalance: VaultBalance;
-  onOpenDepositModal: () => void;
-  onOpenConsole: () => void;
+  onOpenDepositModal?: () => void;
+  onOpenConsole?: () => void;
   onOpenVideoModal?: () => void;
   isConsoleView?: boolean;
 }
@@ -126,7 +126,7 @@ export function MinimalNav({
         </div>
 
         {/* Group 2 (Center): Navigation Links */}
-        <nav className="hidden lg:flex items-center gap-6 text-sm text-muted-foreground font-medium">
+        <nav className="hidden lg:flex items-center gap-6 text-sm text-slate-600 font-medium">
           <Link href="/about" className="shrink-0 whitespace-nowrap hover:text-blue-600 transition-colors">
             About
           </Link>
@@ -139,25 +139,10 @@ export function MinimalNav({
           <Link href="/docs" className="shrink-0 whitespace-nowrap hover:text-blue-600 transition-colors">
             Docs
           </Link>
-          <a href="#sandbox" className="shrink-0 whitespace-nowrap hover:text-blue-600 transition-colors">
-            Sandbox
-          </a>
         </nav>
 
         {/* Group 3 (Right): Actions */}
         <div className="flex items-center gap-3 shrink-0">
-          {onOpenVideoModal && (
-            <button
-              onClick={onOpenVideoModal}
-              className="shrink-0 hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 hover:border-blue-400 text-xs font-medium whitespace-nowrap transition-colors cursor-pointer"
-              title="Watch Step-by-Step Video Walkthrough"
-              aria-label="Watch Step-by-Step Video Walkthrough"
-            >
-              <Play className="w-3.5 h-3.5" />
-              <span>Video Tour</span>
-            </button>
-          )}
-
           {user && (
             <button
               onClick={onOpenDepositModal}
@@ -286,15 +271,6 @@ export function MinimalNav({
               >
                 <span className="w-3.5 h-3.5 flex items-center justify-center text-xs font-bold text-blue-600 font-mono">$</span>
                 <span>Pricing</span>
-              </a>
-
-              <a
-                href="#sandbox"
-                onClick={closeMobileMenu}
-                className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-50 border border-slate-200 hover:border-blue-400 text-[#09090B] transition-all"
-              >
-                <Terminal className="w-3.5 h-3.5 text-blue-600" />
-                <span>Sandbox</span>
               </a>
 
               <a

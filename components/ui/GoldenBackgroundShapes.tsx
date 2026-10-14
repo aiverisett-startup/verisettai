@@ -11,156 +11,45 @@ interface GoldenBackgroundShapesProps {
 
 export function GoldenBackgroundShapes({
   className = "",
-  intensity = "subtle",
-  variant = "subtle",
-  density = "normal",
 }: GoldenBackgroundShapesProps) {
   return (
     <div
       aria-hidden="true"
       className={`pointer-events-none absolute inset-0 overflow-hidden select-none -z-10 ${className}`}
     >
-      {/* 1. Electric Blue Dot Matrix Grid with Radial Mask */}
-      <div className="absolute inset-0 bg-[radial-gradient(#2563EB_1px,transparent_1px)] [background-size:32px_32px] opacity-[0.14] [mask-image:radial-gradient(ellipse_75%_65%_at_50%_30%,#000_50%,transparent_90%)]" />
+      {/* 1. Subtle Slate/Blue Grid */}
+      <div className="absolute inset-0 bg-[radial-gradient(#2563EB_1px,transparent_1px)] [background-size:36px_36px] opacity-[0.05] [mask-image:radial-gradient(ellipse_80%_70%_at_50%_30%,#000_40%,transparent_90%)]" />
 
-      {/* 2. Soft Ambient Cyan & Electric Blue Glow Auras */}
-      <div className="absolute -top-32 left-1/2 -translate-x-1/2 h-[450px] w-[800px] rounded-full bg-gradient-to-b from-blue-900/20 via-cyan-900/10 to-transparent blur-3xl opacity-70 animate-pulse" />
-      <div className="absolute top-1/3 -left-48 h-96 w-96 rounded-full bg-blue-950/30 blur-3xl opacity-40" />
-      <div className="absolute top-2/3 -right-48 h-96 w-96 rounded-full bg-cyan-950/30 blur-3xl opacity-40" />
+      {/* 2. Soft Ambient Blue Tint */}
+      <div className="absolute -top-40 left-1/2 -translate-x-1/2 h-[500px] w-[900px] rounded-full bg-[radial-gradient(circle,rgba(37,99,235,0.06)_0%,transparent_70%)] blur-3xl pointer-events-none" />
 
-      {/* 3. Top-Right Large Floating Half-Circle (Semicircle) with Concentric Arcs */}
-      <div className="absolute -top-16 -right-20 w-80 sm:w-[420px] h-80 sm:h-[420px] motion-safe:animate-float-slow">
+      {/* 3. Subtle Hairline Geometric Semicircle */}
+      <div className="absolute -top-20 -right-20 w-80 sm:w-[400px] h-80 sm:h-[400px] opacity-40">
         <svg
           viewBox="0 0 400 400"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
-          className="w-full h-full opacity-65"
-        >
-          <defs>
-            <linearGradient id="gold-half-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#06B6D4" stopOpacity="0.25" />
-              <stop offset="50%" stopColor="#2563EB" stopOpacity="0.12" />
-              <stop offset="100%" stopColor="#0B1528" stopOpacity="0.02" />
-            </linearGradient>
-            <linearGradient id="gold-stroke" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#06B6D4" stopOpacity="0.6" />
-              <stop offset="100%" stopColor="#2563EB" stopOpacity="0.15" />
-            </linearGradient>
-          </defs>
-
-          {/* Solid Electric Blue Half-Circle */}
-          <path
-            d="M 200,20 A 180,180 0 0,1 200,380 Z"
-            fill="url(#gold-half-grad)"
-            stroke="url(#gold-stroke)"
-            strokeWidth="1.5"
-            transform="rotate(25 200 200)"
-          />
-
-          {/* Outer Concentric Half-Arch */}
-          <path
-            d="M 200,-5 A 205,205 0 0,1 200,405"
-            stroke="#0284C7"
-            strokeWidth="1"
-            strokeDasharray="4 6"
-            strokeOpacity="0.35"
-            transform="rotate(25 200 200)"
-          />
-
-          {/* Inner Decorative Blue Arc */}
-          <path
-            d="M 200,70 A 130,130 0 0,1 200,330"
-            stroke="#2563EB"
-            strokeWidth="1.5"
-            strokeOpacity="0.4"
-            transform="rotate(25 200 200)"
-          />
-
-          {/* Vertex Node Accents */}
-          <circle cx="270" cy="90" r="3.5" fill="#06B6D4" />
-          <circle cx="340" cy="200" r="4.5" fill="#2563EB" />
-          <circle cx="270" cy="310" r="3.5" fill="#06B6D4" />
-        </svg>
-      </div>
-
-      {/* 4. Left-Mid Architectural Half-Arch Motif */}
-      <div className="absolute top-1/4 -left-16 w-64 sm:w-80 h-72 sm:h-96 motion-safe:animate-float-reverse">
-        <svg
-          viewBox="0 0 300 400"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          className="w-full h-full opacity-60"
-        >
-          {/* Main Half-Arch */}
-          <path
-            d="M 20,380 L 20,160 A 140,140 0 0,1 160,20 L 200,20"
-            stroke="#2563EB"
-            strokeWidth="1.5"
-            strokeOpacity="0.45"
-          />
-          {/* Parallel Inner Arch */}
-          <path
-            d="M 50,380 L 50,175 A 110,110 0 0,1 160,65 L 180,65"
-            stroke="#06B6D4"
-            strokeWidth="1"
-            strokeDasharray="5 5"
-            strokeOpacity="0.3"
-          />
-          {/* Architectural Horizontal Rungs */}
-          <line x1="20" y1="220" x2="50" y2="220" stroke="#2563EB" strokeWidth="1.2" strokeOpacity="0.4" />
-          <line x1="20" y1="280" x2="50" y2="280" stroke="#2563EB" strokeWidth="1.2" strokeOpacity="0.4" />
-          <line x1="20" y1="340" x2="50" y2="340" stroke="#2563EB" strokeWidth="1.2" strokeOpacity="0.4" />
-
-          {/* Capsule Pill in Half-Arch Center */}
-          <rect
-            x="30"
-            y="90"
-            width="80"
-            height="32"
-            rx="16"
-            fill="#FFFFFF"
-            stroke="#2563EB"
-            strokeWidth="1"
-            strokeOpacity="0.5"
-            className="shadow-sm"
-          />
-          <circle cx="46" cy="106" r="4" fill="#06B6D4" />
-          <line x1="58" y1="106" x2="96" y2="106" stroke="#2563EB" strokeWidth="1.5" strokeOpacity="0.5" />
-        </svg>
-      </div>
-
-      {/* 5. Center-Top Rotating Dual Half-Rings */}
-      <div className="absolute top-12 left-1/2 -translate-x-1/2 w-[600px] h-[350px] pointer-events-none opacity-40">
-        <svg
-          viewBox="0 0 600 350"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
           className="w-full h-full"
         >
-          {/* Upper Elliptical Half-Ring */}
           <path
-            d="M 50,180 C 50,70 550,70 550,180"
-            stroke="#0284C7"
-            strokeWidth="1.2"
-            strokeDasharray="6 8"
-            strokeOpacity="0.4"
-          />
-          {/* Lower Echo Arc */}
-          <path
-            d="M 120,180 C 120,105 480,105 480,180"
+            d="M 200,30 A 170,170 0 0,1 200,370"
             stroke="#2563EB"
             strokeWidth="1"
-            strokeOpacity="0.3"
+            strokeOpacity="0.2"
+            strokeDasharray="4 6"
           />
+          <circle cx="200" cy="200" r="120" stroke="#E2E8F0" strokeWidth="1" strokeOpacity="0.6" />
         </svg>
       </div>
 
-      {/* 6. Lower-Right Angled Geometric Half-Capsule (Pill) */}
-      <div className="absolute bottom-20 right-8 w-44 h-24 rotate-[-20deg] pointer-events-none opacity-50 hidden md:block">
-        <div className="w-full h-full rounded-t-full border-t border-x border-[#2563EB]/40 bg-gradient-to-b from-white/90 to-transparent shadow-xs backdrop-blur-xs flex items-center justify-center">
-          <div className="w-16 h-1 rounded-full bg-[#0284C7]/30" />
-        </div>
+      {/* 4. Left Subtle Arc */}
+      <div className="absolute top-1/3 -left-20 w-64 h-64 opacity-30">
+        <svg viewBox="0 0 260 260" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+          <circle cx="130" cy="130" r="100" stroke="#CBD5E1" strokeWidth="1" strokeDasharray="6 6" />
+          <path d="M 130,30 A 100,100 0 0,1 230,130" stroke="#2563EB" strokeWidth="1.2" strokeOpacity="0.3" />
+        </svg>
       </div>
     </div>
   );
 }
+

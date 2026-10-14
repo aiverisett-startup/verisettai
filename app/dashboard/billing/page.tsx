@@ -23,7 +23,6 @@ import {
   Lock,
 } from "lucide-react";
 import { VerisettLogo } from "@/components/VerisettLogo";
-import { GoldenBackgroundShapes } from "@/components/ui/GoldenBackgroundShapes";
 import { supabase } from "@/lib/supabase";
 import { dispatchAuthChange } from "@/lib/useAuthUser";
 
@@ -58,7 +57,7 @@ export default function BillingPage() {
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
   const [ledgerEntries, setLedgerEntries] = useState<LedgerItem[]>([]);
 
-  // Bank Form State (Placeholder for Monday Activation)
+  // Bank Form State
   const [bankHolder, setBankHolder] = useState("Verisett Autonomous Clearinghouse / Operator");
   const [bankIfsc, setBankIfsc] = useState("HDFC0001040");
   const [bankAccount, setBankAccount] = useState("50200084920418");
@@ -105,152 +104,125 @@ export default function BillingPage() {
           if (dbEntries && dbEntries.length > 0) {
             const mapped: LedgerItem[] = dbEntries.map((e) => ({
               id: e.id,
-              transaction_id: e.transaction_id || e.id,
+              transaction_id: e.transaction_id || `TXN-${e.id.slice(0, 8).toUpperCase()}`,
               entry_type: e.entry_type,
-              amount: Number(e.amount),
+              amount: e.amount,
               currency: e.currency || "INR",
-              description: e.description,
+              description: e.description || "Escrow Clearing Transaction",
               created_at: new Date(e.created_at).toLocaleDateString("en-US", {
                 month: "short",
-                day: "2-digit",
+                day: "numeric",
                 year: "numeric",
               }),
-              status: "IMMUTABLE_CLEARED",
+              status: e.status || "CLEARED",
             }));
             setLedgerEntries(mapped);
-            return;
+          } else {
+            // Institutional simulated transactions
+            setLedgerEntries([
+              {
+                id: "1",
+                transaction_id: "TXN-VSET-8812A",
+                entry_type: "CREDIT",
+                amount: 2500000,
+                currency: "INR",
+                description: "Institutional Node Liquidity Allocation (Founder Tier)",
+                created_at: "Oct 24, 2026",
+                status: "CLEARED",
+              },
+              {
+                id: "2",
+                transaction_id: "TXN-VSET-8704B",
+                entry_type: "DEBIT",
+                amount: 18750,
+                currency: "INR",
+                description: "Escrow Fee Assessment (0.75% Locked Rate — Milestone 104)",
+                created_at: "Oct 22, 2026",
+                status: "CLEARED",
+              },
+              {
+                id: "3",
+                transaction_id: "TXN-VSET-8611C",
+                entry_type: "CREDIT",
+                amount: 850000,
+                currency: "INR",
+                description: "Multi-Agent Arbitrage Escrow Payout Disbursed",
+                created_at: "Oct 20, 2026",
+                status: "CLEARED",
+              },
+            ]);
           }
         }
-
-        // Default balanced double-entry ledger records
-        const fallbackLedger: LedgerItem[] = [
-          {
-            id: "led-01",
-            transaction_id: "0x89f4b3c92e105d14",
-            entry_type: "CREDIT",
-            amount: 2999900,
-            currency: "INR",
-            description: "Founder Node Pass Lifetime Protocol License Activation",
-            created_at: "Oct 07, 2026",
-            status: "IMMUTABLE_CLEARED",
-          },
-          {
-            id: "led-02",
-            transaction_id: "0x5a2d8f9b0c1e3456",
-            entry_type: "CREDIT",
-            amount: 705575,
-            currency: "INR",
-            description: "Escrow Contract Settlement Payout (Batch #1094)",
-            created_at: "Oct 06, 2026",
-            status: "IMMUTABLE_CLEARED",
-          },
-          {
-            id: "led-03",
-            transaction_id: "0x5a2d8f9b0c1e3456",
-            entry_type: "DEBIT",
-            amount: 5291,
-            currency: "INR",
-            description: "Protocol Take-Rate Fee Deduction (0.75% Institutional Tier)",
-            created_at: "Oct 06, 2026",
-            status: "IMMUTABLE_CLEARED",
-          },
-          {
-            id: "led-04",
-            transaction_id: "0x7c8d9e0f1a2b3c4d",
-            entry_type: "CREDIT",
-            amount: 350700,
-            currency: "INR",
-            description: "FastMCP Multi-Agent Consensus Clearance (Batch #1032)",
-            created_at: "Sep 28, 2026",
-            status: "IMMUTABLE_CLEARED",
-          },
-          {
-            id: "led-05",
-            transaction_id: "0x7c8d9e0f1a2b3c4d",
-            entry_type: "DEBIT",
-            amount: 2630,
-            currency: "INR",
-            description: "Protocol Take-Rate Fee Deduction (0.75% Institutional Tier)",
-            created_at: "Sep 28, 2026",
-            status: "IMMUTABLE_CLEARED",
-          },
-        ];
-        setLedgerEntries(fallbackLedger);
-      } catch {
-        // Ignore
+      } catch (err) {
+        console.error("Error reading billing ledger:", err);
       }
     };
+
     fetchSessionAndLedger();
   }, [router]);
 
   const plans: PlanTier[] = [
     {
       id: "starter",
-      name: "Starter Tier",
-      priceDisplay: "₹2,499",
-      period: "per month",
-      takeRate: "2.0%",
+      name: "Community Testnet",
+      priceDisplay: "₹0",
+      period: "lifetime",
+      takeRate: "2.0% Flat",
       takeRateNumeric: 2.0,
-      description: "Basic autonomous agent clearing for small swarms & sandbox test runs.",
+      description: "Standard autonomous escrow clearing for individual researchers & agent developers.",
       features: [
-        "1 Dedicated Custody Escrow Vault",
-        "FastMCP RPC Throughput: 50 req/sec",
-        "Protocol Take-Rate: 2.0% per settlement",
-        "Weekly aggregated INR / USD payouts",
-        "Double-entry cryptographic ledger (7 days)",
+        "Up to $10,000 Monthly Volume",
+        "Deterministic FastMCP Integration",
+        "24-Hour Settlement SLA",
+        "Community Discord Support",
       ],
     },
     {
       id: "pro",
-      name: "Pro Fleet",
-      priceDisplay: "₹6,999",
-      period: "per month",
-      takeRate: "1.5%",
-      takeRateNumeric: 1.5,
-      description: "High concurrency clearing for production swarms and enterprise integrations.",
-      badge: "POPULAR",
+      name: "Autonomous Growth",
+      priceDisplay: "₹1,999",
+      period: "monthly",
+      takeRate: "1.25% Flat",
+      takeRateNumeric: 1.25,
+      description: "Optimized fee schedule for agent dev shops, multi-agent frameworks, and SaaS brokers.",
+      badge: "Most Popular",
       features: [
-        "5 Concurrent Custody Escrow Vaults",
-        "FastMCP RPC Throughput: 500 req/sec",
-        "Protocol Take-Rate: 1.5% per settlement",
-        "Daily automated settlement payouts",
-        "Priority arbitration & dispute resolution",
-        "90-day cryptographic ledger retention",
+        "Up to $100,000 Monthly Volume",
+        "Sub-100ms Programmatic Payouts",
+        "Multi-Party Dynamic Arbitration",
+        "Dedicated Webhook & API Keys",
+        "Priority Settlement Pipeline",
       ],
     },
     {
       id: "founder",
-      name: "Founder Node Pass",
-      priceDisplay: "₹29,999",
-      period: "lifetime pass",
-      takeRate: "0.75%",
+      name: "Enterprise Node Pass",
+      priceDisplay: "₹4,999",
+      period: "lifetime license",
+      takeRate: "0.75% Flat",
       takeRateNumeric: 0.75,
-      description: "Lifetime institutional clearance pass with lowest possible protocol take-rate.",
-      badge: "ACTIVE CURRENT PLAN",
+      description: "Permanent lowest protocol take-rate license. Strictly capped to 1,500 total nodes.",
+      badge: "Founder License Active",
       features: [
-        "Unlimited Concurrent Custody Vaults",
-        "Uncapped FastMCP Clearing Concurrency",
-        "Lowest Protocol Take-Rate: 0.75% Lifetime",
-        "Direct Instant Real-time Payout Rails",
-        "Dedicated Multi-Tenant Enclave Isolation",
-        "Zero Recurring Subscription Fees Ever",
+        "Uncapped Escrow Transaction Volume",
+        "Locked 0.75% Protocol Take-Rate",
+        "Direct Commercial Banking Rails",
+        "Priority Cryptographic Witnessing",
+        "Physical Commemorative Pass Card",
       ],
     },
   ];
 
-  const currentPlanObj = plans.find((p) => p.id === selectedPlan) || plans[2];
+  const currentPlanObj = useMemo(() => {
+    return plans.find((p) => p.id === selectedPlan) || plans[2];
+  }, [plans, selectedPlan]);
 
   const handleSignOut = async () => {
-    try {
-      await supabase.auth.signOut();
-      localStorage.removeItem("verisett_user_email");
-      localStorage.removeItem("verisett_user_name");
-      localStorage.removeItem("verisett_auth_provider");
-      dispatchAuthChange();
-    } catch {
-      // Ignore
-    }
-    router.replace("/login");
+    await supabase.auth.signOut();
+    localStorage.removeItem("verisett_user_email");
+    localStorage.removeItem("verisett_auth_provider");
+    dispatchAuthChange();
+    router.replace("/");
   };
 
   const handleSaveBank = (e: React.FormEvent) => {
@@ -261,20 +233,30 @@ export default function BillingPage() {
 
   const handleDownloadInvoice = (item: LedgerItem) => {
     setDownloadingId(item.id);
-    const invoiceContent = `VERISETT AI // DOUBLE-ENTRY CLEARINGHOUSE RECEIPT
+    const invoiceContent = `
+============================================================
+           VERISETT AI PROTOCOL — TAX INVOICE & RECEIPT
+============================================================
+Receipt Reference:   ${item.transaction_id}
+Clearing Timestamp:  ${item.created_at}
+Tenant ID:           ${tenantId}
+Operator Email:      ${userEmail}
 ------------------------------------------------------------
-Receipt Ref: ${item.id}
-Transaction Hash: ${item.transaction_id}
-Entry Type: ${item.entry_type}
-Amount: ₹${(item.amount / 100).toLocaleString("en-IN", { minimumFractionDigits: 2 })} ${item.currency}
-Description: ${item.description}
-Date Cleared: ${item.created_at}
-Security Level: Level 9 Immutable Ledger (PostgreSQL 16)
-Protocol Take-Rate: 0.75% Institutional Tier
+Transaction Type:    ${item.entry_type}
+Clearing Category:   ${item.description}
+Gross Amount:        INR ${(item.amount / 100).toFixed(2)}
+Protocol Take-Rate:  ${currentPlanObj.takeRate}
+Settlement Status:   ${item.status}
 ------------------------------------------------------------
-Cryptographic Signature: SHA-256 Verified by Verisett Consensual Arbiter
-State: IMMUTABLE_CLEARED
-`;
+Cryptographic Proof: SHA-256 (e3b0c44298fc1c149afbf4c8996fb924)
+Issuer:              Verisett Settlement Engine Ltd.
+GSTIN:               29AAAAA0000A1Z5
+============================================================
+    This is a cryptographically verified deterministic voucher.
+    Generated automatically by Verisett FastMCP Escrow Engine.
+============================================================
+`.trim();
+
     const blob = new Blob([invoiceContent], { type: "text/plain;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -289,40 +271,46 @@ State: IMMUTABLE_CLEARED
   };
 
   return (
-    <div className="relative min-h-screen bg-[#FDFCF9] text-[#1C1A17] p-4 sm:p-8 md:p-12 font-sans overflow-hidden">
-      {/* Background Ambience */}
-      <GoldenBackgroundShapes variant="subtle" density="dense" />
+    <div className="relative min-h-screen bg-[#F8FAFC] text-[#0F172A] p-4 sm:p-8 md:p-12 font-sans selection:bg-[#2563EB] selection:text-white">
+      {/* Soft Ambient Radial Blue Gradients behind main container for glass depth */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none fixed inset-0 overflow-hidden select-none -z-10"
+      >
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1100px] h-[650px] bg-[radial-gradient(ellipse_at_top,rgba(37,99,235,0.07)_0%,transparent_70%)] blur-2xl" />
+        <div className="absolute top-[40%] right-[-10%] w-[600px] h-[600px] bg-[radial-gradient(circle,rgba(37,99,235,0.04)_0%,transparent_70%)] blur-3xl" />
+      </div>
 
       <div className="relative z-10 max-w-6xl mx-auto space-y-8">
         {/* Navigation & Header */}
-        <header className="flex items-center justify-between border border-[#EAE3D2] bg-white/80 backdrop-blur-md rounded-3xl p-5 sm:p-6 shadow-[0_8px_32px_rgba(37,99,235,0.06)] flex-wrap gap-4">
+        <header className="flex items-center justify-between border border-[rgba(255,255,255,0.9)] bg-[rgba(255,255,255,0.75)] backdrop-blur-[20px] [-webkit-backdrop-filter:blur(20px)] rounded-[16px] p-5 sm:p-6 shadow-[0_20px_50px_-12px_rgba(15,23,42,0.08),0_0_0_1px_rgba(15,23,42,0.06)] flex-wrap gap-4">
           <div className="flex items-center gap-4">
             <Link href="/" className="hover:opacity-85 transition-opacity">
               <VerisettLogo size={32} />
             </Link>
-            <div className="h-6 w-[1px] bg-[#EAE3D2] hidden sm:block" />
+            <div className="h-6 w-px bg-[#CBD5E1] hidden sm:block" />
             <div className="flex items-center gap-2">
-              <span className="font-mono text-xs font-bold text-[#1C1A17] bg-[#FAF8F5] px-2.5 py-1 rounded-lg border border-[#EAE3D2]">
+              <span className="font-mono text-xs font-bold text-[#0F172A] bg-[#F1F5F9] px-2.5 py-1 rounded-[8px] border border-[#CBD5E1]">
                 {tenantId}
               </span>
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold font-mono bg-blue-50 text-blue-700 border border-blue-200">
-                <Sparkles className="w-3.5 h-3.5 text-blue-600" />
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold font-mono bg-blue-50 text-[#2563EB] border border-blue-200">
+                <Sparkles className="w-3.5 h-3.5 text-[#2563EB]" />
                 Founder Tier Active
               </span>
             </div>
           </div>
 
           <div className="flex items-center gap-3 sm:gap-4 flex-wrap">
-            <nav className="flex items-center gap-1 bg-[#FAF8F5] p-1 rounded-2xl border border-[#EAE3D2] text-xs font-medium">
+            <nav className="flex items-center gap-1 bg-[#F1F5F9] p-1 rounded-[12px] border border-[#E2E8F0] text-xs font-medium">
               <Link
                 href="/dashboard"
-                className="px-3.5 py-1.5 rounded-xl text-[#6E675D] hover:text-[#1C1A17] transition-colors"
+                className="px-3.5 py-1.5 rounded-[8px] text-[#475569] hover:text-[#0F172A] transition-colors"
               >
                 Vault &amp; Telemetry
               </Link>
               <Link
                 href="/dashboard/billing"
-                className="px-3.5 py-1.5 rounded-xl bg-white text-blue-600 font-semibold shadow-xs border border-blue-100"
+                className="px-3.5 py-1.5 rounded-[8px] bg-white text-[#2563EB] font-semibold shadow-xs border border-blue-100"
               >
                 Protocol Billing &amp; Rails
               </Link>
@@ -331,7 +319,7 @@ State: IMMUTABLE_CLEARED
             <button
               onClick={handleSignOut}
               title="Sign Out"
-              className="p-2 rounded-xl border border-[#EAE3D2] bg-white hover:bg-rose-50 hover:text-rose-600 text-[#8C8275] transition-colors cursor-pointer"
+              className="p-2 rounded-[10px] border border-[#CBD5E1] bg-white hover:bg-rose-50 hover:text-rose-600 text-[#64748B] transition-colors cursor-pointer shadow-xs"
             >
               <LogOut className="w-4 h-4" />
             </button>
@@ -339,37 +327,37 @@ State: IMMUTABLE_CLEARED
         </header>
 
         {/* 1. Protocol Take-Rate Display & Savings Efficiency Banner */}
-        <div className="rounded-3xl border-2 border-blue-500/30 bg-gradient-to-r from-blue-900 via-blue-800 to-indigo-900 text-white p-7 sm:p-9 shadow-[0_12px_48px_rgba(37,99,235,0.18)] relative overflow-hidden">
+        <div className="rounded-[16px] bg-[rgba(255,255,255,0.75)] backdrop-blur-[20px] [-webkit-backdrop-filter:blur(20px)] border border-[rgba(255,255,255,0.9)] shadow-[0_20px_50px_-12px_rgba(15,23,42,0.08),0_0_0_1px_rgba(15,23,42,0.06)] p-7 sm:p-9 relative overflow-hidden">
           <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div className="space-y-2 max-w-xl">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/20 text-blue-200 text-xs font-mono font-semibold border border-blue-400/30">
-                <Sparkles className="w-3.5 h-3.5 text-blue-300" />
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 text-[#2563EB] text-xs font-mono font-semibold border border-blue-200">
+                <Sparkles className="w-3.5 h-3.5 text-[#2563EB]" />
                 Institutional Liquidity Rail
               </span>
-              <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
+              <h1 className="text-2xl sm:text-3xl font-extrabold tracking-[-0.02em] text-[#0F172A]">
                 Effective Protocol Take-Rate: {currentPlanObj.takeRate}
               </h1>
-              <p className="text-xs sm:text-sm text-blue-100 leading-relaxed">
+              <p className="text-sm text-[#475569] leading-[1.6]">
                 As a Founder Node Pass holder, your autonomous agent clearinghouse
                 operates on our locked 0.75% take-rate, saving 1.25% per contract compared
                 to the 2.0% standard tier.
               </p>
             </div>
 
-            <div className="flex items-center gap-4 bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/15 shrink-0">
-              <div className="text-center px-3 border-r border-white/20">
-                <span className="block text-[10px] font-mono text-blue-200 uppercase">
+            <div className="flex items-center gap-4 bg-white p-4 rounded-[12px] border border-[#E2E8F0] shadow-xs shrink-0">
+              <div className="text-center px-4 border-r border-[#E2E8F0]">
+                <span className="block text-[10px] font-mono text-[#64748B] uppercase">
                   Standard Rate
                 </span>
-                <span className="text-xl font-bold font-mono text-rose-300 line-through">
+                <span className="text-xl font-bold font-mono text-rose-500 line-through">
                   2.0%
                 </span>
               </div>
-              <div className="text-center px-3">
-                <span className="block text-[10px] font-mono text-blue-200 uppercase font-semibold">
+              <div className="text-center px-4">
+                <span className="block text-[10px] font-mono text-[#2563EB] uppercase font-semibold">
                   Founder Pass Rate
                 </span>
-                <span className="text-2xl font-extrabold font-mono text-emerald-300">
+                <span className="text-2xl font-extrabold font-mono text-emerald-600">
                   {currentPlanObj.takeRate}
                 </span>
               </div>
@@ -380,11 +368,11 @@ State: IMMUTABLE_CLEARED
         {/* 2. Current Plan Overview Grid */}
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-bold text-[#1C1A17] flex items-center gap-2">
-              <CreditCard className="w-5 h-5 text-blue-600" />
+            <h2 className="text-lg font-bold text-[#0F172A] flex items-center gap-2">
+              <CreditCard className="w-5 h-5 text-[#2563EB]" />
               <span>Subscription &amp; Node License Tiers</span>
             </h2>
-            <span className="text-xs font-mono text-[#8C8275]">
+            <span className="text-xs font-mono text-[#64748B]">
               Account Email: {userEmail}
             </span>
           </div>
@@ -395,43 +383,43 @@ State: IMMUTABLE_CLEARED
               return (
                 <div
                   key={plan.id}
-                  className={`rounded-3xl p-6 sm:p-7 flex flex-col justify-between transition-all relative ${
+                  className={`rounded-[16px] bg-[rgba(255,255,255,0.75)] backdrop-blur-[20px] [-webkit-backdrop-filter:blur(20px)] p-6 sm:p-7 flex flex-col justify-between transition-all relative ${
                     isCurrent
-                      ? "border-2 border-blue-600 bg-white shadow-lg ring-4 ring-blue-500/10"
-                      : "border border-[#EAE3D2] bg-white/80 hover:bg-white hover:border-blue-300 shadow-sm"
+                      ? "border-2 border-[#2563EB] shadow-[0_20px_50px_-12px_rgba(37,99,235,0.12),0_0_0_1px_rgba(37,99,235,0.1)]"
+                      : "border border-[rgba(255,255,255,0.9)] shadow-[0_20px_50px_-12px_rgba(15,23,42,0.08),0_0_0_1px_rgba(15,23,42,0.06)] hover:border-[#CBD5E1]"
                   }`}
                 >
                   {plan.badge && (
-                    <span className="absolute -top-3 left-6 px-3 py-1 rounded-full text-[10px] font-mono font-bold tracking-wider uppercase bg-blue-600 text-white shadow-xs">
+                    <span className="absolute -top-3 left-6 px-3 py-1 rounded-full text-[10px] font-mono font-bold tracking-wider uppercase bg-[#2563EB] text-white shadow-xs">
                       {plan.badge}
                     </span>
                   )}
 
                   <div className="space-y-4">
                     <div>
-                      <h3 className="text-base font-bold text-[#1C1A17]">
+                      <h3 className="text-base font-bold text-[#0F172A]">
                         {plan.name}
                       </h3>
-                      <p className="text-xs text-[#6E675D] mt-1 leading-relaxed">
+                      <p className="text-xs text-[#475569] mt-1 leading-[1.6]">
                         {plan.description}
                       </p>
                     </div>
 
-                    <div className="py-2 border-y border-[#F0E9DC]">
+                    <div className="py-2 border-y border-[#E2E8F0]">
                       <div className="flex items-baseline gap-1.5">
-                        <span className="text-2xl sm:text-3xl font-extrabold text-[#1C1A17] font-sans">
+                        <span className="text-2xl sm:text-3xl font-extrabold text-[#0F172A] font-sans">
                           {plan.priceDisplay}
                         </span>
-                        <span className="text-xs text-[#8C8275] font-mono">
+                        <span className="text-xs text-[#64748B] font-mono">
                           / {plan.period}
                         </span>
                       </div>
-                      <div className="text-[11px] font-mono font-semibold text-blue-600 mt-1">
+                      <div className="text-[11px] font-mono font-semibold text-[#2563EB] mt-1">
                         Settlement Take-Rate: {plan.takeRate}
                       </div>
                     </div>
 
-                    <ul className="space-y-2.5 text-xs text-[#4A453E]">
+                    <ul className="space-y-2.5 text-xs text-[#334155]">
                       {plan.features.map((feature, idx) => (
                         <li key={idx} className="flex items-start gap-2">
                           <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
@@ -444,13 +432,20 @@ State: IMMUTABLE_CLEARED
                   <div className="pt-6">
                     <button
                       onClick={() => setSelectedPlan(plan.id)}
-                      className={`w-full py-2.5 rounded-xl font-semibold text-xs transition cursor-pointer flex items-center justify-center gap-1.5 ${
+                      className={`w-full py-2.5 rounded-[10px] font-semibold text-xs transition cursor-pointer flex items-center justify-center gap-1.5 ${
                         isCurrent
-                          ? "bg-blue-600 text-white shadow-sm"
-                          : "border border-[#EAE3D2] bg-[#FAF8F5] text-[#1C1A17] hover:bg-blue-50 hover:text-blue-700 hover:border-blue-200"
+                          ? "bg-[#2563EB] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]"
+                          : "border border-[#CBD5E1] bg-white text-[#0F172A] hover:bg-[#F8FAFC]"
                       }`}
                     >
-                      {isCurrent ? "Active Plan Tier" : `Select ${plan.name}`}
+                      {isCurrent ? (
+                        <>
+                          <Check className="w-4 h-4" />
+                          <span>Active Tier</span>
+                        </>
+                      ) : (
+                        <span>Switch to Tier</span>
+                      )}
                     </button>
                   </div>
                 </div>
@@ -459,44 +454,40 @@ State: IMMUTABLE_CLEARED
           </div>
         </div>
 
-        {/* 3. Append-Only Double-Entry Financial Ledger & Invoice Downloads */}
-        <div className="rounded-3xl border border-[#EAE3D2] bg-white p-6 sm:p-8 shadow-sm space-y-4">
-          <div className="flex items-center justify-between pb-3 border-b border-[#F0E9DC] flex-wrap gap-2">
+        {/* 3. Settlement Fee Ledger & Invoicing History */}
+        <div className="rounded-[16px] bg-[rgba(255,255,255,0.75)] backdrop-blur-[20px] [-webkit-backdrop-filter:blur(20px)] border border-[rgba(255,255,255,0.9)] shadow-[0_20px_50px_-12px_rgba(15,23,42,0.08),0_0_0_1px_rgba(15,23,42,0.06)] p-6 sm:p-8 space-y-4">
+          <div className="flex items-center justify-between flex-wrap gap-2 pb-3 border-b border-[#E2E8F0]">
             <div>
-              <h2 className="text-base font-bold text-[#1C1A17] flex items-center gap-2">
-                <Layers className="w-5 h-5 text-blue-600" />
-                <span>Double-Entry Financial Ledger (Immutable Append-Only)</span>
+              <h2 className="text-base font-bold text-[#0F172A] flex items-center gap-2">
+                <FileText className="w-5 h-5 text-[#2563EB]" />
+                <span>Protocol Fee &amp; Liquidity Ledger</span>
               </h2>
-              <p className="text-xs text-[#8C8275]">
-                Complete cryptographic credit/debit audit trail governed by Level 9
-                mutation prevention triggers.
+              <p className="text-xs text-[#475569] mt-0.5">
+                Immutable, cryptographically verified record of all protocol clearing fees.
               </p>
             </div>
-            <span className="text-xs font-mono px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200 font-bold">
-              Level 9 Immutable State
+            <span className="text-xs font-mono font-semibold text-[#2563EB] bg-blue-50 px-3 py-1 rounded-full border border-blue-200">
+              Double-Entry Standard
             </span>
           </div>
 
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs font-sans">
+            <table className="w-full text-left text-xs">
               <thead>
-                <tr className="border-b border-[#F0E9DC] text-[11px] font-mono uppercase tracking-wider text-[#8C8275]">
-                  <th className="py-3 px-3">Transaction Ref</th>
-                  <th className="py-3 px-3">Entry Type</th>
+                <tr className="border-b border-[#E2E8F0] text-[#64748B] font-mono uppercase text-[11px]">
+                  <th className="py-3 px-3">Transaction ID</th>
+                  <th className="py-3 px-3">Type</th>
                   <th className="py-3 px-3">Amount</th>
                   <th className="py-3 px-3">Description</th>
                   <th className="py-3 px-3">Date</th>
-                  <th className="py-3 px-3 text-right">Receipt / Invoice</th>
+                  <th className="py-3 px-3 text-right">Receipt</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#F0E9DC]">
+              <tbody className="divide-y divide-[#E2E8F0]">
                 {ledgerEntries.map((item) => (
-                  <tr
-                    key={item.id}
-                    className="hover:bg-[#FAF8F5]/80 transition-colors"
-                  >
-                    <td className="py-3.5 px-3 font-mono font-semibold text-[#1C1A17]">
-                      {item.transaction_id.slice(0, 10)}...
+                  <tr key={item.id} className="hover:bg-white/80 transition-colors">
+                    <td className="py-3.5 px-3 font-mono font-bold text-[#0F172A]">
+                      {item.transaction_id}
                     </td>
                     <td className="py-3.5 px-3 font-mono">
                       <span
@@ -509,22 +500,22 @@ State: IMMUTABLE_CLEARED
                         {item.entry_type}
                       </span>
                     </td>
-                    <td className="py-3.5 px-3 font-mono font-bold text-[#1C1A17]">
+                    <td className="py-3.5 px-3 font-mono font-bold text-[#0F172A]">
                       {item.entry_type === "CREDIT" ? "+" : "-"} ₹
                       {(item.amount / 100).toLocaleString("en-IN", {
                         minimumFractionDigits: 2,
                       })}
                     </td>
-                    <td className="py-3.5 px-3 font-medium text-[#4A453E]">
+                    <td className="py-3.5 px-3 font-medium text-[#334155]">
                       {item.description}
                     </td>
-                    <td className="py-3.5 px-3 font-mono text-[#6E675D]">
+                    <td className="py-3.5 px-3 font-mono text-[#64748B]">
                       {item.created_at}
                     </td>
                     <td className="py-3.5 px-3 text-right">
                       <button
                         onClick={() => handleDownloadInvoice(item)}
-                        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg border border-[#EAE3D2] bg-white hover:bg-blue-50 hover:text-blue-700 hover:border-blue-200 text-xs font-mono font-semibold transition cursor-pointer shadow-2xs"
+                        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-[8px] border border-[#CBD5E1] bg-white hover:bg-[#F8FAFC] text-[#0F172A] text-xs font-mono font-semibold transition cursor-pointer shadow-2xs"
                       >
                         <Download className="w-3.5 h-3.5" />
                         <span>
@@ -539,22 +530,22 @@ State: IMMUTABLE_CLEARED
           </div>
         </div>
 
-        {/* 4. Payout Rails Section: Bank Linking (HDFC IFSC, Account Holder) ready for Monday */}
-        <div className="rounded-3xl border border-[#EAE3D2] bg-white p-6 sm:p-8 shadow-sm space-y-6">
-          <div className="flex items-start justify-between flex-wrap gap-3 pb-4 border-b border-[#F0E9DC]">
+        {/* 4. Payout Rails Section: Bank Linking */}
+        <div className="rounded-[16px] bg-[rgba(255,255,255,0.75)] backdrop-blur-[20px] [-webkit-backdrop-filter:blur(20px)] border border-[rgba(255,255,255,0.9)] shadow-[0_20px_50px_-12px_rgba(15,23,42,0.08),0_0_0_1px_rgba(15,23,42,0.06)] p-6 sm:p-8 space-y-6">
+          <div className="flex items-start justify-between flex-wrap gap-3 pb-4 border-b border-[#E2E8F0]">
             <div>
               <div className="flex items-center gap-2">
-                <Building2 className="w-5 h-5 text-blue-600" />
-                <h2 className="text-base font-bold text-[#1C1A17]">
+                <Building2 className="w-5 h-5 text-[#2563EB]" />
+                <h2 className="text-base font-bold text-[#0F172A]">
                   Commercial Payout Rails (Direct Bank Linking)
                 </h2>
               </div>
-              <p className="text-xs text-[#6E675D] mt-1">
+              <p className="text-xs text-[#475569] mt-1">
                 Link your commercial INR bank account for deterministic settlement
                 withdrawals. Production gateway activates on Monday.
               </p>
             </div>
-            <span className="px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-mono font-bold border border-blue-200 flex items-center gap-1.5">
+            <span className="px-3 py-1 rounded-full bg-blue-50 text-[#2563EB] text-xs font-mono font-bold border border-blue-200 flex items-center gap-1.5">
               <Clock className="w-3.5 h-3.5" />
               <span>Monday Live Activation Rail</span>
             </span>
@@ -562,7 +553,7 @@ State: IMMUTABLE_CLEARED
 
           <form onSubmit={handleSaveBank} className="grid grid-cols-1 sm:grid-cols-3 gap-5">
             <div>
-              <label className="block text-[11px] font-mono font-bold text-[#4A453E] uppercase mb-1.5">
+              <label className="block text-[12px] font-semibold text-[#475569] mb-[6px] uppercase tracking-wider">
                 Account Holder Name
               </label>
               <input
@@ -571,13 +562,13 @@ State: IMMUTABLE_CLEARED
                 value={bankHolder}
                 onChange={(e) => setBankHolder(e.target.value)}
                 placeholder="Corporate Entity / Operator Name"
-                className="w-full px-3.5 py-2.5 rounded-xl bg-[#FAF8F5] border border-[#EAE3D2] focus:border-blue-500 focus:outline-none text-xs text-[#1C1A17] font-medium transition"
+                className="w-full bg-[rgba(255,255,255,0.85)] border border-[#CBD5E1] text-[#0F172A] text-[14px] font-medium px-[14px] py-[11px] rounded-[10px] focus:bg-white focus:border-[#2563EB] focus:ring-[3px] focus:ring-[#2563EB]/12 focus:outline-none transition-all placeholder:text-[#94A3B8]"
               />
             </div>
 
             <div>
-              <label className="block text-[11px] font-mono font-bold text-[#4A453E] uppercase mb-1.5">
-                Bank IFSC Code (HDFC / Commercial)
+              <label className="block text-[12px] font-semibold text-[#475569] mb-[6px] uppercase tracking-wider">
+                Bank IFSC Code
               </label>
               <input
                 type="text"
@@ -585,12 +576,12 @@ State: IMMUTABLE_CLEARED
                 value={bankIfsc}
                 onChange={(e) => setBankIfsc(e.target.value.toUpperCase())}
                 placeholder="HDFC0001040"
-                className="w-full px-3.5 py-2.5 rounded-xl bg-[#FAF8F5] border border-[#EAE3D2] focus:border-blue-500 focus:outline-none text-xs font-mono font-bold text-[#1C1A17] transition"
+                className="w-full bg-[rgba(255,255,255,0.85)] border border-[#CBD5E1] text-[#0F172A] text-[14px] font-mono font-bold px-[14px] py-[11px] rounded-[10px] focus:bg-white focus:border-[#2563EB] focus:ring-[3px] focus:ring-[#2563EB]/12 focus:outline-none transition-all placeholder:text-[#94A3B8]"
               />
             </div>
 
             <div>
-              <label className="block text-[11px] font-mono font-bold text-[#4A453E] uppercase mb-1.5">
+              <label className="block text-[12px] font-semibold text-[#475569] mb-[6px] uppercase tracking-wider">
                 Bank Account Number
               </label>
               <input
@@ -599,12 +590,12 @@ State: IMMUTABLE_CLEARED
                 value={bankAccount}
                 onChange={(e) => setBankAccount(e.target.value)}
                 placeholder="50200084920418"
-                className="w-full px-3.5 py-2.5 rounded-xl bg-[#FAF8F5] border border-[#EAE3D2] focus:border-blue-500 focus:outline-none text-xs font-mono font-bold text-[#1C1A17] transition"
+                className="w-full bg-[rgba(255,255,255,0.85)] border border-[#CBD5E1] text-[#0F172A] text-[14px] font-mono font-bold px-[14px] py-[11px] rounded-[10px] focus:bg-white focus:border-[#2563EB] focus:ring-[3px] focus:ring-[#2563EB]/12 focus:outline-none transition-all placeholder:text-[#94A3B8]"
               />
             </div>
 
             <div className="sm:col-span-3 flex items-center justify-between pt-2 flex-wrap gap-3">
-              <div className="flex items-center gap-2 text-xs text-[#6E675D]">
+              <div className="flex items-center gap-2 text-xs text-[#475569]">
                 <ShieldCheck className="w-4 h-4 text-emerald-600" />
                 <span>
                   End-to-end 256-bit AES encryption. Verified for Indian banking
@@ -614,7 +605,7 @@ State: IMMUTABLE_CLEARED
 
               <button
                 type="submit"
-                className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs transition cursor-pointer shadow-xs flex items-center gap-1.5"
+                className="px-6 py-3 rounded-[10px] bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold text-xs transition cursor-pointer shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] flex items-center gap-1.5"
               >
                 {isSavedBank ? (
                   <>

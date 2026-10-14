@@ -59,24 +59,14 @@ export function HeroSection({
     <section
       ref={sectionRef}
       onMouseMove={handleMouseMove}
-      className="relative w-full pt-20 pb-20 md:pt-28 md:pb-32 overflow-hidden bg-[#FAFAFA] border-b border-zinc-200/80 group"
+      className="relative w-full pt-20 pb-20 md:pt-28 md:pb-32 overflow-hidden bg-white border-b border-[#E2E8F0] group"
     >
-      {/* Dynamic Background Design: Half-Shapes, Concentric Arcs, and Subtle Grid */}
+      {/* Background Shapes */}
       <GoldenBackgroundShapes />
 
-      {/* Mouse-tracking Ambient Electric Blue Spotlight */}
-      <motion.div
-        className="pointer-events-none absolute inset-0 opacity-60 transition-opacity duration-300 will-change-transform -z-10 motion-reduce:hidden"
-        style={{
-          background: useMotionTemplate`
-            radial-gradient(
-              700px circle at ${mouseX}px ${mouseY}px,
-              rgba(37, 99, 235, 0.08),
-              rgba(6, 182, 212, 0.03) 45%,
-              transparent 75%
-            )
-          `,
-        }}
+      {/* Soft Ambient Royal Blue Light */}
+      <div
+        className="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-[radial-gradient(ellipse_at_top,rgba(37,99,235,0.06)_0%,transparent_70%)] blur-3xl -z-10"
       />
 
       <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
@@ -87,55 +77,48 @@ export function HeroSection({
           className="flex flex-col items-center text-center space-y-6 md:space-y-8 will-change-transform"
         >
 
-          {/* 2. Refined Headline adhering to #FAFAFA and Zinc Design System */}
+          {/* 2. Headline with High-Contrast Navy & Slate Typography */}
           <motion.h1
             variants={itemVariants}
-            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-zinc-950 leading-[1.12] will-change-transform max-w-4xl font-sans"
+            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-[-0.02em] text-[#0F172A] leading-[1.12] will-change-transform max-w-4xl"
           >
             <span>Verisett AI</span>{" "}
-            <span className="text-zinc-400 font-light">—</span>{" "}
-            <span className="text-zinc-900">
+            <span className="text-[#94A3B8] font-light">—</span>{" "}
+            <span className="text-[#0F172A]">
               Programmatic Vault Escrow for Multi-Agent Economies.
             </span>
           </motion.h1>
 
-          {/* 3. Concise Supporting Paragraph */}
+          {/* 3. High-Contrast Body Text */}
           <motion.p
             variants={itemVariants}
-            className="text-base sm:text-lg md:text-xl text-zinc-600 max-w-2xl font-normal leading-relaxed will-change-transform font-sans"
+            className="text-base sm:text-lg md:text-xl text-[#334155] max-w-2xl font-normal leading-[1.6] will-change-transform"
           >
             Lock milestone funds in deterministic non-custodial programmatic vaults. Automatically release payouts only when software deliverables, APIs, and commercial milestones meet verified acceptance criteria.
           </motion.p>
 
-          {/* 4. Action Buttons (Zero extraneous video players or tour buttons) */}
+          {/* 4. Single Solid Primary CTA Button */}
           <motion.div
             variants={itemVariants}
-            className="flex flex-wrap items-center justify-center gap-3 pt-2 w-full sm:w-auto relative z-10 will-change-transform"
+            className="flex items-center justify-center pt-2 w-full sm:w-auto relative z-10 will-change-transform"
           >
             {isLoaded && user ? (
               <Link
                 href="/dashboard"
-                className="w-full sm:w-auto minimal-btn-primary flex items-center justify-center gap-2.5 cursor-pointer group/btn font-outfit font-semibold text-xs sm:text-sm tracking-wider"
+                className="w-full sm:w-auto px-8 py-3.5 rounded-[10px] bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold text-sm tracking-wide shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_4px_14px_rgba(37,99,235,0.25)] flex items-center justify-center gap-2.5 transition-all cursor-pointer group"
               >
                 <span>ENTER CONSOLE</span>
-                <ArrowRight className="w-4 h-4 transition-transform group-hover/btn:translate-x-1" />
+                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
               </Link>
             ) : (
               <Link
                 href="/login"
-                className="w-full sm:w-auto minimal-btn-primary flex items-center justify-center gap-2.5 cursor-pointer group/btn font-outfit font-semibold text-xs sm:text-sm tracking-wider"
+                className="w-full sm:w-auto px-8 py-3.5 rounded-[10px] bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold text-sm tracking-wide shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_4px_14px_rgba(37,99,235,0.25)] flex items-center justify-center gap-2.5 transition-all cursor-pointer group"
               >
-                <span>LOGIN</span>
-                <ArrowRight className="w-4 h-4 transition-transform group-hover/btn:translate-x-1" />
+                <span>GET STARTED</span>
+                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
               </Link>
             )}
-
-            <button
-              onClick={onExploreConsole}
-              className="w-full sm:w-auto minimal-btn-secondary flex items-center justify-center gap-2 cursor-pointer font-outfit text-xs sm:text-sm"
-            >
-              <span>Explore Console</span>
-            </button>
           </motion.div>
 
           {/* 5. Metric Highlights adhering to Zinc design system */}

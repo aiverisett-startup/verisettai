@@ -238,10 +238,6 @@ export function MinimalFooter() {
             <a href="#how-it-works" className="hover:text-zinc-950 transition-colors">
               How It Works
             </a>
-            <span className="text-zinc-300 select-none">•</span>
-            <a href="#sandbox" className="hover:text-zinc-950 transition-colors">
-              Sandbox
-            </a>
           </nav>
 
         </div>

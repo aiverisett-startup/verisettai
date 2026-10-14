@@ -2,44 +2,42 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { ShieldCheck, FileCheck, Lock, CheckCircle2, Zap, Play } from "lucide-react";
-import { GoogleIcon } from "../ui/GoogleIcon";
+import { ShieldCheck, FileCheck, Lock, CheckCircle2, Zap } from "lucide-react";
 
 interface HowItWorksSectionProps {
   onStartOnboarding?: () => void;
   onOpenVideoModal?: () => void;
 }
 
-export function HowItWorksSection({ onStartOnboarding, onOpenVideoModal }: HowItWorksSectionProps) {
+export function HowItWorksSection({}: HowItWorksSectionProps) {
   const steps = [
     {
       number: "01",
-      stepBadge: "STEP 1: FASTMCP HANDSHAKE",
+      stepTag: "Step 01 / Authentication",
       title: "M2M FastMCP Handshake",
-      quote: "Authenticate via mTLS & Ephemeral Agent Keys.",
       description:
         "Connect autonomous AI agent swarms securely via Model Context Protocol (FastMCP) with mutual TLS and ephemeral cryptographic session keys. Instant microsecond vault initialization.",
       renderVisual: () => (
-        <div className="bg-[#FDFCF9] rounded-xl p-4 border border-[#E2E8F0] space-y-3">
+        <div className="bg-white rounded-xl p-4 border border-[#E2E8F0] space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="p-1.5 rounded-lg bg-blue-50 border border-blue-200 text-blue-600 shadow-2xs">
+              <div className="p-1.5 rounded-lg bg-blue-50 border border-blue-200 text-[#2563EB]">
                 <Lock className="w-4 h-4" />
               </div>
-              <span className="text-xs font-semibold text-[#09090B]">FastMCP mTLS &amp; Session Keys</span>
+              <span className="text-xs font-semibold text-[#0F172A]">FastMCP mTLS &amp; Session Keys</span>
             </div>
-            <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 font-semibold">
+            <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200 font-semibold">
               SUB-5MS
             </span>
           </div>
 
-          <div className="p-2.5 rounded-lg bg-white border border-[#E2E8F0] flex items-center justify-between text-xs shadow-2xs">
+          <div className="p-2.5 rounded-lg bg-[#F8FAFC] border border-[#E2E8F0] flex items-center justify-between text-xs">
             <div className="flex items-center gap-2">
-              <div className="h-6 w-6 rounded-full bg-[#2563EB] flex items-center justify-center text-white font-mono text-[10px]">
+              <div className="h-6 w-6 rounded-full bg-[#2563EB] flex items-center justify-center text-white font-mono text-[10px] font-bold">
                 α
               </div>
               <div>
-                <div className="font-medium text-[#09090B] text-[11px]">Agent_Alpha_Buyer</div>
+                <div className="font-semibold text-[#0F172A] text-[11px]">Agent_Alpha_Buyer</div>
                 <div className="text-[10px] text-[#64748B]">Session: vrs_live_89f7...</div>
               </div>
             </div>
@@ -50,35 +48,34 @@ export function HowItWorksSection({ onStartOnboarding, onOpenVideoModal }: HowIt
     },
     {
       number: "02",
-      stepBadge: "STEP 2: DEFINE ESCROW",
+      stepTag: "Step 02 / Invariant Definition",
       title: "Define Settlement Invariants",
-      quote: "Deterministic code-level programmatic vault locking until deliverables pass.",
       description:
         "Specify milestone deliverables, testnet USD amounts, and SHA-256 deliverable commitments. Set automated assertion rules or zero-knowledge cryptographic checks.",
       renderVisual: () => (
-        <div className="bg-[#FDFCF9] rounded-xl p-4 border border-[#E2E8F0] space-y-2.5">
+        <div className="bg-white rounded-xl p-4 border border-[#E2E8F0] space-y-2.5">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="p-1.5 rounded-lg bg-blue-50 border border-blue-200 text-[#2563EB] shadow-2xs">
+              <div className="p-1.5 rounded-lg bg-blue-50 border border-blue-200 text-[#2563EB]">
                 <FileCheck className="w-4 h-4" />
               </div>
-              <span className="text-xs font-semibold text-[#09090B]">FastMCP Escrow Vault</span>
+              <span className="text-xs font-semibold text-[#0F172A]">FastMCP Escrow Vault</span>
             </div>
-            <span className="text-xs font-mono font-bold text-[#09090B]">$250.00 USD</span>
+            <span className="text-xs font-mono font-bold text-[#0F172A]">$250.00 USD</span>
           </div>
 
           <div className="space-y-1.5">
-            <div className="flex items-center justify-between text-[11px] text-[#64748B] bg-white p-2 rounded-lg border border-[#E2E8F0]">
+            <div className="flex items-center justify-between text-[11px] text-[#475569] bg-[#F8FAFC] p-2 rounded-lg border border-[#E2E8F0]">
               <span className="flex items-center gap-1.5">
                 <Lock className="w-3 h-3 text-[#2563EB]" />
                 Vault Custody
               </span>
-              <span className="text-emerald-700 font-medium font-mono">Locked (SET NX)</span>
+              <span className="text-emerald-700 font-semibold font-mono">Locked (SET NX)</span>
             </div>
 
-            <div className="flex items-center justify-between text-[11px] text-[#64748B] bg-white p-2 rounded-lg border border-[#E2E8F0]">
+            <div className="flex items-center justify-between text-[11px] text-[#475569] bg-[#F8FAFC] p-2 rounded-lg border border-[#E2E8F0]">
               <span>Acceptance Invariant</span>
-              <span className="font-mono text-[#09090B]">SHA-256 Output Match</span>
+              <span className="font-mono text-[#0F172A] font-semibold">SHA-256 Output Match</span>
             </div>
           </div>
         </div>
@@ -86,13 +83,12 @@ export function HowItWorksSection({ onStartOnboarding, onOpenVideoModal }: HowIt
     },
     {
       number: "03",
-      stepBadge: "STEP 3: AUTO-RELEASE",
+      stepTag: "Step 03 / Automated Clearance",
       title: "Automated Release & Protection",
-      quote: "Zero manual delay. Payouts clear in under 25ms upon cryptographic validation.",
       description:
-        "When autonomous worker agents deliver verifiable deliverables matching the SHA-256 hash or zero-knowledge proof, funds instantly clear. Zero counterparty risk and immutable cryptographic audit logs.",
+        "When autonomous worker agents deliver verifiable deliverables matching the SHA-256 hash or zero-knowledge proof, funds instantly clear. Zero counterparty risk.",
       renderVisual: () => (
-        <div className="bg-[#FDFCF9] rounded-xl p-4 border border-[#E2E8F0] space-y-3">
+        <div className="bg-white rounded-xl p-4 border border-[#E2E8F0] space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <div className="p-1.5 rounded-lg bg-emerald-50 border border-emerald-200">
@@ -100,18 +96,18 @@ export function HowItWorksSection({ onStartOnboarding, onOpenVideoModal }: HowIt
               </div>
               <span className="text-xs font-semibold text-emerald-900">Atomic Payout Disbursed</span>
             </div>
-            <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-semibold">
+            <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 font-semibold">
               &lt;25ms
             </span>
           </div>
 
-          <div className="p-2.5 rounded-lg bg-white border border-[#E2E8F0] space-y-1.5 text-xs shadow-2xs">
+          <div className="p-2.5 rounded-lg bg-[#F8FAFC] border border-[#E2E8F0] space-y-1.5 text-xs">
             <div className="flex items-center justify-between text-[11px]">
               <span className="text-[#64748B]">Settlement Status:</span>
               <span className="text-emerald-700 font-semibold">Completed</span>
             </div>
             <div className="w-full bg-emerald-100 h-1.5 rounded-full overflow-hidden">
-              <div className="bg-emerald-500 h-full w-full rounded-full" />
+              <div className="bg-emerald-600 h-full w-full rounded-full" />
             </div>
             <div className="flex items-center justify-between text-[10px] text-[#64748B] font-mono pt-0.5">
               <span>Audit ID: #SETTLE-8821</span>
@@ -124,127 +120,51 @@ export function HowItWorksSection({ onStartOnboarding, onOpenVideoModal }: HowIt
   ];
 
   return (
-    <section id="how-it-works" className="relative py-20 md:py-28 bg-[#FDFCF9] overflow-hidden">
-      {/* Background Half-Shapes for How It Works section */}
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden select-none -z-10">
-        {/* Left Edge: Golden Half-Circle with Concentric Arc */}
-        <div className="absolute top-1/4 -left-16 sm:-left-20 w-64 sm:w-80 h-64 sm:h-80 opacity-35 motion-safe:animate-float-slow">
-          <svg viewBox="0 0 300 300" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
-            <path
-              d="M 150,20 A 130,130 0 0,1 150,280 Z"
-              fill="#FAF6EE"
-              stroke="#D4AF37"
-              strokeWidth="1.2"
-              strokeOpacity="0.4"
-            />
-            <path
-              d="M 150,45 A 105,105 0 0,1 150,255"
-              stroke="#C59B5F"
-              strokeWidth="1"
-              strokeDasharray="5 5"
-              strokeOpacity="0.3"
-              fill="none"
-            />
-          </svg>
-        </div>
-
-        {/* Right Edge: Smooth Concentric Half-Arch */}
-        <div className="absolute top-1/3 -right-16 sm:-right-20 w-64 sm:w-80 h-64 sm:h-80 opacity-35 motion-safe:animate-float-reverse">
-          <svg viewBox="0 0 300 300" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
-            <path
-              d="M 150,20 A 130,130 0 0,0 150,280 Z"
-              fill="#FAF6EE"
-              fillOpacity="0.4"
-              stroke="#C59B5F"
-              strokeWidth="1.2"
-              strokeOpacity="0.4"
-            />
-            <path
-              d="M 150,50 A 100,100 0 0,0 150,250"
-              stroke="#D4AF37"
-              strokeWidth="1"
-              strokeDasharray="4 6"
-              strokeOpacity="0.3"
-              fill="none"
-            />
-          </svg>
-        </div>
-      </div>
-
+    <section id="how-it-works" className="relative py-24 md:py-32 bg-[#F8FAFC] border-y border-[#E2E8F0]">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-          className="text-center max-w-2xl mx-auto mb-16 md:mb-20"
-        >
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-[#1C1A17]">
-            How it works in three simple steps.
+        <div className="max-w-2xl mb-16 md:mb-20">
+          <div className="text-xs font-mono font-semibold uppercase tracking-wider text-[#2563EB] mb-2">
+            Protocol Mechanics
+          </div>
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-[-0.02em] text-[#0F172A] leading-[1.15]">
+            How it works in three deterministic steps.
           </h2>
-          <p className="text-base sm:text-lg text-[#8C8275] mt-3 leading-relaxed">
+          <p className="text-base sm:text-lg text-[#334155] mt-3 leading-[1.6]">
             Eliminate payment disputes and deliverable uncertainty. Verisett automates the escrow lifecycle from initial proposal to verified commercial payout.
           </p>
-          {onOpenVideoModal && (
-            <div className="mt-5 flex justify-center">
-              <button
-                onClick={onOpenVideoModal}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#FAF6EE] hover:bg-[#F5EBD7] text-[#9E7A45] hover:text-[#7A5B2E] border border-[#D4AF37]/50 hover:border-[#D4AF37] font-semibold text-xs transition-all shadow-xs cursor-pointer group"
-                title="Watch 6-Step Interactive Video Walkthrough"
-              >
-                <div className="h-5 w-5 rounded-full bg-white flex items-center justify-center border border-[#D4AF37]/40 shadow-2xs">
-                  <Play className="w-2.5 h-2.5 fill-[#9E7A45] text-[#9E7A45] ml-0.5 group-hover:scale-110 transition-transform" />
-                </div>
-                <span>Watch 6-Step Video Walkthrough (30s)</span>
-              </button>
-            </div>
-          )}
-        </motion.div>
+        </div>
 
-        {/* 3 Step Cards Grid with Staggered Entrance */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Editorial 3-Step Structural Grid with 1px Dividers */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-0 border border-[#E2E8F0] rounded-2xl bg-white overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06)] divide-y md:divide-y-0 md:divide-x divide-[#E2E8F0]">
           {steps.map((step, idx) => (
-            <motion.div
+            <div
               key={idx}
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-60px" }}
-              transition={{
-                duration: 0.6,
-                delay: idx * 0.15,
-                ease: [0.16, 1, 0.3, 1],
-              }}
-              className="flex flex-col justify-between rounded-2xl bg-white border border-[#EAE3D2] hover:border-[#D4AF37] p-6 sm:p-7 shadow-[0_2px_12px_rgba(197,155,95,0.04)] hover:shadow-[0_10px_30px_rgba(197,155,95,0.09)] transition-all duration-300 will-change-transform"
+              className="flex flex-col justify-between p-7 sm:p-9 hover:bg-[#F8FAFC]/50 transition-colors"
             >
               <div>
-                {/* Step Top Header */}
-                <div className="flex items-center justify-between mb-4">
-                  <span className="text-sm font-mono font-bold text-[#2563EB]">
+                <div className="flex items-center justify-between mb-6">
+                  <span className="text-2xl font-mono font-extrabold text-[#2563EB]">
                     {step.number}
                   </span>
-                  <span className="text-[10px] font-mono uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-blue-50 text-[#2563EB] border border-blue-200">
-                    {step.stepBadge}
+                  <span className="text-[11px] font-mono uppercase tracking-wider text-[#64748B] font-semibold">
+                    {step.stepTag}
                   </span>
                 </div>
 
-                <h3 className="text-xl font-bold text-[#09090B] tracking-tight mb-2">
+                <h3 className="text-xl font-bold text-[#0F172A] tracking-tight mb-2.5">
                   {step.title}
                 </h3>
 
-                <blockquote className="text-xs text-[#2563EB] font-medium mb-3 italic">
-                  "{step.quote}"
-                </blockquote>
-
-                <p className="text-xs sm:text-sm text-[#64748B] leading-relaxed mb-6">
+                <p className="text-sm text-[#334155] leading-[1.6] mb-8">
                   {step.description}
                 </p>
               </div>
 
               {/* Render Visual Preview */}
-              <div>{step.renderVisual()}</div>
-            </motion.div>
+              <div className="pt-4 border-t border-[#E2E8F0]">{step.renderVisual()}</div>
+            </div>
           ))}
         </div>
       </div>

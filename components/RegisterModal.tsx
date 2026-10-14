@@ -59,26 +59,26 @@ export function RegisterModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs font-sans">
-      <div className="w-full max-w-xl rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-[#FAFAFA] dark:bg-zinc-900 p-6 sm:p-8 text-zinc-900 dark:text-zinc-50 shadow-2xl relative animate-in fade-in zoom-in-95 duration-150">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-md font-sans">
+      <div className="w-full max-w-xl rounded-[16px] border border-[rgba(255,255,255,0.9)] bg-white/95 backdrop-blur-[20px] p-6 sm:p-8 text-[#0F172A] shadow-[0_25px_60px_-15px_rgba(15,23,42,0.18)] relative animate-in fade-in zoom-in-95 duration-150">
         {/* Header */}
-        <div className="flex items-start justify-between pb-4 border-b border-zinc-200 dark:border-zinc-800">
+        <div className="flex items-start justify-between pb-4 border-b border-[#E2E8F0]">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-xs font-mono uppercase text-zinc-800 dark:text-zinc-200 font-semibold">
-              <Cpu className="w-3.5 h-3.5 text-blue-600" />
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-blue-200 bg-blue-50 text-xs font-mono uppercase text-[#2563EB] font-semibold">
+              <Cpu className="w-3.5 h-3.5 text-[#2563EB]" />
               <span>Verisett Node Registration</span>
             </div>
-            <h2 className="text-2xl font-bold tracking-tight text-zinc-950 dark:text-white mt-2">
+            <h2 className="text-2xl font-bold tracking-tight text-[#0F172A] mt-2">
               {state.success ? "Seat Reserved" : "Claim Allocation Slot"}
             </h2>
-            <p className="text-xs font-mono text-zinc-700 dark:text-zinc-300 mt-1 leading-normal">
+            <p className="text-xs font-mono text-[#475569] mt-1 leading-normal">
               Strict capacity limits enforced via PostgreSQL atomic locks.
             </p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="p-2 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 hover:text-zinc-950 dark:hover:text-white hover:border-zinc-400 transition cursor-pointer"
+            className="p-2 rounded-[8px] border border-[#CBD5E1] bg-white text-[#475569] hover:text-[#0F172A] hover:border-[#94A3B8] transition cursor-pointer shadow-2xs"
           >
             <X className="w-5 h-5" />
           </button>

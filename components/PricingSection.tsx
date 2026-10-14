@@ -277,16 +277,16 @@ export function PricingSection({ initialPlans }: PricingSectionProps) {
             return (
               <div
                 key={plan.id}
-                className={`rounded-2xl p-6 sm:p-7 flex flex-col justify-between h-full border transition-all duration-200 relative ${
+                className={`rounded-[16px] p-6 sm:p-7 flex flex-col justify-between h-full border transition-all duration-200 relative ${
                   plan.id === "tier_2"
-                    ? "border-zinc-900 bg-white ring-2 ring-zinc-900 shadow-md"
-                    : "border-zinc-200 bg-white hover:border-zinc-300 shadow-xs"
+                    ? "border-[#2563EB] bg-white ring-2 ring-[#2563EB] shadow-[0_20px_50px_-12px_rgba(37,99,235,0.12)]"
+                    : "border-[#E2E8F0] bg-white hover:border-[#CBD5E1] shadow-xs"
                 }`}
               >
                 {/* Popular Badge for Tier 2 */}
                 {plan.id === "tier_2" && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-20 whitespace-nowrap">
-                    <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-zinc-900 text-white text-xs font-mono font-bold tracking-wider uppercase shadow-xs">
+                    <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-[#2563EB] text-white text-xs font-mono font-bold tracking-wider uppercase shadow-xs">
                       <Sparkles className="w-3.5 h-3.5 text-white" />
                       MOST POPULAR
                     </span>
@@ -407,7 +407,7 @@ export function PricingSection({ initialPlans }: PricingSectionProps) {
                     <button
                       type="button"
                       disabled
-                      className="w-full min-h-[46px] py-2.5 px-4 rounded-lg text-xs sm:text-sm font-semibold tracking-wide flex items-center justify-center gap-1.5 bg-zinc-100 text-zinc-400 border border-zinc-200 cursor-not-allowed opacity-60"
+                      className="w-full min-h-[46px] py-2.5 px-4 rounded-[10px] text-xs sm:text-sm font-semibold tracking-wide flex items-center justify-center gap-1.5 bg-zinc-100 text-zinc-400 border border-zinc-200 cursor-not-allowed opacity-60"
                     >
                       <span>
                         {isTierCapReached
@@ -420,10 +420,10 @@ export function PricingSection({ initialPlans }: PricingSectionProps) {
                   ) : (
                     <Link
                       href={`/checkout?plan=${plan.id}`}
-                      className={`w-full min-h-[46px] py-2.5 px-4 rounded-lg text-xs sm:text-sm font-semibold tracking-wide flex items-center justify-center gap-2 transition-all cursor-pointer ${
+                      className={`w-full min-h-[46px] py-2.5 px-4 rounded-[10px] text-xs sm:text-sm font-semibold tracking-wide flex items-center justify-center gap-2 transition-all cursor-pointer ${
                         plan.id === "tier_2"
-                          ? "bg-zinc-900 hover:bg-zinc-800 text-white border border-zinc-900 shadow-sm"
-                          : "bg-white hover:bg-zinc-50 text-zinc-950 border border-zinc-300 hover:border-zinc-400 shadow-2xs"
+                          ? "bg-[#2563EB] hover:bg-[#1D4ED8] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]"
+                          : "bg-white hover:bg-[#F8FAFC] text-[#0F172A] border border-[#CBD5E1] hover:border-[#94A3B8] shadow-2xs"
                       }`}
                     >
                       <span>
