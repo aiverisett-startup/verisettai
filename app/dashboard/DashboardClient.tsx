@@ -1083,16 +1083,16 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
                     <button
                       onClick={() => handleSimulateHeartbeat(selectedAgent.id)}
                       disabled={isPinging}
-                      className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-zinc-900 border border-zinc-800 text-xs font-medium text-zinc-200 shadow-sm transition-all duration-200 hover:bg-zinc-800 hover:border-blue-500/60 hover:text-white cursor-pointer disabled:opacity-60 font-sans"
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-[#CBD5E1] hover:border-[#2563EB] text-xs font-semibold text-[#0F172A] shadow-2xs transition-all duration-200 hover:bg-blue-50/50 cursor-pointer disabled:opacity-60 font-sans"
                       title="Transmit heartbeat ping to trigger verified status"
                     >
-                      <Activity className={`text-blue-500 w-3.5 h-3.5 ${isPinging ? "animate-spin" : ""}`} />
+                      <Activity className={`text-[#2563EB] w-3.5 h-3.5 ${isPinging ? "animate-spin" : ""}`} />
                       <span>{isPinging ? "Transmitting..." : `Transmit Heartbeat for ${selectedAgent.name}`}</span>
                     </button>
 
                     <button
                       onClick={() => loadTenantData(user.id)}
-                      className="w-8 h-8 rounded-full bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-700 flex items-center justify-center transition-colors cursor-pointer"
+                      className="w-8 h-8 rounded-full bg-white border border-[#CBD5E1] hover:border-[#94A3B8] text-[#64748B] hover:text-[#0F172A] flex items-center justify-center transition-colors cursor-pointer shadow-2xs"
                       title="Refresh Telemetry"
                     >
                       <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? "animate-spin" : ""}`} />
@@ -1228,9 +1228,9 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
                     <button
                       onClick={() => handleSimulateHeartbeat(selectedAgent.id)}
                       disabled={isPinging}
-                      className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-zinc-900 border border-zinc-800 text-xs font-medium text-zinc-200 shadow-sm transition-all duration-200 hover:bg-zinc-800 hover:border-blue-500/60 hover:text-white cursor-pointer disabled:opacity-60 font-sans"
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-[#CBD5E1] hover:border-[#2563EB] text-xs font-semibold text-[#0F172A] shadow-2xs transition-all duration-200 hover:bg-blue-50/50 cursor-pointer disabled:opacity-60 font-sans"
                     >
-                      <Activity className={`text-blue-500 w-3.5 h-3.5 ${isPinging ? "animate-spin" : ""}`} />
+                      <Activity className={`text-[#2563EB] w-3.5 h-3.5 ${isPinging ? "animate-spin" : ""}`} />
                       <span>
                         {isPinging ? "Transmitting..." : `Transmit Heartbeat for ${selectedAgent.name}`}
                       </span>
@@ -1406,15 +1406,15 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
           {/* ========================================================================= */}
           <div className="lg:col-span-3 space-y-6">
             {/* Watchlist Main Container */}
-            <div className="rounded-2xl border border-zinc-800/80 bg-zinc-950 shadow-xs overflow-hidden flex flex-col font-sans">
+            <div className="rounded-[16px] border border-[rgba(255,255,255,0.9)] bg-white/80 backdrop-blur-[20px] shadow-[0_20px_50px_-12px_rgba(15,23,42,0.08),0_0_0_1px_rgba(15,23,42,0.06)] overflow-hidden flex flex-col font-sans">
               {/* Watchlist Top Header */}
-              <div className="p-4 border-b border-zinc-800/80 bg-zinc-900/60 flex items-center justify-between gap-2">
+              <div className="p-4 border-b border-[#E2E8F0] bg-white/60 backdrop-blur-md flex items-center justify-between gap-2">
                 <div className="flex items-center gap-1.5">
-                  <button className="flex items-center gap-1 font-mono font-bold text-xs text-zinc-200 bg-zinc-900 px-2.5 py-1 rounded-lg border border-zinc-800 shadow-2xs">
+                  <button className="flex items-center gap-1 font-mono font-bold text-xs text-[#0F172A] bg-white px-2.5 py-1.5 rounded-[8px] border border-[#CBD5E1] shadow-2xs hover:border-[#94A3B8] transition cursor-pointer">
                     <span>{watchlistGroup}</span>
-                    <ChevronDown className="w-3 h-3 text-zinc-400" />
+                    <ChevronDown className="w-3 h-3 text-[#64748B]" />
                   </button>
-                  <span className="text-[11px] font-mono text-zinc-500">
+                  <span className="text-[11px] font-mono text-[#64748B]">
                     ({agents.length})
                   </span>
                 </div>
@@ -1422,7 +1422,7 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
                 <div className="flex items-center gap-1">
                   <button
                     onClick={() => setIsRegisterAgentModalOpen(true)}
-                    className="p-1.5 rounded-lg bg-blue-950/60 border border-blue-800/60 hover:bg-blue-900/60 text-blue-400 transition cursor-pointer"
+                    className="p-1.5 rounded-[8px] bg-blue-50 border border-blue-200 hover:bg-blue-100 text-[#2563EB] transition cursor-pointer shadow-2xs"
                     title="+ Add Agent"
                   >
                     <Plus className="w-3.5 h-3.5" />
@@ -1430,7 +1430,7 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
 
                   <button
                     onClick={handleGenerateFastMcpKey}
-                    className="p-1.5 rounded-lg hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 transition cursor-pointer"
+                    className="p-1.5 rounded-[8px] hover:bg-slate-100 text-[#64748B] hover:text-[#0F172A] transition cursor-pointer"
                     title="Quick Connect FastMCP"
                   >
                     <Grid className="w-3.5 h-3.5" />
@@ -1438,7 +1438,7 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
 
                   <button
                     onClick={() => loadTenantData(user.id)}
-                    className="p-1.5 rounded-lg hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 transition cursor-pointer"
+                    className="p-1.5 rounded-[8px] hover:bg-slate-100 text-[#64748B] hover:text-[#0F172A] transition cursor-pointer"
                     title="Options Menu"
                   >
                     <MoreVertical className="w-3.5 h-3.5" />
@@ -1447,25 +1447,25 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
               </div>
 
               {/* Watchlist Column Subheader */}
-              <div className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400 bg-transparent px-4 py-2 border-b border-zinc-800/60 flex items-center justify-between font-sans">
+              <div className="text-[11px] font-semibold uppercase tracking-wider text-[#64748B] bg-slate-50/70 px-4 py-2 border-b border-[#E2E8F0] flex items-center justify-between font-sans">
                 <span className="min-w-[180px] flex-1">Agent / Node</span>
                 <span className="w-24 text-right">Throughput</span>
                 <span className="w-20 text-right">24h Chg%</span>
               </div>
 
               {/* Categorized Rows List */}
-              <div className="divide-y divide-zinc-800/40 max-h-[580px] overflow-y-auto custom-dark-scrollbar bg-zinc-950">
+              <div className="divide-y divide-[#E2E8F0] max-h-[580px] overflow-y-auto custom-glass-scrollbar bg-white/40">
                 {/* 1. Group: CONNECTED AGENTS */}
-                <div className="text-[10px] font-mono tracking-widest text-zinc-400 uppercase py-1.5 px-4 bg-zinc-900/50 border-y border-zinc-800/50 flex items-center justify-between">
-                  <span className="flex items-center gap-1.5 text-emerald-400 font-semibold">
+                <div className="text-[10px] font-mono tracking-widest text-[#475569] uppercase py-1.5 px-4 bg-slate-100/70 border-y border-[#E2E8F0] flex items-center justify-between">
+                  <span className="flex items-center gap-1.5 text-emerald-700 font-bold">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                     CONNECTED AGENTS
                   </span>
-                  <span className="text-zinc-500">({connectedAgents.length})</span>
+                  <span className="text-[#64748B] font-semibold">({connectedAgents.length})</span>
                 </div>
 
                 {connectedAgents.length === 0 ? (
-                  <div className="p-4 text-center text-xs font-sans text-zinc-500">
+                  <div className="p-4 text-center text-xs font-sans text-[#64748B]">
                     No agents actively streaming.
                   </div>
                 ) : (
@@ -1479,10 +1479,10 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
                       <div
                         key={agent.id}
                         onClick={() => setSelectedAgentId(agent.id)}
-                        className={`border-b border-zinc-800/40 px-4 py-3 text-zinc-300 transition-colors duration-150 flex items-center justify-between gap-3 group ${
+                        className={`border-b border-[#E2E8F0] px-4 py-3 transition-colors duration-150 flex items-center justify-between gap-3 group cursor-pointer ${
                           isSelected
-                            ? "bg-zinc-900 border-l-2 border-l-blue-500 text-white"
-                            : "bg-transparent hover:bg-zinc-900 hover:text-white cursor-pointer hover:border-l-2 hover:border-l-blue-500"
+                            ? "bg-blue-50/80 border-l-2 border-l-[#2563EB] text-[#0F172A]"
+                            : "bg-transparent hover:bg-slate-50/80 text-[#334155] hover:text-[#0F172A] hover:border-l-2 hover:border-l-[#2563EB]/40"
                         }`}
                       >
                         {/* Agent Avatar / ID / Name (min-w-[180px] preventing line breaks) */}
@@ -1494,28 +1494,28 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
                               className="w-7 h-7 rounded-full object-cover shrink-0 border border-blue-500/50"
                             />
                           ) : (
-                            <div className="w-7 h-7 rounded-full bg-blue-950/70 text-blue-400 border border-blue-800/60 font-semibold text-xs flex items-center justify-center shrink-0">
+                            <div className="w-7 h-7 rounded-full bg-blue-50 text-[#2563EB] border border-blue-200 font-semibold text-xs flex items-center justify-center shrink-0">
                               {agent.name.slice(0, 1).toUpperCase()}
                             </div>
                           )}
                           <div className="min-w-0 flex-1">
-                            <span className="font-mono text-xs font-bold text-zinc-100 group-hover:text-white block truncate">
+                            <span className="font-mono text-xs font-bold text-[#0F172A] group-hover:text-[#2563EB] block truncate">
                               {code}
                             </span>
-                            <span className="text-xs text-zinc-400 group-hover:text-zinc-200 block whitespace-nowrap truncate font-sans">
+                            <span className="text-xs text-[#64748B] group-hover:text-[#334155] block whitespace-nowrap truncate font-sans">
                               {agent.name}
                             </span>
                           </div>
                         </div>
 
                         {/* Throughput */}
-                        <div className="w-24 text-right font-mono text-xs font-medium text-zinc-300 group-hover:text-white">
+                        <div className="w-24 text-right font-mono text-xs font-semibold text-[#0F172A]">
                           {(agent.throughput_tps || 1259.1).toFixed(1)}{" "}
-                          <span className="text-[10px] text-zinc-500 font-sans">TPS</span>
+                          <span className="text-[10px] text-[#64748B] font-sans">TPS</span>
                         </div>
 
                         {/* Real-time Rate Indicator */}
-                        <div className="w-20 text-right font-mono text-xs font-medium text-emerald-400 group-hover:text-emerald-300">
+                        <div className="w-20 text-right font-mono text-xs font-bold text-emerald-600">
                           +14.1%
                         </div>
                       </div>
@@ -1524,16 +1524,16 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
                 )}
 
                 {/* 2. Group: STANDBY NODES */}
-                <div className="text-[10px] font-mono tracking-widest text-zinc-400 uppercase py-1.5 px-4 bg-zinc-900/50 border-y border-zinc-800/50 flex items-center justify-between">
-                  <span className="flex items-center gap-1.5 text-zinc-400 font-semibold">
-                    <span className="w-1.5 h-1.5 rounded-full bg-zinc-500" />
+                <div className="text-[10px] font-mono tracking-widest text-[#475569] uppercase py-1.5 px-4 bg-slate-100/70 border-y border-[#E2E8F0] flex items-center justify-between">
+                  <span className="flex items-center gap-1.5 text-[#475569] font-bold">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#94A3B8]" />
                     STANDBY NODES
                   </span>
-                  <span className="text-zinc-500">({standbyNodes.length})</span>
+                  <span className="text-[#64748B] font-semibold">({standbyNodes.length})</span>
                 </div>
 
                 {standbyNodes.length === 0 ? (
-                  <div className="p-4 text-center text-xs font-sans text-zinc-500">
+                  <div className="p-4 text-center text-xs font-sans text-[#64748B]">
                     No standby nodes.
                   </div>
                 ) : (
@@ -1548,10 +1548,10 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
                       <div
                         key={agent.id}
                         onClick={() => setSelectedAgentId(agent.id)}
-                        className={`border-b border-zinc-800/40 px-4 py-3 text-zinc-300 transition-colors duration-150 flex items-center justify-between gap-3 group ${
+                        className={`border-b border-[#E2E8F0] px-4 py-3 transition-colors duration-150 flex items-center justify-between gap-3 group cursor-pointer ${
                           isSelected
-                            ? "bg-zinc-900 border-l-2 border-l-blue-500 text-white"
-                            : "bg-transparent hover:bg-zinc-900 hover:text-white cursor-pointer hover:border-l-2 hover:border-l-blue-500"
+                            ? "bg-slate-100/90 border-l-2 border-l-[#2563EB] text-[#0F172A]"
+                            : "bg-transparent hover:bg-slate-50/80 text-[#334155] hover:text-[#0F172A] hover:border-l-2 hover:border-l-[#2563EB]/40"
                         }`}
                       >
                         {/* Agent Avatar / ID / Name */}
@@ -1560,34 +1560,34 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
                             <img
                               src={agent.avatar_url}
                               alt={agent.name}
-                              className="w-7 h-7 rounded-full object-cover shrink-0 grayscale opacity-60 border border-zinc-800"
+                              className="w-7 h-7 rounded-full object-cover shrink-0 grayscale opacity-60 border border-[#CBD5E1]"
                             />
                           ) : (
-                            <div className="w-7 h-7 rounded-full bg-zinc-900 text-zinc-500 border border-zinc-800 font-semibold text-xs flex items-center justify-center shrink-0">
+                            <div className="w-7 h-7 rounded-full bg-slate-100 text-[#64748B] border border-[#CBD5E1] font-semibold text-xs flex items-center justify-center shrink-0">
                               {agent.name.slice(0, 1).toUpperCase()}
                             </div>
                           )}
                           <div className="min-w-0 flex-1">
-                            <span className="font-mono text-xs font-semibold text-zinc-400 group-hover:text-zinc-200 block truncate">
+                            <span className="font-mono text-xs font-semibold text-[#1E293B] group-hover:text-[#0F172A] block truncate">
                               {code}
                             </span>
-                            <span className="text-xs text-zinc-500 group-hover:text-zinc-300 block whitespace-nowrap truncate font-sans">
+                            <span className="text-xs text-[#64748B] group-hover:text-[#334155] block whitespace-nowrap truncate font-sans">
                               {agent.name}
                             </span>
                           </div>
                         </div>
 
                         {/* Throughput */}
-                        <div className="w-24 text-right font-mono text-xs text-zinc-500 group-hover:text-zinc-400">
+                        <div className="w-24 text-right font-mono text-xs text-[#94A3B8]">
                           0.0 <span className="text-[10px]">TPS</span>
                         </div>
 
                         {/* Rate Indicator / Status */}
                         <div className="w-20 text-right font-mono text-xs">
                           {isRevoked ? (
-                            <span className="font-semibold text-rose-500 group-hover:text-rose-400">REV</span>
+                            <span className="font-bold text-rose-600">REV</span>
                           ) : (
-                            <span className="text-zinc-500 group-hover:text-zinc-400">-2.4%</span>
+                            <span className="text-[#94A3B8]">-2.4%</span>
                           )}
                         </div>
                       </div>
@@ -1599,54 +1599,54 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
 
             {/* Bottom Panel: Quick Summary Card of Selected Active Agent */}
             {selectedAgent && (
-              <div className="rounded-2xl border border-zinc-800/80 bg-zinc-950 p-5 shadow-xs space-y-4 font-sans text-zinc-200">
+              <div className="rounded-[16px] border border-[rgba(255,255,255,0.9)] bg-white/80 backdrop-blur-[20px] p-5 shadow-[0_20px_50px_-12px_rgba(15,23,42,0.08),0_0_0_1px_rgba(15,23,42,0.06)] space-y-4 font-sans text-[#0F172A]">
                 <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400 font-sans">
+                  <span className="text-[11px] font-semibold uppercase tracking-wider text-[#64748B] font-sans">
                     Agent Summary
                   </span>
-                  <span className="text-xs text-blue-400 font-semibold font-sans">
+                  <span className="text-xs text-[#2563EB] font-bold font-mono px-2.5 py-0.5 rounded-full bg-blue-50 border border-blue-200">
                     {selectedAgent.framework || "FastMCP"}
                   </span>
                 </div>
 
                 <div className="space-y-2.5 text-xs font-sans">
-                  <div className="flex items-center justify-between py-1 border-b border-zinc-800/60">
-                    <span className="text-zinc-400 font-sans">Latency:</span>
-                    <span className="font-mono font-medium text-xs text-zinc-200">
+                  <div className="flex items-center justify-between py-1.5 border-b border-[#E2E8F0]">
+                    <span className="text-[#64748B] font-sans">Latency:</span>
+                    <span className="font-mono font-bold text-xs text-[#0F172A]">
                       {isTelemetryLive && selectedAgent.ping_latency_ms
                         ? `${selectedAgent.ping_latency_ms}ms`
                         : "—"}
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-between py-1 border-b border-zinc-800/60">
-                    <span className="text-zinc-400 font-sans">Settled Vol:</span>
-                    <span className="font-mono font-medium text-xs text-zinc-200">
+                  <div className="flex items-center justify-between py-1.5 border-b border-[#E2E8F0]">
+                    <span className="text-[#64748B] font-sans">Settled Vol:</span>
+                    <span className="font-mono font-bold text-xs text-[#0F172A]">
                       ₹{metrics.totalVolumeINR.toLocaleString("en-IN", { maximumFractionDigits: 0 })}
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-between py-1 border-b border-zinc-800/60">
-                    <span className="text-zinc-400 font-sans">Uptime State:</span>
-                    <span className="font-sans font-medium text-xs text-zinc-200">
+                  <div className="flex items-center justify-between py-1.5 border-b border-[#E2E8F0]">
+                    <span className="text-[#64748B] font-sans">Uptime State:</span>
+                    <span className="font-sans font-semibold text-xs text-[#0F172A]">
                       {isTelemetryLive ? "Connected (Live)" : "Standby / Dormant"}
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-between py-1">
-                    <span className="text-zinc-400 font-sans">Webhook:</span>
-                    <span className="font-sans font-medium text-xs text-zinc-200 truncate max-w-[120px]">
+                  <div className="flex items-center justify-between py-1.5">
+                    <span className="text-[#64748B] font-sans">Webhook:</span>
+                    <span className="font-sans font-medium text-xs text-[#0F172A] truncate max-w-[140px]">
                       {selectedAgent.webhook_url ? "Configured" : "None"}
                     </span>
                   </div>
                 </div>
 
                 {/* Agent Actions: Modernized Ping Button */}
-                <div className="pt-2 border-t border-zinc-800/60 flex items-center justify-between gap-2 font-sans">
+                <div className="pt-2 border-t border-[#E2E8F0] flex items-center justify-between gap-2 font-sans">
                   <button
                     onClick={() => handleSimulateHeartbeat(selectedAgent.id)}
                     disabled={isPinging}
-                    className="flex-1 font-medium text-sm text-blue-400 bg-blue-950/60 hover:bg-blue-900/60 py-2.5 rounded-xl border border-blue-800/60 transition-colors text-center cursor-pointer disabled:opacity-60 font-sans shadow-2xs"
+                    className="flex-1 font-semibold text-sm text-white bg-[#2563EB] hover:bg-[#1D4ED8] py-2.5 rounded-[10px] shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] transition-colors text-center cursor-pointer disabled:opacity-60 font-sans"
                     title="Send Heartbeat"
                   >
                     {isPinging ? "Pinging..." : "Ping"}
@@ -1655,7 +1655,7 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
                   {(selectedAgent.status || "").toUpperCase() !== "REVOKED" && (
                     <button
                       onClick={() => handleRevokeAgent(selectedAgent.id)}
-                      className="py-2.5 px-3 rounded-xl border border-zinc-800 bg-zinc-900 hover:bg-rose-950/40 hover:text-rose-400 hover:border-rose-900/60 text-zinc-300 text-xs font-medium font-sans transition cursor-pointer"
+                      className="py-2.5 px-3 rounded-[10px] border border-[#CBD5E1] bg-white hover:bg-rose-50 hover:text-rose-600 hover:border-rose-300 text-[#475569] text-xs font-medium font-sans transition cursor-pointer shadow-2xs"
                       title="Revoke Credentials"
                     >
                       Revoke
@@ -1664,7 +1664,7 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
 
                   <button
                     onClick={() => handleDeleteAgent(selectedAgent.id, selectedAgent.name)}
-                    className="p-2.5 rounded-xl border border-rose-900/50 bg-rose-950/40 hover:bg-rose-900/60 text-rose-400 transition cursor-pointer"
+                    className="p-2.5 rounded-[10px] border border-rose-200 bg-rose-50 hover:bg-rose-100 text-rose-600 transition cursor-pointer shadow-2xs"
                     title="Delete Agent Row"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -1717,22 +1717,22 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
 
       {/* MODAL 3: Custody Deposit Modal */}
       {isDepositModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
-          <div className="w-full max-w-md rounded-3xl border border-[#EAE3D2] bg-white p-7 shadow-2xl space-y-5 font-sans">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-md animate-in fade-in">
+          <div className="w-full max-w-md rounded-[20px] border border-[rgba(255,255,255,0.9)] bg-white/95 backdrop-blur-xl p-7 shadow-2xl space-y-5 font-sans">
             <div>
-              <h3 className="text-lg font-bold text-[#1C1A17]">Deposit Custody Funds</h3>
-              <p className="text-xs text-[#6E675D]">
+              <h3 className="text-lg font-bold text-[#0F172A]">Deposit Custody Funds</h3>
+              <p className="text-xs text-[#64748B] mt-1">
                 Add balance to your tenant vault to power autonomous agent escrows.
               </p>
             </div>
 
             <form onSubmit={handleSimulateDeposit} className="space-y-4">
               <div>
-                <label className="block text-xs font-mono font-bold text-[#4A453E] mb-1.5 uppercase">
+                <label className="block text-xs font-mono font-bold text-[#334155] mb-1.5 uppercase">
                   Deposit Amount (INR)
                 </label>
                 <div className="relative">
-                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-bold text-[#8C8275]">
+                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-bold text-[#64748B]">
                     ₹
                   </span>
                   <input
@@ -1742,10 +1742,10 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
                     required
                     value={depositAmount}
                     onChange={(e) => setDepositAmount(e.target.value)}
-                    className="w-full pl-8 pr-4 py-2.5 rounded-xl bg-[#FAF8F5] border border-[#EAE3D2] focus:border-blue-500 focus:outline-none font-mono text-sm font-bold text-[#1C1A17]"
+                    className="w-full pl-8 pr-4 py-2.5 rounded-[10px] bg-slate-50 border border-[#CBD5E1] focus:border-[#2563EB] focus:bg-white focus:outline-none font-mono text-sm font-bold text-[#0F172A]"
                   />
                 </div>
-                <p className="text-[11px] font-mono text-[#8C8275] mt-1.5">
+                <p className="text-[11px] font-mono text-[#64748B] mt-1.5">
                   Equivalent: ${((parseFloat(depositAmount) || 0) / 84).toFixed(2)} USD (@ ₹84/$)
                 </p>
               </div>
@@ -1754,14 +1754,14 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
                 <button
                   type="button"
                   onClick={() => setIsDepositModalOpen(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-semibold text-[#6E675D] hover:text-[#1C1A17] transition cursor-pointer"
+                  className="px-4 py-2 rounded-[10px] text-xs font-semibold text-[#64748B] hover:text-[#0F172A] transition cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isDepositing}
-                  className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold transition cursor-pointer disabled:opacity-60"
+                  className="px-5 py-2.5 rounded-[10px] bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-semibold transition cursor-pointer disabled:opacity-60 shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]"
                 >
                   {isDepositing ? "Processing..." : "Confirm Deposit"}
                 </button>
@@ -1773,27 +1773,27 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
 
       {/* MODAL 4: Quick Re-Key One-Time Token Modal */}
       {isKeyModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
-          <div className="w-full max-w-lg rounded-3xl border border-[#EAE3D2] bg-white p-7 shadow-2xl space-y-5 font-sans">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-md animate-in fade-in">
+          <div className="w-full max-w-lg rounded-[20px] border border-[rgba(255,255,255,0.9)] bg-white/95 backdrop-blur-xl p-7 shadow-2xl space-y-5 font-sans">
             <div>
-              <span className="inline-flex p-2 rounded-xl bg-blue-50 text-blue-600 mb-2">
+              <span className="inline-flex p-2 rounded-[10px] bg-blue-50 text-[#2563EB] mb-2 border border-blue-200 shadow-2xs">
                 <Key className="w-5 h-5" />
               </span>
-              <h3 className="text-lg font-bold text-[#1C1A17]">FastMCP Scoped Key Generated</h3>
-              <p className="text-xs text-[#6E675D]">
+              <h3 className="text-lg font-bold text-[#0F172A]">FastMCP Scoped Key Generated</h3>
+              <p className="text-xs text-[#64748B] mt-1">
                 This raw secret key is only displayed once. Please store it securely.
               </p>
             </div>
 
             <div className="space-y-2">
-              <label className="text-[11px] font-mono uppercase font-bold text-[#4A453E]">
+              <label className="text-[11px] font-mono uppercase font-bold text-[#334155]">
                 Raw API Secret Key
               </label>
-              <div className="flex items-center justify-between p-3 rounded-xl bg-zinc-950 border border-zinc-800 text-emerald-400 font-mono text-xs">
+              <div className="flex items-center justify-between p-3 rounded-[10px] bg-slate-900 border border-slate-800 text-emerald-400 font-mono text-xs">
                 <span className="truncate mr-2">{generatedKey}</span>
                 <button
                   onClick={() => copyToClipboard(generatedKey)}
-                  className="shrink-0 p-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-white transition cursor-pointer"
+                  className="shrink-0 p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-white transition cursor-pointer"
                   title="Copy Key"
                 >
                   {copiedKey ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
@@ -1804,7 +1804,7 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
             <div className="pt-2 flex justify-end">
               <button
                 onClick={() => setIsKeyModalOpen(false)}
-                className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold tracking-wide transition cursor-pointer"
+                className="px-5 py-2.5 rounded-[10px] bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-semibold tracking-wide transition cursor-pointer shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]"
               >
                 I Have Saved My Secret Key
               </button>

@@ -259,24 +259,24 @@ export function RegisterAgentModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/70 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="relative w-full max-w-xl bg-white rounded-3xl border border-[#EAE3D2] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[92vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-900/40 backdrop-blur-md animate-in fade-in duration-200">
+      <div className="relative w-full max-w-xl bg-white/95 backdrop-blur-xl rounded-[24px] border border-[rgba(255,255,255,0.9)] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[92vh]">
         {/* Modal Top Header Bar */}
-        <div className="flex items-center justify-between px-6 py-4.5 border-b border-[#F0E9DC] bg-[#FAF8F5]/80">
+        <div className="flex items-center justify-between px-6 py-4.5 border-b border-[#E2E8F0] bg-slate-50/70">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600 shadow-xs">
+            <div className="w-10 h-10 rounded-[12px] bg-blue-50 border border-blue-200 flex items-center justify-center text-[#2563EB] shadow-2xs">
               <Bot className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="text-base sm:text-lg font-bold text-[#1C1A17] tracking-tight">
+                <h3 className="text-base sm:text-lg font-bold text-[#0F172A] tracking-tight">
                   AI Agent Registration Flow
                 </h3>
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 font-semibold border border-blue-200">
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-blue-50 text-[#2563EB] font-semibold border border-blue-200">
                   Step {currentStep} of 4
                 </span>
               </div>
-              <p className="text-xs text-[#8C8275]">
+              <p className="text-xs text-[#64748B] mt-0.5">
                 {currentStep === 1 && "Step 1: Identity & Protocol Parameters"}
                 {currentStep === 2 && "Step 2: ID Allocation & Email Authorization"}
                 {currentStep === 3 && "Step 3: Protocol Escrow Legal Consents"}
@@ -287,7 +287,7 @@ export function RegisterAgentModal({
 
           <button
             onClick={handleResetAndClose}
-            className="p-2 rounded-xl text-[#8C8275] hover:text-[#1C1A17] hover:bg-neutral-100 transition cursor-pointer"
+            className="p-2 rounded-[10px] text-[#64748B] hover:text-[#0F172A] hover:bg-slate-100 transition cursor-pointer"
             title="Close"
           >
             <X className="w-5 h-5" />
@@ -295,7 +295,7 @@ export function RegisterAgentModal({
         </div>
 
         {/* Step Progress Tracker */}
-        <div className="grid grid-cols-4 px-6 pt-3 pb-2 border-b border-[#F0E9DC] gap-2 bg-[#FCFAF7]">
+        <div className="grid grid-cols-4 px-6 pt-3 pb-2 border-b border-[#E2E8F0] gap-2 bg-slate-50/40">
           {[
             { num: 1, label: "Identity" },
             { num: 2, label: "Security & OTP" },
@@ -306,13 +306,13 @@ export function RegisterAgentModal({
               <div
                 className={`h-1.5 rounded-full transition-all ${
                   currentStep >= s.num
-                    ? "bg-blue-600"
-                    : "bg-neutral-200"
+                    ? "bg-[#2563EB]"
+                    : "bg-slate-200"
                 }`}
               />
               <span
                 className={`text-[10px] font-mono font-medium truncate ${
-                  currentStep >= s.num ? "text-blue-700 font-semibold" : "text-[#8C8275]"
+                  currentStep >= s.num ? "text-[#2563EB] font-bold" : "text-[#64748B]"
                 }`}
               >
                 {s.label}
@@ -324,7 +324,7 @@ export function RegisterAgentModal({
         {/* Modal Scrollable Body */}
         <div className="p-6 overflow-y-auto space-y-5">
           {errorMessage && (
-            <div className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-medium flex items-center gap-2.5 animate-in fade-in">
+            <div className="p-3.5 rounded-[12px] bg-rose-50 border border-rose-200 text-rose-800 text-xs font-medium flex items-center gap-2.5 animate-in fade-in">
               <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
               <span>{errorMessage}</span>
             </div>
@@ -336,8 +336,8 @@ export function RegisterAgentModal({
           {currentStep === 1 && (
             <form onSubmit={handleStep1Next} className="space-y-4">
               {/* Avatar Upload */}
-              <div className="flex items-center gap-4 p-4 rounded-2xl bg-[#FAF8F5] border border-[#EAE3D2]">
-                <div className="relative w-16 h-16 rounded-2xl border-2 border-dashed border-[#D6CDBC] bg-white flex items-center justify-center overflow-hidden shrink-0 group">
+              <div className="flex items-center gap-4 p-4 rounded-[14px] bg-slate-50 border border-[#E2E8F0]">
+                <div className="relative w-16 h-16 rounded-[12px] border-2 border-dashed border-[#CBD5E1] bg-white flex items-center justify-center overflow-hidden shrink-0 group shadow-2xs">
                   {avatarUrl ? (
                     <img
                       src={avatarUrl}
@@ -345,7 +345,7 @@ export function RegisterAgentModal({
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <Bot className="w-8 h-8 text-[#8C8275]" />
+                    <Bot className="w-8 h-8 text-[#94A3B8]" />
                   )}
                   <button
                     type="button"
@@ -359,7 +359,7 @@ export function RegisterAgentModal({
 
                 <div className="space-y-1 flex-1 min-w-0">
                   <div className="flex items-center justify-between">
-                    <label className="text-xs font-mono font-bold uppercase text-[#4A453E]">
+                    <label className="text-xs font-mono font-bold uppercase text-[#334155]">
                       Agent Avatar / Badge
                     </label>
                     {avatarUrl && (
@@ -372,7 +372,7 @@ export function RegisterAgentModal({
                       </button>
                     )}
                   </div>
-                  <p className="text-[11px] text-[#8C8275]">
+                  <p className="text-[11px] text-[#64748B]">
                     Upload a custom node badge (PNG/JPG, max 2MB) or keep default.
                   </p>
                   <input
@@ -385,9 +385,9 @@ export function RegisterAgentModal({
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#D6CDBC] bg-white hover:bg-neutral-50 text-xs font-semibold text-[#1C1A17] transition cursor-pointer"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[10px] border border-[#CBD5E1] bg-white hover:bg-slate-50 text-xs font-semibold text-[#0F172A] transition cursor-pointer shadow-2xs"
                   >
-                    <Upload className="w-3.5 h-3.5 text-blue-600" />
+                    <Upload className="w-3.5 h-3.5 text-[#2563EB]" />
                     <span>{avatarUrl ? "Replace Avatar" : "Choose Image"}</span>
                   </button>
                 </div>
@@ -395,7 +395,7 @@ export function RegisterAgentModal({
 
               {/* Agent Identifier */}
               <div className="space-y-1.5">
-                <label className="block text-xs font-mono font-bold uppercase tracking-wider text-[#4A453E]">
+                <label className="block text-xs font-mono font-bold uppercase tracking-wider text-[#334155]">
                   Agent Name / Handle <span className="text-rose-500">*</span>
                 </label>
                 <input
@@ -404,20 +404,20 @@ export function RegisterAgentModal({
                   placeholder="e.g. Swarm-Alpha-Trader"
                   value={agentName}
                   onChange={(e) => setAgentName(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-2xl bg-[#FAF8F5] border border-[#EAE3D2] focus:border-blue-500 focus:bg-white focus:outline-none text-sm font-semibold text-[#1C1A17] transition"
+                  className="w-full min-h-[46px] px-4 py-2.5 rounded-[12px] bg-slate-50 border border-[#CBD5E1] focus:border-[#2563EB] focus:bg-white focus:outline-none text-sm font-semibold text-[#0F172A] transition shadow-2xs"
                 />
               </div>
 
               {/* Protocol selector */}
               <div className="space-y-1.5">
-                <label className="block text-xs font-mono font-bold uppercase tracking-wider text-[#4A453E]">
+                <label className="block text-xs font-mono font-bold uppercase tracking-wider text-[#334155]">
                   Protocol / Framework Architecture <span className="text-rose-500">*</span>
                 </label>
                 <div className="relative">
                   <select
                     value={framework}
                     onChange={(e) => setFramework(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-2xl bg-[#FAF8F5] border border-[#EAE3D2] focus:border-blue-500 focus:bg-white focus:outline-none text-sm font-semibold text-[#1C1A17] transition appearance-none cursor-pointer"
+                    className="w-full min-h-[46px] px-4 py-2.5 rounded-[12px] bg-slate-50 border border-[#CBD5E1] focus:border-[#2563EB] focus:bg-white focus:outline-none text-sm font-semibold text-[#0F172A] transition appearance-none cursor-pointer shadow-2xs"
                   >
                     {FRAMEWORK_OPTIONS.map((opt) => (
                       <option key={opt.value} value={opt.value}>
@@ -425,7 +425,7 @@ export function RegisterAgentModal({
                       </option>
                     ))}
                   </select>
-                  <div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[#8C8275]">
+                  <div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[#64748B]">
                     ▾
                   </div>
                 </div>
@@ -433,11 +433,11 @@ export function RegisterAgentModal({
 
               {/* Spending Cap */}
               <div className="space-y-1.5">
-                <label className="block text-xs font-mono font-bold uppercase tracking-wider text-[#4A453E]">
+                <label className="block text-xs font-mono font-bold uppercase tracking-wider text-[#334155]">
                   Spending Limit / Escrow Lock Cap (INR) <span className="text-rose-500">*</span>
                 </label>
                 <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 font-mono font-bold text-[#8C8275]">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 font-mono font-bold text-[#64748B]">
                     ₹
                   </span>
                   <input
@@ -448,7 +448,7 @@ export function RegisterAgentModal({
                     placeholder="50000"
                     value={spendingLimit}
                     onChange={(e) => setSpendingLimit(e.target.value)}
-                    className="w-full pl-8 pr-4 py-2.5 rounded-2xl bg-[#FAF8F5] border border-[#EAE3D2] focus:border-blue-500 focus:bg-white focus:outline-none text-sm font-mono font-bold text-[#1C1A17] transition"
+                    className="w-full min-h-[46px] pl-8 pr-4 py-2.5 rounded-[12px] bg-slate-50 border border-[#CBD5E1] focus:border-[#2563EB] focus:bg-white focus:outline-none text-sm font-mono font-bold text-[#0F172A] transition shadow-2xs"
                   />
                 </div>
               </div>
@@ -456,31 +456,31 @@ export function RegisterAgentModal({
               {/* Webhook Callback URL */}
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <label className="block text-xs font-mono font-bold uppercase tracking-wider text-[#4A453E]">
+                  <label className="block text-xs font-mono font-bold uppercase tracking-wider text-[#334155]">
                     Webhook Callback Endpoint
                   </label>
-                  <span className="text-[10px] font-mono text-[#8C8275]">Optional</span>
+                  <span className="text-[10px] font-mono text-[#64748B]">Optional</span>
                 </div>
                 <input
                   type="url"
                   placeholder="https://api.yourdomain.com/v1/agent-webhook"
                   value={webhookUrl}
                   onChange={(e) => setWebhookUrl(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-2xl bg-[#FAF8F5] border border-[#EAE3D2] focus:border-blue-500 focus:bg-white focus:outline-none text-sm font-mono text-[#1C1A17] placeholder:text-[#A8A196] transition"
+                  className="w-full min-h-[46px] px-4 py-2.5 rounded-[12px] bg-slate-50 border border-[#CBD5E1] focus:border-[#2563EB] focus:bg-white focus:outline-none text-sm font-mono text-[#0F172A] placeholder:text-slate-400 transition shadow-2xs"
                 />
               </div>
 
-              <div className="pt-3 border-t border-[#F0E9DC] flex items-center justify-between">
+              <div className="pt-3 border-t border-[#E2E8F0] flex items-center justify-between">
                 <button
                   type="button"
                   onClick={handleResetAndClose}
-                  className="px-4 py-2 text-xs font-semibold text-[#8C8275] hover:text-[#1C1A17] transition cursor-pointer"
+                  className="px-4 py-2 text-xs font-semibold text-[#64748B] hover:text-[#0F172A] transition cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2.5 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs sm:text-sm tracking-wide shadow-md shadow-blue-500/20 transition flex items-center gap-2 cursor-pointer"
+                  className="px-6 py-2.5 rounded-[12px] bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-bold text-xs sm:text-sm tracking-wide shadow-md shadow-blue-500/20 transition flex items-center gap-2 cursor-pointer shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]"
                 >
                   <span>Continue to Security</span>
                   <ArrowRight className="w-4 h-4" />
@@ -495,9 +495,9 @@ export function RegisterAgentModal({
           {currentStep === 2 && (
             <form onSubmit={handleStep2Next} className="space-y-4">
               {/* Generated Globally Unique Agent ID */}
-              <div className="p-4 rounded-2xl bg-[#FAF8F5] border border-[#EAE3D2] space-y-1.5">
+              <div className="p-4 rounded-[14px] bg-slate-50 border border-[#E2E8F0] space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <label className="text-[11px] font-mono uppercase tracking-wider text-[#6E675D] font-bold">
+                  <label className="text-[11px] font-mono uppercase tracking-wider text-[#334155] font-bold">
                     Allocated Unique Agent ID
                   </label>
                   <button
@@ -507,58 +507,58 @@ export function RegisterAgentModal({
                         if (r.success) setAgentIdCode(r.agentIdCode);
                       });
                     }}
-                    className="text-[11px] font-mono text-blue-600 hover:underline flex items-center gap-1 cursor-pointer"
+                    className="text-[11px] font-mono text-[#2563EB] hover:underline flex items-center gap-1 cursor-pointer"
                   >
                     <RefreshCw className="w-3 h-3" />
                     <span>Regenerate</span>
                   </button>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="font-mono text-base font-black text-[#1C1A17] bg-white px-3 py-1.5 rounded-xl border border-[#D6CDBC]">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="font-mono text-base font-bold text-[#0F172A] bg-white px-3.5 py-2 rounded-[10px] border border-[#CBD5E1] shadow-2xs">
                     {agentIdCode || "Generating..."}
                   </span>
-                  <span className="text-[11px] text-emerald-700 bg-emerald-50 px-2 py-1 rounded-lg border border-emerald-200 font-mono">
+                  <span className="text-[11px] text-emerald-700 bg-emerald-50 px-2.5 py-1.5 rounded-[8px] border border-emerald-200 font-mono font-medium">
                     ✓ Non-Colliding Tenant Unique
                   </span>
                 </div>
-                <p className="text-[11px] text-[#8C8275]">
+                <p className="text-[11px] text-[#64748B]">
                   Globally reserved identifier for cross-agent consensus and telemetry routing.
                 </p>
               </div>
 
               {/* Agent Security Passphrase */}
               <div className="space-y-1.5">
-                <label className="block text-xs font-mono font-bold uppercase tracking-wider text-[#4A453E]">
+                <label className="block text-xs font-mono font-bold uppercase tracking-wider text-[#334155]">
                   Agent Security Passphrase / Secret Password <span className="text-rose-500">*</span>
                 </label>
                 <div className="relative">
-                  <Lock className="w-4 h-4 text-[#8C8275] absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <Lock className="w-4 h-4 text-[#64748B] absolute left-3.5 top-1/2 -translate-y-1/2" />
                   <input
                     type="password"
                     required
                     placeholder="Enter agent security passphrase (min 6 characters)"
                     value={passphrase}
                     onChange={(e) => setPassphrase(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-[#FAF8F5] border border-[#EAE3D2] focus:border-blue-500 focus:bg-white focus:outline-none text-sm font-semibold text-[#1C1A17] transition"
+                    className="w-full min-h-[46px] pl-10 pr-4 py-2.5 rounded-[12px] bg-slate-50 border border-[#CBD5E1] focus:border-[#2563EB] focus:bg-white focus:outline-none text-sm font-semibold text-[#0F172A] transition shadow-2xs"
                   />
                 </div>
-                <p className="text-[11px] text-[#8C8275]">
+                <p className="text-[11px] text-[#64748B]">
                   Required for programmatic key rotations and autonomous contract sign-off.
                 </p>
               </div>
 
               {/* Email Security Verification Code */}
-              <div className="space-y-2 p-4 rounded-2xl bg-blue-50/50 border border-blue-200/80">
+              <div className="space-y-2 p-4 rounded-[14px] bg-blue-50/60 border border-blue-200/80">
                 <div className="flex items-center justify-between">
                   <label className="text-xs font-mono font-bold uppercase tracking-wider text-blue-950 flex items-center gap-1.5">
-                    <Mail className="w-4 h-4 text-blue-600" />
+                    <Mail className="w-4 h-4 text-[#2563EB]" />
                     <span>Email Security Authorization Code</span>
                   </label>
                   <button
                     type="button"
                     onClick={handleSendOtp}
                     disabled={isSendingOtp}
-                    className="text-xs font-mono text-blue-700 hover:underline font-semibold cursor-pointer disabled:opacity-60"
+                    className="text-xs font-mono text-[#2563EB] hover:underline font-semibold cursor-pointer disabled:opacity-60"
                   >
                     {isSendingOtp ? "Dispatching..." : "Resend Code"}
                   </button>
@@ -569,7 +569,7 @@ export function RegisterAgentModal({
                 </p>
 
                 {devOtpHint && (
-                  <div className="px-3 py-1.5 rounded-xl bg-blue-100/80 border border-blue-300 text-blue-900 text-xs font-mono flex items-center justify-between">
+                  <div className="px-3 py-1.5 rounded-[8px] bg-blue-100/90 border border-blue-300 text-blue-900 text-xs font-mono flex items-center justify-between">
                     <span>Developer Verification Code:</span>
                     <strong className="tracking-widest font-bold">{devOtpHint}</strong>
                   </div>
@@ -583,23 +583,23 @@ export function RegisterAgentModal({
                     placeholder="6-digit code (e.g. 888888)"
                     value={otpCode}
                     onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ""))}
-                    className="w-full px-4 py-2.5 rounded-2xl bg-white border border-blue-300 focus:border-blue-600 focus:outline-none text-center font-mono font-bold text-lg tracking-widest text-[#1C1A17]"
+                    className="w-full min-h-[48px] px-4 py-2.5 rounded-[12px] bg-white border border-blue-300 focus:border-[#2563EB] focus:ring-2 focus:ring-blue-500/20 focus:outline-none text-center font-mono font-bold text-lg tracking-widest text-[#0F172A] shadow-2xs"
                   />
                 </div>
               </div>
 
-              <div className="pt-3 border-t border-[#F0E9DC] flex items-center justify-between">
+              <div className="pt-3 border-t border-[#E2E8F0] flex items-center justify-between">
                 <button
                   type="button"
                   onClick={() => setCurrentStep(1)}
-                  className="px-4 py-2 text-xs font-semibold text-[#8C8275] hover:text-[#1C1A17] transition flex items-center gap-1 cursor-pointer"
+                  className="px-4 py-2 text-xs font-semibold text-[#64748B] hover:text-[#0F172A] transition flex items-center gap-1 cursor-pointer"
                 >
                   <ArrowLeft className="w-4 h-4" />
                   <span>Back</span>
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2.5 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs sm:text-sm tracking-wide shadow-md shadow-blue-500/20 transition flex items-center gap-2 cursor-pointer"
+                  className="px-6 py-2.5 rounded-[12px] bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-bold text-xs sm:text-sm tracking-wide shadow-md shadow-blue-500/20 transition flex items-center gap-2 cursor-pointer shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]"
                 >
                   <span>Continue to Consents</span>
                   <ArrowRight className="w-4 h-4" />
@@ -613,7 +613,7 @@ export function RegisterAgentModal({
           {/* ========================================================================= */}
           {currentStep === 3 && (
             <form onSubmit={handleStep3Submit} className="space-y-4">
-              <div className="p-4 rounded-2xl bg-amber-50/70 border border-amber-200 text-amber-900 text-xs space-y-1">
+              <div className="p-4 rounded-[14px] bg-amber-50/70 border border-amber-200 text-amber-900 text-xs space-y-1">
                 <div className="flex items-center gap-2 font-bold text-amber-950">
                   <ShieldCheck className="w-4 h-4 text-amber-600" />
                   <span>Statutory Node Settlement Compliance</span>
@@ -624,48 +624,48 @@ export function RegisterAgentModal({
               </div>
 
               {/* Checkbox 1 */}
-              <label className="flex items-start gap-3 p-4 rounded-2xl bg-[#FAF8F5] border border-[#EAE3D2] hover:border-blue-400 transition cursor-pointer">
+              <label className="flex items-start gap-3 p-4 rounded-[14px] bg-slate-50 border border-[#E2E8F0] hover:border-blue-400 transition cursor-pointer">
                 <input
                   type="checkbox"
                   required
                   checked={consentTerms}
                   onChange={(e) => setConsentTerms(e.target.checked)}
-                  className="mt-0.5 w-4 h-4 text-blue-600 rounded border-[#D6CDBC] focus:ring-blue-500 cursor-pointer"
+                  className="mt-0.5 w-4 h-4 text-[#2563EB] rounded border-[#CBD5E1] focus:ring-blue-500 cursor-pointer"
                 />
                 <div className="text-xs space-y-0.5">
-                  <span className="font-bold text-[#1C1A17] block">
+                  <span className="font-bold text-[#0F172A] block">
                     Protocol Settlement Terms &amp; Spending Cap Verification
                   </span>
-                  <p className="text-[#6E675D] text-[11px] leading-relaxed">
+                  <p className="text-[#64748B] text-[11px] leading-relaxed">
                     I agree to the Verisett Protocol Settlement Terms and verify that this agent has authorized spending limits for automated escrow clearing.
                   </p>
                 </div>
               </label>
 
               {/* Checkbox 2 */}
-              <label className="flex items-start gap-3 p-4 rounded-2xl bg-[#FAF8F5] border border-[#EAE3D2] hover:border-blue-400 transition cursor-pointer">
+              <label className="flex items-start gap-3 p-4 rounded-[14px] bg-slate-50 border border-[#E2E8F0] hover:border-blue-400 transition cursor-pointer">
                 <input
                   type="checkbox"
                   required
                   checked={consentPrivacy}
                   onChange={(e) => setConsentPrivacy(e.target.checked)}
-                  className="mt-0.5 w-4 h-4 text-blue-600 rounded border-[#D6CDBC] focus:ring-blue-500 cursor-pointer"
+                  className="mt-0.5 w-4 h-4 text-[#2563EB] rounded border-[#CBD5E1] focus:ring-blue-500 cursor-pointer"
                 />
                 <div className="text-xs space-y-0.5">
-                  <span className="font-bold text-[#1C1A17] block">
+                  <span className="font-bold text-[#0F172A] block">
                     Telemetry Privacy &amp; Autonomous Processing Agreement
                   </span>
-                  <p className="text-[#6E675D] text-[11px] leading-relaxed">
+                  <p className="text-[#64748B] text-[11px] leading-relaxed">
                     I accept the Data Processing &amp; Autonomous Agent Telemetry Privacy Policy for multi-tenant node operations.
                   </p>
                 </div>
               </label>
 
-              <div className="pt-3 border-t border-[#F0E9DC] flex items-center justify-between">
+              <div className="pt-3 border-t border-[#E2E8F0] flex items-center justify-between">
                 <button
                   type="button"
                   onClick={() => setCurrentStep(2)}
-                  className="px-4 py-2 text-xs font-semibold text-[#8C8275] hover:text-[#1C1A17] transition flex items-center gap-1 cursor-pointer"
+                  className="px-4 py-2 text-xs font-semibold text-[#64748B] hover:text-[#0F172A] transition flex items-center gap-1 cursor-pointer"
                 >
                   <ArrowLeft className="w-4 h-4" />
                   <span>Back</span>
@@ -673,7 +673,7 @@ export function RegisterAgentModal({
                 <button
                   type="submit"
                   disabled={isSubmitting || !consentTerms || !consentPrivacy}
-                  className="px-7 py-3 rounded-2xl bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white font-bold text-xs sm:text-sm tracking-wide shadow-md shadow-blue-500/20 transition flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                  className="px-7 py-3 rounded-[12px] bg-[#2563EB] hover:bg-[#1D4ED8] active:bg-blue-800 text-white font-bold text-xs sm:text-sm tracking-wide shadow-md shadow-blue-500/20 transition flex items-center gap-2 cursor-pointer disabled:opacity-50 shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]"
                 >
                   {isSubmitting ? (
                     <>
@@ -697,7 +697,7 @@ export function RegisterAgentModal({
           {currentStep === 4 && generatedApiKey && (
             <div className="space-y-5 animate-in fade-in">
               {/* Security Warning Alert */}
-              <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 flex items-start gap-3">
+              <div className="p-4 rounded-[14px] bg-amber-50 border border-amber-200 text-amber-900 flex items-start gap-3">
                 <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
                 <div className="text-xs space-y-1">
                   <p className="font-bold text-amber-950">
@@ -711,17 +711,17 @@ export function RegisterAgentModal({
 
               {/* Generated API Key Card */}
               <div className="space-y-1.5">
-                <label className="text-[11px] font-mono uppercase tracking-wider text-[#6E675D] font-bold block">
+                <label className="text-[11px] font-mono uppercase tracking-wider text-[#334155] font-bold block">
                   Agent Authentication Key
                 </label>
-                <div className="p-3.5 rounded-2xl bg-zinc-950 border border-zinc-800 flex items-center justify-between gap-3 shadow-inner">
-                  <span className="font-mono text-xs sm:text-sm text-emerald-400 select-all truncate">
+                <div className="p-3.5 rounded-[12px] bg-slate-900 border border-slate-800 flex flex-wrap sm:flex-nowrap items-center justify-between gap-3 shadow-inner">
+                  <span className="font-mono text-xs sm:text-sm text-emerald-400 select-all break-all">
                     {generatedApiKey}
                   </span>
                   <button
                     type="button"
                     onClick={handleCopyKey}
-                    className="shrink-0 px-3 py-1.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white font-mono text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer"
+                    className="shrink-0 px-3.5 py-2 rounded-[8px] bg-slate-800 hover:bg-slate-700 text-white font-mono text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer"
                   >
                     {copiedKey ? (
                       <>
@@ -730,7 +730,7 @@ export function RegisterAgentModal({
                       </>
                     ) : (
                       <>
-                        <Copy className="w-3.5 h-3.5 text-zinc-300" />
+                        <Copy className="w-3.5 h-3.5 text-slate-300" />
                         <span>Copy Key</span>
                       </>
                     )}
@@ -740,32 +740,32 @@ export function RegisterAgentModal({
 
               {/* Provisioned Node Summary */}
               {registeredAgent && (
-                <div className="p-4 rounded-2xl bg-[#FAF8F5] border border-[#EAE3D2] space-y-2 text-xs">
-                  <p className="text-[11px] font-mono uppercase tracking-wider text-[#8C8275] font-bold">
+                <div className="p-4 rounded-[14px] bg-slate-50 border border-[#E2E8F0] space-y-2 text-xs">
+                  <p className="text-[11px] font-mono uppercase tracking-wider text-[#64748B] font-bold">
                     Registered Node Specification
                   </p>
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <span className="text-[#8C8275] block text-[11px]">Identifier</span>
-                      <span className="font-bold text-[#1C1A17] font-mono">
+                      <span className="text-[#64748B] block text-[11px]">Identifier</span>
+                      <span className="font-bold text-[#0F172A] font-mono">
                         {registeredAgent.agentIdCode} ({registeredAgent.agentName})
                       </span>
                     </div>
                     <div>
-                      <span className="text-[#8C8275] block text-[11px]">Protocol</span>
-                      <span className="font-semibold text-blue-700 font-mono">
+                      <span className="text-[#64748B] block text-[11px]">Protocol</span>
+                      <span className="font-semibold text-[#2563EB] font-mono">
                         {registeredAgent.framework}
                       </span>
                     </div>
                     <div>
-                      <span className="text-[#8C8275] block text-[11px]">Spending Cap</span>
-                      <span className="font-bold text-[#1C1A17] font-mono">
+                      <span className="text-[#64748B] block text-[11px]">Spending Cap</span>
+                      <span className="font-bold text-[#0F172A] font-mono">
                         ₹{registeredAgent.spendingLimit.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                       </span>
                     </div>
                     <div>
-                      <span className="text-[#8C8275] block text-[11px]">Initial Status</span>
-                      <span className="font-mono text-neutral-500 font-semibold">
+                      <span className="text-[#64748B] block text-[11px]">Initial Status</span>
+                      <span className="font-mono text-slate-500 font-semibold">
                         Unlinked (Awaiting First Ping)
                       </span>
                     </div>
@@ -775,21 +775,21 @@ export function RegisterAgentModal({
 
               {/* Quickstart CLI Snippet */}
               <div className="space-y-1.5">
-                <label className="text-[11px] font-mono uppercase tracking-wider text-[#6E675D] font-bold block">
+                <label className="text-[11px] font-mono uppercase tracking-wider text-[#334155] font-bold block">
                   Quickstart CLI Integration
                 </label>
-                <div className="p-3 rounded-2xl bg-zinc-950 border border-zinc-800 flex items-center justify-between gap-3 text-xs font-mono text-zinc-300">
-                  <code className="text-zinc-300 truncate">{launchSnippet}</code>
+                <div className="p-3 rounded-[12px] bg-slate-900 border border-slate-800 flex items-center justify-between gap-3 text-xs font-mono text-slate-300">
+                  <code className="text-slate-300 break-all">{launchSnippet}</code>
                   <button
                     type="button"
                     onClick={handleCopySnippet}
-                    className="shrink-0 p-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-white transition cursor-pointer"
+                    className="shrink-0 p-2 rounded-[8px] bg-slate-800 hover:bg-slate-700 text-white transition cursor-pointer"
                     title="Copy command"
                   >
                     {copiedSnippet ? (
                       <Check className="w-4 h-4 text-emerald-400" />
                     ) : (
-                      <Copy className="w-4 h-4 text-zinc-400" />
+                      <Copy className="w-4 h-4 text-slate-400" />
                     )}
                   </button>
                 </div>
@@ -800,7 +800,7 @@ export function RegisterAgentModal({
                 <button
                   type="button"
                   onClick={handleResetAndClose}
-                  className="w-full sm:w-auto px-7 py-3 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm shadow-md shadow-blue-500/25 transition cursor-pointer flex items-center justify-center gap-2"
+                  className="w-full sm:w-auto px-7 py-3 rounded-[12px] bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-bold text-sm shadow-md shadow-blue-500/25 transition cursor-pointer flex items-center justify-center gap-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]"
                 >
                   <Sparkles className="w-4 h-4" />
                   <span>Enter Terminal Dashboard</span>
