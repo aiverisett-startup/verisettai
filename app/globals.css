@@ -348,36 +348,83 @@ body {
   animation: aurora-pulse 4s ease-in-out infinite;
 }
 
-/* Infinite Marquee Stream Keyframes */
-@keyframes marquee-stream-left {
+/* ==========================================================================
+   Continuous Infinite Marquee Engine (Zero-Pause, Hardware-Accelerated)
+   ========================================================================== */
+
+@keyframes continuous-marquee-left {
   0% {
     transform: translate3d(0, 0, 0);
   }
   100% {
-    transform: translate3d(-50%, 0, 0);
+    transform: translate3d(-100%, 0, 0);
   }
 }
 
-@keyframes marquee-stream-right {
+@keyframes continuous-marquee-right {
   0% {
-    transform: translate3d(-50%, 0, 0);
+    transform: translate3d(-100%, 0, 0);
   }
   100% {
     transform: translate3d(0, 0, 0);
   }
 }
 
-.animate-marquee-stream-left {
-  animation: marquee-stream-left 34s linear infinite;
+.continuous-marquee-track-left {
+  animation: continuous-marquee-left var(--marquee-duration, 38s) linear infinite;
   will-change: transform;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.continuous-marquee-track-right {
+  animation: continuous-marquee-right var(--marquee-duration, 38s) linear infinite;
+  will-change: transform;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Eliminate Text Sub-Pixel Jitter, Glyph Snapping & Micro-Stutter */
+.continuous-marquee-content {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Legacy Compatibility Layer (Enforces Hardware Acceleration & Running State) */
+.animate-marquee-stream-left {
+  animation: continuous-marquee-left var(--marquee-duration, 38s) linear infinite !important;
+  will-change: transform;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 .animate-marquee-stream-right {
-  animation: marquee-stream-right 34s linear infinite;
+  animation: continuous-marquee-right var(--marquee-duration, 38s) linear infinite !important;
   will-change: transform;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
+/* Strict Invariant: Zero Pause on Hover / Focus / Active */
+.continuous-marquee-track-left,
+.continuous-marquee-track-right,
+.continuous-marquee-track-left:hover,
+.continuous-marquee-track-right:hover,
+.continuous-marquee-track-left:focus,
+.continuous-marquee-track-right:focus,
+.animate-marquee-stream-left,
+.animate-marquee-stream-right,
+.animate-marquee-stream-left:hover,
+.animate-marquee-stream-right:hover,
 .marquee-pause-hover:hover .animate-marquee-stream-left,
 .marquee-pause-hover:hover .animate-marquee-stream-right {
-  animation-play-state: paused;
+  animation-play-state: running !important;
 }

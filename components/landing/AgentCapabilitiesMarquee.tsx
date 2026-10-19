@@ -145,10 +145,10 @@ function PillCapsule({ item, spacerIndex }: { item: MarqueePill; spacerIndex: nu
   const spacer = spacers[spacerIndex % spacers.length];
 
   return (
-    <div className="flex items-center gap-3 shrink-0">
-      <div className="group/pill flex items-center gap-2.5 rounded-full border border-zinc-200 dark:border-zinc-800 bg-white/85 dark:bg-zinc-900/85 px-4 py-2 backdrop-blur-sm shadow-xs hover:border-blue-500/40 hover:bg-white dark:hover:bg-zinc-850 hover:shadow-sm transition-all duration-200 cursor-default select-none">
+    <div className="flex items-center gap-3 shrink-0 select-none pointer-events-none">
+      <div className="flex items-center gap-2.5 rounded-full border border-zinc-200 dark:border-zinc-800 bg-white/85 dark:bg-zinc-900/85 px-4 py-2 backdrop-blur-sm shadow-xs select-none">
         <div
-          className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-zinc-200/60 dark:border-zinc-700/60 ${item.iconBg} ${item.iconColor} shadow-2xs group-hover/pill:scale-105 transition-transform`}
+          className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-zinc-200/60 dark:border-zinc-700/60 ${item.iconBg} ${item.iconColor} shadow-2xs`}
         >
           <Icon className="h-3.5 w-3.5" />
         </div>
@@ -176,21 +176,35 @@ function MarqueeRow({
   items: MarqueePill[];
   direction: "left" | "right";
 }) {
-  // Multiply items to ensure seamless loop on large screens
-  const duplicated = [...items, ...items, ...items, ...items];
+  // Repeating items within a track ensures one single track comfortably exceeds wide viewport bounds (4K)
+  const trackItems = [...items, ...items];
+
+  const trackAnimationClass =
+    direction === "left"
+      ? "continuous-marquee-track-left"
+      : "continuous-marquee-track-right";
 
   return (
-    <div className="flex overflow-hidden py-1.5 select-none w-full">
-      <div
-        className={
-          direction === "left"
-            ? "animate-marquee-stream-left flex shrink-0 items-center gap-3"
-            : "animate-marquee-stream-right flex shrink-0 items-center gap-3"
-        }
-      >
-        {duplicated.map((item, idx) => (
-          <PillCapsule key={idx} item={item} spacerIndex={idx} />
-        ))}
+    <div className="flex overflow-hidden py-1.5 select-none w-full pointer-events-none">
+      <div className="flex w-max shrink-0 select-none pointer-events-none continuous-marquee-content">
+        {/* Track A: Moves from 0% to -100% (or -100% to 0%) */}
+        <div
+          className={`${trackAnimationClass} flex shrink-0 items-center gap-3 pr-3 select-none pointer-events-none`}
+        >
+          {trackItems.map((item, idx) => (
+            <PillCapsule key={`track-a-${idx}`} item={item} spacerIndex={idx} />
+          ))}
+        </div>
+
+        {/* Track B: Identical Duplicate Following in Absolute Lockstep */}
+        <div
+          className={`${trackAnimationClass} flex shrink-0 items-center gap-3 pr-3 select-none pointer-events-none`}
+          aria-hidden="true"
+        >
+          {trackItems.map((item, idx) => (
+            <PillCapsule key={`track-b-${idx}`} item={item} spacerIndex={idx} />
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -212,8 +226,8 @@ export function AgentCapabilitiesMarquee() {
         </p>
       </div>
 
-      {/* Marquee Container with Gradient Edge Masks & Pause on Hover */}
-      <div className="marquee-pause-hover relative w-full flex flex-col gap-3 overflow-hidden">
+      {/* Marquee Container with Gradient Edge Masks (Continuous Uninterrupted Motion) */}
+      <div className="relative w-full flex flex-col gap-3 overflow-hidden select-none pointer-events-none">
         {/* Left & Right Smooth Edge Fade Masks */}
         <div className="pointer-events-none absolute inset-y-0 left-0 w-24 sm:w-40 bg-gradient-to-r from-[#FAFAFA] dark:from-[#09090b] to-transparent z-10" />
         <div className="pointer-events-none absolute inset-y-0 right-0 w-24 sm:w-40 bg-gradient-to-l from-[#FAFAFA] dark:from-[#09090b] to-transparent z-10" />
