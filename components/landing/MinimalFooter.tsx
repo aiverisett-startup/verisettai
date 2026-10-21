@@ -1,10 +1,9 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { ExternalLink } from "lucide-react";
-import { motion } from "framer-motion";
 import { VerisettLogo } from "../VerisettLogo";
 
 function InstagramGradientIcon({ className = "w-3.5 h-3.5" }: { className?: string }) {
@@ -55,37 +54,6 @@ function GithubIcon({ className = "w-3.5 h-3.5" }: { className?: string }) {
 }
 
 export function MinimalFooter() {
-  const [isScrolledToBottom, setIsScrolledToBottom] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const windowHeight = window.innerHeight;
-      const documentHeight = document.documentElement.scrollHeight;
-      const scrollTop = window.scrollY || document.documentElement.scrollTop;
-      
-      // When user is scrolled to the bottom (within 50px of the end)
-      const atBottom = windowHeight + scrollTop >= documentHeight - 50;
-      setIsScrolledToBottom(atBottom);
-    };
-
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
-      handleScroll();
-    };
-
-    handleResize();
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    window.addEventListener("resize", handleResize, { passive: true });
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
-
-  const liftDistance = isMobile ? -42 : -88;
-
   return (
     <footer className="border-t border-zinc-200 bg-[#FAF8F5] pt-14 pb-0 text-sm font-sans relative overflow-hidden">
       {/* Background Subtle Semicircles */}
@@ -238,65 +206,7 @@ export function MinimalFooter() {
         <div className="flex items-center font-black font-sans tracking-[-0.04em] leading-none text-[11vw] sm:text-[12.5vw] md:text-[13.5vw] lg:text-[14vw] text-zinc-950">
           <span>Verisett</span>
           <span className="inline-block w-[0.16em]" />
-          <motion.span
-            animate={
-              isScrolledToBottom
-                ? {
-                    y: [liftDistance, liftDistance - 10, liftDistance],
-                    rotate: [-3, -7, -3],
-                    scale: [1, 1.03, 1],
-                    transition: {
-                      y: {
-                        duration: 2.4,
-                        repeat: Infinity,
-                        repeatType: "reverse",
-                        ease: "easeInOut",
-                      },
-                      rotate: {
-                        duration: 2.8,
-                        repeat: Infinity,
-                        repeatType: "reverse",
-                        ease: "easeInOut",
-                      },
-                      scale: {
-                        duration: 2.4,
-                        repeat: Infinity,
-                        repeatType: "reverse",
-                        ease: "easeInOut",
-                      },
-                    },
-                  }
-                : {
-                    y: 0,
-                    rotate: 0,
-                    scale: 1,
-                    transition: {
-                      type: "spring",
-                      stiffness: 260,
-                      damping: 24,
-                    },
-                  }
-            }
-            whileHover={{
-              y: liftDistance - 16,
-              scale: 1.06,
-              rotate: -9,
-              transition: { type: "spring", stiffness: 300, damping: 20 },
-            }}
-            className="inline-block text-blue-600 cursor-pointer relative"
-            title="Verisett AI — Antigravity Liftoff"
-          >
-            AI
-            {/* Subtle Liftoff Pill Indicator */}
-            <span
-              aria-hidden="true"
-              className={`absolute -top-5 sm:-top-7 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full bg-blue-600 text-[8px] sm:text-[10px] font-mono font-bold text-white tracking-widest uppercase shadow-md transition-all duration-300 pointer-events-none whitespace-nowrap ${
-                isScrolledToBottom ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-75 translate-y-2"
-              }`}
-            >
-              Liftoff
-            </span>
-          </motion.span>
+          <span className="inline-block text-blue-600">AI</span>
 
           {/* Round image right after Verisett AI */}
           <Link
