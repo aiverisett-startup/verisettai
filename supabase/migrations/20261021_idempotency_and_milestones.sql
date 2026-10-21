@@ -14,6 +14,11 @@ create table if not exists public.idempotency_keys (
 -- Enable RLS for idempotency_keys
 alter table public.idempotency_keys enable row level security;
 
+-- Drop existing policies if any to avoid 42710 policy already exists errors
+drop policy if exists "Allow read on idempotency_keys" on public.idempotency_keys;
+drop policy if exists "Allow insert on idempotency_keys" on public.idempotency_keys;
+drop policy if exists "Allow update on idempotency_keys" on public.idempotency_keys;
+
 -- Allow authenticated and service-role / anon access for idempotency lookups
 create policy "Allow read on idempotency_keys"
   on public.idempotency_keys for select
@@ -51,6 +56,11 @@ create index if not exists idx_idempotency_created_at on public.idempotency_keys
 
 -- Enable RLS for milestones
 alter table public.milestones enable row level security;
+
+-- Drop existing policies if any to avoid 42710 policy already exists errors
+drop policy if exists "Allow read on milestones" on public.milestones;
+drop policy if exists "Allow insert on milestones" on public.milestones;
+drop policy if exists "Allow update on milestones" on public.milestones;
 
 -- Milestone policies
 create policy "Allow read on milestones"
