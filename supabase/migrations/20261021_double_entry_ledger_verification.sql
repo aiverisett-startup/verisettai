@@ -16,6 +16,12 @@ create table if not exists public.ledger_entries (
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
+-- Ensure columns exist if ledger_entries table was created by an earlier schema version
+alter table public.ledger_entries add column if not exists escrow_id text;
+alter table public.ledger_entries add column if not exists vault_id uuid;
+alter table public.ledger_entries add column if not exists transaction_id uuid default gen_random_uuid();
+alter table public.ledger_entries add column if not exists user_id uuid references auth.users(id) on delete set null;
+
 -- Indexing for high-speed ledger audits and verification
 create index if not exists idx_ledger_escrow_id on public.ledger_entries(escrow_id);
 create index if not exists idx_ledger_vault_id on public.ledger_entries(vault_id);

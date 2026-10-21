@@ -263,6 +263,11 @@ CREATE TABLE IF NOT EXISTS public.ledger_entries (
     created_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now())
 );
 
+ALTER TABLE public.ledger_entries ADD COLUMN IF NOT EXISTS escrow_id TEXT;
+ALTER TABLE public.ledger_entries ADD COLUMN IF NOT EXISTS vault_id UUID;
+ALTER TABLE public.ledger_entries ADD COLUMN IF NOT EXISTS transaction_id UUID DEFAULT gen_random_uuid();
+ALTER TABLE public.ledger_entries ADD COLUMN IF NOT EXISTS user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL;
+
 CREATE INDEX IF NOT EXISTS idx_ledger_escrow_id ON public.ledger_entries(escrow_id);
 CREATE INDEX IF NOT EXISTS idx_ledger_vault_id ON public.ledger_entries(vault_id);
 CREATE INDEX IF NOT EXISTS idx_ledger_transaction_id ON public.ledger_entries(transaction_id);
