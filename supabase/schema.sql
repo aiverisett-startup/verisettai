@@ -144,3 +144,107 @@ CREATE POLICY "Service role full access on transactions"
     ON public.transactions
     FOR ALL
     USING (auth.jwt() ->> 'role' = 'service_role');
+
+-- ==============================================================================
+-- 4. FEEDBACK TABLE (Community Testimonials & Protocol Trust Wall)
+-- ==============================================================================
+CREATE TABLE IF NOT EXISTS public.feedback (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name TEXT NOT NULL,
+    role_title TEXT,
+    company TEXT,
+    rating INTEGER DEFAULT 5 CHECK (rating >= 1 AND rating <= 5),
+    message TEXT NOT NULL,
+    category TEXT DEFAULT 'Protocol Feedback',
+    is_approved BOOLEAN DEFAULT true,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now())
+);
+
+CREATE INDEX IF NOT EXISTS idx_feedback_approved ON public.feedback(is_approved);
+CREATE INDEX IF NOT EXISTS idx_feedback_created_at ON public.feedback(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_feedback_category ON public.feedback(category);
+
+ALTER TABLE public.feedback ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Public can read approved feedback" ON public.feedback;
+CREATE POLICY "Public can read approved feedback"
+    ON public.feedback
+    FOR SELECT
+    USING (is_approved = true);
+
+DROP POLICY IF EXISTS "Public can submit feedback" ON public.feedback;
+CREATE POLICY "Public can submit feedback"
+    ON public.feedback
+    FOR INSERT
+    WITH CHECK (true);
+
+-- ==============================================================================
+-- 5. IDEMPOTENCY KEYS (Zero-Cost Repeated Settlement Loop Protection)
+-- ==============================================================================
+CREATE TABLE IF NOT EXISTS public.idempotency_keys (
+    key TEXT PRIMARY KEY,
+    response_body JSONB NOT NULL,
+    status_code INTEGER DEFAULT 200,
+    endpoint TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now())
+);
+
+CREATE INDEX IF NOT EXISTS idx_idempotency_created_at ON public.idempotency_keys(created_at);
+
+ALTER TABLE public.idempotency_keys ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Allow read on idempotency_keys" ON public.idempotency_keys;
+CREATE POLICY "Allow read on idempotency_keys"
+    ON public.idempotency_keys FOR SELECT
+    USING (true);
+
+DROP POLICY IF EXISTS "Allow insert on idempotency_keys" ON public.idempotency_keys;
+CREATE POLICY "Allow insert on idempotency_keys"
+    ON public.idempotency_keys FOR INSERT
+    WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Allow update on idempotency_keys" ON public.idempotency_keys;
+CREATE POLICY "Allow update on idempotency_keys"
+    ON public.idempotency_keys FOR UPDATE
+    USING (true);
+
+-- ==============================================================================
+-- 6. MILESTONES (Cryptographic Deliverable Proof-of-Work Verification)
+-- ==============================================================================
+CREATE TABLE IF NOT EXISTS public.milestones (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    contract_id TEXT NOT NULL,
+    title TEXT NOT NULL,
+    amount NUMERIC NOT NULL DEFAULT 0,
+    currency TEXT DEFAULT 'VRS',
+    payer_agent TEXT,
+    payee_agent TEXT,
+    deliverable_hash TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'submitted', 'verified', 'completed', 'disputed')),
+    deliverable_payload JSONB,
+    verified_at TIMESTAMPTZ,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now()),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now())
+);
+
+CREATE INDEX IF NOT EXISTS idx_milestones_contract_id ON public.milestones(contract_id);
+CREATE INDEX IF NOT EXISTS idx_milestones_deliverable_hash ON public.milestones(deliverable_hash);
+
+ALTER TABLE public.milestones ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Allow read on milestones" ON public.milestones;
+CREATE POLICY "Allow read on milestones"
+    ON public.milestones FOR SELECT
+    USING (true);
+
+DROP POLICY IF EXISTS "Allow insert on milestones" ON public.milestones;
+CREATE POLICY "Allow insert on milestones"
+    ON public.milestones FOR INSERT
+    WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Allow update on milestones" ON public.milestones;
+CREATE POLICY "Allow update on milestones"
+    ON public.milestones FOR UPDATE
+    USING (true);
+
+

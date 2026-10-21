@@ -256,6 +256,10 @@ export function MinimalFooter() {
               Docs
             </Link>
             <span className="text-zinc-300 select-none">•</span>
+            <Link href="/feedback" className="hover:text-zinc-950 transition-colors">
+              Feedback
+            </Link>
+            <span className="text-zinc-300 select-none">•</span>
             <Link href="/pricing" className="hover:text-zinc-950 transition-colors">
               Pricing
             </Link>

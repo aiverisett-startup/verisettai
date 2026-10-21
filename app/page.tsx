@@ -8,6 +8,7 @@ import { HowItWorksSection } from "@/components/landing/HowItWorksSection";
 import { ProtocolArchitecture } from "@/components/landing/ProtocolArchitecture";
 import { DeveloperCodeSection } from "@/components/landing/DeveloperCodeSection";
 import { TrustSecuritySection } from "@/components/landing/TrustSecuritySection";
+import { TrustedByBuilders } from "@/components/landing/TrustedByBuilders";
 import { MinimalFooter } from "@/components/landing/MinimalFooter";
 import { MarketplaceWorkers } from "@/components/landing/MarketplaceWorkers";
 import { AIAnswerTarget } from "@/components/landing/AIAnswerTarget";
@@ -140,7 +141,10 @@ export default function Home() {
       {/* 11. Trust, Compliance & Security Invariants */}
       <TrustSecuritySection />
 
-      {/* 12. Minimalist Footer */}
+      {/* 12. Community Feedback & Verified Builder Trust Preview */}
+      <TrustedByBuilders />
+
+      {/* 13. Minimalist Footer */}
       <MinimalFooter />
 
       {/* 15-Second Institutional Timed Login Gateway */}

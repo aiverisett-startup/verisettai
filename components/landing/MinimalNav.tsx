@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { Play, Lock, Menu, X, ShieldCheck, HelpCircle, Terminal, Cpu, ArrowRight } from "lucide-react";
+import { Play, Lock, Menu, X, ShieldCheck, HelpCircle, Terminal, Cpu, ArrowRight, MessageSquare } from "lucide-react";
 import { GoogleIcon } from "../ui/GoogleIcon";
 import { VerisettLogo } from "../VerisettLogo";
 import { EnvironmentMode, VaultBalance } from "../dashboard/types";
@@ -138,6 +138,9 @@ export function MinimalNav({
           </a>
           <Link href="/docs" className="shrink-0 whitespace-nowrap hover:text-blue-600 transition-colors">
             Docs
+          </Link>
+          <Link href="/feedback" className="shrink-0 whitespace-nowrap hover:text-blue-600 transition-colors">
+            Feedback
           </Link>
         </nav>
 
@@ -289,6 +292,15 @@ export function MinimalNav({
               >
                 <ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
                 <span>Security</span>
+              </Link>
+
+              <Link
+                href="/feedback"
+                onClick={closeMobileMenu}
+                className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-50 border border-slate-200 hover:border-blue-400 text-[#09090B] transition-all"
+              >
+                <MessageSquare className="w-3.5 h-3.5 text-blue-600" />
+                <span>Feedback</span>
               </Link>
             </div>
 
