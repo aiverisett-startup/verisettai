@@ -11,6 +11,7 @@ import {
   getVaultState,
   getProgrammaticVault,
 } from "@/lib/serverStore";
+import { insertAndVerifyDoubleEntryLedger } from "@/lib/escrow-settlement";
 
 // Fallback in-memory idempotency cache in case of temporary DB connectivity drops
 const localIdempotencyCache = new Map<string, { body: any; status: number; timestamp: number }>();
@@ -186,10 +187,36 @@ export async function POST(req: NextRequest) {
       milestoneRecord?.payee_agent ||
       "Autonomous Payee Agent";
 
-    // Attempt programmatic vault settlement in serverStore if vault exists
+    // Look up vault and prepare double-entry ledger settlement
     const existingVault = getProgrammaticVault(targetVaultId);
     let txRecord: any = null;
 
+    // 4. DOUBLE-ENTRY LEDGER ATOMICITY VERIFICATION
+    const escrowIdentifier = contractId || (milestoneId ? `milestone-${milestoneId}` : targetVaultId);
+    const amountInSmallestUnit = Math.max(1, Math.round(amount * 100));
+
+    const ledgerCheck = await insertAndVerifyDoubleEntryLedger({
+      escrowId: escrowIdentifier,
+      amountCentsOrPaise: amountInSmallestUnit,
+      userId: milestoneRecord?.payer_agent || null,
+      vaultId: existingVault?.id || null,
+      currency: "INR",
+      description: `Escrow Clearance: ${escrowIdentifier} (${payer} -> ${payee})`,
+    });
+
+    if (!ledgerCheck.success || !ledgerCheck.verified) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: ledgerCheck.error || "LEDGER_BALANCE_VERIFICATION_FAILED",
+          message: "Clearance cleanly failed: verify_ledger_balance RPC returned false or ledger unbalanced.",
+          escrow_id: escrowIdentifier,
+        },
+        { status: 422 }
+      );
+    }
+
+    // 5. UNLOCK ESCROW FUNDS & SETTLE TRANSACTION
     if (existingVault && existingVault.status !== "Settled") {
       const settleResult = settleProgrammaticVault({
         vault_id: targetVaultId,

@@ -247,4 +247,74 @@ CREATE POLICY "Allow update on milestones"
     ON public.milestones FOR UPDATE
     USING (true);
 
+-- ==============================================================================
+-- 7. DOUBLE-ENTRY FINANCIAL LEDGER & ATOMIC VERIFICATION RPC
+-- ==============================================================================
+CREATE TABLE IF NOT EXISTS public.ledger_entries (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,
+    vault_id UUID,
+    escrow_id TEXT,
+    transaction_id UUID NOT NULL DEFAULT gen_random_uuid(),
+    entry_type TEXT NOT NULL CHECK (entry_type IN ('DEBIT', 'CREDIT')),
+    amount BIGINT NOT NULL CHECK (amount > 0),
+    currency TEXT NOT NULL DEFAULT 'INR',
+    description TEXT NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now())
+);
+
+CREATE INDEX IF NOT EXISTS idx_ledger_escrow_id ON public.ledger_entries(escrow_id);
+CREATE INDEX IF NOT EXISTS idx_ledger_vault_id ON public.ledger_entries(vault_id);
+CREATE INDEX IF NOT EXISTS idx_ledger_transaction_id ON public.ledger_entries(transaction_id);
+CREATE INDEX IF NOT EXISTS idx_ledger_created_at ON public.ledger_entries(created_at DESC);
+
+ALTER TABLE public.ledger_entries ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Allow read on ledger_entries" ON public.ledger_entries;
+CREATE POLICY "Allow read on ledger_entries"
+    ON public.ledger_entries FOR SELECT
+    USING (true);
+
+DROP POLICY IF EXISTS "Allow insert on ledger_entries" ON public.ledger_entries;
+CREATE POLICY "Allow insert on ledger_entries"
+    ON public.ledger_entries FOR INSERT
+    WITH CHECK (true);
+
+CREATE OR REPLACE FUNCTION public.verify_ledger_balance(escrow_id TEXT)
+RETURNS BOOLEAN AS $$
+DECLARE
+  v_debit_sum BIGINT;
+  v_credit_sum BIGINT;
+  v_uuid UUID;
+BEGIN
+  SELECT 
+    COALESCE(SUM(CASE WHEN entry_type = 'DEBIT' THEN amount ELSE 0 END), 0),
+    COALESCE(SUM(CASE WHEN entry_type = 'CREDIT' THEN amount ELSE 0 END), 0)
+  INTO v_debit_sum, v_credit_sum
+  FROM public.ledger_entries
+  WHERE escrow_id = $1;
+
+  IF v_debit_sum = 0 AND v_credit_sum = 0 THEN
+    BEGIN
+      v_uuid := $1::UUID;
+      SELECT 
+        COALESCE(SUM(CASE WHEN entry_type = 'DEBIT' THEN amount ELSE 0 END), 0),
+        COALESCE(SUM(CASE WHEN entry_type = 'CREDIT' THEN amount ELSE 0 END), 0)
+      INTO v_debit_sum, v_credit_sum
+      FROM public.ledger_entries
+      WHERE vault_id = v_uuid OR transaction_id = v_uuid;
+    EXCEPTION WHEN OTHERS THEN
+      NULL;
+    END;
+  END IF;
+
+  IF v_debit_sum > 0 AND v_debit_sum = v_credit_sum THEN
+    RETURN true;
+  END IF;
+
+  RETURN false;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+
 

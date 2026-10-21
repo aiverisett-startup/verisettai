@@ -1,40 +1,52 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-// In-memory rate limiting store for edge requests
-interface RateLimitRecord {
-  count: number;
-  resetTime: number;
+// In-memory token-bucket rate limiter for edge API requests
+interface TokenBucket {
+  tokens: number;
+  lastRefill: number;
 }
 
-const rateLimitStore = new Map<string, RateLimitRecord>();
+const tokenBucketStore = new Map<string, TokenBucket>();
+const TOKEN_BUCKET_CAPACITY = 60;
+const REPLENISHMENT_RATE_PER_SEC = 2; // 2 tokens per second
 
-// Periodic cleanup of expired rate limit entries (every 5 minutes)
-setInterval(() => {
-  const now = Date.now();
-  for (const [key, record] of rateLimitStore.entries()) {
-    if (now > record.resetTime) {
-      rateLimitStore.delete(key);
+// Periodic cleanup of idle token bucket entries (every 5 minutes)
+if (typeof setInterval !== "undefined") {
+  setInterval(() => {
+    const now = Date.now();
+    for (const [key, bucket] of tokenBucketStore.entries()) {
+      if (now - bucket.lastRefill > 5 * 60 * 1000) {
+        tokenBucketStore.delete(key);
+      }
     }
-  }
-}, 5 * 60 * 1000);
+  }, 5 * 60 * 1000);
+}
 
-function checkRateLimit(ip: string, category: string, limit: number, windowMs: number): boolean {
+function checkTokenBucketRateLimit(clientKey: string): boolean {
   const now = Date.now();
-  const key = `${category}:${ip}`;
-  const record = rateLimitStore.get(key);
+  let bucket = tokenBucketStore.get(clientKey);
 
-  if (!record || now > record.resetTime) {
-    rateLimitStore.set(key, { count: 1, resetTime: now + windowMs });
+  if (!bucket) {
+    bucket = { tokens: TOKEN_BUCKET_CAPACITY - 1, lastRefill: now };
+    tokenBucketStore.set(clientKey, bucket);
     return true;
   }
 
-  if (record.count >= limit) {
-    return false;
+  // Replenish tokens proportional to elapsed time: 2 tokens/sec up to capacity of 60
+  const elapsedSec = (now - bucket.lastRefill) / 1000;
+  bucket.tokens = Math.min(
+    TOKEN_BUCKET_CAPACITY,
+    bucket.tokens + elapsedSec * REPLENISHMENT_RATE_PER_SEC
+  );
+  bucket.lastRefill = now;
+
+  if (bucket.tokens >= 1) {
+    bucket.tokens -= 1;
+    return true;
   }
 
-  record.count += 1;
-  return true;
+  return false;
 }
 
 // Blocklist of common exploit scanner targets
@@ -91,61 +103,24 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // 3. API Rate Limiting
+  // 3. API Edge Token-Bucket Rate Limiting (Capacity: 60, Replenishment: 2 tokens/sec)
   if (pathname.startsWith("/api/")) {
     const forwardedFor = request.headers.get("x-forwarded-for");
-    const ip = forwardedFor ? forwardedFor.split(",")[0].trim() : "127.0.0.1";
+    const clientIp = forwardedFor
+      ? forwardedFor.split(",")[0].trim()
+      : request.headers.get("x-real-ip") || "127.0.0.1";
 
-    if (pathname === "/api/contact") {
-      const allowed = checkRateLimit(ip, "contact", 5, 60 * 1000);
-      if (!allowed) {
-        return new NextResponse(
-          JSON.stringify({
-            error: "Too many requests. Please wait a minute before submitting again.",
-            retryAfterSeconds: 60,
-          }),
-          {
-            status: 429,
-            headers: {
-              "Content-Type": "application/json",
-              "Retry-After": "60",
-            },
-          }
-        );
-      }
-    }
-
-    if (pathname.startsWith("/api/auth/")) {
-      const allowed = checkRateLimit(ip, "auth", 25, 60 * 1000);
-      if (!allowed) {
-        return new NextResponse(
-          JSON.stringify({
-            error: "Too many authentication requests. Rate limit exceeded.",
-            retryAfterSeconds: 60,
-          }),
-          {
-            status: 429,
-            headers: {
-              "Content-Type": "application/json",
-              "Retry-After": "60",
-            },
-          }
-        );
-      }
-    }
-
-    const generalAllowed = checkRateLimit(ip, "general_api", 60, 60 * 1000);
-    if (!generalAllowed) {
+    const allowed = checkTokenBucketRateLimit(clientIp);
+    if (!allowed) {
       return new NextResponse(
-        JSON.stringify({
-          error: "Rate limit exceeded. Please slow down.",
-          retryAfterSeconds: 60,
-        }),
+        JSON.stringify({ error: "RATE_LIMIT_EXCEEDED" }),
         {
           status: 429,
           headers: {
             "Content-Type": "application/json",
-            "Retry-After": "60",
+            "Retry-After": "1",
+            "X-RateLimit-Capacity": "60",
+            "X-RateLimit-Replenishment": "2/sec",
           },
         }
       );
