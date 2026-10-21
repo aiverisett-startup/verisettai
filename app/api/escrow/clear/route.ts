@@ -280,10 +280,24 @@ export async function POST(req: NextRequest) {
         verified: true,
         unlocked_at: new Date().toISOString(),
       },
-      transaction_id: txRecord?.id,
+      take_rate: {
+        tier: ledgerCheck.takeRate?.tier || "starter",
+        plan_name: ledgerCheck.takeRate?.planName || "Starter Plan",
+        fee_percentage: ledgerCheck.takeRate?.ratePercentage || "2.0%",
+        fee_amount: (ledgerCheck.details?.feeAmount || 0) / 100,
+        net_amount: (ledgerCheck.details?.netDisbursed || 0) / 100,
+        is_lifetime: ledgerCheck.takeRate?.isLifetime || false,
+      },
+      ledger_verification: {
+        double_entry_verified: true,
+        debit_sum_units: ledgerCheck.details?.debitAmount,
+        credit_sum_units: ledgerCheck.details?.creditAmount,
+        transaction_id: ledgerCheck.transactionId,
+      },
+      transaction_id: txRecord?.id || ledgerCheck.transactionId,
       transaction: txRecord,
       message:
-        "Milestone escrow successfully verified and unlocked via zero-cost cryptographic SHA-256 proof.",
+        "Milestone escrow successfully verified, unlocked, and settled via balanced double-entry ledger.",
     };
 
     // 7. CACHE UNDER IDEMPOTENCY KEY (to prevent duplicate billing/settlement loops)

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "./supabase";
+import { triggerFirstLoginWelcomeEmail } from "./welcome-email";
 
 export interface AuthUser {
   id?: string;
@@ -88,6 +89,14 @@ export function useAuthUser() {
 
         setUser(resolved);
         setIsLoaded(true);
+
+        // Automated First-Login Welcome Email check (non-blocking)
+        triggerFirstLoginWelcomeEmail({
+          email,
+          name,
+          userId: supaUser.id,
+        }).catch(() => {});
+
         return;
       }
     } catch {

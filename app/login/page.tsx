@@ -25,6 +25,7 @@ import { VerisettLogo } from "@/components/VerisettLogo";
 import { GoldenBackgroundShapes } from "@/components/ui/GoldenBackgroundShapes";
 import { supabase } from "@/lib/supabase";
 import { dispatchAuthChange } from "@/lib/useAuthUser";
+import { triggerFirstLoginWelcomeEmail } from "@/lib/welcome-email";
 
 type AuthMode = "signin" | "signup" | "magic_link";
 
@@ -233,6 +234,12 @@ function LoginForm() {
         localStorage.setItem("verisett_auth_provider", "email");
         dispatchAuthChange();
 
+        // Dispatch institutional welcome email (deduplicated on first authentication)
+        triggerFirstLoginWelcomeEmail({
+          email: trimmedEmail,
+          userId: data.user?.id,
+        }).catch(() => {});
+
         if (data.session) {
           setFeedback({
             type: "success",
@@ -324,6 +331,12 @@ function LoginForm() {
       localStorage.setItem("verisett_user_name", trimmedEmail.split("@")[0]);
       localStorage.setItem("verisett_auth_provider", "email");
       dispatchAuthChange();
+
+      // Dispatch institutional welcome email (deduplicated on first authentication)
+      triggerFirstLoginWelcomeEmail({
+        email: trimmedEmail,
+        userId: data.user?.id,
+      }).catch(() => {});
 
       setFeedback({
         type: "success",

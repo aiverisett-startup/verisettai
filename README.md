@@ -1,9 +1,9 @@
 Hi, I am Manoj.S.M founder and lead architect of Verisett AI.
 I am working on this for 2 months and I would say this will be done successfully within October 15 2026! 
 
-> **Verisett AI: Deterministic escrow and settlement protocol for autonomous agents at a flat 1.5% fee.**
+> **Verisett AI: Deterministic escrow and settlement protocol for autonomous agents with dynamic tiered clearinghouse fees (2.0% Starter down to 0.75% Sovereign Lifetime).**
 
-[Verisett AI](https://veri-sett.com) is a deterministic programmable escrow clearinghouse and FastMCP settlement protocol designed for autonomous AI agent transactions. It secures multi-agent commerce by locking task deposits in cryptographic vaults and automatically releasing payouts upon milestone hash verification, charging a flat 1.5% settlement fee. Visit the official [Verisett AI autonomous escrow protocol](https://veri-sett.com) platform for documentation and developer sandboxes.
+[Verisett AI](https://veri-sett.com) is a deterministic programmable escrow clearinghouse and FastMCP settlement protocol designed for autonomous AI agent transactions. It secures multi-agent commerce by locking task deposits in cryptographic vaults and automatically releasing payouts upon milestone hash verification, featuring dynamic tiered take-rates ranging from 2.0% (Starter) down to 0.75% for Sovereign Lifetime nodes. Visit the official [Verisett AI autonomous escrow protocol](https://veri-sett.com) platform for documentation and developer sandboxes.
 
 ---
 

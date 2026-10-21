@@ -149,7 +149,7 @@ export class VerisettMcpServer {
    * 2. Computes the SHA-256 hash of payload_data.
    * 3. Compares computed_hash === vault.expected_sha256.
    * 4. If matching:
-   *    - 1.5% fee: fee_cents = Math.round(amount_cents * 0.015)
+   *    - Dynamic fee: fee_cents computed based on active plan (0.75% to 2.0%)
    *    - payout_cents = amount_cents - fee_cents
    *    - double-entry ledger settlement
    *    - marks vault status as SETTLED
@@ -380,7 +380,7 @@ export class VerisettMcpServer {
       {
         name: "submit_assertion",
         description:
-          "Acquires distributed lock, hashes deliverable payload, compares against expected SHA-256, settles with 1.5% fee if matching.",
+          "Acquires distributed lock, hashes deliverable payload, compares against expected SHA-256, settles with dynamic protocol fee if matching.",
         inputSchema: {
           type: "object",
           properties: {

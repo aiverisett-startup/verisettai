@@ -45,7 +45,7 @@ settlement = client.settle_milestone(
     deliverable_payload={"metrics": {"accuracy": 0.99, "status": "PASS"}}
 )
 
-print(f"Settled: {settlement['status']} | Fee: 1.5% | Net Payout: \${settlement['net_amount']}")`;
+print(f"Settled: {settlement['status']} | Fee: {settlement.get('fee_percentage', 'Tiered')} | Net Payout: \${settlement['net_amount']}")`;
 
   const mcpConfigSnippet = `{
   "mcpServers": {

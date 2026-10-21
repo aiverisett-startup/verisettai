@@ -8,7 +8,7 @@ export interface RegisterPlanInput {
   orgName: string;
   email: string;
   agentHandle: string;
-  planId: "community" | "builder" | "pro" | "enterprise";
+  planId: "community" | "builder" | "pro" | "enterprise" | "starter" | "institutional" | "sovereign" | string;
   currentClaimed: number;
 }
 

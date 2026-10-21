@@ -656,14 +656,22 @@ function CheckoutInner() {
 
                 <div className="flex items-center justify-between text-xs sm:text-sm font-mono text-[#475569]">
                   <span>Settlement Fee</span>
-                  <span className="text-emerald-700 font-semibold">1.5% Programmatic Escrow</span>
+                  <span className="text-emerald-700 font-semibold font-mono">
+                    {selectedPlanId === "community"
+                      ? "2.0% Protocol Fee"
+                      : selectedPlanId === "tier_1"
+                      ? "1.5% Protocol Fee"
+                      : selectedPlanId === "tier_2"
+                      ? "1.0% Protocol Fee"
+                      : "0.75% Sovereign Fee (Lowest)"}
+                  </span>
                 </div>
 
                 {selectedPlanId === "tier_3" && (
-                  <div className="mt-2.5 pt-2.5 border-t border-[#E2E8F0] flex items-center gap-2 text-xs font-mono text-[#1D4ED8] bg-blue-50/60 p-2.5 rounded-[8px] border border-blue-200">
-                    <Sparkles className="w-4 h-4 text-[#2563EB] shrink-0" />
+                  <div className="mt-2.5 pt-2.5 border-t border-[#E2E8F0] flex items-center gap-2 text-xs font-mono text-amber-900 bg-amber-50/80 p-2.5 rounded-[8px] border border-amber-300">
+                    <Sparkles className="w-4 h-4 text-amber-600 shrink-0" />
                     <span className="font-semibold leading-normal">
-                      Digital Pass Card &amp; Dedicated Rails Included
+                      Sovereign Lifetime Access • Pay Once, Keep Forever (Zero Recurring Fees)
                     </span>
                   </div>
                 )}

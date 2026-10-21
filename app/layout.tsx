@@ -119,9 +119,9 @@ export default function RootLayout({
         "softwareVersion": "2.4.0",
         "offers": {
           "@type": "Offer",
-          "price": "1.5",
-          "priceCurrency": "USD",
-          "description": "1.5% flat take rate per settled escrow milestone"
+          "price": "0",
+          "priceCurrency": "INR",
+          "description": "Dynamic tiered protocol fee (from 2.0% on Starter down to 0.75% for Sovereign Lifetime)"
         },
         "creator": {
           "@id": "https://veri-sett.com/#founder"
@@ -222,7 +222,7 @@ export default function RootLayout({
         "name": "What is the fee for Verisett transactions?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Verisett AI charges a flat 1.5% commission on settled escrow milestones with zero hidden intermediary fees."
+          "text": "Verisett AI features dynamic tiered pricing: Starter (₹0/mo, 2.0% fee), Pro (₹2,500/mo, 1.5% fee), Enterprise (₹7,999/mo, 1.0% fee), and Sovereign Lifetime (₹30,000, 0.75% fee) with transparent double-entry accounting."
         }
       },
       {

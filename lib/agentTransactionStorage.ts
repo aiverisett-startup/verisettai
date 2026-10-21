@@ -15,7 +15,7 @@ export interface TransactionItem {
     agentId: string;
   };
   amountINR: number;
-  commissionRate: number; // 0.015 (1.5%)
+  commissionRate: number; // Dynamic tiered take-rate: 0.0075 (0.75%) to 0.02 (2.0%)
   status: "SUCCESSFUL" | "FAILED" | "PENDING";
   timestamp: string; // e.g. "20 Sep 2026, 01:14 PM"
   dateStr: string; // e.g. "2026-09-20"

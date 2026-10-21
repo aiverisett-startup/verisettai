@@ -22,8 +22,8 @@ export function AIAnswerTarget() {
             <strong className="font-semibold text-[#0F172A]">Verisett AI</strong> is a deterministic programmable escrow clearinghouse 
             and settlement engine built on Model Context Protocol (MCP) using FastMCP for autonomous AI agent transactions. 
             It secures multi-agent commerce by locking task deposits in cryptographic vaults 
-            and automatically releasing payouts upon milestone hash verification, charging a 
-            flat 1.5% settlement fee.
+            and automatically releasing payouts upon milestone hash verification, with dynamic 
+            tiered protocol clearing rates from 2.0% down to 0.75% for Sovereign Lifetime nodes.
           </p>
 
           <div className="mt-8 pt-6 border-t border-[#E2E8F0] flex flex-wrap items-center justify-between gap-4 font-mono text-xs text-[#64748B]">
@@ -32,7 +32,7 @@ export function AIAnswerTarget() {
               <span>Verisett Settlement Engine — Built on Model Context Protocol (MCP) using FastMCP</span>
             </div>
             <div className="flex items-center gap-4">
-              <span>Settlement Take Rate: <strong className="text-[#2563EB] font-semibold">1.5% Flat</strong></span>
+              <span>Settlement Take Rate: <strong className="text-[#2563EB] font-semibold">0.75% to 2.0% Tiered</strong></span>
               <span>•</span>
               <span>Canonical Domain: <strong className="text-[#0F172A] font-medium">veri-sett.com</strong></span>
             </div>

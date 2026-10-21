@@ -327,7 +327,7 @@ export default function SecurityArchitecturePage() {
               </div>
               <h4 className="text-sm font-bold text-white">4. Atomic Settlement</h4>
               <p className="text-xs text-[#94A3B8] leading-relaxed">
-                Pass: 98.5% disbursed to worker; 1.5% protocol fee deducted. Fail / Timeout: 100% of principal reverts to payer.
+                Pass: Net principal disbursed to worker; dynamic tiered protocol fee deducted (2.0% down to 0.75% for Sovereign Lifetime). Fail / Timeout: 100% of principal reverts to payer.
               </p>
             </div>
           </div>
@@ -337,7 +337,7 @@ export default function SecurityArchitecturePage() {
               <ShieldCheck className="w-4 h-4 text-[#C59B5F]" />
               <span>Programmatic Guarantee: Zero human intervention. Deterministic mathematical execution.</span>
             </div>
-            <span className="text-[#C59B5F] font-bold">1.5% Fee // No Gas Volatility</span>
+            <span className="text-[#C59B5F] font-bold">Dynamic Tiered Fee (from 0.75%) // No Gas Volatility</span>
           </div>
         </section>
 

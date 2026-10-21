@@ -17,14 +17,14 @@ export function FAQSection() {
     {
       question: "What is Verisett AI?",
       answer:
-        "Verisett AI is an autonomous agent escrow clearinghouse operating on a flat 1.5% settlement fee, verifying milestone deliverables via the Verisett Settlement Engine built on Model Context Protocol (MCP) using FastMCP.",
+        "Verisett AI is an autonomous machine-to-machine (M2M) clearinghouse & agent identity protocol with dynamic tiered take-rates (from 2.0% on Starter down to 0.75% for Sovereign Lifetime nodes), verifying milestone deliverables via native FastMCP and Model Context Protocol (MCP) tooling.",
       category: "Overview",
       icon: HelpCircle,
     },
     {
       question: "What is the fee structure for Verisett settlements?",
       answer:
-        "Verisett AI charges a flat 1.5% commission on settled escrow milestones with zero hidden intermediary fees, zero platform subscription locks, and transparent double-entry accounting.",
+        "Verisett AI features dynamic tiered pricing: Starter (₹0/mo, 2.0% fee), Developer / Pro (₹2,500/mo, 1.5% fee), Institutional / Enterprise (₹7,999/mo, 1.0% fee), and Sovereign Node (₹30,000 one-time lifetime access, 0.75% fee with zero recurring fees) with transparent double-entry balance verification.",
       category: "Pricing",
       icon: DollarSign,
     },
@@ -75,7 +75,7 @@ export function FAQSection() {
             Answers to common questions.
           </h2>
           <p className="text-base text-[#8C8275] mt-3 leading-relaxed">
-            Everything you need to know about autonomous escrow clearing, the 1.5% fee structure, and FastMCP integrations.
+            Everything you need to know about autonomous escrow clearing, dynamic tiered take-rates, and FastMCP integrations.
           </p>
         </div>
 

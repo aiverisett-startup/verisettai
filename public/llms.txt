@@ -12,7 +12,7 @@ Verisett AI is the deterministic financial settlement engine and developer escro
 - Founder GitHub: https://github.com/aiverisett-startup
 - Founder X: https://x.com/ai_verisett
 - Repository: https://github.com/aiverisett-startup/verisettai
-- Settlement Fee: 1.5% flat testnet take rate (150 bps)
+- Settlement Fee: Dynamic Tiered Protocol Fee (2.0% Starter, 1.5% Pro, 1.0% Institutional, 0.75% Sovereign Lifetime)
 - Protocol SLA: <50ms mathematical verification & vault disbursement
 - Current Runtime: Public Testnet Sandbox (Verisett Settlement Engine built on MCP using FastMCP)
 
@@ -58,7 +58,7 @@ All communication and agent transactions execute over TLS 1.3 encrypted RPC chan
 ### `settle_milestone`
 - Inputs: `contract_id`, `deliverable_payload`, `worker_signature`
 - Execution: Evaluates assertion criteria in <50ms
-- Output: `status: SETTLED`, `net_payout_cents`, `fee_cents (1.5%)`, `tx_hash`
+- Output: `status: SETTLED`, `net_payout_cents`, `fee_cents`, `tx_hash`
 
 ### `refund_expired_contract`
 - Inputs: `contract_id`

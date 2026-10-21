@@ -88,6 +88,11 @@ export async function POST(req: NextRequest) {
 
     const settleAmountPaise = Number(amount || vault.balance_cents || 1000000);
 
+    // Resolve active protocol take-rate dynamically for this tenant / user
+    const { resolveTakeRateForPayer, computeBalancedSettlementSplit } = await import("@/lib/take-rate");
+    const activeTakeRate = await resolveTakeRateForPayer(auth.userId);
+    const split = computeBalancedSettlementSplit(settleAmountPaise, activeTakeRate);
+
     // 4. Execute atomic settlement via stored procedure settle_vault_atomic
     let settleResult: any = null;
     let transactionId = crypto.randomUUID();
@@ -123,20 +128,30 @@ export async function POST(req: NextRequest) {
           vault_id: sanitizedVaultId,
           escrow_id: String(vault_id || "").trim(),
           transaction_id: transactionId,
-          entry_type: "CREDIT",
-          amount: settleAmountPaise,
+          entry_type: "DEBIT",
+          amount: split.grossAmount,
           currency: "INR",
-          description: "Autonomous Agent Escrow Consensus Settlement",
+          description: "Escrow Vault Principal Release Execution",
         },
         {
           user_id: sanitizedUserId,
           vault_id: sanitizedVaultId,
           escrow_id: String(vault_id || "").trim(),
           transaction_id: transactionId,
-          entry_type: "DEBIT",
-          amount: settleAmountPaise,
+          entry_type: "CREDIT",
+          amount: split.netDisbursed,
           currency: "INR",
-          description: "Escrow Vault Fund Release Execution",
+          description: `Autonomous Agent Escrow Consensus Settlement Payout (${(100 - activeTakeRate.rate * 100).toFixed(2)}%)`,
+        },
+        {
+          user_id: sanitizedUserId,
+          vault_id: sanitizedVaultId,
+          escrow_id: String(vault_id || "").trim(),
+          transaction_id: transactionId,
+          entry_type: "CREDIT",
+          amount: split.feeAmount,
+          currency: "INR",
+          description: `Verisett Protocol Take-Rate Fee (${activeTakeRate.ratePercentage} - ${activeTakeRate.planName})`,
         },
       ]);
 
@@ -180,17 +195,25 @@ export async function POST(req: NextRequest) {
       user_id: isUuid(auth.userId) ? auth.userId : null,
       vault_id: isUuid(vault_id) ? vault_id : null,
       amount: Math.round(settleAmountPaise / 84) / 100, // USD amount
-      fee: Math.round((settleAmountPaise / 84) * 0.0075) / 100,
+      fee: Math.round((settleAmountPaise / 84) * activeTakeRate.rate) / 100,
       status: "SETTLED",
       job_title: milestone_title,
       proof: sha256Proof,
     });
 
-    // 7. Return success and cryptographic receipt
+    // 7. Return success and cryptographic receipt with dynamic take-rate
     return NextResponse.json({
       success: true,
       receipt,
       settlement: settleResult,
+      take_rate: {
+        tier: activeTakeRate.tier,
+        plan_name: activeTakeRate.planName,
+        fee_percentage: activeTakeRate.ratePercentage,
+        fee_amount_units: split.feeAmount,
+        net_amount_units: split.netDisbursed,
+        is_lifetime: activeTakeRate.isLifetime,
+      },
       proof: sha256Proof,
       tenantId: auth.userId,
       timestamp: settlementTimestamp,

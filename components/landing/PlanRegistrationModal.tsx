@@ -19,7 +19,7 @@ import { registerPlanAction } from "@/app/actions/registerPlanAction";
 
 export interface PlanRegistrationModalProps {
   isOpen: boolean;
-  selectedPlanId: "community" | "builder" | "pro" | "enterprise";
+  selectedPlanId: "community" | "builder" | "pro" | "enterprise" | "starter" | "institutional" | "sovereign" | string;
   claimedCounts: Record<string, number>;
   onClose: () => void;
   onSuccess: (planId: string, newCount: number) => void;
@@ -32,7 +32,7 @@ export function PlanRegistrationModal({
   onClose,
   onSuccess,
 }: PlanRegistrationModalProps) {
-  const [activePlanId, setActivePlanId] = useState<"community" | "builder" | "pro" | "enterprise">(selectedPlanId);
+  const [activePlanId, setActivePlanId] = useState<string>(selectedPlanId);
   const [orgName, setOrgName] = useState("");
   const [email, setEmail] = useState("");
   const [agentHandle, setAgentHandle] = useState("");
@@ -245,7 +245,13 @@ export function PlanRegistrationModal({
                     >
                       <span className="truncate block font-bold">{p.name}</span>
                       <span className="text-[10px] block mt-1">
-                        {isCapped ? "Sold Out" : p.isPaid ? `$${p.priceMonthlyUSD}/mo` : "Free"}
+                        {isCapped
+                          ? "Sold Out"
+                          : p.isPaid
+                          ? p.isLifetime
+                            ? `₹${p.priceINR.toLocaleString()} lifetime`
+                            : `₹${p.priceINR.toLocaleString()}/mo`
+                          : "Free"}
                       </span>
                     </button>
                   );

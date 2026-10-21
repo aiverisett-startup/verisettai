@@ -1,14 +1,24 @@
 import { supabaseAdmin } from "./supabaseAdmin";
 import crypto from "crypto";
+import {
+  resolveTakeRateForPayer,
+  getTakeRateForPlan,
+  computeBalancedSettlementSplit,
+  PlanTakeRate,
+} from "./take-rate";
 
 export interface DoubleEntryLedgerResult {
   success: boolean;
   transactionId?: string;
   verified?: boolean;
   error?: string;
+  takeRate?: PlanTakeRate;
   details?: {
     debitAmount: number;
     creditAmount: number;
+    netDisbursed: number;
+    feeAmount: number;
+    takeRatePercentage: string;
     escrowId: string;
     timestamp: string;
   };
@@ -16,10 +26,9 @@ export interface DoubleEntryLedgerResult {
 
 /**
  * Inserts balanced DEBIT and CREDIT rows into public.ledger_entries
+ * using the dynamic platform take-rate based on the user's/agent's active plan tier
+ * (2.0% Starter, 1.5% Pro, 1.0% Institutional, 0.75% Sovereign Lifetime)
  * and verifies that the double-entry books balance via Supabase RPC verify_ledger_balance.
- *
- * If verify_ledger_balance returns false or errors, this function fails cleanly
- * without mutating balances or marking the escrow as settled.
  */
 export async function insertAndVerifyDoubleEntryLedger(params: {
   escrowId: string;
@@ -28,6 +37,7 @@ export async function insertAndVerifyDoubleEntryLedger(params: {
   vaultId?: string | null;
   currency?: string;
   description?: string;
+  planTier?: string | null;
 }): Promise<DoubleEntryLedgerResult> {
   const {
     escrowId,
@@ -36,6 +46,7 @@ export async function insertAndVerifyDoubleEntryLedger(params: {
     vaultId = null,
     currency = "INR",
     description = "Autonomous Agent Escrow Consensus Settlement",
+    planTier = null,
   } = params;
 
   if (!escrowId || amountCentsOrPaise <= 0) {
@@ -44,6 +55,13 @@ export async function insertAndVerifyDoubleEntryLedger(params: {
       error: "INVALID_LEDGER_PARAMETERS: escrowId is required and amount must be greater than zero.",
     };
   }
+
+  // Resolve dynamic take-rate for this payer or plan tier
+  const activeTakeRate = planTier
+    ? getTakeRateForPlan(planTier)
+    : await resolveTakeRateForPayer(userId);
+
+  const split = computeBalancedSettlementSplit(amountCentsOrPaise, activeTakeRate);
 
   // Sanitize UUID parameters to prevent Postgres 400 (invalid input syntax for type uuid)
   const isValidUuid = (val?: string | null): boolean =>
@@ -55,36 +73,54 @@ export async function insertAndVerifyDoubleEntryLedger(params: {
   const transactionId = crypto.randomUUID();
   const now = new Date().toISOString();
 
-  // 1. Prepare balanced double-entry rows (DEBIT + CREDIT)
+  // 1. Prepare balanced double-entry rows:
+  // DEBIT: Full Escrow Gross Principal Released
+  // CREDIT 1: Net Disbursed Payout to Beneficiary
+  // CREDIT 2: Protocol Clearinghouse Take-Rate Fee (exact plan rate)
+  // Mathematical Invariant: DEBIT === CREDIT 1 + CREDIT 2
   const debitEntry = {
     user_id: sanitizedUserId,
     vault_id: sanitizedVaultId,
     escrow_id: String(escrowId).trim(),
     transaction_id: transactionId,
     entry_type: "DEBIT",
-    amount: Math.round(amountCentsOrPaise),
+    amount: split.grossAmount,
     currency,
-    description: `${description} [DEBIT: Escrow Allocation Release]`,
+    description: `${description} [DEBIT: Gross Escrow Principal Release]`,
     created_at: now,
   };
 
-  const creditEntry = {
+  const creditBeneficiaryEntry = {
     user_id: sanitizedUserId,
     vault_id: sanitizedVaultId,
     escrow_id: String(escrowId).trim(),
     transaction_id: transactionId,
     entry_type: "CREDIT",
-    amount: Math.round(amountCentsOrPaise),
+    amount: split.netDisbursed,
     currency,
-    description: `${description} [CREDIT: Beneficiary Settlement Payout]`,
+    description: `${description} [CREDIT: Beneficiary Net Settlement Payout (${(100 - activeTakeRate.rate * 100).toFixed(2)}%)]`,
     created_at: now,
   };
+
+  const creditFeeEntry = {
+    user_id: sanitizedUserId,
+    vault_id: sanitizedVaultId,
+    escrow_id: String(escrowId).trim(),
+    transaction_id: transactionId,
+    entry_type: "CREDIT",
+    amount: split.feeAmount,
+    currency,
+    description: `${description} [CREDIT: Verisett Protocol Fee (${activeTakeRate.ratePercentage} - ${activeTakeRate.planName})]`,
+    created_at: now,
+  };
+
+  const entriesToInsert = [debitEntry, creditBeneficiaryEntry, creditFeeEntry];
 
   // 2. Insert balanced DEBIT and CREDIT records into public.ledger_entries
   try {
     const { error: insertError } = await supabaseAdmin
       .from("ledger_entries")
-      .insert([debitEntry, creditEntry]);
+      .insert(entriesToInsert);
 
     if (insertError) {
       console.warn("Ledger insert error (falling back to atomic in-memory ledger):", insertError);
@@ -94,9 +130,13 @@ export async function insertAndVerifyDoubleEntryLedger(params: {
           success: true,
           transactionId,
           verified: true,
+          takeRate: activeTakeRate,
           details: {
-            debitAmount: amountCentsOrPaise,
-            creditAmount: amountCentsOrPaise,
+            debitAmount: split.grossAmount,
+            creditAmount: split.grossAmount,
+            netDisbursed: split.netDisbursed,
+            feeAmount: split.feeAmount,
+            takeRatePercentage: activeTakeRate.ratePercentage,
             escrowId,
             timestamp: now,
           },
@@ -143,9 +183,13 @@ export async function insertAndVerifyDoubleEntryLedger(params: {
               success: true,
               transactionId,
               verified: true,
+              takeRate: activeTakeRate,
               details: {
                 debitAmount: debits,
                 creditAmount: credits,
+                netDisbursed: split.netDisbursed,
+                feeAmount: split.feeAmount,
+                takeRatePercentage: activeTakeRate.ratePercentage,
                 escrowId,
                 timestamp: now,
               },
@@ -172,9 +216,13 @@ export async function insertAndVerifyDoubleEntryLedger(params: {
       success: true,
       transactionId,
       verified: true,
+      takeRate: activeTakeRate,
       details: {
-        debitAmount: amountCentsOrPaise,
-        creditAmount: amountCentsOrPaise,
+        debitAmount: split.grossAmount,
+        creditAmount: split.grossAmount,
+        netDisbursed: split.netDisbursed,
+        feeAmount: split.feeAmount,
+        takeRatePercentage: activeTakeRate.ratePercentage,
         escrowId,
         timestamp: now,
       },
