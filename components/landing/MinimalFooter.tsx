@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { ExternalLink, ArrowUp } from "lucide-react";
+import Image from "next/image";
+import { ExternalLink } from "lucide-react";
 import { motion } from "framer-motion";
 import { VerisettLogo } from "../VerisettLogo";
 
@@ -230,38 +231,11 @@ export function MinimalFooter() {
 
         </div>
 
-        {/* 3. "Experience liftoff" Top Row (Matching Reference Image) */}
-        <div className="pt-6 flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4">
-          <div>
-            <h3 className="text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight text-zinc-950">
-              Experience liftoff
-            </h3>
-            <p className="text-xs sm:text-sm text-zinc-500 mt-1 font-mono">
-              Autonomous Machine-to-Machine Clearinghouse &amp; Settlement Protocol
-            </p>
-          </div>
-
-          <div className="flex items-center gap-5 text-xs text-zinc-600 font-medium">
-            <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200/60 text-emerald-700">
-              <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span>Vault Settlement Active</span>
-            </div>
-            <button
-              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-              className="inline-flex items-center gap-1 text-zinc-500 hover:text-zinc-950 transition-colors cursor-pointer"
-              title="Back to top"
-            >
-              <span>Back to top</span>
-              <ArrowUp className="w-3.5 h-3.5" />
-            </button>
-          </div>
-        </div>
-
       </div>
 
-      {/* 4. Monumental "Verisett AI" Letters Spanning the Width (Google Antigravity Aesthetic) */}
-      <div className="w-full overflow-hidden select-none pt-4 sm:pt-6 md:pt-10 pb-2 sm:pb-4 flex items-baseline justify-center">
-        <div className="flex items-baseline font-black font-sans tracking-[-0.04em] leading-[0.86] text-[12.5vw] sm:text-[14vw] md:text-[15vw] lg:text-[15.5vw] xl:text-[16vw] text-zinc-950">
+      {/* 3. Monumental "Verisett AI" Letters Spanning the Width with Founder Round Avatar */}
+      <div className="w-full overflow-hidden select-none pt-8 sm:pt-14 md:pt-18 pb-6 sm:pb-8 flex items-center justify-center">
+        <div className="flex items-center font-black font-sans tracking-[-0.04em] leading-none text-[11vw] sm:text-[12.5vw] md:text-[13.5vw] lg:text-[14vw] text-zinc-950">
           <span>Verisett</span>
           <span className="inline-block w-[0.16em]" />
           <motion.span
@@ -323,6 +297,28 @@ export function MinimalFooter() {
               Liftoff
             </span>
           </motion.span>
+
+          {/* Round image right after Verisett AI */}
+          <Link
+            href="/about"
+            title="Manoj S Malavalli — CEO/Founder"
+            className="relative shrink-0 ml-3 sm:ml-5 md:ml-7 pointer-events-auto group inline-flex"
+          >
+            <div className="w-[8vw] h-[8vw] min-w-[38px] min-h-[38px] max-w-[100px] max-h-[100px] rounded-full overflow-hidden border-2 sm:border-3 md:border-4 border-zinc-950 shadow-2xl ring-2 sm:ring-4 ring-blue-500/20 group-hover:scale-105 group-hover:ring-blue-500/40 transition-all">
+              <Image
+                src="/founder.jpg"
+                alt="Manoj S Malavalli - CEO/Founder of Verisett AI"
+                width={100}
+                height={100}
+                className="w-full h-full object-cover object-top"
+                priority
+              />
+            </div>
+            <span className="absolute bottom-0 right-0 flex h-2.5 w-2.5 sm:h-3.5 sm:w-3.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 sm:h-3.5 sm:w-3.5 bg-emerald-500 border border-white"></span>
+            </span>
+          </Link>
         </div>
       </div>
 
