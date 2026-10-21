@@ -347,21 +347,37 @@ export default function FeedbackPage() {
             <p className="text-xs font-mono text-zinc-500">Loading verified protocol reviews...</p>
           </div>
         ) : filteredReviews.length === 0 ? (
-          <div className="py-20 text-center rounded-2xl border border-dashed border-zinc-800 p-8 space-y-3 max-w-md mx-auto">
-            <MessageSquarePlus className="w-8 h-8 text-zinc-600 mx-auto" />
-            <h3 className="text-base font-bold text-zinc-200">No reviews found</h3>
-            <p className="text-xs text-zinc-500">
-              No testimonials match your current search or category filter.
+          <div className="py-20 text-center rounded-2xl border border-dashed border-zinc-800 p-8 space-y-3.5 max-w-md mx-auto">
+            <MessageSquarePlus className="w-8 h-8 text-blue-500 mx-auto" />
+            <h3 className="text-base font-bold text-zinc-200">
+              {reviews.length === 0 ? "No community reviews yet" : "No reviews found"}
+            </h3>
+            <p className="text-xs text-zinc-400 leading-relaxed">
+              {reviews.length === 0
+                ? "Be the first verified builder to share feedback and testimonials on Verisett AI!"
+                : "No testimonials match your current search or category filter."}
             </p>
-            <button
-              onClick={() => {
-                setSelectedCategory("All");
-                setSearchQuery("");
-              }}
-              className="text-xs font-semibold text-blue-400 hover:underline pt-2 inline-block cursor-pointer"
-            >
-              Clear filters
-            </button>
+            {reviews.length === 0 ? (
+              <div className="pt-2">
+                <button
+                  onClick={() => setIsModalOpen(true)}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-600 hover:bg-blue-500 text-xs font-semibold text-white transition-all shadow-sm cursor-pointer"
+                >
+                  <MessageSquarePlus className="w-3.5 h-3.5" />
+                  <span>Submit the First Review</span>
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => {
+                  setSelectedCategory("All");
+                  setSearchQuery("");
+                }}
+                className="text-xs font-semibold text-blue-400 hover:underline pt-2 inline-block cursor-pointer"
+              >
+                Clear filters
+              </button>
+            )}
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

@@ -4,10 +4,10 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Star, ShieldCheck, ArrowRight, MessageSquarePlus, Sparkles } from "lucide-react";
 import type { FeedbackItem } from "@/app/api/feedback/route";
-import { SEED_FEEDBACK } from "@/app/api/feedback/route";
 
 export function TrustedByBuilders() {
-  const [previewReviews, setPreviewReviews] = useState<FeedbackItem[]>(SEED_FEEDBACK.slice(0, 3));
+  const [previewReviews, setPreviewReviews] = useState<FeedbackItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     let isMounted = true;
@@ -20,12 +20,15 @@ export function TrustedByBuilders() {
         return res.json();
       })
       .then((data) => {
-        if (data?.feedback && data.feedback.length > 0 && isMounted) {
+        if (data?.feedback && isMounted) {
           setPreviewReviews(data.feedback.slice(0, 3));
         }
       })
       .catch((err) => {
         console.warn("[TrustedByBuilders Exception]", err?.message || err);
+      })
+      .finally(() => {
+        if (isMounted) setIsLoading(false);
       });
 
     return () => {
@@ -67,69 +70,112 @@ export function TrustedByBuilders() {
           </Link>
         </div>
 
-        {/* 3-Card Preview Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {previewReviews.map((item) => (
-            <div
-              key={item.id}
-              className="rounded-2xl border border-zinc-200 bg-[#FAF8F5]/80 p-6 shadow-2xs hover:shadow-md hover:border-zinc-300 transition-all flex flex-col justify-between"
-            >
-              <div className="space-y-3.5">
-                {/* Rating & Category */}
-                <div className="flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-0.5" aria-label={`${item.rating} stars`}>
-                    {Array.from({ length: 5 }).map((_, i) => (
-                      <Star
-                        key={i}
-                        className={`w-3.5 h-3.5 ${
-                          i < item.rating
-                            ? "text-amber-500 fill-amber-500"
-                            : "text-zinc-300"
-                        }`}
-                      />
-                    ))}
-                  </div>
-
-                  <span className="px-2.5 py-0.5 rounded-full bg-white border border-zinc-200 text-[10px] font-mono font-medium text-zinc-700">
-                    {item.category}
-                  </span>
+        {/* Reviews Content: Loading Skeletons vs Empty Invite vs Live Reviews */}
+        {isLoading ? (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[1, 2, 3].map((n) => (
+              <div
+                key={n}
+                className="rounded-2xl border border-zinc-200 bg-[#FAF8F5]/80 p-6 shadow-2xs flex flex-col justify-between animate-pulse space-y-4"
+              >
+                <div className="space-y-3">
+                  <div className="h-4 w-24 bg-zinc-200 rounded" />
+                  <div className="h-3 w-full bg-zinc-200 rounded" />
+                  <div className="h-3 w-4/5 bg-zinc-200 rounded" />
                 </div>
-
-                {/* Review Message */}
-                <blockquote className="text-xs sm:text-sm text-zinc-700 leading-relaxed font-sans">
-                  “{item.message}”
-                </blockquote>
-              </div>
-
-              {/* Author Row */}
-              <div className="pt-5 mt-5 border-t border-zinc-200/80 flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-xs font-bold text-white shrink-0 shadow-2xs">
-                  {item.name
-                    .split(" ")
-                    .map((n) => n[0])
-                    .slice(0, 2)
-                    .join("")}
-                </div>
-
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-1.5">
-                    <span className="font-semibold text-xs text-zinc-950 truncate">
-                      {item.name}
-                    </span>
-                    <ShieldCheck className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+                <div className="pt-4 border-t border-zinc-200 flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-zinc-200" />
+                  <div className="space-y-1.5 flex-1">
+                    <div className="h-3 w-28 bg-zinc-200 rounded" />
+                    <div className="h-2.5 w-36 bg-zinc-100 rounded" />
                   </div>
-                  <p className="text-[11px] text-zinc-500 truncate font-mono">
-                    {item.role_title}
-                    {item.role_title && item.company && " • "}
-                    {item.company && (
-                      <span className="font-semibold text-zinc-700">{item.company}</span>
-                    )}
-                  </p>
                 </div>
               </div>
+            ))}
+          </div>
+        ) : previewReviews.length === 0 ? (
+          <div className="rounded-2xl border border-dashed border-zinc-300 bg-[#FAF8F5]/60 p-8 sm:p-12 text-center max-w-xl mx-auto space-y-3.5">
+            <MessageSquarePlus className="w-8 h-8 text-blue-600 mx-auto" />
+            <h3 className="text-base font-bold text-zinc-950 font-sans">
+              Be the First Builder to Leave a Review
+            </h3>
+            <p className="text-xs sm:text-sm text-zinc-500 leading-relaxed font-sans max-w-md mx-auto">
+              Share your team&apos;s experience integrating Verisett AI&apos;s autonomous M2M clearinghouse, deterministic vaults, and cryptographic assertion protocol.
+            </p>
+            <div className="pt-2">
+              <Link
+                href="/feedback"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-zinc-950 hover:bg-blue-600 text-xs font-semibold text-white transition-all shadow-xs"
+              >
+                <MessageSquarePlus className="w-3.5 h-3.5" />
+                <span>Submit Feedback &amp; Testimonial</span>
+              </Link>
             </div>
-          ))}
-        </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {previewReviews.map((item) => (
+              <div
+                key={item.id}
+                className="rounded-2xl border border-zinc-200 bg-[#FAF8F5]/80 p-6 shadow-2xs hover:shadow-md hover:border-zinc-300 transition-all flex flex-col justify-between"
+              >
+                <div className="space-y-3.5">
+                  {/* Rating & Category */}
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-0.5" aria-label={`${item.rating} stars`}>
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <Star
+                          key={i}
+                          className={`w-3.5 h-3.5 ${
+                            i < item.rating
+                              ? "text-amber-500 fill-amber-500"
+                              : "text-zinc-300"
+                          }`}
+                        />
+                      ))}
+                    </div>
+
+                    <span className="px-2.5 py-0.5 rounded-full bg-white border border-zinc-200 text-[10px] font-mono font-medium text-zinc-700">
+                      {item.category}
+                    </span>
+                  </div>
+
+                  {/* Review Message */}
+                  <blockquote className="text-xs sm:text-sm text-zinc-700 leading-relaxed font-sans">
+                    “{item.message}”
+                  </blockquote>
+                </div>
+
+                {/* Author Row */}
+                <div className="pt-5 mt-5 border-t border-zinc-200/80 flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-xs font-bold text-white shrink-0 shadow-2xs">
+                    {item.name
+                      .split(" ")
+                      .map((n) => n[0])
+                      .slice(0, 2)
+                      .join("")}
+                  </div>
+
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-semibold text-xs text-zinc-950 truncate">
+                        {item.name}
+                      </span>
+                      <ShieldCheck className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+                    </div>
+                    <p className="text-[11px] text-zinc-500 truncate font-mono">
+                      {item.role_title}
+                      {item.role_title && item.company && " • "}
+                      {item.company && (
+                        <span className="font-semibold text-zinc-700">{item.company}</span>
+                      )}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
 
       </div>
     </section>
