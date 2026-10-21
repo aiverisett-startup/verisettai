@@ -11,6 +11,8 @@ export interface AppEnv {
   PAYMENT_WEBHOOK_SECRET: string;
   RAZORPAY_KEY_ID?: string;
   RAZORPAY_KEY_SECRET?: string;
+  AWS_WORKER_URL?: string;
+  AWS_WORKER_SECRET_KEY?: string;
   NODE_ENV: string;
 }
 
@@ -53,6 +55,8 @@ export function validateEnvironment(): {
       "whsec_production_verisett_secret",
     RAZORPAY_KEY_ID: process.env.RAZORPAY_KEY_ID,
     RAZORPAY_KEY_SECRET: process.env.RAZORPAY_KEY_SECRET,
+    AWS_WORKER_URL: process.env.AWS_WORKER_URL,
+    AWS_WORKER_SECRET_KEY: process.env.AWS_WORKER_SECRET_KEY,
     NODE_ENV: process.env.NODE_ENV || "development",
   };
 

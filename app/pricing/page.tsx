@@ -6,6 +6,7 @@ import { PricingSection } from "@/components/PricingSection";
 import { FAQSection } from "@/components/landing/FAQSection";
 import { WebsiteEdgeShapes } from "@/components/ui/WebsiteEdgeShapes";
 import { GoldenBackgroundShapes } from "@/components/ui/GoldenBackgroundShapes";
+import { MinimalFooter } from "@/components/landing/MinimalFooter";
 import { getPlans } from "@/app/actions/register";
 
 export default async function PricingPage() {
@@ -23,9 +24,6 @@ export default async function PricingPage() {
           <div className="flex items-center gap-3">
             <Link href="/" className="flex items-center gap-2.5 group">
               <VerisettLogo size={30} />
-              <span className="text-base font-bold tracking-tight text-[#1C1A17] group-hover:text-blue-600 transition-colors">
-                Verisett AI
-              </span>
             </Link>
             <span className="hidden sm:inline-block text-[#EAE3D2]">/</span>
             <span className="hidden sm:inline-block rounded-lg bg-[#FAF8F5] px-2.5 py-1 text-[11px] font-mono text-[#6E675D] border border-[#EAE3D2]">
@@ -59,29 +57,8 @@ export default async function PricingPage() {
         <FAQSection />
       </main>
 
-      {/* Clean Light Footer */}
-      <footer className="border-t border-[#EAE3D2] bg-[#FAF8F5] py-12 text-xs text-[#8C8275] font-sans">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p>© {new Date().getFullYear()} Verisett AI Project / Manoj S.M. — Experimental Open-Source Sandbox</p>
-          <div className="flex items-center gap-4 font-mono text-xs">
-            <Link href="/about" className="hover:text-blue-600 transition-colors">
-              /about
-            </Link>
-            <Link href="/security" className="hover:text-blue-600 transition-colors">
-              /security
-            </Link>
-            <Link href="/terms" className="hover:text-blue-600 transition-colors">
-              /terms
-            </Link>
-            <Link href="/privacy" className="hover:text-blue-600 transition-colors">
-              /privacy
-            </Link>
-            <Link href="/docs" className="hover:text-blue-600 transition-colors">
-              /docs
-            </Link>
-          </div>
-        </div>
-      </footer>
+      {/* Clean Monumental Footer */}
+      <MinimalFooter />
     </div>
   );
 }

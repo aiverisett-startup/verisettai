@@ -285,9 +285,6 @@ function CheckoutInner() {
             <div className="h-4 w-px bg-[#CBD5E1] hidden sm:block" />
             <Link href="/" className="flex items-center gap-2">
               <VerisettLogo size={22} />
-              <span className="font-bold text-sm tracking-tight text-[#0F172A]">
-                Verisett AI
-              </span>
               <span className="text-[11px] font-mono text-[#64748B] uppercase px-2 py-0.5 rounded-md bg-[#F1F5F9] border border-[#E2E8F0] hidden md:inline-block">
                 Protocol Billing
               </span>

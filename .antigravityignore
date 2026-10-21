@@ -1,0 +1,72 @@
+# ==============================================================================
+# Verisett AI — Antigravity Agent Ignore Rules
+# Excludes heavy artifacts, caches, build files, and test outputs to prevent
+# memory overflows and maintain optimal agent context windows.
+# ==============================================================================
+
+# Node dependencies & package manager caches
+node_modules/
+.pnpm-store/
+.yarn/
+.npm/
+
+# Next.js, Remotion, and web build outputs
+.next/
+dist/
+out/
+build/
+.turbo/
+.parcel-cache/
+
+# Version control system internals
+.git/
+.svn/
+.hg/
+
+# TypeScript & Compiler build caches
+*.tsbuildinfo
+.cache/
+tsconfig.tsbuildinfo
+
+# Python / Virtual Environment caches
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+env/
+.pytest_cache/
+.ruff_cache/
+
+# Test & coverage artifacts
+coverage/
+.nyc_output/
+playwright-report/
+test-results/
+blob-report/
+cypress/videos/
+cypress/screenshots/
+
+# Temporary and log files
+tmp/
+temp/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment and secrets (local secrets only)
+.env.local
+.env.*.local
+
+# Large media outputs (rendered video & audio assets)
+out/*.mp4
+out/*.webm
+public/*.mp4
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

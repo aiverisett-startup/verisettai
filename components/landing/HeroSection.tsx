@@ -82,11 +82,7 @@ export function HeroSection({
             variants={itemVariants}
             className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-[-0.02em] text-[#0F172A] leading-[1.12] will-change-transform max-w-4xl"
           >
-            <span>Verisett AI</span>{" "}
-            <span className="text-[#94A3B8] font-light">—</span>{" "}
-            <span className="text-[#0F172A]">
-              Programmatic Vault Escrow for Multi-Agent Economies.
-            </span>
+            Programmatic Vault Escrow for Multi-Agent Economies.
           </motion.h1>
 
           {/* 3. High-Contrast Body Text */}

@@ -31,6 +31,7 @@ const eslintConfig = defineConfig([
     "src/**",
     "tests/**",
     "examples/**",
+    "backend/**",
   ]),
 ]);
 

@@ -862,9 +862,6 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
           <div className="flex items-center gap-4 sm:gap-6">
             <Link href="/" className="hover:opacity-85 transition-opacity flex items-center gap-2">
               <VerisettLogo size={32} />
-              <span className="font-bold tracking-tight text-base hidden md:inline font-mono">
-                VERISETT
-              </span>
             </Link>
 
             {/* Global Command Bar (Ctrl+K) */}

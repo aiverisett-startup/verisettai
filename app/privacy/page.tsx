@@ -18,6 +18,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { VerisettLogo } from "@/components/VerisettLogo";
+import { MinimalFooter } from "@/components/landing/MinimalFooter";
 
 export default function PrivacyPolicyPage() {
   const lastUpdated = "September 13, 2026";
@@ -43,10 +44,7 @@ export default function PrivacyPolicyPage() {
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-3">
             <Link href="/" className="flex items-center gap-2.5 group">
-              <VerisettLogo size={28} />
-              <span className="text-base font-bold tracking-tight text-white group-hover:text-[#C59B5F] transition-colors">
-                Verisett AI
-              </span>
+              <VerisettLogo size={28} inverted={true} />
             </Link>
             <span className="hidden sm:inline-block text-[#3B527E]">/</span>
             <span className="hidden sm:inline-block rounded-md bg-[#142442] px-2.5 py-0.5 text-[11px] font-mono text-[#C59B5F] border border-[#1E345E]">
@@ -399,28 +397,8 @@ export default function PrivacyPolicyPage() {
         </div>
       </div>
 
-      {/* Minimal Dark Footer */}
-      <footer className="border-t border-[#1E345E]/80 bg-[#070E1B] py-8 text-xs text-[#64748B]">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2 text-[#94A3B8]">
-            <VerisettLogo size={18} />
-            <span>&copy; {new Date().getFullYear()} Verisett AI Project / Manoj S.M. All rights reserved.</span>
-          </div>
-          <div className="flex items-center gap-6 font-medium">
-            <Link href="/" className="hover:text-[#C59B5F] transition-colors">Platform Home</Link>
-            <Link href="/terms" className="hover:text-[#C59B5F] transition-colors">Terms of Service</Link>
-            <a href="https://www.youtube.com/@VerisettAI" target="_blank" rel="noopener noreferrer" className="hover:text-[#C59B5F] transition-colors">
-              YouTube
-            </a>
-            <a href="https://www.instagram.com/ai.verisett/" target="_blank" rel="noopener noreferrer" className="hover:text-[#C59B5F] transition-colors">
-              Instagram
-            </a>
-            <a href="https://x.com/ai_verisett" target="_blank" rel="noopener noreferrer" className="hover:text-[#C59B5F] transition-colors">
-              Twitter / X
-            </a>
-          </div>
-        </div>
-      </footer>
+      {/* Monumental Footer */}
+      <MinimalFooter />
     </div>
   );
 }

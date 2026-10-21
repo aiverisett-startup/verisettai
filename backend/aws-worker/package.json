@@ -1,0 +1,13 @@
+{
+  "name": "verisett-aws-worker",
+  "version": "1.0.0",
+  "description": "Verisett AI - AWS Free-Tier Background Clearinghouse Worker (Lambda / EC2)",
+  "main": "handler.js",
+  "scripts": {
+    "start": "node handler.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "private": true
+}

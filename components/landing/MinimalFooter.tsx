@@ -1,8 +1,9 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, ArrowUp } from "lucide-react";
+import { motion } from "framer-motion";
 import { VerisettLogo } from "../VerisettLogo";
 
 function InstagramGradientIcon({ className = "w-3.5 h-3.5" }: { className?: string }) {
@@ -53,8 +54,39 @@ function GithubIcon({ className = "w-3.5 h-3.5" }: { className?: string }) {
 }
 
 export function MinimalFooter() {
+  const [isScrolledToBottom, setIsScrolledToBottom] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const windowHeight = window.innerHeight;
+      const documentHeight = document.documentElement.scrollHeight;
+      const scrollTop = window.scrollY || document.documentElement.scrollTop;
+      
+      // When user is scrolled to the bottom (within 50px of the end)
+      const atBottom = windowHeight + scrollTop >= documentHeight - 50;
+      setIsScrolledToBottom(atBottom);
+    };
+
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+      handleScroll();
+    };
+
+    handleResize();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("resize", handleResize, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+  const liftDistance = isMobile ? -42 : -88;
+
   return (
-    <footer className="border-t border-zinc-200 bg-[#FAF8F5] py-14 text-sm font-sans relative overflow-hidden">
+    <footer className="border-t border-zinc-200 bg-[#FAF8F5] pt-14 pb-0 text-sm font-sans relative overflow-hidden">
       {/* Background Subtle Semicircles */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden select-none -z-10">
         <div className="absolute bottom-4 -left-8 sm:-left-12 w-36 sm:w-48 h-36 opacity-25">
@@ -90,9 +122,6 @@ export function MinimalFooter() {
           <div className="flex flex-col items-start gap-1">
             <div className="flex items-center gap-2.5">
               <VerisettLogo size={24} />
-              <span className="font-bold text-base tracking-tight text-zinc-950 font-sans">
-                Verisett AI
-              </span>
             </div>
             <span className="text-[11px] font-mono text-zinc-500 uppercase tracking-wider">
               Autonomous M2M Clearinghouse Protocol
@@ -163,7 +192,7 @@ export function MinimalFooter() {
             </span>
             <p className="text-xs sm:text-sm text-zinc-700 leading-relaxed font-sans">
               <span className="font-semibold text-zinc-950">
-                Founded &amp; Architected by Manoj S.M.
+                Founded &amp; Architected by Manoj S Malavalli
               </span>{" "}
               <span className="text-zinc-500">
                 — Deterministic financial settlement for autonomous agent economies.
@@ -201,16 +230,114 @@ export function MinimalFooter() {
 
         </div>
 
-        {/* 3. Bottom Navigation & Copyright */}
-        <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
-          
-          {/* Bottom Left: Copyright */}
-          <div className="text-zinc-500 font-sans">
-            © 2026 Verisett AI. All rights reserved.
+        {/* 3. "Experience liftoff" Top Row (Matching Reference Image) */}
+        <div className="pt-6 flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4">
+          <div>
+            <h3 className="text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight text-zinc-950">
+              Experience liftoff
+            </h3>
+            <p className="text-xs sm:text-sm text-zinc-500 mt-1 font-mono">
+              Autonomous Machine-to-Machine Clearinghouse &amp; Settlement Protocol
+            </p>
           </div>
 
-          {/* Bottom Right: Evenly spaced single-line horizontal bar with subtle dividers */}
-          <nav className="flex flex-wrap items-center justify-center sm:justify-end gap-x-3 sm:gap-x-4 gap-y-2 text-zinc-600 font-sans font-medium">
+          <div className="flex items-center gap-5 text-xs text-zinc-600 font-medium">
+            <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200/60 text-emerald-700">
+              <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span>Vault Settlement Active</span>
+            </div>
+            <button
+              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+              className="inline-flex items-center gap-1 text-zinc-500 hover:text-zinc-950 transition-colors cursor-pointer"
+              title="Back to top"
+            >
+              <span>Back to top</span>
+              <ArrowUp className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      {/* 4. Monumental "Verisett AI" Letters Spanning the Width (Google Antigravity Aesthetic) */}
+      <div className="w-full overflow-hidden select-none pt-4 sm:pt-6 md:pt-10 pb-2 sm:pb-4 flex items-baseline justify-center">
+        <div className="flex items-baseline font-black font-sans tracking-[-0.04em] leading-[0.86] text-[12.5vw] sm:text-[14vw] md:text-[15vw] lg:text-[15.5vw] xl:text-[16vw] text-zinc-950">
+          <span>Verisett</span>
+          <span className="inline-block w-[0.16em]" />
+          <motion.span
+            animate={
+              isScrolledToBottom
+                ? {
+                    y: [liftDistance, liftDistance - 10, liftDistance],
+                    rotate: [-3, -7, -3],
+                    scale: [1, 1.03, 1],
+                    transition: {
+                      y: {
+                        duration: 2.4,
+                        repeat: Infinity,
+                        repeatType: "reverse",
+                        ease: "easeInOut",
+                      },
+                      rotate: {
+                        duration: 2.8,
+                        repeat: Infinity,
+                        repeatType: "reverse",
+                        ease: "easeInOut",
+                      },
+                      scale: {
+                        duration: 2.4,
+                        repeat: Infinity,
+                        repeatType: "reverse",
+                        ease: "easeInOut",
+                      },
+                    },
+                  }
+                : {
+                    y: 0,
+                    rotate: 0,
+                    scale: 1,
+                    transition: {
+                      type: "spring",
+                      stiffness: 260,
+                      damping: 24,
+                    },
+                  }
+            }
+            whileHover={{
+              y: liftDistance - 16,
+              scale: 1.06,
+              rotate: -9,
+              transition: { type: "spring", stiffness: 300, damping: 20 },
+            }}
+            className="inline-block text-blue-600 cursor-pointer relative"
+            title="Verisett AI — Antigravity Liftoff"
+          >
+            AI
+            {/* Subtle Liftoff Pill Indicator */}
+            <span
+              aria-hidden="true"
+              className={`absolute -top-5 sm:-top-7 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full bg-blue-600 text-[8px] sm:text-[10px] font-mono font-bold text-white tracking-widest uppercase shadow-md transition-all duration-300 pointer-events-none whitespace-nowrap ${
+                isScrolledToBottom ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-75 translate-y-2"
+              }`}
+            >
+              Liftoff
+            </span>
+          </motion.span>
+        </div>
+      </div>
+
+      {/* 5. Bottom Navigation & Copyright Row (Matching Bottom Divider in Reference Image) */}
+      <div className="border-t border-zinc-200 bg-[#FAF8F5]">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-5 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-sans text-zinc-500">
+          
+          {/* Bottom Left: Logo / Brand + Copyright */}
+          <div className="flex items-center gap-2 text-zinc-600">
+            <span className="font-semibold text-zinc-950">Verisett AI</span>
+            <span>© 2026. All rights reserved.</span>
+          </div>
+
+          {/* Bottom Right: Clean Horizontal Navigation Links */}
+          <nav className="flex flex-wrap items-center justify-center sm:justify-end gap-x-3 sm:gap-x-4 gap-y-2 text-zinc-600 font-medium">
             <Link href="/about" className="hover:text-zinc-950 transition-colors">
               About
             </Link>
@@ -241,7 +368,6 @@ export function MinimalFooter() {
           </nav>
 
         </div>
-
       </div>
     </footer>
   );

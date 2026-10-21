@@ -27,6 +27,7 @@ import {
   Check,
 } from "lucide-react";
 import { VerisettLogo } from "@/components/VerisettLogo";
+import { MinimalFooter } from "@/components/landing/MinimalFooter";
 
 export default function SecurityArchitecturePage() {
   const [copiedSnippet, setCopiedSnippet] = useState(false);
@@ -128,10 +129,7 @@ export default function SecurityArchitecturePage() {
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-3">
             <Link href="/" className="flex items-center gap-2.5 group">
-              <VerisettLogo size={28} />
-              <span className="text-base font-bold tracking-tight text-white group-hover:text-[#C59B5F] transition-colors">
-                Verisett AI
-              </span>
+              <VerisettLogo size={28} inverted={true} />
             </Link>
             <span className="hidden sm:inline-block text-[#3B527E]">/</span>
             <span className="hidden sm:inline-block rounded-md bg-[#142442] px-2.5 py-0.5 text-[11px] font-mono text-[#C59B5F] border border-[#1E345E]">
@@ -554,48 +552,8 @@ export default function SecurityArchitecturePage() {
         </section>
       </main>
 
-      {/* Sleek Minimal Dark Footer */}
-      <footer className="border-t border-[#1E345E]/80 bg-[#070E1B] py-12 text-xs text-[#64748B] font-montserrat">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-8">
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pb-6 border-b border-[#1E345E]/60">
-            <div className="space-y-1">
-              <div className="flex items-center gap-2.5">
-                <VerisettLogo size={22} />
-                <span className="text-sm font-bold text-white tracking-tight">Verisett AI</span>
-                <span className="rounded bg-[#142442] px-2 py-0.5 text-[10px] font-mono text-[#C59B5F] border border-[#1E345E]">
-                  SECURITY SPECIFICATION
-                </span>
-              </div>
-              <p className="text-xs text-[#94A3B8]">
-                Founded &amp; Architected by Manoj S.M. — Deterministic financial settlement for autonomous agent economies.
-              </p>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-5 font-mono text-xs">
-              <Link href="/security" className="text-[#C59B5F] hover:text-white transition-colors font-semibold">
-                /security
-              </Link>
-              <Link href="/about" className="hover:text-white transition-colors">
-                /about
-              </Link>
-              <Link href="/terms" className="hover:text-white transition-colors">
-                /terms
-              </Link>
-              <Link href="/privacy" className="hover:text-white transition-colors">
-                /privacy
-              </Link>
-              <Link href="/docs" className="hover:text-white transition-colors">
-                /docs
-              </Link>
-            </div>
-          </div>
-
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-[#475569]">
-            <p>© {new Date().getFullYear()} Verisett AI Project / Manoj S.M. All rights reserved. Open-Source Simulation Sandbox.</p>
-            <p>Deterministic Invariant: Lock &gt; Mathematical Verification (&lt;50ms) &gt; Release.</p>
-          </div>
-        </div>
-      </footer>
+      {/* Monumental Footer */}
+      <MinimalFooter />
     </div>
   );
 }

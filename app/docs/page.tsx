@@ -17,6 +17,7 @@ import {
   Code2,
 } from "lucide-react";
 import { VerisettLogo } from "@/components/VerisettLogo";
+import { MinimalFooter } from "@/components/landing/MinimalFooter";
 
 export default function ProtocolDocsPage() {
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
@@ -72,10 +73,7 @@ print(f"Settled: {settlement['status']} | Fee: 1.5% | Net Payout: \${settlement[
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-3">
             <Link href="/" className="flex items-center gap-2.5 group">
-              <VerisettLogo size={28} />
-              <span className="text-base font-bold tracking-tight text-white group-hover:text-blue-400 transition-colors">
-                Verisett AI
-              </span>
+              <VerisettLogo size={28} inverted={true} />
             </Link>
             <span className="hidden sm:inline-block text-[#3B527E]">/</span>
             <span className="hidden sm:inline-block rounded-md bg-[#142442] px-2.5 py-0.5 text-[11px] font-mono text-blue-400 border border-[#1E345E]">
@@ -317,29 +315,8 @@ print(f"Settled: {settlement['status']} | Fee: 1.5% | Net Payout: \${settlement[
         </section>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-[#1E345E]/80 bg-[#070E1B] py-10 text-xs text-[#64748B] font-montserrat">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p>© {new Date().getFullYear()} Verisett AI Project / Manoj S.M. — Experimental Open-Source Sandbox</p>
-          <div className="flex items-center gap-4 font-mono text-xs">
-            <Link href="/about" className="hover:text-white transition-colors">
-              /about
-            </Link>
-            <Link href="/security" className="hover:text-white transition-colors">
-              /security
-            </Link>
-            <Link href="/terms" className="hover:text-white transition-colors">
-              /terms
-            </Link>
-            <Link href="/privacy" className="hover:text-white transition-colors">
-              /privacy
-            </Link>
-            <Link href="/docs" className="text-blue-400 font-semibold hover:text-white transition-colors">
-              /docs
-            </Link>
-          </div>
-        </div>
-      </footer>
+      {/* Monumental Footer */}
+      <MinimalFooter />
     </div>
   );
 }
