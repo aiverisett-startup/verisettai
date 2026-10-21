@@ -276,8 +276,8 @@ export function PricingSection({ initialPlans }: PricingSectionProps) {
           )}
         </div>
 
-        {/* Tier Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch pt-2">
+        {/* Bento Box Grid Container */}
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 auto-rows-fr items-stretch pt-2">
           {plans.map((plan) => {
             const details = PLAN_DESCRIPTIONS[plan.id] || PLAN_DESCRIPTIONS.tier_1;
             const isPaid = plan.is_paid;
@@ -287,19 +287,39 @@ export function PricingSection({ initialPlans }: PricingSectionProps) {
             const remaining = plan.max_capacity !== null ? Math.max(0, plan.max_capacity - plan.claimed_count) : null;
             const percentage = plan.max_capacity !== null ? Math.min(100, Math.round((plan.claimed_count / plan.max_capacity) * 100)) : null;
 
+            // Responsive Bento footprint spans per plan
+            const getBentoCellSpan = (id: string) => {
+              switch (id) {
+                case "tier_3": // Sovereign Node Plan (₹30,000 Lifetime) - 2-column flagship anchor
+                  return "col-span-1 md:col-span-3 lg:col-span-2 lg:row-span-2 lg:col-start-3 lg:row-start-1";
+                case "tier_1": // Developer / Pro Plan (₹2,500/mo) - prominent vertical pillar
+                  return "col-span-1 md:col-span-1 lg:col-span-1 lg:row-span-2 lg:col-start-2 lg:row-start-1";
+                case "community": // Starter Plan (₹0) - balanced modular cell
+                  return "col-span-1 md:col-span-1 lg:col-span-1 lg:row-span-1 lg:col-start-1 lg:row-start-1";
+                case "tier_2": // Institutional / Enterprise Plan (₹7,999/mo) - balanced modular cell
+                  return "col-span-1 md:col-span-1 lg:col-span-1 lg:row-span-1 lg:col-start-1 lg:row-start-2";
+                default:
+                  return "col-span-1";
+              }
+            };
+
             return (
               <div
                 key={plan.id}
-                className={`rounded-[16px] p-6 sm:p-7 flex flex-col justify-between h-full border transition-all duration-200 relative ${
+                className={`rounded-2xl p-6 sm:p-7 flex flex-col justify-between h-full border transition-all duration-300 backdrop-blur-xl relative group ${getBentoCellSpan(
+                  plan.id
+                )} ${
                   plan.id === "tier_3"
-                    ? "border-amber-400/80 bg-gradient-to-b from-amber-500/[0.04] via-white to-amber-500/[0.08] ring-2 ring-amber-400 shadow-[0_20px_50px_-12px_rgba(245,158,11,0.25)]"
+                    ? "border-amber-400/80 bg-gradient-to-b from-amber-500/[0.04] via-white to-amber-500/[0.08] ring-2 ring-amber-400 shadow-[0_20px_50px_-12px_rgba(245,158,11,0.25)] hover:border-amber-300 hover:shadow-[0_25px_60px_-12px_rgba(245,158,11,0.35)]"
+                    : plan.id === "tier_1"
+                    ? "border-[#2563EB] bg-white ring-2 ring-[#2563EB] shadow-[0_20px_50px_-12px_rgba(37,99,235,0.12)] hover:border-blue-500 hover:shadow-[0_25px_60px_-12px_rgba(37,99,235,0.22)]"
                     : plan.id === "tier_2"
-                    ? "border-[#2563EB] bg-white ring-2 ring-[#2563EB] shadow-[0_20px_50px_-12px_rgba(37,99,235,0.12)]"
-                    : "border-[#E2E8F0] bg-white hover:border-[#CBD5E1] shadow-xs"
+                    ? "border-[#E2E8F0] bg-white hover:border-[#2563EB]/60 shadow-xs hover:shadow-md"
+                    : "border-[#E2E8F0] bg-white hover:border-zinc-300 shadow-xs hover:shadow-sm"
                 }`}
               >
-                {/* Popular Badge for Tier 2 */}
-                {plan.id === "tier_2" && (
+                {/* Popular Badge for Developer / Pro Plan (Tier 1) */}
+                {plan.id === "tier_1" && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-20 whitespace-nowrap">
                     <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-[#2563EB] text-white text-xs font-mono font-bold tracking-wider uppercase shadow-xs">
                       <Sparkles className="w-3.5 h-3.5 text-white" />
@@ -318,57 +338,62 @@ export function PricingSection({ initialPlans }: PricingSectionProps) {
                   </div>
                 )}
 
-                <div className="space-y-5">
-                  {/* Tier Header & Status Badge */}
-                  <div className="flex items-center justify-between gap-2 pt-1 flex-wrap">
-                    <span
-                      className={`text-xs font-mono font-bold tracking-wider uppercase px-2.5 py-1 rounded border ${
-                        plan.id === "tier_3"
-                          ? "border-amber-300 bg-amber-50 text-amber-900"
-                          : "border-zinc-200 bg-zinc-50 text-zinc-800"
-                      }`}
-                    >
-                      {plan.id === "community"
-                        ? "FREE // UNMETERED"
-                        : plan.id === "tier_1"
-                        ? "PRO // 800 SLOTS"
-                        : plan.id === "tier_2"
-                        ? "ENTERPRISE // 500 SLOTS"
-                        : "SOVEREIGN // 200 SEATS"}
-                    </span>
-
-                    {/* Status Pill */}
-                    {isTierCapReached ? (
-                      <span className="px-2.5 py-1 rounded border border-rose-300 bg-rose-50 text-rose-700 text-xs font-mono font-bold">
-                        [Cap Reached]
-                      </span>
-                    ) : isTotalPaidExhausted && isPaid ? (
-                      <span className="px-2.5 py-1 rounded border border-rose-300 bg-rose-50 text-rose-700 text-xs font-mono font-bold">
-                        [Closed]
-                      </span>
-                    ) : (
+                <div className="space-y-4">
+                  {/* Top Quadrant: Plan name, badge pill, protocol take-rate */}
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between gap-2 pt-1 flex-wrap">
                       <span
-                        className={`text-xs sm:text-sm font-mono font-bold ${
-                          plan.id === "tier_3" ? "text-amber-800" : "text-emerald-700"
+                        className={`text-[11px] font-mono font-bold tracking-wider uppercase px-2.5 py-1 rounded border ${
+                          plan.id === "tier_3"
+                            ? "border-amber-300 bg-amber-50 text-amber-900"
+                            : "border-zinc-200 bg-zinc-50 text-zinc-800"
                         }`}
                       >
-                        {details.takeRate}
+                        {plan.id === "community"
+                          ? "FREE // UNMETERED"
+                          : plan.id === "tier_1"
+                          ? "PRO // 800 SLOTS"
+                          : plan.id === "tier_2"
+                          ? "ENTERPRISE // 500 SLOTS"
+                          : "SOVEREIGN // 200 SEATS"}
                       </span>
-                    )}
+
+                      {/* Status Pill / Take-Rate */}
+                      {isTierCapReached ? (
+                        <span className="px-2.5 py-1 rounded border border-rose-300 bg-rose-50 text-rose-700 text-xs font-mono font-bold">
+                          [Cap Reached]
+                        </span>
+                      ) : isTotalPaidExhausted && isPaid ? (
+                        <span className="px-2.5 py-1 rounded border border-rose-300 bg-rose-50 text-rose-700 text-xs font-mono font-bold">
+                          [Closed]
+                        </span>
+                      ) : (
+                        <span
+                          className={`text-xs sm:text-sm font-mono font-bold px-2 py-0.5 rounded border ${
+                            plan.id === "tier_3"
+                              ? "text-amber-900 bg-amber-100/70 border-amber-300"
+                              : "text-emerald-700 bg-emerald-50 border-emerald-200"
+                          }`}
+                        >
+                          {details.takeRate}
+                        </span>
+                      )}
+                    </div>
+
+                    <div>
+                      <h3 className="text-xl sm:text-2xl font-bold text-zinc-950 tracking-tight">
+                        {plan.name}
+                      </h3>
+                      <p className="text-xs text-zinc-600 mt-1 leading-relaxed">
+                        {details.tagline}
+                      </p>
+                    </div>
                   </div>
 
-                  {/* Title & Tagline */}
-                  <div>
-                    <h3 className="text-2xl font-bold text-zinc-950 tracking-tight">{plan.name}</h3>
-                    <p className="text-xs sm:text-sm text-zinc-600 mt-1.5 leading-relaxed">
-                      {details.tagline}
-                    </p>
-                  </div>
-
-                  {/* Price Section */}
-                  <div className="pt-3 border-t border-zinc-100">
+                  {/* Middle Quadrant: Dynamic price callout & billing cadence */}
+                  <div className="pt-3.5 border-t border-zinc-100 space-y-2">
                     <div className="flex items-baseline gap-1.5 flex-wrap">
-                      <span className="text-3xl sm:text-4xl font-bold text-zinc-950 font-sans tracking-tight">
+                      <span className="text-3xl sm:text-4xl font-extrabold text-zinc-950 font-sans tracking-tight">
                         {isPaid ? `₹${plan.price_inr.toLocaleString()}` : "₹0"}
                       </span>
                       {isPaid && (
@@ -377,61 +402,72 @@ export function PricingSection({ initialPlans }: PricingSectionProps) {
                         </span>
                       )}
                     </div>
-                    <p className="text-xs font-mono text-zinc-600 mt-1">
+                    <p className="text-xs font-mono text-zinc-600">
                       {plan.id === "tier_3"
-                        ? "Pay once, keep forever • Zero recurring fees"
+                        ? "One-time / Lifetime validity • Zero recurring fees"
                         : isPaid
-                        ? "Fixed monthly node pass"
+                        ? "Fixed monthly node pass • Billed monthly"
                         : "Free / Unmetered developer sandbox"}
                     </p>
-                  </div>
 
-                  {/* Capacity Tracker */}
-                  <div className="p-3.5 rounded-xl border border-zinc-200 bg-[#FAFAFA] space-y-2 text-xs font-mono">
-                    <div className="flex items-center justify-between text-xs flex-wrap gap-1">
-                      <span className="text-zinc-600 font-medium">Quota Allocation:</span>
-                      {isPaid && plan.max_capacity !== null ? (
-                        <span className="font-bold text-zinc-950">
-                          {plan.claimed_count} / {plan.max_capacity} claimed
-                        </span>
-                      ) : (
-                        <span className="font-bold text-emerald-700">Free / Unmetered</span>
+                    {/* Capacity Tracker */}
+                    <div className="p-3 rounded-xl border border-zinc-200 bg-[#FAFAFA] space-y-2 text-xs font-mono">
+                      <div className="flex items-center justify-between text-xs flex-wrap gap-1">
+                        <span className="text-zinc-600 font-medium">Quota Allocation:</span>
+                        {isPaid && plan.max_capacity !== null ? (
+                          <span className="font-bold text-zinc-950">
+                            {plan.claimed_count} / {plan.max_capacity} claimed
+                          </span>
+                        ) : (
+                          <span className="font-bold text-emerald-700">Free / Unmetered</span>
+                        )}
+                      </div>
+
+                      {isPaid && percentage !== null && (
+                        <>
+                          <div className="w-full h-1.5 rounded-full bg-white border border-zinc-200 overflow-hidden">
+                            <div
+                              className={`h-full rounded-full transition-all duration-500 ${
+                                isTierCapReached
+                                  ? "bg-rose-500"
+                                  : plan.id === "tier_3"
+                                  ? "bg-amber-600"
+                                  : "bg-zinc-900"
+                              }`}
+                              style={{ width: `${percentage}%` }}
+                            />
+                          </div>
+                          <div className="text-[11px] text-right text-zinc-600 font-medium">
+                            {isTierCapReached ? "0 slots remaining" : `${remaining} slots remaining`}
+                          </div>
+                        </>
+                      )}
+
+                      {!isPaid && (
+                        <div className="text-[11px] text-zinc-600">
+                          Ignored in the 1,500 total paid members pool.
+                        </div>
                       )}
                     </div>
-
-                    {isPaid && percentage !== null && (
-                      <>
-                        <div className="w-full h-2 rounded-full bg-white border border-zinc-200 overflow-hidden">
-                          <div
-                            className={`h-full rounded-full transition-all duration-500 ${
-                              isTierCapReached
-                                ? "bg-rose-500"
-                                : plan.id === "tier_3"
-                                ? "bg-amber-600"
-                                : "bg-zinc-900"
-                            }`}
-                            style={{ width: `${percentage}%` }}
-                          />
-                        </div>
-                        <div className="text-xs text-right text-zinc-600 font-medium">
-                          {isTierCapReached ? "0 slots remaining" : `${remaining} slots remaining`}
-                        </div>
-                      </>
-                    )}
-
-                    {!isPaid && (
-                      <div className="text-xs text-zinc-600">
-                        Ignored in the 1,500 total paid members pool.
-                      </div>
-                    )}
                   </div>
 
-                  {/* Feature Bullets */}
-                  <div className="pt-3 border-t border-zinc-100 space-y-2.5">
-                    <div className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-700">
-                      Protocol Capabilities
+                  {/* Feature Checklist Quadrant */}
+                  <div className="pt-3.5 border-t border-zinc-100 space-y-2.5">
+                    <div className="text-[11px] font-mono font-bold uppercase tracking-wider text-zinc-700 flex items-center justify-between">
+                      <span>Protocol Capabilities</span>
+                      {plan.id === "tier_3" && (
+                        <span className="text-[10px] text-amber-700 font-normal">
+                          Direct Clearing Queue Priority
+                        </span>
+                      )}
                     </div>
-                    <ul className="space-y-2.5 text-xs sm:text-sm text-zinc-800">
+                    <ul
+                      className={
+                        plan.id === "tier_3"
+                          ? "grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 text-xs text-zinc-800"
+                          : "space-y-2 text-xs text-zinc-800"
+                      }
+                    >
                       {details.features.map((feat, idx) => (
                         <li key={idx} className="flex items-start gap-2.5">
                           <div
@@ -450,7 +486,7 @@ export function PricingSection({ initialPlans }: PricingSectionProps) {
                   </div>
                 </div>
 
-                {/* Card CTA Action */}
+                {/* Bottom Anchor: Full-width CTA button aligned cleanly to bottom */}
                 <div className="pt-6 mt-auto">
                   {isBlocked ? (
                     <button
@@ -472,7 +508,7 @@ export function PricingSection({ initialPlans }: PricingSectionProps) {
                       className={`w-full min-h-[46px] py-2.5 px-4 rounded-[10px] text-xs sm:text-sm font-semibold tracking-wide flex items-center justify-center gap-2 transition-all cursor-pointer ${
                         plan.id === "tier_3"
                           ? "bg-gradient-to-r from-amber-600 via-amber-500 to-yellow-600 hover:from-amber-700 hover:to-yellow-700 text-white font-bold shadow-sm"
-                          : plan.id === "tier_2"
+                          : plan.id === "tier_1"
                           ? "bg-[#2563EB] hover:bg-[#1D4ED8] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]"
                           : "bg-white hover:bg-[#F8FAFC] text-[#0F172A] border border-[#CBD5E1] hover:border-[#94A3B8] shadow-2xs"
                       }`}
