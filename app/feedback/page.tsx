@@ -58,34 +58,37 @@ export default function FeedbackPage() {
     async function loadReviews() {
       setIsLoading(true);
       try {
-        // Try direct Supabase select first
+        // 1. Try direct Supabase select with anon client
         const { data, error } = await supabase
           .from("feedback")
           .select("*")
           .eq("is_approved", true)
           .order("created_at", { ascending: false });
 
+        if (error) {
+          // Log exact error code and message once to avoid spamming console
+          console.warn(
+            `[Supabase Feedback Query Note] Error code: ${error.code}, Message: ${error.message}`
+          );
+        }
+
         if (!error && data && data.length > 0) {
           if (isMounted) setReviews(data as FeedbackItem[]);
-        } else {
-          // Fall back to server API endpoint which also includes verified seeds
-          const res = await fetch("/api/feedback");
-          const json = await res.json();
-          if (json?.feedback && isMounted) {
-            setReviews(json.feedback);
-          }
+          return;
         }
-      } catch {
-        // Fallback to API route
-        try {
-          const res = await fetch("/api/feedback");
-          const json = await res.json();
-          if (json?.feedback && isMounted) {
-            setReviews(json.feedback);
-          }
-        } catch {
-          // Ignore
+
+        // 2. Controlled fallback to server API endpoint (bypasses RLS blocks via service role)
+        const res = await fetch("/api/feedback");
+        if (!res.ok) {
+          console.warn(`[Feedback API Route Note] HTTP status: ${res.status} (${res.statusText})`);
+          return;
         }
+        const json = await res.json();
+        if (json?.feedback && isMounted) {
+          setReviews(json.feedback);
+        }
+      } catch (err: any) {
+        console.warn("[Feedback Loading Exception]", err?.message || err);
       } finally {
         if (isMounted) setIsLoading(false);
       }

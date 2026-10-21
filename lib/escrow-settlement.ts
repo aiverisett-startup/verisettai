@@ -45,29 +45,36 @@ export async function insertAndVerifyDoubleEntryLedger(params: {
     };
   }
 
+  // Sanitize UUID parameters to prevent Postgres 400 (invalid input syntax for type uuid)
+  const isValidUuid = (val?: string | null): boolean =>
+    Boolean(val && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(val));
+
+  const sanitizedUserId = isValidUuid(userId) ? userId : null;
+  const sanitizedVaultId = isValidUuid(vaultId) ? vaultId : null;
+
   const transactionId = crypto.randomUUID();
   const now = new Date().toISOString();
 
   // 1. Prepare balanced double-entry rows (DEBIT + CREDIT)
   const debitEntry = {
-    user_id: userId,
-    vault_id: vaultId,
-    escrow_id: escrowId,
+    user_id: sanitizedUserId,
+    vault_id: sanitizedVaultId,
+    escrow_id: String(escrowId).trim(),
     transaction_id: transactionId,
     entry_type: "DEBIT",
-    amount: amountCentsOrPaise,
+    amount: Math.round(amountCentsOrPaise),
     currency,
     description: `${description} [DEBIT: Escrow Allocation Release]`,
     created_at: now,
   };
 
   const creditEntry = {
-    user_id: userId,
-    vault_id: vaultId,
-    escrow_id: escrowId,
+    user_id: sanitizedUserId,
+    vault_id: sanitizedVaultId,
+    escrow_id: String(escrowId).trim(),
     transaction_id: transactionId,
     entry_type: "CREDIT",
-    amount: amountCentsOrPaise,
+    amount: Math.round(amountCentsOrPaise),
     currency,
     description: `${description} [CREDIT: Beneficiary Settlement Payout]`,
     created_at: now,

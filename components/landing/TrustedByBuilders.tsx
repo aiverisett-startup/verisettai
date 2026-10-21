@@ -12,13 +12,21 @@ export function TrustedByBuilders() {
   useEffect(() => {
     let isMounted = true;
     fetch("/api/feedback?limit=3")
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) {
+          console.warn(`[TrustedByBuilders Fetch Note] HTTP status: ${res.status}`);
+          return null;
+        }
+        return res.json();
+      })
       .then((data) => {
         if (data?.feedback && data.feedback.length > 0 && isMounted) {
           setPreviewReviews(data.feedback.slice(0, 3));
         }
       })
-      .catch(() => {});
+      .catch((err) => {
+        console.warn("[TrustedByBuilders Exception]", err?.message || err);
+      });
 
     return () => {
       isMounted = false;

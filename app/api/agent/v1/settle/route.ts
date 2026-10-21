@@ -110,11 +110,18 @@ export async function POST(req: NextRequest) {
         transactionId = settleResult.transaction_id;
       }
     } catch {
+      const isUuid = (val?: string | null): boolean =>
+        Boolean(val && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(val));
+
+      const sanitizedUserId = isUuid(auth.userId) ? auth.userId : null;
+      const sanitizedVaultId = isUuid(vault_id) ? vault_id : null;
+
       // Fallback: update status and insert balanced double-entry ledger entries directly
       await supabaseAdmin.from("ledger_entries").insert([
         {
-          user_id: auth.userId,
-          vault_id: vault_id,
+          user_id: sanitizedUserId,
+          vault_id: sanitizedVaultId,
+          escrow_id: String(vault_id || "").trim(),
           transaction_id: transactionId,
           entry_type: "CREDIT",
           amount: settleAmountPaise,
@@ -122,8 +129,9 @@ export async function POST(req: NextRequest) {
           description: "Autonomous Agent Escrow Consensus Settlement",
         },
         {
-          user_id: auth.userId,
-          vault_id: vault_id,
+          user_id: sanitizedUserId,
+          vault_id: sanitizedVaultId,
+          escrow_id: String(vault_id || "").trim(),
           transaction_id: transactionId,
           entry_type: "DEBIT",
           amount: settleAmountPaise,
@@ -132,14 +140,16 @@ export async function POST(req: NextRequest) {
         },
       ]);
 
-      await supabaseAdmin
-        .from("vaults")
-        .update({
-          status: "SETTLED",
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", vault_id)
-        .eq("user_id", auth.userId);
+      if (sanitizedVaultId && sanitizedUserId) {
+        await supabaseAdmin
+          .from("vaults")
+          .update({
+            status: "SETTLED",
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", sanitizedVaultId)
+          .eq("user_id", sanitizedUserId);
+      }
 
       settleResult = {
         success: true,
@@ -163,9 +173,12 @@ export async function POST(req: NextRequest) {
     const sha256Proof =
       verifiedProofHash || `0x${crypto.randomBytes(16).toString("hex")}`;
 
+    const isUuid = (val?: string | null): boolean =>
+      Boolean(val && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(val));
+
     await supabaseAdmin.from("settlements").insert({
-      user_id: auth.userId,
-      vault_id: vault_id,
+      user_id: isUuid(auth.userId) ? auth.userId : null,
+      vault_id: isUuid(vault_id) ? vault_id : null,
       amount: Math.round(settleAmountPaise / 84) / 100, // USD amount
       fee: Math.round((settleAmountPaise / 84) * 0.0075) / 100,
       status: "SETTLED",

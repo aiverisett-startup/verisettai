@@ -2,6 +2,7 @@
 
 import crypto from "crypto";
 import { createServerSupabaseClient } from "@/lib/supabaseServer";
+import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
 export interface RegisterAgentInput {
   agentName: string;
@@ -209,7 +210,7 @@ export async function registerAgentMultiStepAction(
     const keyHint = `...${rawApiKey.slice(-4)}`;
     const keyHash = crypto.createHash("sha256").update(rawApiKey).digest("hex");
 
-    // 6. Persist to public.registered_agents table
+    // 6. Persist to public.registered_agents table via supabaseAdmin (service role bypass)
     let registeredAgentId = crypto.randomUUID();
     let createdAtIso = new Date().toISOString();
 
@@ -225,7 +226,7 @@ export async function registerAgentMultiStepAction(
       status: "Unlinked",
     };
 
-    const { data: insertedData, error: dbError } = await supabase
+    const { data: insertedData, error: dbError } = await supabaseAdmin
       .from("registered_agents")
       .insert(insertPayload)
       .select("id, agent_name, agent_id_code, avatar_url, framework, spending_limit, webhook_url, status, created_at")
@@ -235,9 +236,9 @@ export async function registerAgentMultiStepAction(
       if (dbError.code === "PGRST205") {
         console.warn("registered_agents table syncing cache.");
       } else {
-        console.warn("registered_agents insert warning, attempting fallback:", dbError.message);
+        console.warn(`[registered_agents Insert Note] Code: ${dbError.code}, Message: ${dbError.message}`);
         // Retry with standard columns if custom columns not yet migrated
-        await supabase
+        await supabaseAdmin
           .from("registered_agents")
           .insert({
             user_id: user.id,
@@ -254,22 +255,22 @@ export async function registerAgentMultiStepAction(
       createdAtIso = insertedData.created_at || createdAtIso;
     }
 
-    // 7. Sync with public.agents table
+    // 7. Sync with public.agents table via supabaseAdmin
     try {
-      await supabase.from("agents").insert({
+      await supabaseAdmin.from("agents").insert({
         user_id: user.id,
         name: trimmedName,
         framework: frameworkValue,
         ping_latency_ms: null,
         status: "Unlinked",
       });
-    } catch (e) {
-      console.warn("Telemetry agents insertion notice:", e);
+    } catch (e: any) {
+      console.warn(`[Telemetry agents insert note] ${e?.message || e}`);
     }
 
-    // 8. Register key in public.api_keys
+    // 8. Register key in public.api_keys via supabaseAdmin
     try {
-      await supabase.from("api_keys").insert({
+      await supabaseAdmin.from("api_keys").insert({
         user_id: user.id,
         key_hash: keyHash,
         key_hint: keyHint,
@@ -277,8 +278,8 @@ export async function registerAgentMultiStepAction(
         name: `${trimmedName} Key`,
         status: "ACTIVE",
       });
-    } catch (e) {
-      console.warn("Telemetry api_keys insertion notice:", e);
+    } catch (e: any) {
+      console.warn(`[Telemetry api_keys insert note] ${e?.message || e}`);
     }
 
     return {

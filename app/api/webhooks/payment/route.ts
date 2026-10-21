@@ -128,19 +128,24 @@ export async function POST(req: NextRequest) {
         planName.toLowerCase().includes("founder") ||
         amountPaise === 2999900;
 
+      const isUuid = (val?: string | null): boolean =>
+        Boolean(val && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(val));
+
       // Insert guaranteed CREDIT record into ledger_entries via Supabase Service Role client
       await supabaseAdmin.from("ledger_entries").insert({
-        user_id: userId,
-        vault_id: metadata.vault_id || null,
+        user_id: isUuid(userId) ? userId : null,
+        vault_id: isUuid(metadata.vault_id) ? metadata.vault_id : null,
+        escrow_id: String(metadata.escrow_id || metadata.vault_id || transactionId),
         transaction_id: transactionId,
         entry_type: "CREDIT",
-        amount: amountPaise,
+        amount: Math.round(amountPaise),
         currency: currency,
         description: `Payment received: ${planName} (${transactionId})`,
+        created_at: new Date().toISOString(),
       });
 
       // Update vault balance if vault_id is present
-      if (metadata.vault_id) {
+      if (isUuid(metadata.vault_id)) {
         const { data: vault } = await supabaseAdmin
           .from("vaults")
           .select("balance, balance_cents")
@@ -162,7 +167,7 @@ export async function POST(req: NextRequest) {
       }
 
       // If Founder Node Pass (₹29,999): update user profile
-      if (isFounderPass) {
+      if (isFounderPass && isUuid(userId)) {
         await supabaseAdmin.from("profiles").upsert({
           id: userId,
           plan_tier: "founder_pass",
@@ -172,17 +177,17 @@ export async function POST(req: NextRequest) {
         });
       }
 
-      // Record in idempotency_keys
+      // Record in idempotency_keys matching canonical schema
       try {
-        await supabaseAdmin.from("idempotency_keys").insert({
-          user_id: userId,
+        await supabaseAdmin.from("idempotency_keys").upsert({
           key: eventId,
-          request_hash: crypto.createHash("sha256").update(rawBodyString).digest("hex"),
-          response_status: 200,
           response_body: { received: true, event_id: eventId },
+          status_code: 200,
+          endpoint: "/api/webhooks/payment",
+          created_at: new Date().toISOString(),
         });
-      } catch {
-        // Table uniqueness violation ignored
+      } catch (idempErr) {
+        console.warn("Idempotency key save note:", idempErr);
       }
     }
 

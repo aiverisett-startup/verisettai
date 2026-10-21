@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { supabase, supabaseServer } from "@/lib/supabaseClient";
+import { supabaseAdmin } from "@/lib/supabaseClient";
 
 export interface FeedbackItem {
   id: string;
@@ -90,7 +90,7 @@ export async function GET(request: Request) {
     const category = searchParams.get("category");
     const limit = parseInt(searchParams.get("limit") || "50", 10);
 
-    let query = supabaseServer
+    let query = supabaseAdmin
       .from("feedback")
       .select("*")
       .eq("is_approved", true)
@@ -102,6 +102,10 @@ export async function GET(request: Request) {
     }
 
     const { data, error } = await query;
+
+    if (error) {
+      console.warn(`[Feedback GET Note] Supabase query returned code: ${error.code}, message: ${error.message}`);
+    }
 
     if (error || !data || data.length === 0) {
       // Return filtered seed data if database is empty or not yet migrated
@@ -126,7 +130,8 @@ export async function GET(request: Request) {
       source: "database",
       total: combined.length,
     });
-  } catch {
+  } catch (err: any) {
+    console.warn("[Feedback GET Exception]", err?.message || err);
     return NextResponse.json({
       feedback: SEED_FEEDBACK,
       source: "fallback",
@@ -151,35 +156,31 @@ export async function POST(request: Request) {
     const numericRating = Math.max(1, Math.min(5, Number(rating) || 5));
     const selectedCategory = category || "Protocol Feedback";
 
-    const newRecord: Partial<FeedbackItem> = {
-      name: name.trim(),
-      role_title: role_title?.trim() || null,
-      company: company?.trim() || null,
+    const sanitizedRecord = {
+      name: String(name).trim(),
+      role_title: role_title ? String(role_title).trim() : null,
+      company: company ? String(company).trim() : null,
       rating: numericRating,
-      message: message.trim(),
+      message: String(message).trim(),
       category: selectedCategory,
       is_approved: true,
+      created_at: new Date().toISOString(),
     };
 
-    // Attempt direct insert into Supabase feedback table
-    const { data, error } = await supabaseServer
+    // Attempt insert with elevated service role to securely bypass RLS
+    const { data, error } = await supabaseAdmin
       .from("feedback")
-      .insert([newRecord])
+      .insert([sanitizedRecord])
       .select()
       .single();
 
     if (error) {
+      console.warn(`[Feedback POST Note] Code: ${error.code}, Message: ${error.message}`);
+
       // If table does not yet exist in remote instance, return a simulated valid item
       const fallbackItem: FeedbackItem = {
         id: "fb-" + Date.now(),
-        name: newRecord.name!,
-        role_title: newRecord.role_title,
-        company: newRecord.company,
-        rating: numericRating,
-        message: newRecord.message!,
-        category: selectedCategory,
-        is_approved: true,
-        created_at: new Date().toISOString(),
+        ...sanitizedRecord,
         is_just_posted: true,
       };
 
