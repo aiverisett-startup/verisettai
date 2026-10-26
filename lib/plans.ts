@@ -1,3 +1,5 @@
+import { getTierLevel } from "./pricingTiers";
+
 export interface PlanRecord {
   id: "community" | "tier_1" | "tier_2" | "tier_3";
   name: string;
@@ -8,6 +10,7 @@ export interface PlanRecord {
   take_rate_pct?: number; // 2.0, 1.5, 1.0, 0.75
   take_rate_label?: string; // "2.0%", "1.5%", "1.0%", "0.75%"
   is_lifetime?: boolean;
+  level?: number;
 }
 
 export const fallbackPlans: Record<string, PlanRecord> = {
@@ -21,6 +24,7 @@ export const fallbackPlans: Record<string, PlanRecord> = {
     take_rate_pct: 2.0,
     take_rate_label: "2.0% Take-Rate",
     is_lifetime: false,
+    level: 0,
   },
   tier_1: {
     id: "tier_1",
@@ -32,6 +36,7 @@ export const fallbackPlans: Record<string, PlanRecord> = {
     take_rate_pct: 1.5,
     take_rate_label: "1.5% Take-Rate",
     is_lifetime: false,
+    level: 1,
   },
   tier_2: {
     id: "tier_2",
@@ -43,6 +48,7 @@ export const fallbackPlans: Record<string, PlanRecord> = {
     take_rate_pct: 1.0,
     take_rate_label: "1.0% Take-Rate",
     is_lifetime: false,
+    level: 2,
   },
   tier_3: {
     id: "tier_3",
@@ -54,6 +60,7 @@ export const fallbackPlans: Record<string, PlanRecord> = {
     take_rate_pct: 0.75,
     take_rate_label: "0.75% Take-Rate (Lowest)",
     is_lifetime: true,
+    level: 3,
   },
 };
 
@@ -85,4 +92,11 @@ export function normalizePlanId(id: string): "community" | "tier_1" | "tier_2" |
     default:
       return "community";
   }
+}
+
+/**
+ * Returns numeric level for a given plan ID
+ */
+export function getPlanLevel(id: string): number {
+  return getTierLevel(id);
 }

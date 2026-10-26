@@ -5,7 +5,8 @@ import Link from "next/link";
 import { Check, ShieldCheck, Zap, Users, ArrowRight, Sparkles, AlertOctagon } from "lucide-react";
 import { RegisterModal } from "@/components/RegisterModal";
 import { getPlans } from "@/app/actions/register";
-import { PlanRecord } from "@/lib/plans";
+import { PlanRecord, getPlanLevel } from "@/lib/plans";
+import { getTierLevel, getTierInfoByLevel } from "@/lib/pricingTiers";
 import { supabase } from "@/lib/supabase";
 
 interface PricingSectionProps {
@@ -23,6 +24,7 @@ const DEFAULT_PLANS: PlanRecord[] = [
     take_rate_pct: 2.0,
     take_rate_label: "2.0% Protocol Fee",
     is_lifetime: false,
+    level: 0,
   },
   {
     id: "tier_1",
@@ -34,6 +36,7 @@ const DEFAULT_PLANS: PlanRecord[] = [
     take_rate_pct: 1.5,
     take_rate_label: "1.5% Protocol Fee",
     is_lifetime: false,
+    level: 1,
   },
   {
     id: "tier_2",
@@ -45,6 +48,7 @@ const DEFAULT_PLANS: PlanRecord[] = [
     take_rate_pct: 1.0,
     take_rate_label: "1.0% Protocol Fee",
     is_lifetime: false,
+    level: 2,
   },
   {
     id: "tier_3",
@@ -56,6 +60,7 @@ const DEFAULT_PLANS: PlanRecord[] = [
     take_rate_pct: 0.75,
     take_rate_label: "0.75% Protocol Fee (Lowest)",
     is_lifetime: true,
+    level: 3,
   },
 ];
 
@@ -185,6 +190,95 @@ export function PricingSection({ initialPlans }: PricingSectionProps) {
   const isTotalPaidExhausted = totalPaidClaimed >= 1500;
   const totalPaidPercentage = Math.min(100, Math.round((totalPaidClaimed / 1500) * 100));
 
+  const [userPlanLevel, setUserPlanLevel] = useState<number>(0);
+  const [currentUserTier, setCurrentUserTier] = useState<string | null>(null);
+
+  // Authenticated user session & plan tier detection
+  useEffect(() => {
+    let isMounted = true;
+    async function checkAuthAndTier() {
+      try {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+        if (!session?.user) {
+          if (isMounted) {
+            setUserPlanLevel(0);
+            setCurrentUserTier(null);
+          }
+          return;
+        }
+
+        const userId = session.user.id;
+        let detectedTier = (session.user.user_metadata?.plan_tier as string) || "starter";
+
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("plan_tier, founder_pass")
+          .eq("id", userId)
+          .maybeSingle();
+
+        if (profile) {
+          if (profile.founder_pass || profile.plan_tier === "FOUNDER_NODE" || profile.plan_tier === "tier_3") {
+            detectedTier = "founder_lifetime";
+          } else if (profile.plan_tier) {
+            detectedTier = profile.plan_tier;
+          }
+        }
+
+        const level = getTierLevel(detectedTier);
+        if (isMounted) {
+          setCurrentUserTier(detectedTier);
+          setUserPlanLevel(level);
+        }
+      } catch (err) {
+        console.warn("[PRICING-UI] Auth user tier check:", err);
+      }
+    }
+
+    checkAuthAndTier();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(() => {
+      checkAuthAndTier();
+    });
+
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  const currentTierInfo = useMemo(() => getTierInfoByLevel(userPlanLevel), [userPlanLevel]);
+
+  // Filter plans based on authenticated user active tier level:
+  // If logged-out or starter (level 0), show all plans.
+  // If paid tier (level > 0), only show plans with plan.level > currentUserPlan.level.
+  const visiblePlans = useMemo(() => {
+    if (userPlanLevel <= 0) {
+      return plans;
+    }
+    return plans.filter((p) => {
+      const planLvl = p.level ?? getPlanLevel(p.id);
+      return planLvl > userPlanLevel;
+    });
+  }, [plans, userPlanLevel]);
+
+  // Dynamic responsive CSS grid adjustment according to remaining card count
+  const gridLayoutClass = useMemo(() => {
+    switch (visiblePlans.length) {
+      case 3:
+        return "grid-cols-1 md:grid-cols-3 max-w-5xl";
+      case 2:
+        return "grid-cols-1 md:grid-cols-2 max-w-3xl";
+      case 1:
+        return "grid-cols-1 max-w-md mx-auto";
+      default:
+        return "grid-cols-1 md:grid-cols-2 lg:grid-cols-4 max-w-7xl";
+    }
+  }, [visiblePlans.length]);
+
   const handleOpenRegister = (planId: "community" | "tier_1" | "tier_2" | "tier_3") => {
     setSelectedPlanId(planId);
     setIsModalOpen(true);
@@ -276,9 +370,53 @@ export function PricingSection({ initialPlans }: PricingSectionProps) {
           )}
         </div>
 
-        {/* Balanced 4-Column Side-by-Side Responsive Grid Container */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch w-full max-w-7xl mx-auto pt-2">
-          {plans.map((plan) => {
+        {/* Current Active Tier Upgrade Banner for Authenticated Paid Users (level 1 or 2) */}
+        {userPlanLevel > 0 && userPlanLevel < 3 && (
+          <div className="max-w-4xl mx-auto p-4 rounded-xl border border-blue-200 bg-blue-50/90 text-blue-950 text-xs sm:text-sm font-mono flex items-center justify-between gap-3 shadow-xs animate-in fade-in slide-in-from-top-2">
+            <div className="flex items-center gap-2.5">
+              <ShieldCheck className="w-4 h-4 text-blue-600 shrink-0" />
+              <span>
+                <strong className="font-semibold text-blue-900">Current Active Tier:</strong>{" "}
+                {currentTierInfo.name} ({currentTierInfo.feePercent} fee) — Available Upgrades Below
+              </span>
+            </div>
+            <span className="hidden sm:inline-flex px-2 py-0.5 rounded text-[11px] font-bold bg-blue-100 text-blue-800 border border-blue-300 uppercase">
+              Active Tier
+            </span>
+          </div>
+        )}
+
+        {/* Highest Tier Full-Width Confirmation Card (Level 3 / Sovereign Node) */}
+        {userPlanLevel >= 3 ? (
+          <div className="max-w-3xl mx-auto rounded-3xl border border-amber-400/80 bg-gradient-to-b from-amber-500/[0.06] via-white to-amber-500/[0.1] p-8 sm:p-12 shadow-[0_20px_50px_-12px_rgba(245,158,11,0.25)] text-center space-y-6 animate-in fade-in slide-in-from-bottom-2">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-amber-600 via-amber-500 to-yellow-600 text-white text-xs font-mono font-bold tracking-wider uppercase shadow-md border border-amber-300/40">
+              <Sparkles className="w-3.5 h-3.5 text-amber-200" />
+              MAXIMUM PROTOCOL TIER UNLOCKED
+            </div>
+
+            <div className="space-y-3">
+              <h3 className="text-2xl sm:text-3xl font-extrabold text-zinc-950 font-sans tracking-tight">
+                Sovereign Node (Lifetime Access)
+              </h3>
+              <p className="text-sm sm:text-base text-zinc-700 max-w-xl mx-auto leading-relaxed">
+                You are on the highest tier: Sovereign Node (Lifetime Access). You enjoy the lowest protocol clearance fee of 0.75% with zero recurring fees.
+              </p>
+            </div>
+
+            <div className="pt-2 flex flex-wrap items-center justify-center gap-4">
+              <Link
+                href="/dashboard"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white text-xs sm:text-sm font-semibold transition-all shadow-sm"
+              >
+                <span>Open Settlement Dashboard</span>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+          </div>
+        ) : (
+          /* Dynamically Adjusted Responsive Grid for Available Upgrade Plans */
+          <div className={`grid ${gridLayoutClass} gap-6 items-stretch w-full mx-auto pt-2`}>
+            {visiblePlans.map((plan) => {
             const details = PLAN_DESCRIPTIONS[plan.id] || PLAN_DESCRIPTIONS.tier_1;
             const isPaid = plan.is_paid;
             const isTierCapReached = isPaid && plan.max_capacity !== null && plan.claimed_count >= plan.max_capacity;
@@ -506,6 +644,7 @@ export function PricingSection({ initialPlans }: PricingSectionProps) {
             );
           })}
         </div>
+        )}
       </div>
 
       {/* Registration Intake Modal */}
