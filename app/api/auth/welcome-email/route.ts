@@ -1,29 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import { executeSendCustomerEmail } from "@/lib/geminiOpsTools";
+import { parseAndValidateJson, WelcomeEmailSchema } from "@/lib/security-guard";
 
 export const dynamic = "force-dynamic";
 
-interface WelcomeEmailRequest {
-  email: string;
-  name?: string;
-  userId?: string;
-}
-
 export async function POST(req: NextRequest) {
   try {
-    const body: WelcomeEmailRequest = await req.json().catch(() => ({ email: "" }));
-    const { email, name, userId } = body;
-
-    if (!email || typeof email !== "string" || !email.includes("@")) {
-      return NextResponse.json(
-        { success: false, error: "Valid email address is required" },
-        { status: 400 }
-      );
+    const validation = await parseAndValidateJson(req, WelcomeEmailSchema);
+    if (!validation.success) {
+      return validation.response;
     }
 
+    const { email, name, userId } = validation.data;
     const normalizedEmail = email.trim().toLowerCase();
     const recipientName = name?.trim() || normalizedEmail.split("@")[0] || "Protocol Operator";
+
 
     // 1. Check if welcome email was already dispatched to prevent duplicate sends
     try {

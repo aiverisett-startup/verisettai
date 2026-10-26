@@ -11,14 +11,36 @@ import {
   getVaultState,
   getProgrammaticVault,
 } from "@/lib/serverStore";
-import { insertAndVerifyDoubleEntryLedger } from "@/lib/escrow-settlement";
+import {
+  insertAndVerifyDoubleEntryLedger,
+  validateEscrowPartyAuthorization,
+} from "@/lib/escrow-settlement";
+import {
+  verifyReplayAttackTimestamp,
+  parseAndValidateJson,
+  getAuthenticatedRequester,
+  EscrowClearanceSchema,
+} from "@/lib/security-guard";
 
 // Fallback in-memory idempotency cache in case of temporary DB connectivity drops
 const localIdempotencyCache = new Map<string, { body: any; status: number; timestamp: number }>();
 
 export async function POST(req: NextRequest) {
   try {
-    // 1. IDEMPOTENCY MIDDLEWARE (API Route Protection)
+    // 1. REPLAY ATTACK & AGENT REQUEST EXPIRATION GUARD
+    const replayCheck = verifyReplayAttackTimestamp(req.headers);
+    if (!replayCheck.valid) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: replayCheck.error,
+          code: "REPLAY_PROTECTION_VIOLATION",
+        },
+        { status: 400 }
+      );
+    }
+
+    // 2. IDEMPOTENCY MIDDLEWARE (API Route Protection)
     const idempotencyKey =
       req.headers.get("x-idempotency-key") ||
       req.headers.get("x-idempotency-token") ||
@@ -68,8 +90,13 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // 2. PARSE ESCROW CLEARANCE REQUEST
-    const body = await req.json().catch(() => ({}));
+    // 3. ZERO-TOLERANCE PAYLOAD VALIDATION & INJECTION DEFENSE
+    const validation = await parseAndValidateJson(req, EscrowClearanceSchema);
+    if (!validation.success) {
+      return validation.response;
+    }
+
+    const body = validation.data;
     const contractId = body.contract_id || body.contractId || body.vault_id || body.vaultId;
     const milestoneId = body.milestone_id || body.milestoneId;
     const deliverableContent =
@@ -95,6 +122,26 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
+
+    // 4. BROKEN OBJECT-LEVEL AUTHORIZATION (BOLA/IDOR) GUARD
+    const requester = await getAuthenticatedRequester(req);
+    const authCheck = await validateEscrowPartyAuthorization({
+      escrowId: (contractId || milestoneId) as string,
+      requesterUserId: requester.userId,
+      requesterAgentId: requester.agentId,
+      isServiceRole: requester.isServiceRole,
+    });
+
+    if (!authCheck.authorized) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: authCheck.reason || "BOLA_FORBIDDEN: Unauthorized access to target escrow object.",
+        },
+        { status: 403 }
+      );
+    }
+
 
     // 3. CRYPTOGRAPHIC PROOF-OF-WORK VERIFICATION
     let registeredHash = providedHash;

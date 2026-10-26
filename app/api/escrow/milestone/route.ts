@@ -2,10 +2,16 @@ import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import { normalizeDeliverableContent } from "@/lib/crypto-verify";
+import { parseAndValidateJson, EscrowMilestoneSchema } from "@/lib/security-guard";
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json().catch(() => ({}));
+    const validation = await parseAndValidateJson(req, EscrowMilestoneSchema);
+    if (!validation.success) {
+      return validation.response;
+    }
+
+    const body = validation.data;
     const contractId = body.contract_id || body.contractId || `CTR-VRS-${Date.now()}`;
     const title = body.title || body.milestone_title || "Milestone Deliverable";
     const amount = Number(body.amount || 250);
@@ -27,6 +33,7 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
+
 
     // Cryptographic Proof-of-Work Hashing using native Node.js crypto
     const normalizedContent = normalizeDeliverableContent(deliverableContent);

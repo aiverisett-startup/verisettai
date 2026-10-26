@@ -60,6 +60,13 @@ export function validateEnvironment(): {
     NODE_ENV: process.env.NODE_ENV || "development",
   };
 
+  // Zero-trust client isolation: Never expose server-side secret keys to browser runtimes
+  if (typeof window !== "undefined") {
+    config.SUPABASE_SERVICE_ROLE_KEY = "";
+    config.PAYMENT_WEBHOOK_SECRET = "";
+  }
+
+
   if (missing.length > 0 && process.env.NODE_ENV === "production") {
     console.warn(
       `[EnvValidator] Warning: Missing operational environment variables in production: ${missing.join(", ")}`

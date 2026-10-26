@@ -1,5 +1,6 @@
-import { NextResponse } from "next/server";
-import { supabaseAdmin } from "@/lib/supabaseClient";
+import { NextRequest, NextResponse } from "next/server";
+import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { parseAndValidateJson, FeedbackSchema } from "@/lib/security-guard";
 
 export interface FeedbackItem {
   id: string;
@@ -57,28 +58,22 @@ export async function GET(request: Request) {
   }
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const { name, role_title, company, rating, message, category } = body;
-
-    if (!name || typeof name !== "string" || name.trim().length === 0) {
-      return NextResponse.json({ error: "Author name is required" }, { status: 400 });
+    const validation = await parseAndValidateJson(request, FeedbackSchema);
+    if (!validation.success) {
+      return validation.response;
     }
 
-    if (!message || typeof message !== "string" || message.trim().length === 0) {
-      return NextResponse.json({ error: "Review message is required" }, { status: 400 });
-    }
-
-    const numericRating = Math.max(1, Math.min(5, Number(rating) || 5));
+    const { name, role_title, company, rating, message, category } = validation.data;
     const selectedCategory = category || "Protocol Feedback";
 
     const sanitizedRecord = {
-      name: String(name).trim(),
-      role_title: role_title ? String(role_title).trim() : null,
-      company: company ? String(company).trim() : null,
-      rating: numericRating,
-      message: String(message).trim(),
+      name: name.trim(),
+      role_title: role_title ? role_title.trim() : null,
+      company: company ? company.trim() : null,
+      rating,
+      message: message.trim(),
       category: selectedCategory,
       is_approved: true,
       created_at: new Date().toISOString(),
@@ -93,18 +88,28 @@ export async function POST(request: Request) {
 
     if (error) {
       console.warn(`[Feedback POST Note] Code: ${error.code}, Message: ${error.message}`);
-      return NextResponse.json({
-        error: error.message || "Failed to submit review to database",
-      }, { status: 400 });
+      return NextResponse.json(
+        {
+          error: error.message || "Failed to submit review to database",
+        },
+        { status: 400 }
+      );
     }
 
-    return NextResponse.json({
-      success: true,
-      data: { ...data, is_just_posted: true },
-    }, { status: 201 });
+    return NextResponse.json(
+      {
+        success: true,
+        data: { ...data, is_just_posted: true },
+      },
+      { status: 201 }
+    );
   } catch (err: any) {
-    return NextResponse.json({
-      error: err.message || "Failed to process review submission",
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        error: err.message || "Failed to process review submission",
+      },
+      { status: 500 }
+    );
   }
 }
+

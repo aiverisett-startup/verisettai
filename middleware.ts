@@ -73,15 +73,17 @@ export async function middleware(request: NextRequest) {
   // 1. Web Application Firewall (WAF): Block malicious scanner probes
   for (const pattern of MALICIOUS_PATH_PATTERNS) {
     if (pattern.test(rawPath)) {
-      return new NextResponse(
-        JSON.stringify({
-          error: "Forbidden: Malicious request signature detected.",
-          timestamp: new Date().toISOString(),
-        }),
-        {
-          status: 403,
-          headers: { "Content-Type": "application/json" },
-        }
+      return applySecurityHeaders(
+        new NextResponse(
+          JSON.stringify({
+            error: "Forbidden: Malicious request signature detected.",
+            timestamp: new Date().toISOString(),
+          }),
+          {
+            status: 403,
+            headers: { "Content-Type": "application/json" },
+          }
+        )
       );
     }
   }
@@ -98,7 +100,7 @@ export async function middleware(request: NextRequest) {
       ) {
         const sanitizedUrl = request.nextUrl.clone();
         sanitizedUrl.searchParams.set("next", "/dashboard");
-        return NextResponse.redirect(sanitizedUrl);
+        return applySecurityHeaders(NextResponse.redirect(sanitizedUrl));
       }
     }
   }
@@ -112,20 +114,23 @@ export async function middleware(request: NextRequest) {
 
     const allowed = checkTokenBucketRateLimit(clientIp);
     if (!allowed) {
-      return new NextResponse(
-        JSON.stringify({ error: "RATE_LIMIT_EXCEEDED" }),
-        {
-          status: 429,
-          headers: {
-            "Content-Type": "application/json",
-            "Retry-After": "1",
-            "X-RateLimit-Capacity": "60",
-            "X-RateLimit-Replenishment": "2/sec",
-          },
-        }
+      return applySecurityHeaders(
+        new NextResponse(
+          JSON.stringify({ error: "RATE_LIMIT_EXCEEDED" }),
+          {
+            status: 429,
+            headers: {
+              "Content-Type": "application/json",
+              "Retry-After": "1",
+              "X-RateLimit-Capacity": "60",
+              "X-RateLimit-Replenishment": "2/sec",
+            },
+          }
+        )
       );
     }
   }
+
 
   // 4. Supabase Session Validation & Cookie Sync via @supabase/ssr updateSession
   return await updateSession(request);
@@ -196,13 +201,25 @@ async function updateSession(request: NextRequest) {
     return redirectResponse;
   }
 
-  // Inject security headers
-  supabaseResponse.headers.set("X-Content-Type-Options", "nosniff");
-  supabaseResponse.headers.set("X-Frame-Options", "DENY");
-  supabaseResponse.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
-
-  return supabaseResponse;
+  // 6. Inject enterprise-grade security response headers
+  return applySecurityHeaders(supabaseResponse);
 }
+
+function applySecurityHeaders(response: NextResponse): NextResponse {
+  response.headers.set("X-Frame-Options", "DENY");
+  response.headers.set("X-Content-Type-Options", "nosniff");
+  response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+  response.headers.set(
+    "Permissions-Policy",
+    "camera=(), microphone=(), geolocation=()"
+  );
+  response.headers.set(
+    "Strict-Transport-Security",
+    "max-age=63072000; includeSubDomains; preload"
+  );
+  return response;
+}
+
 
 export const config = {
   matcher: [

@@ -58,17 +58,30 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const body = await req.json().catch(() => ({}));
-    const { vault_id, reason = "User initiated cancellation" } = body;
+    // 3. Strict payload validation & injection defense
+    const { parseAndValidateJson, VaultCancelSchema } = await import("@/lib/security-guard");
+    const validation = await parseAndValidateJson(req, VaultCancelSchema);
+    if (!validation.success) {
+      return validation.response;
+    }
 
-    if (!vault_id) {
+    const { vault_id, reason = "User initiated cancellation" } = validation.data;
+
+    // 4. BOLA Ownership Guard: Verify this vault belongs to the caller before cancelling
+    const { data: vaultRecord } = await supabaseAdmin
+      .from("vaults")
+      .select("id, user_id")
+      .eq("id", vault_id)
+      .maybeSingle();
+
+    if (vaultRecord && vaultRecord.user_id && vaultRecord.user_id !== userId) {
       return NextResponse.json(
-        { error: "Bad Request: Missing 'vault_id' parameter" },
-        { status: 400 }
+        { error: "Forbidden: BOLA violation — caller does not own this vault" },
+        { status: 403 }
       );
     }
 
-    // 3. Execute atomic cancellation via RPC
+    // 5. Execute atomic cancellation via RPC
     const { data: cancelResult, error: rpcError } = await supabaseAdmin.rpc(
       "cancel_vault_atomic",
       {
@@ -77,6 +90,7 @@ export async function POST(req: NextRequest) {
         p_reason: reason,
       }
     );
+
 
     if (rpcError) {
       return NextResponse.json(

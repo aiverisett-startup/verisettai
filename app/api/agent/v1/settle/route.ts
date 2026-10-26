@@ -3,10 +3,27 @@ import crypto from "crypto";
 import { authenticateAgentKey } from "@/lib/auth/agent-auth";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import { generateSettlementReceipt } from "@/lib/crypto/receipt";
+import {
+  verifyReplayAttackTimestamp,
+  parseAndValidateJson,
+  AgentSettleSchema,
+} from "@/lib/security-guard";
 
 export async function POST(req: NextRequest) {
   try {
-    // 1. Authenticate the incoming agent via FastMCP Bearer key guard
+    // 1. Replay attack & request expiration guard
+    const replayCheck = verifyReplayAttackTimestamp(req.headers);
+    if (!replayCheck.valid) {
+      return NextResponse.json(
+        {
+          error: "Replay Attack Defense: Request expired or skewed beyond allowable 5-minute window",
+          details: replayCheck.error,
+        },
+        { status: 400 }
+      );
+    }
+
+    // 2. Authenticate the incoming agent via FastMCP Bearer key guard
     const auth = await authenticateAgentKey(req);
     if (!auth.authorized || !auth.userId) {
       return NextResponse.json(
@@ -15,15 +32,19 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const body = await req.json().catch(() => ({}));
-    const {
-      vault_id,
-      proof,
-      proof_payload,
-      expected_hash,
-      amount,
-      milestone_title = "Autonomous Agent Escrow Settlement",
-    } = body;
+    // 3. Strict payload validation & prototype pollution / injection defense
+    const validation = await parseAndValidateJson(req, AgentSettleSchema);
+    if (!validation.success) {
+      return validation.response;
+    }
+
+    const body = validation.data;
+    const vault_id = body.vault_id || body.vaultId;
+    const proof = body.proof;
+    const proof_payload = body.proof_payload ?? body.proofPayload;
+    const expected_hash = body.expected_hash ?? body.expectedHash;
+    const amount = body.amount;
+    const milestone_title = body.milestone_title || body.milestoneTitle || "Autonomous Agent Escrow Settlement";
 
     if (!vault_id) {
       return NextResponse.json(
@@ -31,6 +52,7 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
+
 
     // 2. Deterministic Proof Verification
     let verifiedProofHash = proof || "";
