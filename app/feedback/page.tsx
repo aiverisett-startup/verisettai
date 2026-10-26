@@ -384,51 +384,56 @@ export default function FeedbackPage() {
             {filteredReviews.map((item) => (
               <div
                 key={item.id}
-                className={`group relative rounded-2xl border bg-zinc-900/60 p-6 backdrop-blur-md flex flex-col justify-between transition-all hover:border-zinc-700/80 hover:shadow-xl hover:shadow-blue-900/10 ${
+                className={`group relative rounded-2xl border bg-zinc-950/80 hover:bg-black/90 p-6 backdrop-blur-xl flex flex-col justify-between transition-all duration-300 hover:border-blue-500/30 hover:shadow-2xl hover:shadow-blue-500/10 ${
                   item.is_just_posted
-                    ? "border-blue-500/60 ring-2 ring-blue-500/20 bg-blue-950/20"
+                    ? "border-emerald-500/50 ring-2 ring-emerald-500/20 bg-emerald-950/10"
                     : "border-white/10"
                 }`}
               >
                 {/* Just Posted Badge */}
                 {item.is_just_posted && (
-                  <div className="absolute -top-3 right-4 px-2.5 py-0.5 rounded-full bg-blue-600 text-[10px] font-mono font-bold text-white uppercase tracking-wider shadow-md animate-pulse">
+                  <div className="absolute -top-3 right-4 px-2.5 py-0.5 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 text-[10px] font-mono font-bold text-black uppercase tracking-wider shadow-md animate-pulse">
                     Just Posted
                   </div>
                 )}
 
                 <div className="space-y-4">
-                  {/* Top Bar: Stars + Category */}
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-0.5" aria-label={`${item.rating} stars`}>
+                  {/* Top Bar: Stars + Category + Timestamp Pill */}
+                  <div className="flex items-center justify-between gap-2 flex-wrap">
+                    <div className="flex items-center gap-1" aria-label={`${item.rating} stars`}>
                       {Array.from({ length: 5 }).map((_, i) => (
                         <Star
                           key={i}
                           className={`w-3.5 h-3.5 ${
                             i < item.rating
-                              ? "text-amber-400 fill-amber-400"
-                              : "text-zinc-700"
+                              ? "text-amber-400 fill-amber-400 drop-shadow-[0_0_6px_rgba(251,191,36,0.3)]"
+                              : "text-zinc-800"
                           }`}
                         />
                       ))}
                     </div>
 
-                    <span className="px-2.5 py-0.5 rounded-full bg-zinc-800/80 text-[10px] font-mono font-medium text-zinc-300 border border-zinc-700/60">
-                      {item.category}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className="px-2.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 text-[10px] font-mono font-medium">
+                        {item.category}
+                      </span>
+                      <span className="px-2 py-0.5 rounded-full bg-zinc-900 border border-white/5 text-[10px] font-mono text-zinc-500">
+                        {formatRelativeTime(item.created_at)}
+                      </span>
+                    </div>
                   </div>
 
                   {/* Message Quote */}
-                  <blockquote className="text-sm text-zinc-300 leading-relaxed font-sans">
+                  <blockquote className="text-sm text-zinc-200 leading-relaxed font-sans">
                     “{item.message}”
                   </blockquote>
                 </div>
 
                 {/* Author Metadata Footer */}
-                <div className="pt-6 mt-6 border-t border-zinc-800/80 flex items-center justify-between gap-3">
+                <div className="pt-5 mt-6 border-t border-white/5 flex items-center justify-between gap-3">
                   <div className="flex items-center gap-3 min-w-0">
                     {/* Initials Avatar */}
-                    <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-xs font-bold text-white shrink-0 shadow-xs">
+                    <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center text-xs font-bold text-white shrink-0 shadow-md ring-1 ring-white/20">
                       {item.name
                         .split(" ")
                         .map((n) => n[0])
@@ -437,25 +442,24 @@ export default function FeedbackPage() {
                     </div>
 
                     <div className="min-w-0">
-                      <div className="flex items-center gap-1.5">
+                      <div className="flex items-center gap-2 flex-wrap">
                         <span className="font-semibold text-xs text-white truncate">
                           {item.name}
                         </span>
-                        <ShieldCheck className="w-3.5 h-3.5 text-blue-400 shrink-0" aria-label="Verified Builder" />
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-mono font-medium shrink-0">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                          <span>Verified</span>
+                        </span>
                       </div>
-                      <p className="text-[11px] text-zinc-400 truncate font-mono">
+                      <p className="text-[11px] text-zinc-400 truncate font-mono mt-0.5">
                         {item.role_title}
                         {item.role_title && item.company && " • "}
                         {item.company && (
-                          <span className="text-zinc-400 font-semibold">{item.company}</span>
+                          <span className="text-zinc-300 font-semibold">{item.company}</span>
                         )}
                       </p>
                     </div>
                   </div>
-
-                  <span className="text-[10px] font-mono text-zinc-600 shrink-0">
-                    {formatRelativeTime(item.created_at)}
-                  </span>
                 </div>
               </div>
             ))}
@@ -463,9 +467,9 @@ export default function FeedbackPage() {
         )}
 
         {/* Bottom CTA Banner */}
-        <div className="rounded-3xl border border-white/10 bg-gradient-to-r from-blue-950/40 via-zinc-900 to-indigo-950/40 p-8 sm:p-10 flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left shadow-2xl backdrop-blur-md">
+        <div className="rounded-3xl border border-white/10 bg-gradient-to-r from-zinc-950 via-zinc-900/90 to-black p-8 sm:p-10 flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left shadow-2xl backdrop-blur-xl">
           <div className="space-y-1.5 max-w-xl">
-            <h3 className="text-xl sm:text-2xl font-bold text-white">
+            <h3 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
               Building on Verisett AI? Share Your Experience
             </h3>
             <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed">
@@ -482,14 +486,14 @@ export default function FeedbackPage() {
         </div>
       </main>
 
-      {/* Review Submission Modal */}
+      {/* Review Submission Modal with Deep Obsidian Theme */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in">
-          <div className="relative w-full max-w-lg rounded-3xl border border-zinc-800 bg-[#0F0F12] p-6 sm:p-8 shadow-2xl space-y-6">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-in fade-in">
+          <div className="relative w-full max-w-lg rounded-3xl border border-white/10 bg-zinc-950/95 p-6 sm:p-8 shadow-2xl shadow-black/80 backdrop-blur-2xl space-y-6">
             {/* Modal Header */}
-            <div className="flex items-center justify-between pb-3 border-b border-zinc-800">
+            <div className="flex items-center justify-between pb-3 border-b border-white/10">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-full bg-blue-600/20 border border-blue-500/30 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-full bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
                   <MessageSquarePlus className="w-4 h-4 text-blue-400" />
                 </div>
                 <div>
@@ -507,7 +511,7 @@ export default function FeedbackPage() {
             </div>
 
             {formError && (
-              <div className="rounded-xl border border-red-500/30 bg-red-950/40 p-3 text-xs text-red-300">
+              <div className="rounded-xl border border-rose-500/30 bg-rose-950/40 p-3 text-xs text-rose-300">
                 {formError}
               </div>
             )}
@@ -516,9 +520,9 @@ export default function FeedbackPage() {
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Name & Role Row */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                <div className="space-y-1">
+                <div className="space-y-1.5">
                   <label className="text-xs font-medium text-zinc-300 block">
-                    Full Name <span className="text-blue-500">*</span>
+                    Full Name <span className="text-blue-400">*</span>
                   </label>
                   <input
                     type="text"
@@ -526,11 +530,11 @@ export default function FeedbackPage() {
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     placeholder="e.g. Alex Chen"
-                    className="w-full px-3 py-2 rounded-xl bg-zinc-900 border border-zinc-800 text-xs text-zinc-100 placeholder-zinc-600 focus:outline-hidden focus:border-blue-500"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900/80 border border-white/10 text-white placeholder-zinc-500 focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 text-xs transition-all outline-hidden"
                   />
                 </div>
 
-                <div className="space-y-1">
+                <div className="space-y-1.5">
                   <label className="text-xs font-medium text-zinc-300 block">
                     Role / Title
                   </label>
@@ -539,14 +543,14 @@ export default function FeedbackPage() {
                     value={formData.role_title}
                     onChange={(e) => setFormData({ ...formData, role_title: e.target.value })}
                     placeholder="e.g. Lead Agent Architect"
-                    className="w-full px-3 py-2 rounded-xl bg-zinc-900 border border-zinc-800 text-xs text-zinc-100 placeholder-zinc-600 focus:outline-hidden focus:border-blue-500"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900/80 border border-white/10 text-white placeholder-zinc-500 focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 text-xs transition-all outline-hidden"
                   />
                 </div>
               </div>
 
               {/* Company & Category Row */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                <div className="space-y-1">
+                <div className="space-y-1.5">
                   <label className="text-xs font-medium text-zinc-300 block">
                     Company / Organization
                   </label>
@@ -555,18 +559,18 @@ export default function FeedbackPage() {
                     value={formData.company}
                     onChange={(e) => setFormData({ ...formData, company: e.target.value })}
                     placeholder="e.g. NovaScale AI"
-                    className="w-full px-3 py-2 rounded-xl bg-zinc-900 border border-zinc-800 text-xs text-zinc-100 placeholder-zinc-600 focus:outline-hidden focus:border-blue-500"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900/80 border border-white/10 text-white placeholder-zinc-500 focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 text-xs transition-all outline-hidden"
                   />
                 </div>
 
-                <div className="space-y-1">
+                <div className="space-y-1.5">
                   <label className="text-xs font-medium text-zinc-300 block">
                     Category Tag
                   </label>
                   <select
                     value={formData.category}
                     onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl bg-zinc-900 border border-zinc-800 text-xs text-zinc-100 focus:outline-hidden focus:border-blue-500 cursor-pointer"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900/80 border border-white/10 text-white focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 text-xs transition-all outline-hidden cursor-pointer"
                   >
                     <option value="M2M Escrow">M2M Escrow</option>
                     <option value="Security & Auth">Security &amp; Auth</option>
@@ -577,11 +581,11 @@ export default function FeedbackPage() {
               </div>
 
               {/* Star Rating Selector */}
-              <div className="space-y-1">
+              <div className="space-y-1.5">
                 <label className="text-xs font-medium text-zinc-300 block">
                   Rating: <span className="font-bold text-amber-400">{formData.rating} / 5 Stars</span>
                 </label>
-                <div className="flex items-center gap-1 pt-1">
+                <div className="flex items-center gap-1.5 pt-1">
                   {[1, 2, 3, 4, 5].map((star) => (
                     <button
                       type="button"
@@ -590,10 +594,10 @@ export default function FeedbackPage() {
                       className="p-1 hover:scale-110 transition-transform cursor-pointer"
                     >
                       <Star
-                        className={`w-6 h-6 ${
+                        className={`w-6 h-6 transition-colors ${
                           star <= formData.rating
-                            ? "text-amber-400 fill-amber-400"
-                            : "text-zinc-700"
+                            ? "text-amber-400 fill-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.4)]"
+                            : "text-zinc-700 hover:text-zinc-500"
                         }`}
                       />
                     </button>
@@ -602,9 +606,9 @@ export default function FeedbackPage() {
               </div>
 
               {/* Message Textarea */}
-              <div className="space-y-1">
+              <div className="space-y-1.5">
                 <label className="text-xs font-medium text-zinc-300 block">
-                  Review &amp; Testimonial <span className="text-blue-500">*</span>
+                  Review &amp; Testimonial <span className="text-blue-400">*</span>
                 </label>
                 <textarea
                   required
@@ -612,7 +616,7 @@ export default function FeedbackPage() {
                   value={formData.message}
                   onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                   placeholder="Share your experience with Verisett AI's deterministic settlement, FastMCP tools, or autonomous vaults..."
-                  className="w-full px-3 py-2 rounded-xl bg-zinc-900 border border-zinc-800 text-xs text-zinc-100 placeholder-zinc-600 focus:outline-hidden focus:border-blue-500 resize-none"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900/80 border border-white/10 text-white placeholder-zinc-500 focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 text-xs transition-all outline-hidden resize-none"
                 />
               </div>
 
@@ -621,14 +625,14 @@ export default function FeedbackPage() {
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-xs font-medium text-zinc-300 transition-colors cursor-pointer"
+                  className="px-4 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-xs font-medium text-zinc-400 hover:text-zinc-200 border border-white/5 transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="inline-flex items-center gap-2 px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-xs font-semibold text-white transition-all shadow-md shadow-blue-600/30 disabled:opacity-50 cursor-pointer"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-xs font-semibold text-white transition-all shadow-md shadow-blue-600/30 disabled:opacity-50 cursor-pointer"
                 >
                   {isSubmitting ? (
                     <>
@@ -647,6 +651,7 @@ export default function FeedbackPage() {
           </div>
         </div>
       )}
+
 
       {/* Unified Footer */}
       <MinimalFooter />

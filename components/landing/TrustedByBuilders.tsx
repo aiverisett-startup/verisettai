@@ -37,11 +37,11 @@ export function TrustedByBuilders() {
   }, []);
 
   return (
-    <section className="relative py-16 sm:py-20 bg-white border-t border-zinc-200/80 overflow-hidden">
+    <section className="relative py-20 sm:py-24 bg-[#09090B] text-zinc-100 border-t border-zinc-800/80 overflow-hidden">
       {/* Background Subtle Ambience */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-blue-500/5 blur-[90px] rounded-full -z-10"
+        className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-blue-600/10 blur-[120px] rounded-full -z-10"
       />
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-10">
@@ -49,21 +49,21 @@ export function TrustedByBuilders() {
         {/* Section Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4">
           <div className="space-y-2 max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-200/60 text-xs font-mono font-semibold text-blue-700">
-              <Sparkles className="w-3.5 h-3.5 text-blue-600" />
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-xs font-mono font-semibold text-blue-400">
+              <Sparkles className="w-3.5 h-3.5 text-blue-400" />
               <span>COMMUNITY TRUST WALL</span>
             </div>
-            <h2 className="text-2xl sm:text-4xl font-bold tracking-tight text-zinc-950 font-sans">
+            <h2 className="text-2xl sm:text-4xl font-bold tracking-tight text-white font-sans">
               Trusted by Builders &amp; Agent Protocols
             </h2>
-            <p className="text-xs sm:text-sm text-zinc-500 leading-relaxed font-sans">
+            <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed font-sans">
               See how teams building autonomous multi-agent pipelines rely on Verisett AI for deterministic M2M escrow and cryptographic assertion settlement.
             </p>
           </div>
 
           <Link
             href="/feedback"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-zinc-950 hover:bg-blue-600 text-xs font-semibold text-white transition-all shadow-sm shrink-0 group"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-blue-600 hover:bg-blue-500 text-xs font-semibold text-white transition-all shadow-md shadow-blue-600/25 shrink-0 group"
           >
             <span>View All Feedback &amp; Leave a Review</span>
             <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
@@ -76,36 +76,36 @@ export function TrustedByBuilders() {
             {[1, 2, 3].map((n) => (
               <div
                 key={n}
-                className="rounded-2xl border border-zinc-200 bg-[#FAF8F5]/80 p-6 shadow-2xs flex flex-col justify-between animate-pulse space-y-4"
+                className="rounded-2xl border border-white/5 bg-zinc-950/60 p-6 shadow-xl flex flex-col justify-between animate-pulse space-y-4"
               >
                 <div className="space-y-3">
-                  <div className="h-4 w-24 bg-zinc-200 rounded" />
-                  <div className="h-3 w-full bg-zinc-200 rounded" />
-                  <div className="h-3 w-4/5 bg-zinc-200 rounded" />
+                  <div className="h-4 w-24 bg-zinc-800 rounded" />
+                  <div className="h-3 w-full bg-zinc-800 rounded" />
+                  <div className="h-3 w-4/5 bg-zinc-800 rounded" />
                 </div>
-                <div className="pt-4 border-t border-zinc-200 flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-zinc-200" />
+                <div className="pt-4 border-t border-white/5 flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-zinc-800" />
                   <div className="space-y-1.5 flex-1">
-                    <div className="h-3 w-28 bg-zinc-200 rounded" />
-                    <div className="h-2.5 w-36 bg-zinc-100 rounded" />
+                    <div className="h-3 w-28 bg-zinc-800 rounded" />
+                    <div className="h-2.5 w-36 bg-zinc-900 rounded" />
                   </div>
                 </div>
               </div>
             ))}
           </div>
         ) : previewReviews.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-zinc-300 bg-[#FAF8F5]/60 p-8 sm:p-12 text-center max-w-xl mx-auto space-y-3.5">
-            <MessageSquarePlus className="w-8 h-8 text-blue-600 mx-auto" />
-            <h3 className="text-base font-bold text-zinc-950 font-sans">
+          <div className="rounded-2xl border border-dashed border-zinc-800 bg-zinc-950/60 p-8 sm:p-12 text-center max-w-xl mx-auto space-y-3.5 backdrop-blur-xl">
+            <MessageSquarePlus className="w-8 h-8 text-blue-400 mx-auto" />
+            <h3 className="text-base font-bold text-white font-sans">
               Be the First Builder to Leave a Review
             </h3>
-            <p className="text-xs sm:text-sm text-zinc-500 leading-relaxed font-sans max-w-md mx-auto">
+            <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed font-sans max-w-md mx-auto">
               Share your team&apos;s experience integrating Verisett AI&apos;s autonomous M2M clearinghouse, deterministic vaults, and cryptographic assertion protocol.
             </p>
             <div className="pt-2">
               <Link
                 href="/feedback"
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-zinc-950 hover:bg-blue-600 text-xs font-semibold text-white transition-all shadow-xs"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-blue-600 hover:bg-blue-500 text-xs font-semibold text-white transition-all shadow-md shadow-blue-600/25"
               >
                 <MessageSquarePlus className="w-3.5 h-3.5" />
                 <span>Submit Feedback &amp; Testimonial</span>
@@ -117,38 +117,38 @@ export function TrustedByBuilders() {
             {previewReviews.map((item) => (
               <div
                 key={item.id}
-                className="rounded-2xl border border-zinc-200 bg-[#FAF8F5]/80 p-6 shadow-2xs hover:shadow-md hover:border-zinc-300 transition-all flex flex-col justify-between"
+                className="rounded-2xl border border-white/10 hover:border-blue-500/30 bg-zinc-950/80 hover:bg-black/90 p-6 shadow-xl backdrop-blur-xl hover:shadow-2xl hover:shadow-blue-500/10 transition-all duration-300 flex flex-col justify-between"
               >
                 <div className="space-y-3.5">
                   {/* Rating & Category */}
                   <div className="flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-0.5" aria-label={`${item.rating} stars`}>
+                    <div className="flex items-center gap-1" aria-label={`${item.rating} stars`}>
                       {Array.from({ length: 5 }).map((_, i) => (
                         <Star
                           key={i}
                           className={`w-3.5 h-3.5 ${
                             i < item.rating
-                              ? "text-amber-500 fill-amber-500"
-                              : "text-zinc-300"
+                              ? "text-amber-400 fill-amber-400 drop-shadow-[0_0_6px_rgba(251,191,36,0.3)]"
+                              : "text-zinc-800"
                           }`}
                         />
                       ))}
                     </div>
 
-                    <span className="px-2.5 py-0.5 rounded-full bg-white border border-zinc-200 text-[10px] font-mono font-medium text-zinc-700">
+                    <span className="px-2.5 py-0.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-[10px] font-mono font-medium text-cyan-400">
                       {item.category}
                     </span>
                   </div>
 
                   {/* Review Message */}
-                  <blockquote className="text-xs sm:text-sm text-zinc-700 leading-relaxed font-sans">
+                  <blockquote className="text-xs sm:text-sm text-zinc-300 leading-relaxed font-sans">
                     “{item.message}”
                   </blockquote>
                 </div>
 
                 {/* Author Row */}
-                <div className="pt-5 mt-5 border-t border-zinc-200/80 flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-xs font-bold text-white shrink-0 shadow-2xs">
+                <div className="pt-5 mt-5 border-t border-white/5 flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center text-xs font-bold text-white shrink-0 shadow-md ring-1 ring-white/20">
                     {item.name
                       .split(" ")
                       .map((n) => n[0])
@@ -157,17 +157,20 @@ export function TrustedByBuilders() {
                   </div>
 
                   <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-1.5">
-                      <span className="font-semibold text-xs text-zinc-950 truncate">
+                    <div className="flex items-center gap-2">
+                      <span className="font-semibold text-xs text-white truncate">
                         {item.name}
                       </span>
-                      <ShieldCheck className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[9px] font-mono font-medium shrink-0">
+                        <span className="w-1 h-1 rounded-full bg-emerald-400 animate-pulse" />
+                        <span>Verified</span>
+                      </span>
                     </div>
-                    <p className="text-[11px] text-zinc-500 truncate font-mono">
+                    <p className="text-[11px] text-zinc-400 truncate font-mono mt-0.5">
                       {item.role_title}
                       {item.role_title && item.company && " • "}
                       {item.company && (
-                        <span className="font-semibold text-zinc-700">{item.company}</span>
+                        <span className="font-semibold text-zinc-300">{item.company}</span>
                       )}
                     </p>
                   </div>
@@ -176,10 +179,11 @@ export function TrustedByBuilders() {
             ))}
           </div>
         )}
-
       </div>
     </section>
   );
+
 }
 
 export default TrustedByBuilders;
+

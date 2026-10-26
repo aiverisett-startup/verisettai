@@ -16,8 +16,8 @@ import { FAQSection } from "@/components/landing/FAQSection";
 import { PricingSection } from "@/components/landing/PricingSection";
 import { TimedLoginModal } from "@/components/auth/TimedLoginModal";
 import { LegalConsentModal } from "@/components/LegalConsentModal";
-import { CinematicFounderCard } from "@/components/founder/CinematicFounderCard";
 import { supabase } from "@/lib/supabase";
+
 import {
   EnvironmentMode,
   TelemetryStats,
@@ -145,11 +145,9 @@ export default function Home() {
       {/* 12. Community Feedback & Verified Builder Trust Preview */}
       <TrustedByBuilders />
 
-      {/* 13. Cinematic Realistic Founder Profile Card */}
-      <CinematicFounderCard />
-
-      {/* 14. Minimalist Footer */}
+      {/* 13. Minimalist Footer */}
       <MinimalFooter />
+
 
       {/* 15-Second Institutional Timed Login Gateway */}
       <TimedLoginModal delaySeconds={15} />

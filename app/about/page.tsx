@@ -21,7 +21,8 @@ import { VerisettLogo } from "@/components/VerisettLogo";
 import { GoldenBackgroundShapes } from "@/components/ui/GoldenBackgroundShapes";
 import { WebsiteEdgeShapes } from "@/components/ui/WebsiteEdgeShapes";
 import { MinimalFooter } from "@/components/landing/MinimalFooter";
-import { CinematicFounderCard } from "@/components/founder/CinematicFounderCard";
+
+
 
 function TwitterXIcon({ className = "w-4 h-4" }: { className?: string }) {
   return (
@@ -114,13 +115,9 @@ export default function AboutPage() {
       {/* Main Content */}
       <main className="mx-auto max-w-5xl px-4 py-10 sm:py-14 lg:px-8 space-y-10">
         
-        {/* Cinematic Obsidian Founder & Leadership Profile Card */}
-        <div className="rounded-3xl overflow-hidden border border-[#EAE3D2] shadow-xl">
-          <CinematicFounderCard />
-        </div>
-
         {/* Technology Clarification & Framework Framing */}
         <section className="rounded-3xl border border-[#EAE3D2] bg-white p-7 sm:p-10 shadow-xs space-y-6">
+
           <div className="space-y-2">
             <span className="text-xs font-mono uppercase text-[#8C8275] font-semibold tracking-wider block">
               Technology Stack &amp; Implementation Architecture

@@ -276,8 +276,8 @@ export function PricingSection({ initialPlans }: PricingSectionProps) {
           )}
         </div>
 
-        {/* Bento Box Grid Container */}
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 auto-rows-fr items-stretch pt-2">
+        {/* Balanced 4-Column Side-by-Side Responsive Grid Container */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch w-full max-w-7xl mx-auto pt-2">
           {plans.map((plan) => {
             const details = PLAN_DESCRIPTIONS[plan.id] || PLAN_DESCRIPTIONS.tier_1;
             const isPaid = plan.is_paid;
@@ -287,28 +287,10 @@ export function PricingSection({ initialPlans }: PricingSectionProps) {
             const remaining = plan.max_capacity !== null ? Math.max(0, plan.max_capacity - plan.claimed_count) : null;
             const percentage = plan.max_capacity !== null ? Math.min(100, Math.round((plan.claimed_count / plan.max_capacity) * 100)) : null;
 
-            // Responsive Bento footprint spans per plan
-            const getBentoCellSpan = (id: string) => {
-              switch (id) {
-                case "tier_3": // Sovereign Node Plan (₹30,000 Lifetime) - 2-column flagship anchor
-                  return "col-span-1 md:col-span-3 lg:col-span-2 lg:row-span-2 lg:col-start-3 lg:row-start-1";
-                case "tier_1": // Developer / Pro Plan (₹2,500/mo) - prominent vertical pillar
-                  return "col-span-1 md:col-span-1 lg:col-span-1 lg:row-span-2 lg:col-start-2 lg:row-start-1";
-                case "community": // Starter Plan (₹0) - balanced modular cell
-                  return "col-span-1 md:col-span-1 lg:col-span-1 lg:row-span-1 lg:col-start-1 lg:row-start-1";
-                case "tier_2": // Institutional / Enterprise Plan (₹7,999/mo) - balanced modular cell
-                  return "col-span-1 md:col-span-1 lg:col-span-1 lg:row-span-1 lg:col-start-1 lg:row-start-2";
-                default:
-                  return "col-span-1";
-              }
-            };
-
             return (
               <div
                 key={plan.id}
-                className={`rounded-2xl p-6 sm:p-7 flex flex-col justify-between h-full border transition-all duration-300 backdrop-blur-xl relative group ${getBentoCellSpan(
-                  plan.id
-                )} ${
+                className={`rounded-2xl p-6 sm:p-7 flex flex-col justify-between h-full border transition-all duration-300 backdrop-blur-xl relative group w-full ${
                   plan.id === "tier_3"
                     ? "border-amber-400/80 bg-gradient-to-b from-amber-500/[0.04] via-white to-amber-500/[0.08] ring-2 ring-amber-400 shadow-[0_20px_50px_-12px_rgba(245,158,11,0.25)] hover:border-amber-300 hover:shadow-[0_25px_60px_-12px_rgba(245,158,11,0.35)]"
                     : plan.id === "tier_1"
@@ -327,6 +309,7 @@ export function PricingSection({ initialPlans }: PricingSectionProps) {
                     </span>
                   </div>
                 )}
+
 
                 {/* Sovereign Lifetime Badge for Tier 3 */}
                 {plan.id === "tier_3" && (
@@ -461,14 +444,9 @@ export function PricingSection({ initialPlans }: PricingSectionProps) {
                         </span>
                       )}
                     </div>
-                    <ul
-                      className={
-                        plan.id === "tier_3"
-                          ? "grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 text-xs text-zinc-800"
-                          : "space-y-2 text-xs text-zinc-800"
-                      }
-                    >
+                    <ul className="space-y-2 text-xs text-zinc-800">
                       {details.features.map((feat, idx) => (
+
                         <li key={idx} className="flex items-start gap-2.5">
                           <div
                             className={`h-4 w-4 rounded-full flex items-center justify-center shrink-0 mt-0.5 border ${
