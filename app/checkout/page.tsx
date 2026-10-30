@@ -24,6 +24,7 @@ import {
   Loader2,
   Cpu,
   BadgeCheck,
+  CreditCard,
 } from "lucide-react";
 import { VerisettLogo } from "@/components/VerisettLogo";
 import { getPlans, registerAction } from "@/app/actions/register";
@@ -33,6 +34,7 @@ import {
   normalizePlanId,
 } from "@/lib/plans";
 import { supabase } from "@/lib/supabase";
+import { openRazorpayCheckout } from "@/lib/razorpayClient";
 
 const PROTOCOL_PURPOSES = [
   "Autonomous Escrow Clearing",
@@ -81,6 +83,9 @@ function CheckoutInner() {
   const [gstin, setGstin] = useState("");
   const [protocolPurpose, setProtocolPurpose] = useState(PROTOCOL_PURPOSES[0]);
   const [paymentUtr, setPaymentUtr] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState<"razorpay" | "upi">("razorpay");
+  const [isRazorpayProcessing, setIsRazorpayProcessing] = useState(false);
+  const [paymentNotification, setPaymentNotification] = useState<string | null>(null);
 
   // Processing & Success State
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -257,6 +262,94 @@ function CheckoutInner() {
       setErrorMessage(err?.message || "An unexpected error occurred during node provisioning.");
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleRazorpayCheckout = async () => {
+    setErrorMessage(null);
+    setPaymentNotification(null);
+
+    if (isTierFull || (selectedPlan.is_paid && isTotalPaidExhausted)) {
+      setErrorMessage("Selected plan has reached maximum capacity limits. Please select another tier.");
+      return;
+    }
+
+    if (!orgName.trim() || orgName.trim().length < 2) {
+      setErrorMessage("Please enter a valid Legal Entity or Developer Organization Name.");
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email.trim() || !emailRegex.test(email.trim())) {
+      setErrorMessage("Please provide a valid corporate work email address.");
+      return;
+    }
+
+    setIsRazorpayProcessing(true);
+
+    try {
+      const fullLocation = [city.trim(), countryState.trim(), pincode.trim()].filter(Boolean).join(", ");
+      const amountInPaise = Math.round(selectedPlan.price_inr * 100);
+
+      await openRazorpayCheckout({
+        amount: amountInPaise,
+        currency: "INR",
+        name: "Verisett AI",
+        description: `${selectedPlan.name} Settlement Node Provisioning`,
+        receipt: `rcpt_${agentId.replace(/[^a-zA-Z0-9]/g, "").slice(-8)}_${Date.now().toString().slice(-6)}`,
+        prefill: {
+          name: operatorName.trim() || orgName.trim(),
+          email: email.trim().toLowerCase(),
+        },
+        notes: {
+          agent_id: agentId,
+          plan_id: selectedPlanId,
+          organization: orgName.trim(),
+        },
+        onSuccess: async (verifyResult) => {
+          setPaymentNotification("Payment confirmed! Provisioning protocol settlement node...");
+          try {
+            const res = await registerAction(null, {
+              orgName: orgName.trim(),
+              email: email.trim().toLowerCase(),
+              agentId: agentId,
+              planId: selectedPlanId,
+              operatorName: operatorName.trim(),
+              countryState: fullLocation || countryState.trim(),
+              gstin: gstin.trim(),
+              protocolPurpose: protocolPurpose,
+              paymentUtr: verifyResult.payment_id,
+              paymentStatus: "verified",
+            });
+
+            if (res.success) {
+              setSuccessData({
+                registration_id: res.data?.registration_id,
+                agent_id: res.data?.agent_id || agentId,
+                plan_id: res.data?.plan_id || selectedPlanId,
+                payment_status: `Verified via Razorpay (${verifyResult.payment_id})`,
+              });
+            } else {
+              setErrorMessage(res.error || "Payment received, but error provisioning node. Please contact support.");
+            }
+          } catch (regErr: any) {
+            setErrorMessage(regErr?.message || "Failed to finalize node registration.");
+          } finally {
+            setIsRazorpayProcessing(false);
+          }
+        },
+        onFailure: (err) => {
+          setIsRazorpayProcessing(false);
+          setErrorMessage(err.description || "Payment failed or was declined by bank.");
+        },
+        onDismiss: () => {
+          setIsRazorpayProcessing(false);
+          setPaymentNotification("Checkout window closed without completing payment.");
+        },
+      });
+    } catch (err: any) {
+      setIsRazorpayProcessing(false);
+      setErrorMessage(err?.message || "Failed to initiate Razorpay checkout.");
     }
   };
 
@@ -684,116 +777,275 @@ function CheckoutInner() {
                 </div>
               </div>
 
-              {/* Dynamic UPI Payment Scanner Section (Only for Paid Plans) */}
+              {/* Payment Section (Only for Paid Plans) */}
               {selectedPlan.is_paid ? (
                 <div className="space-y-4 pt-1">
-                  <div className="flex items-center justify-between text-xs font-mono font-bold uppercase tracking-wider text-[#0F172A]">
-                    <span className="flex items-center gap-1.5">
-                      <QrCode className="w-4 h-4 text-[#2563EB]" />
-                      Dynamic UPI Payment Scanner
-                    </span>
-                    <span className="text-xs text-emerald-700 font-semibold">Instant Verification</span>
-                  </div>
-
-                  {/* QR Image Box */}
-                  <div className="p-5 sm:p-6 rounded-[12px] border border-[#CBD5E1] bg-white flex flex-col items-center justify-center text-center shadow-xs">
-                    {qrDataUrl ? (
-                      <div className="relative p-3 bg-white rounded-[10px] border border-[#E2E8F0] shadow-sm inline-block">
-                        <img
-                          src={qrDataUrl}
-                          alt="Verisett UPI QR Code"
-                          className="w-56 h-56 sm:w-64 sm:h-64 object-contain mx-auto"
-                        />
-                      </div>
-                    ) : (
-                      <div className="w-56 h-56 sm:w-64 sm:h-64 flex items-center justify-center bg-[#F8FAFC] rounded-[10px] border border-dashed border-[#CBD5E1] mx-auto">
-                        <Loader2 className="w-8 h-8 text-[#94A3B8] animate-spin" />
-                      </div>
-                    )}
-
-                    {/* Designated UPI ID with Copy Button */}
-                    <div className="mt-4 flex items-center justify-center gap-2 flex-wrap text-sm font-mono">
-                      <span className="text-[#475569] font-semibold">UPI ID:</span>
-                      <span className="font-bold text-[#0F172A] bg-[#F1F5F9] px-3 py-1.5 rounded-[8px] border border-[#CBD5E1] text-sm">
-                        {UPI_DESIGNATED_ID}
-                      </span>
+                  {/* Payment Method Switcher Tabs */}
+                  <div>
+                    <label className="block text-[12px] font-semibold text-[#475569] mb-2 uppercase tracking-wider">
+                      Payment Settlement Rail
+                    </label>
+                    <div className="grid grid-cols-2 gap-2 text-xs font-mono">
                       <button
                         type="button"
-                        onClick={handleCopyUpiId}
-                        className="px-3 py-1.5 rounded-[8px] border border-[#CBD5E1] hover:bg-[#F8FAFC] text-[#0F172A] text-xs font-mono font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
-                        title="Copy UPI ID"
+                        onClick={() => {
+                          setPaymentMethod("razorpay");
+                          setErrorMessage(null);
+                        }}
+                        className={`p-3 rounded-[10px] border flex items-center justify-center gap-2 font-semibold transition-all cursor-pointer ${
+                          paymentMethod === "razorpay"
+                            ? "border-[#2563EB] bg-blue-50/80 text-[#2563EB] shadow-xs"
+                            : "border-[#CBD5E1] bg-white text-[#475569] hover:border-[#94A3B8]"
+                        }`}
                       >
-                        {copiedUpi ? (
+                        <CreditCard className="w-4 h-4 shrink-0" />
+                        <span>Razorpay Instant</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setPaymentMethod("upi");
+                          setErrorMessage(null);
+                        }}
+                        className={`p-3 rounded-[10px] border flex items-center justify-center gap-2 font-semibold transition-all cursor-pointer ${
+                          paymentMethod === "upi"
+                            ? "border-[#2563EB] bg-blue-50/80 text-[#2563EB] shadow-xs"
+                            : "border-[#CBD5E1] bg-white text-[#475569] hover:border-[#94A3B8]"
+                        }`}
+                      >
+                        <QrCode className="w-4 h-4 shrink-0" />
+                        <span>Manual UPI QR</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {paymentMethod === "razorpay" ? (
+                    /* Razorpay Instant Checkout Method Box */
+                    <div className="p-5 sm:p-6 rounded-[12px] border border-blue-200 bg-gradient-to-b from-blue-50/50 to-white space-y-4 shadow-xs">
+                      <div className="flex items-center justify-between gap-2 flex-wrap pb-3 border-b border-blue-100">
+                        <div className="flex items-center gap-2">
+                          <CreditCard className="w-5 h-5 text-[#2563EB]" />
+                          <div>
+                            <div className="text-sm font-bold text-[#0F172A]">
+                              Razorpay Standard Checkout
+                            </div>
+                            <div className="text-xs font-mono text-[#64748B]">
+                              Zero-trust HMAC-SHA256 verified
+                            </div>
+                          </div>
+                        </div>
+                        <span className="text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold border border-emerald-300">
+                          INSTANT CLEARING
+                        </span>
+                      </div>
+
+                      <div className="text-xs text-[#475569] space-y-2">
+                        <p className="leading-relaxed">
+                          Securely provision your node via official Razorpay modal. Accepts all major payment rails:
+                        </p>
+                        <div className="grid grid-cols-2 gap-2 text-[11px] font-mono text-[#334155]">
+                          <div className="p-2 rounded-[8px] bg-white border border-[#E2E8F0]">
+                            💳 Credit &amp; Debit Cards
+                          </div>
+                          <div className="p-2 rounded-[8px] bg-white border border-[#E2E8F0]">
+                            ⚡ UPI (GPay, PhonePe, Paytm)
+                          </div>
+                          <div className="p-2 rounded-[8px] bg-white border border-[#E2E8F0]">
+                            🏦 50+ NetBanking Portals
+                          </div>
+                          <div className="p-2 rounded-[8px] bg-white border border-[#E2E8F0]">
+                            🔒 Corporate Wallets &amp; EMI
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Razorpay CTA Button */}
+                      <button
+                        type="button"
+                        disabled={
+                          isRazorpayProcessing ||
+                          isTierFull ||
+                          (selectedPlan.is_paid && isTotalPaidExhausted)
+                        }
+                        onClick={handleRazorpayCheckout}
+                        className="w-full bg-[#2563EB] hover:bg-[#1D4ED8] text-white px-6 py-3.5 rounded-[12px] font-semibold text-sm shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_4px_14px_rgba(37,99,235,0.25)] flex items-center justify-center gap-2.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                      >
+                        {isRazorpayProcessing ? (
                           <>
-                            <Check className="w-4 h-4 text-emerald-600" />
-                            <span className="text-emerald-700 font-bold">Copied</span>
+                            <Loader2 className="w-5 h-5 animate-spin text-white" />
+                            <span>Opening Razorpay Checkout...</span>
                           </>
                         ) : (
                           <>
-                            <Copy className="w-4 h-4 text-[#64748B]" />
-                            <span>Copy UPI</span>
+                            <CreditCard className="w-4 h-4" />
+                            <span>
+                              Pay ₹{selectedPlan.price_inr.toLocaleString()} via Razorpay
+                            </span>
+                            <ArrowRight className="w-4 h-4" />
+                          </>
+                        )}
+                      </button>
+
+                      <div className="flex items-center justify-center gap-2 text-[11px] font-mono text-[#64748B] pt-1">
+                        <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                        <span>256-bit Bank Grade Encryption • PCI-DSS Certified</span>
+                      </div>
+                    </div>
+                  ) : (
+                    /* Manual UPI QR Scanner Box */
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between text-xs font-mono font-bold uppercase tracking-wider text-[#0F172A]">
+                        <span className="flex items-center gap-1.5">
+                          <QrCode className="w-4 h-4 text-[#2563EB]" />
+                          Dynamic UPI Payment Scanner
+                        </span>
+                        <span className="text-xs text-emerald-700 font-semibold">
+                          Manual Reconciliation
+                        </span>
+                      </div>
+
+                      {/* QR Image Box */}
+                      <div className="p-5 sm:p-6 rounded-[12px] border border-[#CBD5E1] bg-white flex flex-col items-center justify-center text-center shadow-xs">
+                        {qrDataUrl ? (
+                          <div className="relative p-3 bg-white rounded-[10px] border border-[#E2E8F0] shadow-sm inline-block">
+                            <img
+                              src={qrDataUrl}
+                              alt="Verisett UPI QR Code"
+                              className="w-56 h-56 sm:w-64 sm:h-64 object-contain mx-auto"
+                            />
+                          </div>
+                        ) : (
+                          <div className="w-56 h-56 sm:w-64 sm:h-64 flex items-center justify-center bg-[#F8FAFC] rounded-[10px] border border-dashed border-[#CBD5E1] mx-auto">
+                            <Loader2 className="w-8 h-8 text-[#94A3B8] animate-spin" />
+                          </div>
+                        )}
+
+                        {/* Designated UPI ID with Copy Button */}
+                        <div className="mt-4 flex items-center justify-center gap-2 flex-wrap text-sm font-mono">
+                          <span className="text-[#475569] font-semibold">UPI ID:</span>
+                          <span className="font-bold text-[#0F172A] bg-[#F1F5F9] px-3 py-1.5 rounded-[8px] border border-[#CBD5E1] text-sm">
+                            {UPI_DESIGNATED_ID}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={handleCopyUpiId}
+                            className="px-3 py-1.5 rounded-[8px] border border-[#CBD5E1] hover:bg-[#F8FAFC] text-[#0F172A] text-xs font-mono font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+                            title="Copy UPI ID"
+                          >
+                            {copiedUpi ? (
+                              <>
+                                <Check className="w-4 h-4 text-emerald-600" />
+                                <span className="text-emerald-700 font-bold">Copied</span>
+                              </>
+                            ) : (
+                              <>
+                                <Copy className="w-4 h-4 text-[#64748B]" />
+                                <span>Copy UPI</span>
+                              </>
+                            )}
+                          </button>
+                        </div>
+
+                        <p className="text-xs text-[#64748B] mt-2.5 font-mono leading-normal text-center">
+                          Scan using Google Pay, PhonePe, Paytm, CRED or any BHIM UPI App
+                        </p>
+                      </div>
+
+                      {/* 12-Digit UTR Transaction Input */}
+                      <div>
+                        <label className="block text-[12px] font-semibold text-[#475569] mb-[6px] uppercase tracking-wider">
+                          12-Digit UPI Reference Number (UTR) <span className="text-rose-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          value={paymentUtr}
+                          onChange={(e) =>
+                            setPaymentUtr(e.target.value.replace(/[^0-9A-Za-z]/g, ""))
+                          }
+                          placeholder="e.g. 428910284729"
+                          maxLength={16}
+                          className="w-full bg-[rgba(255,255,255,0.85)] border border-[#CBD5E1] text-[#0F172A] text-[14px] font-mono font-bold px-[14px] py-[11px] rounded-[10px] focus:bg-white focus:border-[#2563EB] focus:ring-[3px] focus:ring-[#2563EB]/12 focus:outline-none transition-all placeholder:text-[#94A3B8]"
+                        />
+                        <p className="text-[12px] font-mono text-[#64748B] mt-1.5 leading-normal">
+                          Enter the 12-digit transaction ID / UTR shown in your banking app after payment.
+                        </p>
+                      </div>
+
+                      {/* Manual Submit Button */}
+                      <button
+                        type="button"
+                        disabled={
+                          isSubmitting ||
+                          isTierFull ||
+                          (selectedPlan.is_paid && isTotalPaidExhausted)
+                        }
+                        onClick={handleSubmit}
+                        className="w-full bg-[#0F172A] hover:bg-slate-800 text-white px-[24px] py-[12px] rounded-[10px] font-semibold text-[14px] shadow-sm flex items-center justify-center gap-2.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                      >
+                        {isSubmitting ? (
+                          <>
+                            <Loader2 className="w-5 h-5 animate-spin" />
+                            <span>Verifying UTR &amp; Minting Node...</span>
+                          </>
+                        ) : (
+                          <>
+                            <span>Verify UTR &amp; Provision Node</span>
+                            <ArrowRight className="w-4 h-4" />
                           </>
                         )}
                       </button>
                     </div>
-
-                    <p className="text-xs text-[#64748B] mt-2.5 font-mono leading-normal text-center">
-                      Scan using Google Pay, PhonePe, Paytm, CRED or any BHIM UPI App
-                    </p>
-                  </div>
-
-                  {/* 12-Digit UTR Transaction Input */}
-                  <div>
-                    <label className="block text-[12px] font-semibold text-[#475569] mb-[6px] uppercase tracking-wider">
-                      12-Digit UPI Reference Number (UTR) <span className="text-rose-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      value={paymentUtr}
-                      onChange={(e) => setPaymentUtr(e.target.value.replace(/[^0-9A-Za-z]/g, ""))}
-                      placeholder="e.g. 428910284729"
-                      maxLength={16}
-                      className="w-full bg-[rgba(255,255,255,0.85)] border border-[#CBD5E1] text-[#0F172A] text-[14px] font-mono font-bold px-[14px] py-[11px] rounded-[10px] focus:bg-white focus:border-[#2563EB] focus:ring-[3px] focus:ring-[#2563EB]/12 focus:outline-none transition-all placeholder:text-[#94A3B8]"
-                    />
-                    <p className="text-[12px] font-mono text-[#64748B] mt-1.5 leading-normal">
-                      Enter the 12-digit transaction ID / UTR shown in your banking app after payment.
-                    </p>
-                  </div>
+                  )}
                 </div>
               ) : (
                 /* Free Community Box */
-                <div className="p-4 rounded-[12px] border border-emerald-300 bg-emerald-50/80 text-emerald-950 text-xs sm:text-sm space-y-1 font-mono">
-                  <div className="font-bold flex items-center gap-1.5">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                    <span>Free Community Environment ($0.00)</span>
+                <div className="space-y-4">
+                  <div className="p-4 rounded-[12px] border border-emerald-300 bg-emerald-50/80 text-emerald-950 text-xs sm:text-sm space-y-1 font-mono">
+                    <div className="font-bold flex items-center gap-1.5">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                      <span>Free Community Environment (₹0.00)</span>
+                    </div>
+                    <p className="text-xs text-emerald-800 font-sans leading-normal">
+                      No payment required. Testnet node will be provisioned immediately.
+                    </p>
                   </div>
-                  <p className="text-xs text-emerald-800 font-sans leading-normal">
-                    No payment required. Testnet node will be provisioned immediately.
-                  </p>
+
+                  <button
+                    type="button"
+                    disabled={isSubmitting}
+                    onClick={handleSubmit}
+                    className="w-full bg-[#2563EB] hover:bg-[#1D4ED8] text-white px-[24px] py-[12px] rounded-[10px] font-semibold text-[14px] shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_4px_14px_rgba(37,99,235,0.25)] flex items-center justify-center gap-2.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                        <span>Provisioning Community Node...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>Provision Free Community Node</span>
+                        <ArrowRight className="w-4 h-4" />
+                      </>
+                    )}
+                  </button>
                 </div>
               )}
 
-              {/* Submit CTA Button */}
-              <button
-                type="button"
-                disabled={isSubmitting || isTierFull || (selectedPlan.is_paid && isTotalPaidExhausted)}
-                onClick={handleSubmit}
-                className="w-full bg-[#2563EB] hover:bg-[#1D4ED8] text-white px-[24px] py-[12px] rounded-[10px] font-semibold text-[14px] shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_4px_14px_rgba(37,99,235,0.25)] flex items-center justify-center gap-2.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-              >
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    <span>Minting Node &amp; Verifying...</span>
-                  </>
-                ) : (
-                  <>
-                    <span>
-                      {selectedPlan.is_paid ? "Verify Payment & Mint Node" : "Provision Community Node"}
-                    </span>
-                    <ArrowRight className="w-4 h-4" />
-                  </>
-                )}
-              </button>
+              {/* Feedback Notifications & Errors */}
+              {errorMessage && (
+                <div className="p-3.5 rounded-[10px] border border-rose-300 bg-rose-50 text-rose-800 text-xs font-mono flex items-start gap-2.5 animate-in fade-in">
+                  <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+                  <span>{errorMessage}</span>
+                </div>
+              )}
+
+              {paymentNotification && (
+                <div className="p-3.5 rounded-[10px] border border-blue-200 bg-blue-50 text-blue-800 text-xs font-mono flex items-start gap-2.5 animate-in fade-in">
+                  <ShieldCheck className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
+                  <span>{paymentNotification}</span>
+                </div>
+              )}
 
               <div className="flex items-center justify-center gap-4 text-xs font-mono text-[#64748B] pt-1 flex-wrap">
                 <span>Instant Provisioning</span>

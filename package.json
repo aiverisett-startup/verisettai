@@ -9,6 +9,7 @@
     "start": "next start",
     "lint": "eslint .",
     "test:settlement": "npx tsx scripts/test-settlement.ts",
+    "test:razorpay": "npx tsx scripts/test-razorpay-checkout.ts",
     "protocol:verify": "npx tsx scripts/test-settlement.ts",
     "video:preview": "remotion preview remotion/index.ts",
     "video:render": "remotion render remotion/index.ts VerisettTeaser out/verisett-teaser.mp4"
@@ -29,6 +30,7 @@
     "next": "16.3.4",
     "next-auth": "^4.24.15",
     "qrcode": "^1.5.4",
+    "razorpay": "^2.9.8",
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "remotion": "^4.0.524",

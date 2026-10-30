@@ -41,7 +41,12 @@ yarn-error.log*
 .pnpm-debug.log*
 
 # env files (safely ignore secret environment variables)
+.env
 .env*
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 !.env.example
 
 # vercel
