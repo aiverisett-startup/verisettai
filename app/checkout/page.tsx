@@ -35,6 +35,7 @@ import {
 } from "@/lib/plans";
 import { supabase } from "@/lib/supabase";
 import { openRazorpayCheckout } from "@/lib/razorpayClient";
+import { DynamicUpiQrModal } from "@/components/DynamicUpiQrModal";
 
 const PROTOCOL_PURPOSES = [
   "Autonomous Escrow Clearing",
@@ -83,7 +84,8 @@ function CheckoutInner() {
   const [gstin, setGstin] = useState("");
   const [protocolPurpose, setProtocolPurpose] = useState(PROTOCOL_PURPOSES[0]);
   const [paymentUtr, setPaymentUtr] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState<"razorpay" | "upi">("razorpay");
+  const [paymentMethod, setPaymentMethod] = useState<"razorpay" | "dynamic_qr" | "upi">("razorpay");
+  const [isDynamicQrOpen, setIsDynamicQrOpen] = useState(false);
   const [isRazorpayProcessing, setIsRazorpayProcessing] = useState(false);
   const [paymentNotification, setPaymentNotification] = useState<string | null>(null);
 
@@ -350,6 +352,44 @@ function CheckoutInner() {
     } catch (err: any) {
       setIsRazorpayProcessing(false);
       setErrorMessage(err?.message || "Failed to initiate Razorpay checkout.");
+    }
+  };
+
+  const handleDynamicQrSuccess = async (paymentData: {
+    qr_id: string;
+    payment_id: string;
+    amount: number;
+  }) => {
+    setPaymentNotification("Payment confirmed via Razorpay Dynamic UPI QR! Provisioning settlement node...");
+    setIsDynamicQrOpen(false);
+
+    try {
+      const fullLocation = [city.trim(), countryState.trim(), pincode.trim()].filter(Boolean).join(", ");
+      const res = await registerAction(null, {
+        orgName: orgName.trim(),
+        email: email.trim().toLowerCase(),
+        agentId: agentId,
+        planId: selectedPlanId,
+        operatorName: operatorName.trim(),
+        countryState: fullLocation || countryState.trim(),
+        gstin: gstin.trim(),
+        protocolPurpose: protocolPurpose,
+        paymentUtr: paymentData.payment_id,
+        paymentStatus: "verified",
+      });
+
+      if (res.success) {
+        setSuccessData({
+          registration_id: res.data?.registration_id,
+          agent_id: res.data?.agent_id || agentId,
+          plan_id: res.data?.plan_id || selectedPlanId,
+          payment_status: `Verified via Dynamic UPI QR (${paymentData.payment_id})`,
+        });
+      } else {
+        setErrorMessage(res.error || "Payment received, but error provisioning node. Please contact support.");
+      }
+    } catch (err: any) {
+      setErrorMessage(err?.message || "Failed to finalize node registration.");
     }
   };
 
@@ -785,7 +825,23 @@ function CheckoutInner() {
                     <label className="block text-[12px] font-semibold text-[#475569] mb-2 uppercase tracking-wider">
                       Payment Settlement Rail
                     </label>
-                    <div className="grid grid-cols-2 gap-2 text-xs font-mono">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs font-mono">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setPaymentMethod("dynamic_qr");
+                          setErrorMessage(null);
+                        }}
+                        className={`p-3 rounded-[10px] border flex items-center justify-center gap-2 font-semibold transition-all cursor-pointer ${
+                          paymentMethod === "dynamic_qr"
+                            ? "border-[#2563EB] bg-blue-50/80 text-[#2563EB] shadow-xs"
+                            : "border-[#CBD5E1] bg-white text-[#475569] hover:border-[#94A3B8]"
+                        }`}
+                      >
+                        <QrCode className="w-4 h-4 shrink-0 text-emerald-600" />
+                        <span>Dynamic UPI QR</span>
+                      </button>
+
                       <button
                         type="button"
                         onClick={() => {
@@ -799,7 +855,7 @@ function CheckoutInner() {
                         }`}
                       >
                         <CreditCard className="w-4 h-4 shrink-0" />
-                        <span>Razorpay Instant</span>
+                        <span>Razorpay Modal</span>
                       </button>
 
                       <button
@@ -814,13 +870,78 @@ function CheckoutInner() {
                             : "border-[#CBD5E1] bg-white text-[#475569] hover:border-[#94A3B8]"
                         }`}
                       >
-                        <QrCode className="w-4 h-4 shrink-0" />
-                        <span>Manual UPI QR</span>
+                        <FileText className="w-4 h-4 shrink-0" />
+                        <span>Manual UTR</span>
                       </button>
                     </div>
                   </div>
 
-                  {paymentMethod === "razorpay" ? (
+                  {paymentMethod === "dynamic_qr" ? (
+                    /* Dynamic Razorpay UPI QR Method Box */
+                    <div className="p-5 sm:p-6 rounded-[12px] border border-emerald-300 bg-gradient-to-b from-emerald-50/60 to-white space-y-4 shadow-xs">
+                      <div className="flex items-center justify-between gap-2 flex-wrap pb-3 border-b border-emerald-200">
+                        <div className="flex items-center gap-2">
+                          <QrCode className="w-5 h-5 text-emerald-600" />
+                          <div>
+                            <div className="text-sm font-bold text-[#0F172A]">
+                              Razorpay Dynamic UPI QR
+                            </div>
+                            <div className="text-xs font-mono text-[#64748B]">
+                              Single-use QR • Auto-cleared via Webhook
+                            </div>
+                          </div>
+                        </div>
+                        <span className="text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold border border-emerald-300 flex items-center gap-1.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                          REAL-TIME SETTLEMENT
+                        </span>
+                      </div>
+
+                      <div className="text-xs text-[#475569] space-y-2">
+                        <p className="leading-relaxed">
+                          Click below to generate a single-use dynamic UPI QR code linked to your agent ID. Scan with GPay, PhonePe, Paytm, or any UPI app for zero-delay payment settlement.
+                        </p>
+                        <div className="p-3 rounded-[8px] bg-white/90 border border-emerald-200/80 text-xs font-mono text-[#1E293B] flex items-center justify-between">
+                          <span className="text-[#64748B]">Settlement Amount:</span>
+                          <span className="font-bold text-emerald-700 text-sm">
+                            ₹{selectedPlan.price_inr.toLocaleString()} ({(Math.round(selectedPlan.price_inr * 100)).toLocaleString()} paise)
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Pay Via Dynamic UPI QR Button */}
+                      <button
+                        type="button"
+                        disabled={
+                          isTierFull ||
+                          (selectedPlan.is_paid && isTotalPaidExhausted)
+                        }
+                        onClick={() => {
+                          if (!orgName.trim() || orgName.trim().length < 2) {
+                            setErrorMessage("Please enter your Legal Entity or Developer Organization Name first.");
+                            return;
+                          }
+                          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                          if (!email.trim() || !emailRegex.test(email.trim())) {
+                            setErrorMessage("Please provide a valid corporate work email address first.");
+                            return;
+                          }
+                          setErrorMessage(null);
+                          setIsDynamicQrOpen(true);
+                        }}
+                        className="w-full bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3.5 rounded-[12px] font-semibold text-sm shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_4px_14px_rgba(16,185,129,0.25)] flex items-center justify-center gap-2.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                      >
+                        <QrCode className="w-4 h-4" />
+                        <span>Pay via UPI QR (₹{selectedPlan.price_inr.toLocaleString()})</span>
+                        <ArrowRight className="w-4 h-4" />
+                      </button>
+
+                      <div className="flex items-center justify-center gap-2 text-[11px] font-mono text-[#64748B] pt-1">
+                        <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                        <span>Webhook Auto-Detected • No Manual UTR Entry Required</span>
+                      </div>
+                    </div>
+                  ) : paymentMethod === "razorpay" ? (
                     /* Razorpay Instant Checkout Method Box */
                     <div className="p-5 sm:p-6 rounded-[12px] border border-blue-200 bg-gradient-to-b from-blue-50/50 to-white space-y-4 shadow-xs">
                       <div className="flex items-center justify-between gap-2 flex-wrap pb-3 border-b border-blue-100">
@@ -1128,6 +1249,18 @@ function CheckoutInner() {
 
           </div>
         </div>
+      )}
+
+      {/* Razorpay Dynamic UPI QR Modal with Real-Time Webhook Polling */}
+      {selectedPlan.is_paid && (
+        <DynamicUpiQrModal
+          isOpen={isDynamicQrOpen}
+          onClose={() => setIsDynamicQrOpen(false)}
+          amount={Math.round(selectedPlan.price_inr * 100)}
+          customerName={operatorName || orgName || "Verisett Client"}
+          description={`Verisett AI Node Provisioning - ${selectedPlan.name}`}
+          onPaymentSuccess={handleDynamicQrSuccess}
+        />
       )}
     </div>
   );
