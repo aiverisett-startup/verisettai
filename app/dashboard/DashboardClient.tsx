@@ -1098,77 +1098,7 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
                 )}
               </div>
 
-              {/* Big Metrics Display (TradingView Prominent Stat) */}
-              <div className="pt-4 border-t border-[#F0E9DC] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {/* Metric 1: Big Number Display with colored delta pill */}
-                <div className="p-4 rounded-2xl bg-[#FAF8F5] border border-[#EAE3D2]">
-                  <span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500 block font-sans">
-                    Throughput Rate
-                  </span>
-                  <div className="flex items-baseline gap-2.5 mt-1 flex-wrap">
-                    <span className="text-2xl sm:text-3xl font-black text-[#1C1A17] font-mono tracking-tight">
-                      {isTelemetryLive
-                        ? `${(selectedAgent?.throughput_tps || 1259.1).toFixed(2)}`
-                        : "0.00"}{" "}
-                      <span className="text-sm font-bold text-blue-600">TPS</span>
-                    </span>
-                    {/* Colored Delta Pill */}
-                    {isTelemetryLive ? (
-                      <span className="px-2 py-0.5 rounded-full text-xs font-mono font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
-                        +14.1 +1.13%
-                      </span>
-                    ) : (
-                      <span className="px-2 py-0.5 rounded-full text-xs font-mono font-semibold bg-neutral-200 text-neutral-600">
-                        0.0%
-                      </span>
-                    )}
-                  </div>
-                  <span className="text-[11px] font-mono text-[#8C8275] mt-1 block">
-                    {isTelemetryLive ? "Peak verified throughput" : "Telemetry stream dormant"}
-                  </span>
-                </div>
 
-                {/* Metric 2: Primary Vault Balance */}
-                <div className="p-4 rounded-2xl bg-[#FAF8F5] border border-[#EAE3D2]">
-                  <span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500 block font-sans">
-                    Escrow Custody Vault
-                  </span>
-                  <div className="text-2xl sm:text-3xl font-black text-[#1C1A17] font-sans tracking-tight mt-1 truncate">
-                    ₹{balanceINR.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                  </div>
-                  <span className="text-[11px] font-mono text-[#8C8275] mt-1 block">
-                    ≈ ${balanceUSD.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD
-                  </span>
-                </div>
-
-                {/* Metric 3: Cleared Volume */}
-                <div className="p-4 rounded-2xl bg-[#FAF8F5] border border-[#EAE3D2]">
-                  <span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500 block font-sans">
-                    Total Cleared Volume
-                  </span>
-                  <div className="text-2xl sm:text-3xl font-black text-[#1C1A17] font-mono tracking-tight mt-1 truncate">
-                    ₹{metrics.totalVolumeINR.toLocaleString("en-IN", { maximumFractionDigits: 0 })}
-                  </div>
-                  <span className="text-[11px] font-mono text-emerald-700 font-semibold mt-1 block">
-                    {metrics.totalDeals} Deals Cleared ({metrics.successRate})
-                  </span>
-                </div>
-
-                {/* Metric 4: Spending Limit / Protocol Cap */}
-                <div className="p-4 rounded-2xl bg-[#FAF8F5] border border-[#EAE3D2]">
-                  <span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500 block font-sans">
-                    Escrow Spending Cap
-                  </span>
-                  <div className="text-2xl sm:text-3xl font-black text-[#1C1A17] font-mono tracking-tight mt-1 truncate">
-                    {selectedAgent?.spending_limit !== undefined
-                      ? `₹${selectedAgent.spending_limit.toLocaleString("en-IN")}`
-                      : "Unlimited"}
-                  </div>
-                  <span className="text-[11px] font-mono text-blue-600 font-medium mt-1 block">
-                    0.75% Protocol Take-Rate
-                  </span>
-                </div>
-              </div>
 
               {/* Sub-navigation Tab Strip (Minimal underline tabs) */}
               <div className="border-b border-[#EAE3D2] flex items-center gap-6 overflow-x-auto text-xs sm:text-sm font-semibold">

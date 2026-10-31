@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import {
   CreditCard,
@@ -13,33 +13,32 @@ import {
   FileText,
   Lock,
   Sparkles,
-  Layers,
-  Check,
+  Building2,
+  Mail,
+  ChevronRight,
+  Headphones,
 } from "lucide-react";
 import confetti from "canvas-confetti";
 import { VerisettLogo } from "@/components/VerisettLogo";
+import { supabase } from "@/lib/supabase";
 import { openRazorpayCheckout } from "@/lib/razorpayClient";
 
-interface PlanTier {
+export interface PlanTier {
   id: "starter" | "growth" | "scale";
   name: string;
   tagline: string;
-  basePrice: number;
-  gstAmount: number;
-  totalAmount: number;
+  price: number;
   apiOps: string;
   popular?: boolean;
   features: string[];
 }
 
-const TIERS: PlanTier[] = [
+export const PLAN_TIERS: PlanTier[] = [
   {
     id: "starter",
     name: "Starter Refill",
     tagline: "Essential capacity for early development and testing.",
-    basePrice: 1000,
-    gstAmount: 180,
-    totalAmount: 1180,
+    price: 1000,
     apiOps: "100,000 Ops",
     features: [
       "100,000 API operations",
@@ -52,9 +51,7 @@ const TIERS: PlanTier[] = [
     id: "growth",
     name: "Growth Tier",
     tagline: "High-volume infrastructure for production workloads.",
-    basePrice: 2500,
-    gstAmount: 450,
-    totalAmount: 2950,
+    price: 2500,
     apiOps: "300,000 Ops",
     popular: true,
     features: [
@@ -68,9 +65,7 @@ const TIERS: PlanTier[] = [
     id: "scale",
     name: "Scale Tier",
     tagline: "Dedicated high-throughput capacity for enterprise applications.",
-    basePrice: 12000,
-    gstAmount: 2160,
-    totalAmount: 14160,
+    price: 12000,
     apiOps: "2,000,000 Ops",
     features: [
       "2,000,000 API operations",
@@ -81,8 +76,27 @@ const TIERS: PlanTier[] = [
   },
 ];
 
+interface UserSubscription {
+  tierId: string;
+  name: string;
+  basePrice: number;
+  opsRemaining: number;
+  opsTotal: number;
+}
+
 export default function BillingPage() {
-  const [selectedTierId, setSelectedTierId] = useState<"starter" | "growth" | "scale">("growth");
+  const [userEmail, setUserEmail] = useState<string>("developer@verisett.ai");
+
+  // Current logged-in user subscription state (Default: Starter Refill ₹1,000)
+  const [currentUserTier, setCurrentUserTier] = useState<UserSubscription>({
+    tierId: "starter",
+    name: "Starter Refill",
+    basePrice: 1000,
+    opsRemaining: 84250,
+    opsTotal: 100000,
+  });
+
+  const [selectedTierId, setSelectedTierId] = useState<string>("growth");
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [verifiedPayment, setVerifiedPayment] = useState<{
@@ -92,27 +106,137 @@ export default function BillingPage() {
     amount: number;
   } | null>(null);
 
-  // Selected plan calculation
-  const selectedTier = useMemo(() => {
-    return TIERS.find((t) => t.id === selectedTierId) || TIERS[1];
-  }, [selectedTierId]);
+  // 1. Fetch user session and subscription tier from Supabase
+  useEffect(() => {
+    async function loadUserSession() {
+      try {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
 
-  // Automated Razorpay Checkout Trigger
-  const handleRazorpayPayment = async () => {
+        if (session?.user) {
+          setUserEmail(session.user.email || "developer@verisett.ai");
+
+          let tierKey =
+            (session.user.user_metadata?.plan_tier as string) ||
+            (session.user.user_metadata?.plan as string) ||
+            "";
+
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("plan_tier, founder_pass")
+            .eq("id", session.user.id)
+            .maybeSingle();
+
+          if (profile) {
+            if (
+              profile.founder_pass ||
+              profile.plan_tier === "FOUNDER_NODE" ||
+              profile.plan_tier === "tier_3" ||
+              profile.plan_tier === "scale"
+            ) {
+              tierKey = "scale";
+            } else if (profile.plan_tier) {
+              tierKey = profile.plan_tier;
+            }
+          }
+
+          if (tierKey) {
+            const normalized = tierKey.toLowerCase();
+            if (
+              normalized.includes("scale") ||
+              normalized.includes("founder") ||
+              normalized.includes("institution")
+            ) {
+              setCurrentUserTier({
+                tierId: "scale",
+                name: "Scale Tier",
+                basePrice: 12000,
+                opsRemaining: 1840000,
+                opsTotal: 2000000,
+              });
+            } else if (
+              normalized.includes("growth") ||
+              normalized.includes("pro") ||
+              normalized.includes("tier_1")
+            ) {
+              setCurrentUserTier({
+                tierId: "growth",
+                name: "Growth Tier",
+                basePrice: 2500,
+                opsRemaining: 245000,
+                opsTotal: 300000,
+              });
+            } else if (normalized.includes("starter")) {
+              setCurrentUserTier({
+                tierId: "starter",
+                name: "Starter Refill",
+                basePrice: 1000,
+                opsRemaining: 84250,
+                opsTotal: 100000,
+              });
+            }
+          }
+        }
+      } catch (err) {
+        console.warn("[BILLING_SESSION_NOTICE]:", err);
+      }
+    }
+
+    loadUserSession();
+  }, []);
+
+  // 2. Filter Upgrade-Only Plans: strictly price > currentUserTier.basePrice
+  const availableUpgradePlans = useMemo(() => {
+    return PLAN_TIERS.filter((tier) => tier.price > currentUserTier.basePrice);
+  }, [currentUserTier.basePrice]);
+
+  // 3. Resolve Active Selected Plan from visible upgrade tiers
+  const activeSelectedPlan = useMemo(() => {
+    if (availableUpgradePlans.length === 0) return null;
+    const match = availableUpgradePlans.find((t) => t.id === selectedTierId);
+    return match || availableUpgradePlans[0];
+  }, [availableUpgradePlans, selectedTierId]);
+
+  // 4. Exact Dynamic Financial Calculations
+  const calculation = useMemo(() => {
+    if (!activeSelectedPlan) {
+      return {
+        baseAmount: 0,
+        gstAmount: 0,
+        totalPayable: 0,
+        totalPayablePaise: 0,
+      };
+    }
+    const baseAmount = activeSelectedPlan.price;
+    const gstAmount = Math.round(baseAmount * 0.18); // 18% Statutory GST
+    const totalPayable = baseAmount + gstAmount;
+    const totalPayablePaise = totalPayable * 100; // in paise for Razorpay
+    return {
+      baseAmount,
+      gstAmount,
+      totalPayable,
+      totalPayablePaise,
+    };
+  }, [activeSelectedPlan]);
+
+  // 5. Automated Razorpay Checkout Execution
+  const handleProceedToPay = async () => {
+    if (!activeSelectedPlan || calculation.totalPayablePaise <= 0) return;
+
     setIsProcessing(true);
     setErrorMessage(null);
 
-    const totalPaise = Math.round(selectedTier.totalAmount * 100);
-
     try {
       await openRazorpayCheckout({
-        amount: totalPaise,
+        amount: calculation.totalPayablePaise,
         name: "Verisett Platform",
-        description: `${selectedTier.name} (${selectedTier.apiOps})`,
+        description: `${activeSelectedPlan.name} Upgrade (${activeSelectedPlan.apiOps})`,
         notes: {
-          tier_id: selectedTier.id,
-          tier_name: selectedTier.name,
-          api_ops: selectedTier.apiOps,
+          tier_id: activeSelectedPlan.id,
+          tier_name: activeSelectedPlan.name,
+          api_ops: activeSelectedPlan.apiOps,
+          user_email: userEmail,
         },
         themeColor: "#2563eb",
         onSuccess: (result) => {
@@ -120,8 +244,17 @@ export default function BillingPage() {
           setVerifiedPayment({
             payment_id: result.payment_id,
             order_id: result.order_id,
-            tier_name: selectedTier.name,
-            amount: selectedTier.totalAmount,
+            tier_name: activeSelectedPlan.name,
+            amount: calculation.totalPayable,
+          });
+
+          // Update active subscription to the upgraded tier
+          setCurrentUserTier({
+            tierId: activeSelectedPlan.id,
+            name: activeSelectedPlan.name,
+            basePrice: activeSelectedPlan.price,
+            opsRemaining: parseInt(activeSelectedPlan.apiOps.replace(/[^0-9]/g, "")) || 300000,
+            opsTotal: parseInt(activeSelectedPlan.apiOps.replace(/[^0-9]/g, "")) || 300000,
           });
 
           try {
@@ -149,6 +282,12 @@ export default function BillingPage() {
       setErrorMessage(err?.message || "Failed to initialize payment gateway. Please try again.");
     }
   };
+
+  const usagePercent = useMemo(() => {
+    if (currentUserTier.opsTotal <= 0) return "0.0";
+    const used = currentUserTier.opsTotal - currentUserTier.opsRemaining;
+    return Math.max(0, Math.min(100, (used / currentUserTier.opsTotal) * 100)).toFixed(1);
+  }, [currentUserTier.opsRemaining, currentUserTier.opsTotal]);
 
   return (
     <div className="min-h-screen bg-[#09090b] text-zinc-100 font-sans selection:bg-[#2563eb] selection:text-white">
@@ -185,27 +324,84 @@ export default function BillingPage() {
           </div>
         </header>
 
-        {/* QUOTA METER CARD */}
+        {/* CURRENT ACTIVE PLAN & QUOTA METER */}
         <div className="rounded-xl border border-[#27272a] bg-[#18181b] p-5 space-y-3">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <div>
-              <span className="text-[11px] font-mono uppercase tracking-wider text-zinc-400 font-semibold block">
-                API Execution Quota
-              </span>
-              <div className="text-sm font-semibold text-white mt-0.5">
-                API Execution Quota: <span className="font-mono text-emerald-400">84,250 / 100,000 Ops used (84.2%)</span>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] font-mono uppercase tracking-wider text-zinc-400 font-semibold">
+                  Active Subscription:
+                </span>
+                <span className="px-2.5 py-0.5 rounded bg-[#2563eb]/20 text-[#3b82f6] border border-[#2563eb]/30 font-bold text-xs font-mono">
+                  {currentUserTier.name} (₹{currentUserTier.basePrice.toLocaleString()}/mo)
+                </span>
+              </div>
+              <div className="text-sm font-semibold text-white">
+                API Execution Quota:{" "}
+                <span className="font-mono text-emerald-400">
+                  {currentUserTier.opsRemaining.toLocaleString()} /{" "}
+                  {currentUserTier.opsTotal.toLocaleString()} Ops used ({usagePercent}%)
+                </span>
               </div>
             </div>
-            <div className="text-xs font-mono text-zinc-400">
-              Billing Cycle: <strong className="text-zinc-200">Continuous Rolling Balance</strong>
+
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-mono text-zinc-500 uppercase">Simulate Tier:</span>
+              <select
+                value={currentUserTier.tierId}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (val === "free") {
+                    setCurrentUserTier({
+                      tierId: "free",
+                      name: "Free Community",
+                      basePrice: 0,
+                      opsRemaining: 5000,
+                      opsTotal: 10000,
+                    });
+                  } else if (val === "starter") {
+                    setCurrentUserTier({
+                      tierId: "starter",
+                      name: "Starter Refill",
+                      basePrice: 1000,
+                      opsRemaining: 84250,
+                      opsTotal: 100000,
+                    });
+                  } else if (val === "growth") {
+                    setCurrentUserTier({
+                      tierId: "growth",
+                      name: "Growth Tier",
+                      basePrice: 2500,
+                      opsRemaining: 245000,
+                      opsTotal: 300000,
+                    });
+                  } else if (val === "scale") {
+                    setCurrentUserTier({
+                      tierId: "scale",
+                      name: "Scale Tier",
+                      basePrice: 12000,
+                      opsRemaining: 1840000,
+                      opsTotal: 2000000,
+                    });
+                  }
+                  setVerifiedPayment(null);
+                  setErrorMessage(null);
+                }}
+                className="bg-[#09090b] border border-[#27272a] text-zinc-300 text-xs font-mono rounded px-2.5 py-1 focus:outline-none focus:border-[#2563eb]"
+              >
+                <option value="free">Free Community (₹0)</option>
+                <option value="starter">Starter Refill (₹1,000)</option>
+                <option value="growth">Growth Tier (₹2,500)</option>
+                <option value="scale">Scale Tier (₹12,000)</option>
+              </select>
             </div>
           </div>
 
-          {/* Progress bar */}
+          {/* Clean Progress bar */}
           <div className="w-full bg-zinc-900 rounded-full h-2 border border-[#27272a] overflow-hidden">
             <div
               className="bg-gradient-to-r from-[#2563eb] to-emerald-400 h-2 rounded-full transition-all duration-500"
-              style={{ width: "84.2%" }}
+              style={{ width: `${usagePercent}%` }}
             />
           </div>
         </div>
@@ -214,22 +410,76 @@ export default function BillingPage() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
           {/* =================================================== */}
-          {/* LEFT COLUMN: PLAN & QUOTA SELECTION + TAX INVOICE   */}
+          {/* LEFT COLUMN: UPGRADE PLANS ONLY (DOWNGRADES PURGED) */}
           {/* =================================================== */}
           <div className="lg:col-span-7 space-y-6">
             
-            {/* Interactive Tier Picker */}
-            <div className="space-y-3">
-              <div className="flex items-center justify-between text-xs font-mono">
-                <span className="font-bold text-zinc-300 uppercase tracking-wider">
-                  Select Execution Tier
-                </span>
-                <span className="text-zinc-500">Includes 18% GST</span>
-              </div>
+            {/* Upgrade Plans Header */}
+            <div className="flex items-center justify-between text-xs font-mono">
+              <span className="font-bold text-zinc-300 uppercase tracking-wider">
+                Available Upgrades
+              </span>
+              <span className="text-zinc-500 font-mono">
+                {availableUpgradePlans.length > 0
+                  ? `${availableUpgradePlans.length} Tier${availableUpgradePlans.length > 1 ? "s" : ""} Available`
+                  : "Highest Tier Active"}
+              </span>
+            </div>
 
+            {/* Case 1: User is already on the top tier -> Render Enterprise Custom Card */}
+            {availableUpgradePlans.length === 0 ? (
+              <div className="rounded-xl border border-[#27272a] bg-[#18181b] p-6 space-y-5 shadow-lg">
+                <div className="flex items-center gap-3">
+                  <div className="p-2.5 rounded-lg bg-[#2563eb]/20 text-[#3b82f6] border border-[#2563eb]/30">
+                    <Building2 className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-bold text-white">
+                      Enterprise Custom Tier
+                    </h3>
+                    <p className="text-xs text-zinc-400 mt-0.5">
+                      You are currently on our highest standard plan ({currentUserTier.name}).
+                    </p>
+                  </div>
+                </div>
+
+                <div className="space-y-2.5 text-xs text-zinc-300 font-mono">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <span>Uncapped custom operations (10M+ Ops/month)</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <span>Dedicated VPC peering &amp; private subnets</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <span>99.99% Enterprise SLA guarantee with dedicated TAM</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <span>Annual purchase orders &amp; custom invoice terms</span>
+                  </div>
+                </div>
+
+                <div className="pt-2">
+                  <a
+                    href="mailto:enterprise@verisett.ai?subject=Enterprise%20Tier%20Inquiry"
+                    className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-[#2563eb] hover:bg-[#1d4ed8] text-white font-mono font-semibold text-xs transition cursor-pointer shadow-sm w-full sm:w-auto"
+                  >
+                    <Mail className="w-4 h-4" />
+                    <span>Contact Enterprise Solutions</span>
+                  </a>
+                </div>
+              </div>
+            ) : (
+              /* Case 2: Available Upgrade Plans Grid (Strictly higher tiers) */
               <div className="space-y-3">
-                {TIERS.map((tier) => {
-                  const isSelected = selectedTierId === tier.id;
+                {availableUpgradePlans.map((tier) => {
+                  const isSelected = activeSelectedPlan?.id === tier.id;
+                  const gst = Math.round(tier.price * 0.18);
+                  const total = tier.price + gst;
+
                   return (
                     <div
                       key={tier.id}
@@ -246,7 +496,7 @@ export default function BillingPage() {
                     >
                       {tier.popular && (
                         <span className="absolute -top-2.5 right-4 px-2.5 py-0.5 rounded text-[10px] font-mono font-bold uppercase tracking-wider bg-[#2563eb] text-white shadow-xs">
-                          Default
+                          Recommended
                         </span>
                       )}
 
@@ -267,95 +517,97 @@ export default function BillingPage() {
 
                         <div className="text-right shrink-0">
                           <div className="text-lg font-extrabold text-white font-mono">
-                            ₹{tier.basePrice.toLocaleString()}
+                            ₹{tier.price.toLocaleString()}
                           </div>
                           <div className="text-[10px] font-mono text-zinc-500">
-                            + 18% GST (₹{tier.gstAmount})
+                            + 18% GST (₹{gst.toLocaleString()})
                           </div>
                         </div>
                       </div>
 
                       <div className="mt-3 pt-3 border-t border-[#27272a] flex items-center justify-between text-xs font-mono">
                         <span className="text-zinc-400 text-[11px]">
-                          Total Payable: <strong className="text-white">₹{tier.totalAmount.toLocaleString()}</strong>
+                          Total Payable: <strong className="text-white">₹{total.toLocaleString()}</strong>
                         </span>
                         <span
                           className={`text-xs font-bold ${
                             isSelected ? "text-[#2563eb]" : "text-zinc-600"
                           }`}
                         >
-                          {isSelected ? "● Selected" : "○ Select Tier"}
+                          {isSelected ? "● Selected Upgrade" : "○ Select"}
                         </span>
                       </div>
                     </div>
                   );
                 })}
               </div>
-            </div>
+            )}
 
-            {/* Itemized Tax Invoice */}
-            <div className="rounded-xl border border-[#27272a] bg-[#18181b] p-5 space-y-4">
-              <div className="flex items-center justify-between pb-3 border-b border-[#27272a] text-xs font-mono">
-                <span className="font-bold text-zinc-200 uppercase tracking-wider flex items-center gap-1.5">
-                  <FileText className="w-4 h-4 text-[#2563eb]" />
-                  Itemized Tax Invoice
-                </span>
-                <span className="text-zinc-500">SAC: 998313</span>
-              </div>
-
-              <div className="space-y-2.5 font-mono text-xs">
-                <div className="flex items-center justify-between text-zinc-300">
-                  <span className="text-zinc-400">
-                    Base Allocation ({selectedTier.name} — {selectedTier.apiOps})
+            {/* Itemized Tax Invoice Breakdown (Only shown if upgrade tiers exist) */}
+            {activeSelectedPlan && (
+              <div className="rounded-xl border border-[#27272a] bg-[#18181b] p-5 space-y-4">
+                <div className="flex items-center justify-between pb-3 border-b border-[#27272a] text-xs font-mono">
+                  <span className="font-bold text-zinc-200 uppercase tracking-wider flex items-center gap-1.5">
+                    <FileText className="w-4 h-4 text-[#2563eb]" />
+                    Itemized Tax Invoice
                   </span>
-                  <span className="font-semibold text-white">
-                    ₹{selectedTier.basePrice.toLocaleString()}.00
-                  </span>
+                  <span className="text-zinc-500">SAC: 998313</span>
                 </div>
 
-                <div className="flex items-center justify-between text-zinc-400 text-[11px]">
-                  <span>CGST (9.0%)</span>
-                  <span>₹{(selectedTier.gstAmount / 2).toLocaleString()}.00</span>
-                </div>
-
-                <div className="flex items-center justify-between text-zinc-400 text-[11px]">
-                  <span>SGST / IGST (9.0%)</span>
-                  <span>₹{(selectedTier.gstAmount / 2).toLocaleString()}.00</span>
-                </div>
-
-                <div className="border-t border-[#27272a] pt-3 flex items-baseline justify-between">
-                  <div>
-                    <span className="text-sm font-bold text-white uppercase tracking-wider block">
-                      Total Payable
+                <div className="space-y-2.5 font-mono text-xs">
+                  <div className="flex items-center justify-between text-zinc-300">
+                    <span className="text-zinc-400">
+                      Base Allocation ({activeSelectedPlan.name} — {activeSelectedPlan.apiOps})
                     </span>
-                    <span className="text-[10px] text-zinc-500 font-mono">
-                      Inclusive of all statutory taxes
+                    <span className="font-semibold text-white">
+                      ₹{calculation.baseAmount.toLocaleString()}.00
                     </span>
                   </div>
-                  <div className="text-right">
-                    <span className="text-2xl font-extrabold text-[#3b82f6] font-mono">
-                      ₹{selectedTier.totalAmount.toLocaleString()}.00
-                    </span>
-                    <span className="block text-[10px] text-zinc-500 font-mono">
-                      INR
-                    </span>
+
+                  <div className="flex items-center justify-between text-zinc-400 text-[11px]">
+                    <span>CGST (9.0%)</span>
+                    <span>₹{Math.round(calculation.gstAmount / 2).toLocaleString()}.00</span>
+                  </div>
+
+                  <div className="flex items-center justify-between text-zinc-400 text-[11px]">
+                    <span>SGST / IGST (9.0%)</span>
+                    <span>₹{(calculation.gstAmount - Math.round(calculation.gstAmount / 2)).toLocaleString()}.00</span>
+                  </div>
+
+                  <div className="border-t border-[#27272a] pt-3 flex items-baseline justify-between">
+                    <div>
+                      <span className="text-sm font-bold text-white uppercase tracking-wider block">
+                        Total Payable
+                      </span>
+                      <span className="text-[10px] text-zinc-500 font-mono">
+                        Inclusive of 18% Goods &amp; Services Tax
+                      </span>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-2xl font-extrabold text-[#3b82f6] font-mono">
+                        ₹{calculation.totalPayable.toLocaleString()}.00
+                      </span>
+                      <span className="block text-[10px] text-zinc-500 font-mono">
+                        INR
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="p-3 rounded-lg bg-zinc-900 border border-[#27272a] text-[11px] font-mono text-zinc-400 flex items-center justify-between flex-wrap gap-2">
-                <span className="flex items-center gap-1.5 text-emerald-400 font-semibold">
-                  <ShieldCheck className="w-3.5 h-3.5" />
-                  B2B Input Tax Credit Compliant
-                </span>
-                <span className="text-zinc-500">Tax Invoice PDF generated on clearing</span>
+                <div className="p-3 rounded-lg bg-zinc-900 border border-[#27272a] text-[11px] font-mono text-zinc-400 flex items-center justify-between flex-wrap gap-2">
+                  <span className="flex items-center gap-1.5 text-emerald-400 font-semibold">
+                    <ShieldCheck className="w-3.5 h-3.5" />
+                    B2B Input Tax Credit Eligible
+                  </span>
+                  <span className="text-zinc-500">Instant PDF Receipt Generated</span>
+                </div>
               </div>
-            </div>
+            )}
 
           </div>
 
           {/* =================================================== */}
-          {/* RIGHT COLUMN: 100% AUTOMATED RAZORPAY CHECKOUT CARD */}
+          {/* RIGHT COLUMN: CLEAN CHECKOUT SUMMARY & PROCEED BTN */}
           {/* =================================================== */}
           <div className="lg:col-span-5 space-y-6">
 
@@ -365,7 +617,7 @@ export default function BillingPage() {
               <div className="flex items-start justify-between pb-4 border-b border-[#27272a]">
                 <div>
                   <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-400 font-bold block mb-1">
-                    Automated Checkout
+                    Direct Gateway Ingress
                   </span>
                   <h3 className="text-base font-bold text-white">
                     Checkout Summary
@@ -373,12 +625,12 @@ export default function BillingPage() {
                 </div>
                 <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-bold">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  Gateway Ready
+                  Terminal Ready
                 </div>
               </div>
 
+              {/* Payment Confirmed State */}
               {verifiedPayment ? (
-                /* Payment Confirmed State */
                 <div className="p-5 rounded-xl border border-emerald-500/40 bg-emerald-950/20 text-center space-y-4 animate-in fade-in zoom-in-95">
                   <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
                     <CheckCircle2 className="w-7 h-7" />
@@ -420,36 +672,36 @@ export default function BillingPage() {
                       onClick={() => setVerifiedPayment(null)}
                       className="w-full py-2 px-4 rounded-lg border border-[#27272a] bg-[#18181b] text-zinc-400 hover:text-white text-xs font-mono transition cursor-pointer"
                     >
-                      Add More Capacity
+                      Dismiss
                     </button>
                   </div>
                 </div>
-              ) : (
-                /* Checkout Form & Trigger */
+              ) : activeSelectedPlan ? (
+                /* Dynamic Checkout Summary Card */
                 <div className="space-y-5">
                   
                   {/* Summary Breakdown Box */}
                   <div className="p-4 rounded-xl border border-[#27272a] bg-[#09090b] space-y-3 font-mono text-xs">
                     <div className="flex justify-between text-zinc-300">
-                      <span className="text-zinc-400">Selected Tier:</span>
-                      <span className="font-bold text-white">{selectedTier.name}</span>
+                      <span className="text-zinc-400">Target Upgrade:</span>
+                      <span className="font-bold text-white">{activeSelectedPlan.name}</span>
                     </div>
                     <div className="flex justify-between text-zinc-300">
                       <span className="text-zinc-400">Capacity Added:</span>
-                      <span className="font-bold text-emerald-400">{selectedTier.apiOps}</span>
+                      <span className="font-bold text-emerald-400">{activeSelectedPlan.apiOps}</span>
                     </div>
                     <div className="flex justify-between text-zinc-300">
-                      <span className="text-zinc-400">Net Amount:</span>
-                      <span>₹{selectedTier.basePrice.toLocaleString()}.00</span>
+                      <span className="text-zinc-400">Dynamic Base Price:</span>
+                      <span>₹{calculation.baseAmount.toLocaleString()}.00</span>
                     </div>
                     <div className="flex justify-between text-zinc-400 text-[11px]">
-                      <span>GST (18%):</span>
-                      <span>₹{selectedTier.gstAmount.toLocaleString()}.00</span>
+                      <span>18% Statutory GST:</span>
+                      <span>₹{calculation.gstAmount.toLocaleString()}.00</span>
                     </div>
                     <div className="pt-2 border-t border-[#27272a] flex justify-between items-baseline">
                       <span className="text-zinc-300 uppercase font-semibold">Total Payable:</span>
                       <span className="text-2xl font-extrabold text-[#3b82f6]">
-                        ₹{selectedTier.totalAmount.toLocaleString()}.00
+                        ₹{calculation.totalPayable.toLocaleString()}.00
                       </span>
                     </div>
                   </div>
@@ -483,22 +735,22 @@ export default function BillingPage() {
                     </div>
                   )}
 
-                  {/* Primary Automated Pay Button */}
+                  {/* Proceed to Pay Button (Dynamic Amount Wired directly to Razorpay) */}
                   <button
                     type="button"
-                    onClick={handleRazorpayPayment}
+                    onClick={handleProceedToPay}
                     disabled={isProcessing}
                     className="w-full py-3.5 px-4 rounded-xl bg-[#2563eb] hover:bg-[#1d4ed8] text-white font-mono font-semibold text-sm transition cursor-pointer flex items-center justify-center gap-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_4px_14px_rgba(37,99,235,0.25)] disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isProcessing ? (
                       <>
                         <Loader2 className="w-4 h-4 animate-spin" />
-                        <span>Launching Razorpay Checkout...</span>
+                        <span>Opening Razorpay Modal...</span>
                       </>
                     ) : (
                       <>
                         <CreditCard className="w-4 h-4" />
-                        <span>Pay with Razorpay (UPI, QR, Cards)</span>
+                        <span>Proceed to Pay (₹{calculation.totalPayable.toLocaleString()})</span>
                         <ArrowRight className="w-4 h-4" />
                       </>
                     )}
@@ -513,6 +765,24 @@ export default function BillingPage() {
                     <span>Verified Razorpay Rail</span>
                   </div>
 
+                </div>
+              ) : (
+                /* Top Tier Active State in Right Column */
+                <div className="p-5 rounded-xl border border-zinc-800 bg-[#09090b] text-center space-y-3 font-mono text-xs">
+                  <ShieldCheck className="w-8 h-8 text-emerald-400 mx-auto" />
+                  <div className="font-bold text-white text-sm">
+                    Maximum Standard Capacity Active
+                  </div>
+                  <p className="text-zinc-400 leading-relaxed text-[11px]">
+                    Your account is running on the Scale Tier with 2,000,000 Ops. For custom dedicated infrastructure or multi-agent cluster expansions, reach out to enterprise sales.
+                  </p>
+                  <a
+                    href="mailto:enterprise@verisett.ai?subject=Enterprise%20Cluster%20Inquiry"
+                    className="inline-flex items-center gap-1.5 text-xs text-[#3b82f6] hover:underline pt-2 font-semibold"
+                  >
+                    <span>enterprise@verisett.ai</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </a>
                 </div>
               )}
 
