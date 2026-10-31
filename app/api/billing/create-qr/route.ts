@@ -1,6 +1,30 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getRazorpayClient } from "@/lib/razorpay";
 import { saveQrRecord } from "@/lib/qrStore";
+import { PNG } from "pngjs";
+
+/**
+ * Crops the 674 x 1644 standee down to the 1:1 square QR code area (429 x 429)
+ * so it fits edge-to-edge inside the square checkout card.
+ */
+function cropQrSquare(buffer: Buffer): Buffer {
+  try {
+    const src = PNG.sync.read(buffer);
+    if (src.width === 674 && src.height === 1644) {
+      const margin = 25;
+      const startX = 146 - margin; // 121
+      const startY = 658 - margin; // 633
+      const size = 379 + margin * 2; // 429
+
+      const dst = new PNG({ width: size, height: size });
+      PNG.bitblt(src, dst, startX, startY, size, size, 0, 0);
+      return PNG.sync.write(dst);
+    }
+  } catch (err) {
+    console.warn("[CROP_QR_NOTICE]:", err);
+  }
+  return buffer;
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -54,13 +78,14 @@ export async function POST(req: NextRequest) {
       throw new Error("Razorpay returned an empty QR code response.");
     }
 
-    // Convert to Base64 data URL so it never fails or gets blocked by CSP/ad-blockers
+    // Convert and crop to 1:1 square Base64 data URL so it fits the card edge-to-edge
     let resolvedImageUrl = qr.image_url;
     try {
       const imgRes = await fetch(qr.image_url);
       if (imgRes.ok) {
-        const buffer = await imgRes.arrayBuffer();
-        const base64 = Buffer.from(buffer).toString("base64");
+        const rawBuffer = Buffer.from(await imgRes.arrayBuffer());
+        const croppedBuffer = cropQrSquare(rawBuffer);
+        const base64 = croppedBuffer.toString("base64");
         resolvedImageUrl = `data:image/png;base64,${base64}`;
       }
     } catch (fetchErr) {

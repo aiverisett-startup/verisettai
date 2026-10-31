@@ -604,9 +604,9 @@ function CheckoutInner() {
                       </div>
 
                       {/* Official Razorpay Dynamic QR Code (No NPCI Technical Error) */}
-                      <div className="inline-block p-4 bg-white rounded-2xl border border-slate-200 shadow-md">
+                      <div className="inline-block p-3.5 bg-white rounded-2xl border border-slate-200 shadow-md">
                         {isQrLoading && !liveQr ? (
-                          <div className="w-[180px] h-[180px] flex flex-col items-center justify-center gap-2.5 text-slate-400">
+                          <div className="w-[220px] h-[220px] flex flex-col items-center justify-center gap-2.5 text-slate-400">
                             <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
                             <span className="text-[11px] font-medium text-slate-500">
                               Minting Verified UPI QR...
@@ -616,10 +616,12 @@ function CheckoutInner() {
                           <img
                             src={liveQr.image_url}
                             alt="Razorpay Verified UPI QR"
-                            className="w-[180px] h-[180px] object-contain mx-auto rounded-lg"
+                            width={220}
+                            height={220}
+                            className="w-[220px] h-[220px] object-cover mx-auto rounded-xl shadow-xs"
                           />
                         ) : (
-                          <div className="w-[180px] h-[180px] flex flex-col items-center justify-center gap-2 text-slate-400">
+                          <div className="w-[220px] h-[220px] flex flex-col items-center justify-center gap-2 text-slate-400">
                             <QrCode className="w-10 h-10 text-slate-300" />
                             <button
                               type="button"
