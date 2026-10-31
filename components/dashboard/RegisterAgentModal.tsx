@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import {
   X,
   Bot,
@@ -12,14 +12,12 @@ import {
   ArrowLeft,
   ShieldCheck,
   Terminal,
-  Upload,
   Mail,
   Lock,
   FileCheck2,
   Loader2,
   RefreshCw,
   Sparkles,
-  Camera,
 } from "lucide-react";
 import {
   registerAgentMultiStepAction,
@@ -54,11 +52,10 @@ export function RegisterAgentModal({
 
   // Step 1: Identity & Profile Details
   const [agentName, setAgentName] = useState("");
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const avatarUrl = "/agent-avatar.png";
   const [framework, setFramework] = useState("FastMCP");
   const [spendingLimit, setSpendingLimit] = useState("50000");
   const [webhookUrl, setWebhookUrl] = useState("");
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   // Step 2: Credential Provisioning & Email Verification
   const [agentIdCode, setAgentIdCode] = useState("");
@@ -95,7 +92,6 @@ export function RegisterAgentModal({
   const handleResetAndClose = () => {
     setCurrentStep(1);
     setAgentName("");
-    setAvatarUrl(null);
     setFramework("FastMCP");
     setSpendingLimit("50000");
     setWebhookUrl("");
@@ -113,24 +109,6 @@ export function RegisterAgentModal({
     setCopiedKey(false);
     setCopiedSnippet(false);
     onClose();
-  };
-
-  // Avatar Image Upload
-  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    if (file.size > 2 * 1024 * 1024) {
-      setErrorMessage("Avatar file size must be under 2MB.");
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setAvatarUrl(reader.result as string);
-      setErrorMessage(null);
-    };
-    reader.readAsDataURL(file);
   };
 
   // Send Email OTP Code
@@ -335,61 +313,28 @@ export function RegisterAgentModal({
           {/* ========================================================================= */}
           {currentStep === 1 && (
             <form onSubmit={handleStep1Next} className="space-y-4">
-              {/* Avatar Upload */}
+              {/* Official Assigned Agent Avatar (Fixed standardized badge) */}
               <div className="flex items-center gap-4 p-4 rounded-[14px] bg-slate-50 border border-[#E2E8F0]">
-                <div className="relative w-16 h-16 rounded-[12px] border-2 border-dashed border-[#CBD5E1] bg-white flex items-center justify-center overflow-hidden shrink-0 group shadow-2xs">
-                  {avatarUrl ? (
-                    <img
-                      src={avatarUrl}
-                      alt="Avatar Preview"
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <Bot className="w-8 h-8 text-[#94A3B8]" />
-                  )}
-                  <button
-                    type="button"
-                    onClick={() => fileInputRef.current?.click()}
-                    className="absolute inset-0 bg-black/40 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition cursor-pointer"
-                    title="Change Photo"
-                  >
-                    <Camera className="w-4 h-4" />
-                  </button>
+                <div className="relative w-16 h-16 rounded-full border-2 border-blue-200 bg-white flex items-center justify-center overflow-hidden shrink-0 shadow-xs">
+                  <img
+                    src="/agent-avatar.png"
+                    alt="Official Agent Avatar"
+                    className="w-full h-full object-cover"
+                  />
                 </div>
 
                 <div className="space-y-1 flex-1 min-w-0">
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
                     <label className="text-xs font-mono font-bold uppercase text-[#334155]">
-                      Agent Avatar / Badge
+                      Assigned Agent Avatar
                     </label>
-                    {avatarUrl && (
-                      <button
-                        type="button"
-                        onClick={() => setAvatarUrl(null)}
-                        className="text-[11px] text-rose-600 hover:underline cursor-pointer"
-                      >
-                        Remove
-                      </button>
-                    )}
+                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 border border-blue-200">
+                      Standard Verified
+                    </span>
                   </div>
                   <p className="text-[11px] text-[#64748B]">
-                    Upload a custom node badge (PNG/JPG, max 2MB) or keep default.
+                    Standardized official Verisett node badge automatically assigned to your agent. Custom photo uploads are restricted.
                   </p>
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/png,image/jpeg,image/webp,image/svg+xml"
-                    onChange={handleAvatarChange}
-                    className="hidden"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => fileInputRef.current?.click()}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[10px] border border-[#CBD5E1] bg-white hover:bg-slate-50 text-xs font-semibold text-[#0F172A] transition cursor-pointer shadow-2xs"
-                  >
-                    <Upload className="w-3.5 h-3.5 text-[#2563EB]" />
-                    <span>{avatarUrl ? "Replace Avatar" : "Choose Image"}</span>
-                  </button>
                 </div>
               </div>
 

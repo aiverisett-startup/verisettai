@@ -314,7 +314,7 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
             framework: reg.framework || "FastMCP",
             agent_id_code:
               reg.agent_id_code || `AGT-${reg.id.replace(/-/g, "").slice(0, 8).toUpperCase()}`,
-            avatar_url: reg.avatar_url || null,
+            avatar_url: reg.avatar_url || "/agent-avatar.png",
             ping_latency_ms: reg.ping_latency_ms || null,
             last_heartbeat_at: reg.last_heartbeat_at || null,
             status: reg.status || "Unlinked",
@@ -340,7 +340,7 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
               agent_id_code:
                 matchedReg?.agent_id_code ||
                 `AGT-${a.id.replace(/-/g, "").slice(0, 8).toUpperCase()}`,
-              avatar_url: matchedReg?.avatar_url || null,
+              avatar_url: matchedReg?.avatar_url || "/agent-avatar.png",
               ping_latency_ms: a.ping_latency_ms || matchedReg?.ping_latency_ms || null,
               last_heartbeat_at: a.last_heartbeat_at || matchedReg?.last_heartbeat_at || null,
               status: a.status || matchedReg?.status || "Unlinked",
@@ -858,24 +858,11 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
       {/* 1. TOP UTILITY & SEARCH BAR (TradingView Terminal Theme) */}
       <header className="sticky top-0 z-40 w-full border-b border-[#EAE3D2] bg-white/90 backdrop-blur-md px-4 sm:px-6 lg:px-8 py-3">
         <div className="max-w-[1800px] mx-auto flex items-center justify-between gap-4 flex-wrap">
-          {/* Left: Platform Logo, Command Search Bar (Ctrl+K), Quick Navigation */}
+          {/* Left: Platform Logo, Quick Navigation */}
           <div className="flex items-center gap-4 sm:gap-6">
             <Link href="/" className="hover:opacity-85 transition-opacity flex items-center gap-2">
               <VerisettLogo size={32} />
             </Link>
-
-            {/* Global Command Bar (Ctrl+K) */}
-            <button
-              onClick={() => setIsCommandPaletteOpen(true)}
-              className="flex items-center gap-3 px-3 py-1.5 rounded-xl border border-[#EAE3D2] bg-[#FAF8F5] hover:bg-[#F4EFE6] text-[#6E675D] hover:text-[#1C1A17] text-xs font-mono transition cursor-pointer shadow-2xs"
-              title="Search commands and navigation (Ctrl+K)"
-            >
-              <Search className="w-3.5 h-3.5 text-[#8C8275]" />
-              <span className="hidden sm:inline">Search terminal or agents...</span>
-              <kbd className="px-1.5 py-0.5 rounded bg-white border border-[#EAE3D2] text-[10px] text-[#4A453E] font-semibold">
-                Ctrl+K
-              </kbd>
-            </button>
 
             {/* Quick Navigation Links */}
             <nav className="hidden lg:flex items-center gap-1 text-xs font-medium font-sans">
@@ -1008,23 +995,13 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
               {/* Entity Title Banner */}
               <div className="flex items-center justify-between gap-4 flex-wrap">
                 <div className="flex items-center gap-4">
-                  {/* Large Circular Avatar (Custom image or default badge) */}
+                  {/* Large Circular Avatar (Official verified agent badge) */}
                   <div className="relative shrink-0">
-                    {selectedAgent?.avatar_url ? (
-                      <img
-                        src={selectedAgent.avatar_url}
-                        alt={selectedAgent.name}
-                        className="w-14 h-14 sm:w-16 sm:h-16 rounded-full object-cover border-2 border-blue-500 shadow-sm"
-                      />
-                    ) : (
-                      <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-blue-600 to-indigo-700 text-white flex items-center justify-center font-bold text-lg sm:text-xl shadow-sm border-2 border-blue-200">
-                        {selectedAgent?.name ? (
-                          selectedAgent.name.slice(0, 2).toUpperCase()
-                        ) : (
-                          <Bot className="w-7 h-7" />
-                        )}
-                      </div>
-                    )}
+                    <img
+                      src={selectedAgent?.avatar_url || "/agent-avatar.png"}
+                      alt={selectedAgent?.name || "Agent"}
+                      className="w-14 h-14 sm:w-16 sm:h-16 rounded-full object-cover border-2 border-blue-500 shadow-sm"
+                    />
                     {isTelemetryLive && (
                       <span className="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-emerald-500 border-2 border-white animate-pulse" />
                     )}
@@ -1414,17 +1391,11 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
                       >
                         {/* Agent Avatar / ID / Name (min-w-[180px] preventing line breaks) */}
                         <div className="flex items-center gap-2.5 min-w-[180px] flex-1">
-                          {agent.avatar_url ? (
-                            <img
-                              src={agent.avatar_url}
-                              alt={agent.name}
-                              className="w-7 h-7 rounded-full object-cover shrink-0 border border-blue-500/50"
-                            />
-                          ) : (
-                            <div className="w-7 h-7 rounded-full bg-blue-50 text-[#2563EB] border border-blue-200 font-semibold text-xs flex items-center justify-center shrink-0">
-                              {agent.name.slice(0, 1).toUpperCase()}
-                            </div>
-                          )}
+                          <img
+                            src={agent.avatar_url || "/agent-avatar.png"}
+                            alt={agent.name}
+                            className="w-7 h-7 rounded-full object-cover shrink-0 border border-blue-500/50"
+                          />
                           <div className="min-w-0 flex-1">
                             <span className="font-mono text-xs font-bold text-[#0F172A] group-hover:text-[#2563EB] block truncate">
                               {code}
@@ -1483,17 +1454,11 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
                       >
                         {/* Agent Avatar / ID / Name */}
                         <div className="flex items-center gap-2.5 min-w-[180px] flex-1">
-                          {agent.avatar_url ? (
-                            <img
-                              src={agent.avatar_url}
-                              alt={agent.name}
-                              className="w-7 h-7 rounded-full object-cover shrink-0 grayscale opacity-60 border border-[#CBD5E1]"
-                            />
-                          ) : (
-                            <div className="w-7 h-7 rounded-full bg-slate-100 text-[#64748B] border border-[#CBD5E1] font-semibold text-xs flex items-center justify-center shrink-0">
-                              {agent.name.slice(0, 1).toUpperCase()}
-                            </div>
-                          )}
+                          <img
+                            src={agent.avatar_url || "/agent-avatar.png"}
+                            alt={agent.name}
+                            className="w-7 h-7 rounded-full object-cover shrink-0 grayscale opacity-60 border border-[#CBD5E1]"
+                          />
                           <div className="min-w-0 flex-1">
                             <span className="font-mono text-xs font-semibold text-[#1E293B] group-hover:text-[#0F172A] block truncate">
                               {code}
