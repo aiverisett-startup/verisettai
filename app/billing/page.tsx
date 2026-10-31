@@ -1,3 +1,3 @@
-import CheckoutPage from "../checkout/page";
+import BillingPage from "../dashboard/billing/page";
 
-export default CheckoutPage;
+export default BillingPage;
