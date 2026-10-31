@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, Suspense } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import {
   CheckCircle2,
   Copy,
@@ -14,11 +14,14 @@ import {
   ShieldCheck,
   Calendar,
   Hash,
+  Sparkles,
+  Bot,
 } from "lucide-react";
 import confetti from "canvas-confetti";
 import { VerisettLogo } from "@/components/VerisettLogo";
 
 function BillingSuccessInner() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const orderId =
     searchParams.get("order_id") ||
@@ -29,7 +32,7 @@ function BillingSuccessInner() {
     searchParams.get("paymentId") ||
     `pay_${Date.now().toString().slice(-8)}`;
 
-  const rawPlan = searchParams.get("plan") || searchParams.get("tier") || "builder";
+  const rawPlan = searchParams.get("plan") || searchParams.get("tier") || "enterprise";
   const planDisplayName =
     rawPlan.toLowerCase().includes("growth") || rawPlan.toLowerCase().includes("settlement")
       ? "Settlement Node"
@@ -40,6 +43,10 @@ function BillingSuccessInner() {
   const [copiedKey, setCopiedKey] = useState(false);
   const [copiedOrderId, setCopiedOrderId] = useState(false);
   const [formattedTimestamp, setFormattedTimestamp] = useState<string>("");
+  const [countdown, setCountdown] = useState<number>(5);
+  const [autoRedirectActive, setAutoRedirectActive] = useState<boolean>(true);
+
+  const registerAgentUrl = `/agents/register?session_id=${encodeURIComponent(orderId)}&tier=${encodeURIComponent(rawPlan)}`;
 
   // Realistic masked API key for immediate node configuration
   const rawApiKey = `vset_live_${orderId.replace(/[^a-zA-Z0-9]/g, "").slice(0, 8)}7a1c4f8d2e6b5a3c9e1f4a7b3f8a`;
@@ -71,6 +78,22 @@ function BillingSuccessInner() {
       // Non-fatal
     }
   }, []);
+
+  // Automatic Redirection Countdown
+  useEffect(() => {
+    if (!autoRedirectActive) return;
+    const timer = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          router.push(registerAgentUrl);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [autoRedirectActive, registerAgentUrl, router]);
 
   const handleCopyKey = () => {
     if (navigator?.clipboard) {
@@ -138,7 +161,48 @@ function BillingSuccessInner() {
               <span>{planDisplayName} — Active</span>
             </div>
             <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-mono font-bold bg-blue-50 text-blue-700 border border-blue-200 shadow-2xs">
-              <span>Paid: ₹2,950.00 (incl. 18% GST)</span>
+              <span>Verified Escrow Clearance</span>
+            </div>
+          </div>
+
+          {/* Seamless Automatic Redirection to Agent Node Registration */}
+          <div className="rounded-2xl p-5 bg-gradient-to-br from-blue-700 via-indigo-700 to-purple-800 text-white shadow-xl text-left space-y-3 relative overflow-hidden border border-white/20">
+            <div className="flex items-center justify-between">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-mono font-bold bg-white/20 border border-white/30 text-cyan-200 tracking-wider uppercase">
+                <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
+                DEDICATED NODE SLOT READY
+              </span>
+              <span className="text-xs font-mono text-cyan-200">
+                {autoRedirectActive ? `Auto-redirecting in ${countdown}s` : "Manual Deploy Mode"}
+              </span>
+            </div>
+
+            <div className="space-y-1">
+              <h3 className="text-base font-bold text-white flex items-center gap-2">
+                <Bot className="w-4 h-4 text-cyan-300" />
+                <span>Deploy &amp; Authenticate Your Autonomous Agent</span>
+              </h3>
+              <p className="text-xs text-blue-100/90 leading-relaxed font-sans">
+                Your settlement capacity has been unlocked. Proceed immediately to configure your sovereign agent identity, generate your passport, and mint your genesis reputation score.
+              </p>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-3 pt-1">
+              <Link
+                href={registerAgentUrl}
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white hover:bg-slate-100 text-blue-900 font-bold text-xs sm:text-sm shadow-md transition cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
+              >
+                <span>Deploy Dedicated Agent Node Now →</span>
+              </Link>
+              {autoRedirectActive && (
+                <button
+                  type="button"
+                  onClick={() => setAutoRedirectActive(false)}
+                  className="text-xs text-blue-200 hover:text-white underline cursor-pointer"
+                >
+                  Stay on receipt
+                </button>
+              )}
             </div>
           </div>
 

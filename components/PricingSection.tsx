@@ -4,6 +4,7 @@ import React, { useState, useEffect, useMemo, useTransition } from "react";
 import Link from "next/link";
 import { Check, ShieldCheck, Zap, Users, ArrowRight, Sparkles, AlertOctagon } from "lucide-react";
 import { RegisterModal } from "@/components/RegisterModal";
+import { EnterpriseAdBanner } from "@/components/landing/EnterpriseAdBanner";
 import { getPlans } from "@/app/actions/register";
 import { PlanRecord, getPlanLevel } from "@/lib/plans";
 import { getTierLevel, getTierInfoByLevel } from "@/lib/pricingTiers";
@@ -299,6 +300,9 @@ export function PricingSection({ initialPlans }: PricingSectionProps) {
       className="py-24 border-t border-zinc-200 bg-[#FAFAFA] text-zinc-900 font-sans relative overflow-hidden"
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-12">
+        {/* High-Impact Enterprise Advertisement Banner */}
+        <EnterpriseAdBanner />
+
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto space-y-4">
           <div className="inline-flex items-center gap-2 rounded-full border border-zinc-300 bg-white px-3.5 py-1 text-xs font-mono text-zinc-700 font-medium">
