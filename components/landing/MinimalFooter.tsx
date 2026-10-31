@@ -248,6 +248,10 @@ export function MinimalFooter() {
               About
             </Link>
             <span className="text-zinc-300 select-none">•</span>
+            <Link href="/support" className="hover:text-zinc-950 transition-colors text-blue-600 font-semibold">
+              Support Desk
+            </Link>
+            <span className="text-zinc-300 select-none">•</span>
             <Link href="/security" className="hover:text-zinc-950 transition-colors">
               Security
             </Link>
@@ -256,25 +260,21 @@ export function MinimalFooter() {
               Docs
             </Link>
             <span className="text-zinc-300 select-none">•</span>
-            <Link href="/feedback" className="hover:text-zinc-950 transition-colors">
-              Feedback
-            </Link>
-            <span className="text-zinc-300 select-none">•</span>
             <Link href="/pricing" className="hover:text-zinc-950 transition-colors">
               Pricing
             </Link>
             <span className="text-zinc-300 select-none">•</span>
             <Link href="/terms" className="hover:text-zinc-950 transition-colors">
-              Terms
+              Terms of Service
             </Link>
             <span className="text-zinc-300 select-none">•</span>
             <Link href="/privacy" className="hover:text-zinc-950 transition-colors">
-              Privacy
+              Privacy Policy
             </Link>
             <span className="text-zinc-300 select-none">•</span>
-            <a href="#how-it-works" className="hover:text-zinc-950 transition-colors">
-              How It Works
-            </a>
+            <Link href="/terms" className="hover:text-zinc-950 transition-colors">
+              Refund &amp; Cancellation
+            </Link>
           </nav>
 
         </div>

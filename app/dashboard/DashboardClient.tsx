@@ -36,9 +36,9 @@ import {
 } from "lucide-react";
 import { VerisettLogo } from "@/components/VerisettLogo";
 import { GoldenBackgroundShapes } from "@/components/ui/GoldenBackgroundShapes";
-import { TransactionChart } from "@/components/dashboard/TransactionChart";
 import { RegisterAgentModal } from "@/components/dashboard/RegisterAgentModal";
-import { TradingViewChart } from "@/components/dashboard/TradingViewChart";
+import { TranslucentTelemetryChart } from "@/components/dashboard/TranslucentTelemetryChart";
+import { AgentFleetTable } from "@/components/dashboard/AgentFleetTable";
 import { CommandPaletteModal } from "@/components/dashboard/CommandPaletteModal";
 import { supabase } from "@/lib/supabase";
 import { dispatchAuthChange } from "@/lib/useAuthUser";
@@ -603,16 +603,17 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
     return days.map(({ date, completed, incomplete }) => ({ date, completed, incomplete }));
   }, [vaults, ledgerEntries]);
 
-  // Transmit real heartbeat ping to activate telemetry stream
+  // Transmit real network heartbeat ping to activate telemetry stream
   const handleSimulateHeartbeat = async (agentIdToPing?: string) => {
     const targetId = agentIdToPing || selectedAgent?.id;
     if (!targetId) return;
 
     try {
       setIsPinging(true);
+      const startPing = performance.now();
+      await fetch("/api/health").catch(() => null);
+      const measuredLatency = Math.max(1, Math.round(performance.now() - startPing));
       const nowIso = new Date().toISOString();
-      const generatedLatency = Math.floor(18 + Math.random() * 18);
-      const generatedTps = Math.round((1180 + Math.random() * 240) * 10) / 10;
 
       // Update in registered_agents
       await supabase
@@ -620,8 +621,7 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
         .update({
           last_heartbeat_at: nowIso,
           status: "Active",
-          ping_latency_ms: generatedLatency,
-          throughput_tps: generatedTps,
+          ping_latency_ms: measuredLatency,
         })
         .eq("id", targetId)
         .eq("user_id", user.id);
@@ -632,7 +632,7 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
         .update({
           last_heartbeat_at: nowIso,
           status: "Active",
-          ping_latency_ms: generatedLatency,
+          ping_latency_ms: measuredLatency,
         })
         .eq("id", targetId)
         .eq("user_id", user.id);
@@ -645,8 +645,7 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
                 ...a,
                 last_heartbeat_at: nowIso,
                 status: "Active",
-                ping_latency_ms: generatedLatency,
-                throughput_tps: generatedTps,
+                ping_latency_ms: measuredLatency,
               }
             : a
         )
@@ -1143,16 +1142,21 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
                 </div>
               </div>
             ) : (
-              /* ACTIVE AGENT: RENDER INTERACTIVE TRADINGVIEW CHART */
+              /* ACTIVE AGENT: RENDER TRANSLUCENT / GLASSMORPMIC TELEMETRY CHART */
               <div className="space-y-4">
-                <TradingViewChart
+                <TranslucentTelemetryChart
+                  hasActiveApiKey={Boolean(generatedKey || agents.some((a) => Boolean(a.last_heartbeat_at)))}
+                  apiKeyHint={generatedKey ? `vst_live_••••${generatedKey.slice(-4)}` : null}
                   agentName={selectedAgent.name}
                   agentId={
                     selectedAgent.agent_id_code ||
                     `AGT-${selectedAgent.id.replace(/-/g, "").slice(0, 8).toUpperCase()}`
                   }
-                  currentTps={selectedAgent.throughput_tps || 1259.1}
-                  latencyMs={selectedAgent.ping_latency_ms || 24}
+                  lastExecutionAt={selectedAgent.last_heartbeat_at}
+                  realLatencyMs={selectedAgent.ping_latency_ms}
+                  currentThroughputTps={selectedAgent.throughput_tps}
+                  onTriggerPing={() => handleSimulateHeartbeat(selectedAgent.id)}
+                  isPinging={isPinging}
                 />
               </div>
             )}
@@ -1160,9 +1164,13 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
             {/* TAB CONTENT VIEWS */}
             {activeTab === "overview" && (
               <div className="space-y-6">
-                <TransactionChart
-                  data={velocityChartData}
-                  onGenerateTestTransaction={handleGenerateTestEscrow}
+                <AgentFleetTable
+                  agents={agents}
+                  selectedAgentId={selectedAgentId}
+                  onSelectAgent={(id) => setSelectedAgentId(id)}
+                  onRegisterAgent={() => setIsRegisterAgentModalOpen(true)}
+                  onTriggerPing={(id) => handleSimulateHeartbeat(id)}
+                  isPinging={isPinging}
                 />
               </div>
             )}
@@ -1408,13 +1416,12 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
 
                         {/* Throughput */}
                         <div className="w-24 text-right font-mono text-xs font-semibold text-[#0F172A]">
-                          {(agent.throughput_tps || 1259.1).toFixed(1)}{" "}
-                          <span className="text-[10px] text-[#64748B] font-sans">TPS</span>
+                          {agent.throughput_tps ? `${agent.throughput_tps.toFixed(1)} TPS` : "0.0 TPS"}
                         </div>
 
-                        {/* Real-time Rate Indicator */}
-                        <div className="w-20 text-right font-mono text-xs font-bold text-emerald-600">
-                          +14.1%
+                        {/* Real-time Status / Ping */}
+                        <div className="w-20 text-right font-mono text-xs font-semibold text-emerald-600">
+                          {agent.ping_latency_ms ? `${agent.ping_latency_ms}ms` : "Active"}
                         </div>
                       </div>
                     );
@@ -1479,7 +1486,7 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
                           {isRevoked ? (
                             <span className="font-bold text-rose-600">REV</span>
                           ) : (
-                            <span className="text-[#94A3B8]">-2.4%</span>
+                            <span className="text-[#94A3B8]">Idle</span>
                           )}
                         </div>
                       </div>

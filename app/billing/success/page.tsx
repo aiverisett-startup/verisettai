@@ -116,8 +116,8 @@ function BillingSuccessInner() {
       <main className="max-w-xl mx-auto px-4 py-12 w-full">
         <div className="bg-white border border-slate-200 rounded-3xl p-8 sm:p-10 shadow-sm space-y-6 text-center animate-in fade-in zoom-in-95 duration-300">
           
-          {/* Centered Emerald Checkmark Icon Badge */}
-          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 border-2 border-emerald-300 shadow-xs">
+          {/* Centered Glowing Emerald Checkmark Icon Badge */}
+          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200 shadow-sm animate-in zoom-in-95 duration-300 ring-4 ring-emerald-500/10">
             <CheckCircle2 className="w-10 h-10" />
           </div>
 
@@ -131,10 +131,15 @@ function BillingSuccessInner() {
             </p>
           </div>
 
-          {/* Plan Name Badge */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/80 shadow-2xs">
-            <span className="w-2 h-2 rounded-full bg-emerald-500" />
-            <span>{planDisplayName} - Active</span>
+          {/* Plan Name & Paid Amount Badge */}
+          <div className="flex flex-wrap items-center justify-center gap-2">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-2xs">
+              <span className="w-2 h-2 rounded-full bg-emerald-500" />
+              <span>{planDisplayName} — Active</span>
+            </div>
+            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-mono font-bold bg-blue-50 text-blue-700 border border-blue-200 shadow-2xs">
+              <span>Paid: ₹2,950.00 (incl. 18% GST)</span>
+            </div>
           </div>
 
           {/* Masked API Key Container with Copy Key Button */}
@@ -142,7 +147,7 @@ function BillingSuccessInner() {
             <div className="flex items-center justify-between text-xs font-medium text-slate-500">
               <span className="flex items-center gap-1.5">
                 <Key className="w-3.5 h-3.5 text-blue-600" />
-                M2M Agent API Key
+                M2M Agent Secret API Key
               </span>
               <span className="text-[11px] text-emerald-600 font-semibold">Active &amp; Ready</span>
             </div>
@@ -154,12 +159,12 @@ function BillingSuccessInner() {
               <button
                 type="button"
                 onClick={handleCopyKey}
-                className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-600 font-semibold text-xs transition cursor-pointer"
+                className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-600 font-semibold text-xs transition cursor-pointer relative group"
               >
                 {copiedKey ? (
                   <>
                     <Check className="w-3.5 h-3.5 text-emerald-600" />
-                    <span className="text-emerald-600">Copied Key</span>
+                    <span className="text-emerald-600 font-bold">Copied!</span>
                   </>
                 ) : (
                   <>
@@ -176,10 +181,10 @@ function BillingSuccessInner() {
             <div className="flex justify-between items-center text-slate-600">
               <span className="flex items-center gap-1.5 text-slate-500">
                 <Hash className="w-3.5 h-3.5" />
-                Payment Reference ID:
+                Razorpay Payment ID:
               </span>
               <div className="flex items-center gap-2">
-                <span className="font-mono font-bold text-slate-900">{paymentId || orderId}</span>
+                <span className="font-mono font-bold text-slate-900">{paymentId}</span>
                 <button
                   type="button"
                   onClick={handleCopyOrderId}
@@ -197,10 +202,20 @@ function BillingSuccessInner() {
 
             {orderId && (
               <div className="flex justify-between items-center text-slate-600">
-                <span className="text-slate-500">Order ID:</span>
+                <span className="text-slate-500">Order Reference ID:</span>
                 <span className="font-mono text-slate-800">{orderId}</span>
               </div>
             )}
+
+            <div className="flex justify-between items-center text-slate-600">
+              <span className="text-slate-500">Plan Tier:</span>
+              <span className="font-semibold text-slate-900">{planDisplayName}</span>
+            </div>
+
+            <div className="flex justify-between items-center text-slate-600">
+              <span className="text-slate-500">Amount Paid:</span>
+              <span className="font-mono font-bold text-blue-600">₹2,950.00</span>
+            </div>
 
             <div className="flex justify-between items-center text-slate-600">
               <span className="flex items-center gap-1.5 text-slate-500">
@@ -229,8 +244,7 @@ function BillingSuccessInner() {
                 href="/docs"
                 className="flex-1 inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2.5 rounded-lg shadow-sm hover:shadow transition"
               >
-                <span>Explore Documentation &amp; Sandbox</span>
-                <ArrowRight className="w-4 h-4" />
+                <span>Launch Console &amp; Docs →</span>
               </Link>
               
               <button
@@ -239,7 +253,7 @@ function BillingSuccessInner() {
                 className="inline-flex items-center justify-center gap-2 border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-medium px-6 py-2.5 rounded-lg transition cursor-pointer shadow-2xs"
               >
                 <Download className="w-4 h-4" />
-                <span>Download Invoice / Receipt</span>
+                <span>Download GST Tax Invoice (PDF)</span>
               </button>
             </div>
 

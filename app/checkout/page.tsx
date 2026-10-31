@@ -109,6 +109,7 @@ function CheckoutInner() {
   }, [rawPlanParam]);
 
   const [selectedTierId, setSelectedTierId] = useState<"builder" | "growth" | "enterprise">(initialTierId);
+  const [isFilterActive, setIsFilterActive] = useState<boolean>(true);
   const [paymentMode, setPaymentMode] = useState<"gateway" | "qr">("qr");
   const [liveQr, setLiveQr] = useState<{
     qr_id: string;
@@ -159,8 +160,15 @@ function CheckoutInner() {
   }, []);
 
   const activeTier = useMemo(() => {
-    return LIGHT_TIERS.find((t) => t.id === selectedTierId) || LIGHT_TIERS[1];
+    return LIGHT_TIERS.find((t) => t.id === selectedTierId) || LIGHT_TIERS[0];
   }, [selectedTierId]);
+
+  // Strict Automatic Tier Card Filtering:
+  // When a tier is selected, collapse/hide any tier card with a lower value
+  const visibleTiers = useMemo(() => {
+    if (!isFilterActive || !activeTier) return LIGHT_TIERS;
+    return LIGHT_TIERS.filter((tier) => tier.basePrice >= activeTier.basePrice);
+  }, [isFilterActive, activeTier]);
 
   // Generate verified dynamic Razorpay merchant UPI QR
   const fetchLiveQr = useCallback(async () => {
@@ -392,14 +400,33 @@ function CheckoutInner() {
             
             {/* Tier Selector Section */}
             <div className="space-y-4">
-              <div className="flex items-center justify-between text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                <span>Select Subscription Tier</span>
+              <div className="flex items-center justify-between text-xs font-semibold text-slate-500 uppercase tracking-wider flex-wrap gap-2">
+                <div className="flex items-center gap-2">
+                  <span>Select Subscription Tier</span>
+                  {visibleTiers.length < LIGHT_TIERS.length && (
+                    <button
+                      type="button"
+                      onClick={() => setIsFilterActive(false)}
+                      className="text-xs text-blue-600 hover:text-blue-700 font-semibold normal-case hover:underline cursor-pointer"
+                    >
+                      (Reset selection &amp; compare all)
+                    </button>
+                  )}
+                </div>
                 <span className="text-blue-600 normal-case font-medium">Monthly Active Cycle</span>
               </div>
 
-              {/* 3 Enlarged Interactive Light-Mode Tier Cards */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
-                {LIGHT_TIERS.map((tier) => {
+              {/* Enlarged Interactive Light-Mode Tier Cards (Filtered Dynamically) */}
+              <div
+                className={`grid grid-cols-1 gap-4 sm:gap-5 ${
+                  visibleTiers.length === 1
+                    ? "sm:grid-cols-1 max-w-sm"
+                    : visibleTiers.length === 2
+                    ? "sm:grid-cols-2"
+                    : "sm:grid-cols-3"
+                }`}
+              >
+                {visibleTiers.map((tier) => {
                   const isSelected = tier.id === selectedTierId;
 
                   return (
@@ -407,6 +434,7 @@ function CheckoutInner() {
                       key={tier.id}
                       onClick={() => {
                         setSelectedTierId(tier.id);
+                        setIsFilterActive(true);
                         setErrorMessage(null);
                         setVerifiedPayment(null);
                       }}
@@ -735,6 +763,14 @@ function CheckoutInner() {
                       256-bit SSL Encrypted
                     </span>
                     <span>Verified Payment Rails</span>
+                  </div>
+
+                  {/* Statutory & Legal Compliance Notice */}
+                  <div className="pt-2 text-[11px] text-slate-500 text-center leading-relaxed">
+                    By initiating checkout or signing in, you accept the{" "}
+                    <Link href="/terms" className="text-blue-600 hover:underline font-medium">Terms of Service</Link>,{" "}
+                    <Link href="/privacy" className="text-blue-600 hover:underline font-medium">Privacy Policy</Link>, and{" "}
+                    <Link href="/terms" className="text-blue-600 hover:underline font-medium">Refund &amp; Cancellation Policy</Link>, along with 18% Statutory GST Compliance terms.
                   </div>
 
                 </div>

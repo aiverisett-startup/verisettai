@@ -595,6 +595,14 @@ function LoginForm() {
             </>
           )}
         </button>
+
+        {/* Statutory & Legal Compliance Notice */}
+        <p className="text-[11px] text-slate-500 text-center leading-relaxed mt-3 font-sans">
+          By initiating checkout or signing in, you accept the{" "}
+          <Link href="/terms" className="text-blue-600 hover:underline font-medium">Terms of Service</Link>,{" "}
+          <Link href="/privacy" className="text-blue-600 hover:underline font-medium">Privacy Policy</Link>, and{" "}
+          <Link href="/terms" className="text-blue-600 hover:underline font-medium">Refund &amp; Cancellation Policy</Link>, along with 18% Statutory GST Compliance terms.
+        </p>
       </form>
     </div>
   );
