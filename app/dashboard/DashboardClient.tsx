@@ -1582,6 +1582,7 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
       <RegisterAgentModal
         isOpen={isRegisterAgentModalOpen}
         onClose={() => setIsRegisterAgentModalOpen(false)}
+        userEmail={user.email}
         onAgentRegistered={(newAgent) => {
           if (newAgent) {
             setAgents((prev) => [
