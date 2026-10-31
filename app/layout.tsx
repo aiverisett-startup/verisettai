@@ -245,7 +245,7 @@ export default function RootLayout({
   };
 
   return (
-    <html lang="en" data-scroll-behavior="smooth" className="h-full antialiased scroll-smooth">
+    <html lang="en" data-scroll-behavior="smooth" className="h-full antialiased scroll-smooth" suppressHydrationWarning>
       <head>
         <script
           type="application/ld+json"
@@ -262,7 +262,7 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="min-h-full flex flex-col bg-[#FAFAF8] text-[#111317] selection:bg-[#111317] selection:text-white">
+      <body className="min-h-full flex flex-col bg-[#FAFAF8] text-[#111317] selection:bg-[#111317] selection:text-white" suppressHydrationWarning>
         {children}
         <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="beforeInteractive" />
         <Script

@@ -94,7 +94,12 @@ interface UserSubscription {
 }
 
 export default function BillingPage() {
+  const [isMounted, setIsMounted] = useState(false);
   const [userEmail, setUserEmail] = useState<string>("developer@verisett.ai");
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Current logged-in user subscription state (Default: Free Community ₹0)
   const [currentUserTier, setCurrentUserTier] = useState<UserSubscription>({

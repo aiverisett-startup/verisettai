@@ -26,8 +26,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const sanitizedAmount = Math.round(numericAmount);
-    const sanitizedCurrency = typeof currency === "string" ? currency.toUpperCase().trim() : "INR";
+    const sanitizedAmount = parseInt(String(Math.round(numericAmount)), 10);
+    const sanitizedCurrency =
+      typeof currency === "string" && currency.trim().length > 0
+        ? currency.toUpperCase().trim()
+        : "INR";
     const sanitizedReceipt =
       typeof receipt === "string" && receipt.trim().length > 0
         ? receipt.trim().slice(0, 40)

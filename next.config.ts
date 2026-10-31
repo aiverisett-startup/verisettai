@@ -36,7 +36,7 @@ const securityHeaders = [
   // 5. Restrict device hardware and browser tracking APIs (FLoC, camera, mic)
   {
     key: "Permissions-Policy",
-    value: "camera=(), microphone=(), geolocation=(), browsing-topics=(), payment=(), usb=()",
+    value: "camera=(), microphone=(), geolocation=(), browsing-topics=(), payment=*, usb=()",
   },
   // 6. Cross-Origin Opener Policy allowing OAuth authentication popups while isolating context
   {
@@ -63,12 +63,12 @@ const securityHeaders = [
     key: "Content-Security-Policy",
     value: [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://accounts.google.com",
+      "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://accounts.google.com https://checkout.razorpay.com",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "font-src 'self' https://fonts.gstatic.com data:",
-      "img-src 'self' data: blob: https://images.unsplash.com https://*.googleusercontent.com https://avatars.githubusercontent.com https://pbs.twimg.com",
-      "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://accounts.google.com https://api.github.com https://api.twitter.com https://api.x.com",
-      "frame-src 'self' https://accounts.google.com",
+      "img-src 'self' data: blob: https://*.razorpay.com https://images.unsplash.com https://*.googleusercontent.com https://avatars.githubusercontent.com https://pbs.twimg.com",
+      "connect-src 'self' https://lumberjack.razorpay.com https://api.razorpay.com https://*.supabase.co wss://*.supabase.co https://accounts.google.com https://api.github.com https://api.twitter.com https://api.x.com",
+      "frame-src 'self' https://api.razorpay.com https://checkout.razorpay.com https://accounts.google.com",
       "object-src 'none'",
       "base-uri 'self'",
       "form-action 'self' https://accounts.google.com https://github.com https://twitter.com https://x.com",

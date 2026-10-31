@@ -8,8 +8,11 @@ import Razorpay from "razorpay";
 let razorpayInstance: Razorpay | null = null;
 
 export function getRazorpayClient(): Razorpay {
-  const key_id = process.env.RAZORPAY_KEY_ID;
-  const key_secret = process.env.RAZORPAY_KEY_SECRET;
+  const rawKeyId = process.env.RAZORPAY_KEY_ID;
+  const rawKeySecret = process.env.RAZORPAY_KEY_SECRET;
+
+  const key_id = rawKeyId?.trim().replace(/^["']|["']$/g, "");
+  const key_secret = rawKeySecret?.trim().replace(/^["']|["']$/g, "");
 
   if (!key_id || !key_secret) {
     throw new Error(
@@ -31,7 +34,8 @@ export function getRazorpayClient(): Razorpay {
  * Returns the public Key ID safe for client-side checkout initialization.
  */
 export function getRazorpayPublicKey(): string {
-  const key_id = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || process.env.RAZORPAY_KEY_ID;
+  const rawKeyId = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || process.env.RAZORPAY_KEY_ID;
+  const key_id = rawKeyId?.trim().replace(/^["']|["']$/g, "");
   if (!key_id) {
     throw new Error("Razorpay public key ID is not configured.");
   }

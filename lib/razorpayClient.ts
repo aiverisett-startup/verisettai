@@ -71,8 +71,8 @@ export async function openRazorpayCheckout({
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        amount,
-        currency,
+        amount: Math.round(Number(amount)),
+        currency: currency || "INR",
         receipt,
         notes,
       }),

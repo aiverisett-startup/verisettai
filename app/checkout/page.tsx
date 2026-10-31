@@ -72,8 +72,13 @@ const SPECIFICATION_DELIVERABLES = [
 ];
 
 function CheckoutInner() {
+  const [isMounted, setIsMounted] = useState(false);
   const searchParams = useSearchParams();
   const rawPlanParam = searchParams.get("plan") || "growth";
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Map incoming param to one of the 3 tiers
   const initialTierId = useMemo<"builder" | "growth" | "enterprise">(() => {
