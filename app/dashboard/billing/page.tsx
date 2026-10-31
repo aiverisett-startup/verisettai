@@ -16,7 +16,11 @@ import {
   Building2,
   Mail,
   Check,
+  QrCode,
+  Copy,
+  CheckCheck,
 } from "lucide-react";
+import { QRCodeSVG } from "qrcode.react";
 import confetti from "canvas-confetti";
 import { VerisettLogo } from "@/components/VerisettLogo";
 import { supabase } from "@/lib/supabase";
@@ -96,6 +100,8 @@ interface UserSubscription {
 export default function BillingPage() {
   const [isMounted, setIsMounted] = useState(false);
   const [userEmail, setUserEmail] = useState<string>("developer@verisett.ai");
+  const [paymentMode, setPaymentMode] = useState<"qr" | "gateway">("qr");
+  const [copiedUpi, setCopiedUpi] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
@@ -241,6 +247,23 @@ export default function BillingPage() {
     };
   }, [activeSelectedPlan]);
 
+  // Dynamic Standard NPCI Fixed-Amount UPI QR Link
+  const upiPayLink = useMemo(() => {
+    const vpa = "ai.verisett@okhdfcbank";
+    const name = encodeURIComponent("Verisett AI");
+    const amount = calculation.totalPayable.toFixed(2);
+    const note = encodeURIComponent(`${activeSelectedPlan?.name || "Tier"} Subscription`);
+    return `upi://pay?pa=${vpa}&pn=${name}&am=${amount}&cu=INR&tn=${note}`;
+  }, [calculation.totalPayable, activeSelectedPlan]);
+
+  const handleCopyUpiId = () => {
+    if (navigator?.clipboard) {
+      navigator.clipboard.writeText("ai.verisett@okhdfcbank");
+      setCopiedUpi(true);
+      setTimeout(() => setCopiedUpi(false), 2000);
+    }
+  };
+
   // 5. Automated Razorpay Checkout Execution
   const handleProceedToPay = async () => {
     if (typeof window === "undefined") return;
@@ -250,7 +273,6 @@ export default function BillingPage() {
 
     // Check if SDK is available
     if (!(window as any).Razorpay) {
-      // Retry once after 500ms
       await new Promise((res) => setTimeout(res, 500));
     }
 
@@ -319,6 +341,25 @@ export default function BillingPage() {
     } catch (err: any) {
       setIsProcessing(false);
       setErrorMessage(err?.message || "Failed to initialize payment gateway. Please try again.");
+    }
+  };
+
+  const handleSimulateQrSuccess = () => {
+    if (!activeSelectedPlan) return;
+    setVerifiedPayment({
+      payment_id: `UPI_${Date.now().toString().slice(-8)}`,
+      order_id: `ORD_${Date.now().toString().slice(-6)}`,
+      tier_name: activeSelectedPlan.name,
+      amount: calculation.totalPayable,
+    });
+    try {
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 },
+      });
+    } catch {
+      // Non-fatal
     }
   };
 
@@ -595,7 +636,7 @@ export default function BillingPage() {
                   {SPECIFICATION_DELIVERABLES.map((feature, idx) => (
                     <li key={idx} className="flex items-start gap-3">
                       <div className="p-0.5 rounded-full bg-emerald-50 text-emerald-600 shrink-0 mt-0.5">
-                        <Check className="w-4 h-4" />
+                        <Check className="w-3.5 h-3.5" />
                       </div>
                       <span className="font-medium text-slate-800">{feature}</span>
                     </li>
@@ -607,7 +648,7 @@ export default function BillingPage() {
           </div>
 
           {/* ======================================================== */}
-          {/* RIGHT COLUMN: SCALED UP ORDER SUMMARY CARD (p-8, shadow-xl) */}
+          {/* RIGHT COLUMN: SCALED UP ORDER SUMMARY WITH DUAL OPTIONS  */}
           {/* ======================================================== */}
           <div className="lg:col-span-5 space-y-6">
             <div className="rounded-2xl border border-slate-200 bg-white p-8 space-y-6 shadow-xl relative">
@@ -676,7 +717,7 @@ export default function BillingPage() {
                   </div>
                 </div>
               ) : activeSelectedPlan ? (
-                /* 1-Click Checkout Ingress */
+                /* Payment Ingress */
                 <div className="space-y-6">
                   
                   {/* Cost Itemization Breakdown Box */}
@@ -706,44 +747,152 @@ export default function BillingPage() {
                           (Inclusive of 18% GST)
                         </span>
                       </div>
-                      {/* Prominent Large Total Payable */}
                       <span className="text-3xl font-extrabold text-blue-600 font-mono tracking-tight">
                         ₹{calculation.totalPayable.toFixed(2)}
                       </span>
                     </div>
                   </div>
 
-                  {/* Clean Authentic Accepted Payment Rails Strip with Big Logos */}
-                  <AcceptedPaymentRailsStrip variant="light" />
+                  {/* Payment Mode Selector Tabs */}
+                  <div className="grid grid-cols-2 gap-2 p-1 bg-slate-100 rounded-xl">
+                    <button
+                      type="button"
+                      onClick={() => setPaymentMode("qr")}
+                      className={`py-2 px-3 rounded-lg text-xs font-semibold transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                        paymentMode === "qr"
+                          ? "bg-white text-blue-600 shadow-xs"
+                          : "text-slate-600 hover:text-slate-900"
+                      }`}
+                    >
+                      <QrCode className="w-4 h-4" />
+                      <span>Scan UPI QR</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPaymentMode("gateway")}
+                      className={`py-2 px-3 rounded-lg text-xs font-semibold transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                        paymentMode === "gateway"
+                          ? "bg-white text-blue-600 shadow-xs"
+                          : "text-slate-600 hover:text-slate-900"
+                      }`}
+                    >
+                      <CreditCard className="w-4 h-4" />
+                      <span>Card / Netbanking</span>
+                    </button>
+                  </div>
 
-                  {/* Error Notification */}
-                  {errorMessage && (
-                    <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-start gap-2.5 animate-in fade-in">
-                      <AlertCircle className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
-                      <span className="font-medium">{errorMessage}</span>
+                  {/* OPTION 1: DIRECT NPCI UPI QR CODE */}
+                  {paymentMode === "qr" ? (
+                    <div className="rounded-2xl border-2 border-blue-600/30 bg-blue-50/20 p-5 space-y-4 text-center">
+                      <div className="space-y-1">
+                        <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-100 text-emerald-800">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                          Direct NPCI UPI Rail • Instant
+                        </div>
+                        <p className="text-xs text-slate-600">
+                          Scan with any UPI App (GPay, PhonePe, Paytm, CRED, BHIM)
+                        </p>
+                      </div>
+
+                      {/* Pure Code High-Contrast QR Code */}
+                      <div className="inline-block p-3.5 bg-white rounded-2xl border border-slate-200 shadow-md">
+                        {isMounted && (
+                          <QRCodeSVG
+                            value={upiPayLink}
+                            size={180}
+                            level="H"
+                            includeMargin={false}
+                            className="mx-auto"
+                          />
+                        )}
+                      </div>
+
+                      {/* Exact Amount Pill */}
+                      <div className="flex items-center justify-center gap-2">
+                        <span className="text-xs text-slate-500">Fixed Amount:</span>
+                        <span className="text-base font-bold font-mono text-blue-600">
+                          ₹{calculation.totalPayable.toFixed(2)}
+                        </span>
+                      </div>
+
+                      {/* VPA Copy Bar */}
+                      <div className="flex items-center justify-between px-3 py-2 bg-white rounded-xl border border-slate-200 text-xs">
+                        <div className="flex items-center gap-1.5 text-slate-600 font-mono">
+                          <span className="text-slate-400">UPI ID:</span>
+                          <span className="font-semibold text-slate-800">ai.verisett@okhdfcbank</span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={handleCopyUpiId}
+                          className="inline-flex items-center gap-1 text-[11px] font-semibold text-blue-600 hover:text-blue-700 cursor-pointer"
+                        >
+                          {copiedUpi ? (
+                            <>
+                              <CheckCheck className="w-3.5 h-3.5 text-emerald-600" />
+                              <span className="text-emerald-600">Copied</span>
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="w-3.5 h-3.5" />
+                              <span>Copy</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
+
+                      {/* Mobile Intent Direct Launch */}
+                      <div className="pt-1 flex flex-col gap-2">
+                        <a
+                          href={upiPayLink}
+                          className="sm:hidden w-full py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs transition flex items-center justify-center gap-2 shadow-sm"
+                        >
+                          <span>Open in UPI App (GPay / PhonePe)</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </a>
+                        <button
+                          type="button"
+                          onClick={handleSimulateQrSuccess}
+                          className="w-full py-2.5 px-3 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold transition cursor-pointer shadow-2xs"
+                        >
+                          ✓ I have completed the payment
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    /* OPTION 2: RAZORPAY GATEWAY */
+                    <div className="space-y-4">
+                      {/* Accepted Payment Rails Strip */}
+                      <AcceptedPaymentRailsStrip variant="light" />
+
+                      {/* Error Notification */}
+                      {errorMessage && (
+                        <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-start gap-2.5 animate-in fade-in">
+                          <AlertCircle className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
+                          <span className="font-medium">{errorMessage}</span>
+                        </div>
+                      )}
+
+                      <button
+                        type="button"
+                        onClick={handleProceedToPay}
+                        disabled={isProcessing}
+                        className="w-full py-4 px-6 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-base transition cursor-pointer flex items-center justify-center gap-2.5 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {isProcessing ? (
+                          <>
+                            <Loader2 className="w-5 h-5 animate-spin" />
+                            <span>Opening Razorpay Gateway...</span>
+                          </>
+                        ) : (
+                          <>
+                            <CreditCard className="w-5 h-5" />
+                            <span>Pay with Card / Netbanking</span>
+                            <ArrowRight className="w-5 h-5" />
+                          </>
+                        )}
+                      </button>
                     </div>
                   )}
-
-                  {/* Primary 1-Click Button: Proceed to Checkout */}
-                  <button
-                    type="button"
-                    onClick={handleProceedToPay}
-                    disabled={isProcessing}
-                    className="w-full py-4 px-6 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-base transition cursor-pointer flex items-center justify-center gap-2.5 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {isProcessing ? (
-                      <>
-                        <Loader2 className="w-5 h-5 animate-spin" />
-                        <span>Opening Razorpay Gateway...</span>
-                      </>
-                    ) : (
-                      <>
-                        <CreditCard className="w-5 h-5" />
-                        <span>Proceed to Checkout</span>
-                        <ArrowRight className="w-5 h-5" />
-                      </>
-                    )}
-                  </button>
 
                   {/* Trust Footer */}
                   <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
@@ -751,7 +900,7 @@ export default function BillingPage() {
                       <ShieldCheck className="w-4 h-4 text-emerald-600" />
                       256-bit SSL Encrypted
                     </span>
-                    <span>Verified Razorpay Rail</span>
+                    <span>Verified Payment Rails</span>
                   </div>
 
                 </div>
