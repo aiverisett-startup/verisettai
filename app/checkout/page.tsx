@@ -133,21 +133,24 @@ function CheckoutInner() {
     return LIGHT_TIERS.find((t) => t.id === selectedTierId) || LIGHT_TIERS[1];
   }, [selectedTierId]);
 
-  // 1-Click Automated Razorpay Checkout with Timeout Protection
+  // 1-Click Automated Razorpay Checkout
   const handleProceedToCheckout = async () => {
+    if (typeof window === "undefined") return;
     setErrorMessage(null);
-    setIsProcessing(true);
 
-    // Timeout safety fallback: never stay stuck on loading state
-    const safetyTimer = setTimeout(() => {
-      setIsProcessing((prev) => {
-        if (prev) {
-          setErrorMessage("Gateway connection timeout. Please check ad-blockers or try again.");
-          return false;
-        }
-        return false;
-      });
-    }, 5000);
+    // Check if SDK is available
+    if (!(window as any).Razorpay) {
+      // Retry once after 500ms
+      await new Promise((res) => setTimeout(res, 500));
+    }
+
+    if (!(window as any).Razorpay) {
+      setErrorMessage("Razorpay script was blocked by browser. Please disable ad-blocker/Brave Shields and refresh.");
+      alert("Razorpay script was blocked by browser. Please disable ad-blocker/Brave Shields and refresh.");
+      return;
+    }
+
+    setIsProcessing(true);
 
     try {
       await openRazorpayCheckout({
@@ -165,7 +168,6 @@ function CheckoutInner() {
         },
         themeColor: "#2563eb",
         onSuccess: (result) => {
-          clearTimeout(safetyTimer);
           setIsProcessing(false);
           setVerifiedPayment({
             payment_id: result.payment_id,
@@ -185,21 +187,18 @@ function CheckoutInner() {
           }
         },
         onFailure: (err) => {
-          clearTimeout(safetyTimer);
           setIsProcessing(false);
           if (err.description && !err.description.toLowerCase().includes("cancel")) {
             setErrorMessage(err.description);
           }
         },
         onDismiss: () => {
-          clearTimeout(safetyTimer);
           setIsProcessing(false);
         },
       });
     } catch (err: any) {
-      clearTimeout(safetyTimer);
       setIsProcessing(false);
-      setErrorMessage(err?.message || "Gateway connection timeout. Please check ad-blockers or try again.");
+      setErrorMessage(err?.message || "Failed to initialize payment gateway. Please try again.");
     }
   };
 
@@ -251,12 +250,12 @@ function CheckoutInner() {
 
         {/* 2-Column Balanced Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          
+
           {/* ======================================================== */}
           {/* LEFT COLUMN: ENLARGED 3 LIGHT TIER CARDS + SPECIFICATIONS */}
           {/* ======================================================== */}
           <div className="lg:col-span-7 space-y-6">
-            
+
             {/* Tier Selector Section */}
             <div className="space-y-4">
               <div className="flex items-center justify-between text-xs font-semibold text-slate-500 uppercase tracking-wider">
@@ -277,11 +276,10 @@ function CheckoutInner() {
                         setErrorMessage(null);
                         setVerifiedPayment(null);
                       }}
-                      className={`p-6 rounded-2xl border transition-all cursor-pointer relative flex flex-col justify-between ${
-                        isSelected
+                      className={`p-6 rounded-2xl border transition-all cursor-pointer relative flex flex-col justify-between ${isSelected
                           ? "border-2 border-blue-600 bg-blue-50/40 shadow-md ring-2 ring-blue-600/20"
                           : "border-slate-200 bg-white hover:border-blue-300 hover:shadow-sm"
-                      }`}
+                        }`}
                     >
                       {tier.badge && (
                         <span className="absolute -top-3 right-4 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-blue-600 text-white shadow-xs">
@@ -309,14 +307,12 @@ function CheckoutInner() {
 
                       <div className="pt-4 mt-4 border-t border-slate-100 flex items-center justify-between text-xs">
                         <span
-                          className={`text-xs font-semibold flex items-center gap-1.5 ${
-                            isSelected ? "text-blue-600" : "text-slate-400"
-                          }`}
+                          className={`text-xs font-semibold flex items-center gap-1.5 ${isSelected ? "text-blue-600" : "text-slate-400"
+                            }`}
                         >
                           <span
-                            className={`w-2.5 h-2.5 rounded-full ${
-                              isSelected ? "bg-blue-600" : "bg-slate-300"
-                            }`}
+                            className={`w-2.5 h-2.5 rounded-full ${isSelected ? "bg-blue-600" : "bg-slate-300"
+                              }`}
                           />
                           {isSelected ? "Selected" : "Select Tier"}
                         </span>
@@ -363,7 +359,7 @@ function CheckoutInner() {
           {/* ======================================================== */}
           <div className="lg:col-span-5 space-y-6">
             <div className="rounded-2xl border border-slate-200 bg-white p-8 space-y-6 shadow-xl relative">
-              
+
               {/* Card Header */}
               <div className="flex items-start justify-between pb-4 border-b border-slate-100">
                 <div>
@@ -430,7 +426,7 @@ function CheckoutInner() {
               ) : (
                 /* 1-Click Checkout Ingress */
                 <div className="space-y-6">
-                  
+
                   {/* Cost Itemization Breakdown Box */}
                   <div className="p-5 rounded-xl border border-slate-200 bg-slate-50/70 space-y-3.5 text-xs sm:text-sm">
                     <div className="flex justify-between text-slate-700">

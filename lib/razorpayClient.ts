@@ -2,74 +2,6 @@
 
 import { RazorpayOptions, RazorpaySuccessResponse, RazorpayErrorResponse } from "@/types/razorpay";
 
-/**
- * Dynamically loads the official Razorpay Checkout SDK (checkout.js) with timeout protection.
- */
-export function loadRazorpayScript(timeoutMs = 4000): Promise<boolean> {
-  return new Promise((resolve) => {
-    if (typeof window === "undefined") {
-      resolve(false);
-      return;
-    }
-
-    if (window.Razorpay) {
-      resolve(true);
-      return;
-    }
-
-    let isSettled = false;
-    const timer = setTimeout(() => {
-      if (!isSettled) {
-        isSettled = true;
-        console.warn("[RAZORPAY_LOAD_TIMEOUT]: SDK script load timed out after", timeoutMs, "ms");
-        resolve(false);
-      }
-    }, timeoutMs);
-
-    // Check if script tag is already in DOM
-    const existingScript = document.querySelector<HTMLScriptElement>(
-      'script[src="https://checkout.razorpay.com/v1/checkout.js"]'
-    );
-    if (existingScript) {
-      existingScript.addEventListener("load", () => {
-        if (!isSettled) {
-          isSettled = true;
-          clearTimeout(timer);
-          resolve(true);
-        }
-      });
-      existingScript.addEventListener("error", () => {
-        if (!isSettled) {
-          isSettled = true;
-          clearTimeout(timer);
-          resolve(false);
-        }
-      });
-      return;
-    }
-
-    const script = document.createElement("script");
-    script.src = "https://checkout.razorpay.com/v1/checkout.js";
-    script.async = true;
-    script.onload = () => {
-      if (!isSettled) {
-        isSettled = true;
-        clearTimeout(timer);
-        resolve(true);
-      }
-    };
-    script.onerror = () => {
-      if (!isSettled) {
-        isSettled = true;
-        clearTimeout(timer);
-        console.error("Failed to load Razorpay Checkout script from checkout.razorpay.com");
-        resolve(false);
-      }
-    };
-    document.body.appendChild(script);
-  });
-}
-
 export interface CheckoutVerificationResult {
   success: boolean;
   order_id: string;
@@ -97,11 +29,12 @@ export interface OpenRazorpayCheckoutOptions {
 
 /**
  * Standard Razorpay Web Checkout Orchestrator:
- * 1. Ensures checkout.js is loaded (with 4s timeout fallback)
- * 2. Creates an order via backend /api/create-order
- * 3. Launches standard modal
- * 4. Verifies HMAC-SHA256 signature via backend /api/verify-payment
- * 5. Handles modal dismiss and payment.failed events
+ * 1. Checks if window.Razorpay exists (with 500ms retry)
+ * 2. Never dynamically creates script tags on click
+ * 3. Creates an order via backend /api/create-order
+ * 4. Launches standard modal: new window.Razorpay(options).open()
+ * 5. Verifies HMAC-SHA256 signature via backend /api/verify-payment
+ * 6. Handles modal dismiss and payment.failed events
  */
 export async function openRazorpayCheckout({
   amount,
@@ -116,21 +49,24 @@ export async function openRazorpayCheckout({
   onFailure,
   onDismiss,
 }: OpenRazorpayCheckoutOptions): Promise<void> {
-  // 1. Ensure SDK is loaded within 4 seconds
-  const isLoaded = await loadRazorpayScript(4000);
-  if (!isLoaded || !window.Razorpay) {
-    const errorMsg = "Gateway connection timeout. Please check ad-blockers or try again.";
-    console.error(errorMsg);
+  if (typeof window === "undefined") return;
+
+  // 1. Check if Razorpay SDK is available (static script loaded via root layout)
+  if (!window.Razorpay) {
+    // Retry once after 500ms
+    await new Promise((res) => setTimeout(res, 500));
+  }
+
+  if (!window.Razorpay) {
+    const errorMsg = "Razorpay script was blocked by browser. Please disable ad-blocker/Brave Shields and refresh.";
+    console.error("[RAZORPAY_SCRIPT_BLOCKED]:", errorMsg);
     onFailure?.({ description: errorMsg });
     return;
   }
 
-  // 2. Fetch order from backend /api/create-order with timeout protection
+  // 2. Fetch order from backend /api/create-order
   let orderData: { order_id: string; amount: number; currency: string; key_id: string };
   try {
-    const controller = new AbortController();
-    const fetchTimer = setTimeout(() => controller.abort(), 6000);
-
     const orderRes = await fetch("/api/create-order", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -140,9 +76,7 @@ export async function openRazorpayCheckout({
         receipt,
         notes,
       }),
-      signal: controller.signal,
     });
-    clearTimeout(fetchTimer);
 
     const data = await orderRes.json();
     if (!orderRes.ok || !data.order_id) {
@@ -151,10 +85,7 @@ export async function openRazorpayCheckout({
 
     orderData = data;
   } catch (err: any) {
-    const errorMsg =
-      err?.name === "AbortError"
-        ? "Gateway connection timeout. Please check ad-blockers or try again."
-        : err?.message || "Order creation failed.";
+    const errorMsg = err?.message || "Order creation failed.";
     console.error("[RAZORPAY_CHECKOUT_CLIENT]:", errorMsg);
     onFailure?.({ description: errorMsg });
     return;

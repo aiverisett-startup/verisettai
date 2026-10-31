@@ -236,23 +236,26 @@ export default function BillingPage() {
     };
   }, [activeSelectedPlan]);
 
-  // 5. Automated Razorpay Checkout Execution with Timeout Fallback
+  // 5. Automated Razorpay Checkout Execution
   const handleProceedToPay = async () => {
+    if (typeof window === "undefined") return;
     if (!activeSelectedPlan || calculation.totalPayablePaise <= 0) return;
 
-    setIsProcessing(true);
     setErrorMessage(null);
 
-    // Timeout safety fallback: never stay stuck on loading state
-    const safetyTimer = setTimeout(() => {
-      setIsProcessing((prev) => {
-        if (prev) {
-          setErrorMessage("Gateway connection timeout. Please check ad-blockers or try again.");
-          return false;
-        }
-        return false;
-      });
-    }, 5000);
+    // Check if SDK is available
+    if (!(window as any).Razorpay) {
+      // Retry once after 500ms
+      await new Promise((res) => setTimeout(res, 500));
+    }
+
+    if (!(window as any).Razorpay) {
+      setErrorMessage("Razorpay script was blocked by browser. Please disable ad-blocker/Brave Shields and refresh.");
+      alert("Razorpay script was blocked by browser. Please disable ad-blocker/Brave Shields and refresh.");
+      return;
+    }
+
+    setIsProcessing(true);
 
     try {
       await openRazorpayCheckout({
@@ -271,7 +274,6 @@ export default function BillingPage() {
         },
         themeColor: "#2563eb",
         onSuccess: (result) => {
-          clearTimeout(safetyTimer);
           setIsProcessing(false);
           setVerifiedPayment({
             payment_id: result.payment_id,
@@ -300,21 +302,18 @@ export default function BillingPage() {
           }
         },
         onFailure: (err) => {
-          clearTimeout(safetyTimer);
           setIsProcessing(false);
           if (err.description && !err.description.toLowerCase().includes("cancel")) {
             setErrorMessage(err.description);
           }
         },
         onDismiss: () => {
-          clearTimeout(safetyTimer);
           setIsProcessing(false);
         },
       });
     } catch (err: any) {
-      clearTimeout(safetyTimer);
       setIsProcessing(false);
-      setErrorMessage(err?.message || "Gateway connection timeout. Please check ad-blockers or try again.");
+      setErrorMessage(err?.message || "Failed to initialize payment gateway. Please try again.");
     }
   };
 
