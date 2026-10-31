@@ -857,64 +857,64 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
 
       {/* 1. TOP UTILITY & SEARCH BAR (TradingView Terminal Theme) */}
       <header className="sticky top-0 z-40 w-full border-b border-[#EAE3D2] bg-white/90 backdrop-blur-md px-4 sm:px-6 lg:px-8 py-3">
-        <div className="max-w-[1800px] mx-auto flex items-center justify-between gap-4 flex-wrap">
-          {/* Left: Platform Logo, Quick Navigation */}
-          <div className="flex items-center gap-4 sm:gap-6">
+        <div className="max-w-[1800px] mx-auto relative flex items-center justify-between gap-4">
+          {/* Left: Platform Logo */}
+          <div className="flex items-center gap-4 sm:gap-6 z-10">
             <Link href="/" className="hover:opacity-85 transition-opacity flex items-center gap-2">
               <VerisettLogo size={32} />
             </Link>
-
-            {/* Quick Navigation Links */}
-            <nav className="hidden lg:flex items-center gap-1 text-xs font-medium font-sans">
-              <button
-                onClick={() => setActiveTab("overview")}
-                className={`px-2.5 py-1 rounded-lg transition cursor-pointer ${
-                  activeTab === "overview"
-                    ? "text-blue-600 font-bold bg-blue-50"
-                    : "text-[#6E675D] hover:text-[#1C1A17]"
-                }`}
-              >
-                Agents
-              </button>
-              <Link
-                href="/dashboard/billing"
-                className="px-2.5 py-1 rounded-lg text-[#6E675D] hover:text-[#1C1A17] transition"
-              >
-                Protocol
-              </Link>
-              <button
-                onClick={() => setActiveTab("transactions")}
-                className={`px-2.5 py-1 rounded-lg transition cursor-pointer ${
-                  activeTab === "transactions"
-                    ? "text-blue-600 font-bold bg-blue-50"
-                    : "text-[#6E675D] hover:text-[#1C1A17]"
-                }`}
-              >
-                Settlements
-              </button>
-              <button
-                onClick={() => setActiveTab("escrow")}
-                className={`px-2.5 py-1 rounded-lg transition cursor-pointer ${
-                  activeTab === "escrow"
-                    ? "text-blue-600 font-bold bg-blue-50"
-                    : "text-[#6E675D] hover:text-[#1C1A17]"
-                }`}
-              >
-                Escrow
-              </button>
-              <a
-                href="https://github.com/aiverisett/verisett"
-                target="_blank"
-                rel="noreferrer"
-                className="px-2.5 py-1 rounded-lg text-[#6E675D] hover:text-[#1C1A17] transition"
-              >
-                Docs
-              </a>
-            </nav>
           </div>
 
+          {/* Middle: Quick Navigation Links (Dead Center) */}
+          <nav className="hidden md:flex items-center gap-1 text-xs font-medium font-sans md:absolute md:left-1/2 md:-translate-x-1/2 z-10">
+            <button
+              onClick={() => setActiveTab("overview")}
+              className={`px-3 py-1.5 rounded-lg transition cursor-pointer ${
+                activeTab === "overview"
+                  ? "text-blue-600 font-bold bg-blue-50"
+                  : "text-[#6E675D] hover:text-[#1C1A17] hover:bg-slate-50"
+              }`}
+            >
+              Agents
+            </button>
+            <Link
+              href="/dashboard/billing"
+              className="px-3 py-1.5 rounded-lg text-[#6E675D] hover:text-[#1C1A17] hover:bg-slate-50 transition"
+            >
+              Protocol
+            </Link>
+            <button
+              onClick={() => setActiveTab("transactions")}
+              className={`px-3 py-1.5 rounded-lg transition cursor-pointer ${
+                activeTab === "transactions"
+                  ? "text-blue-600 font-bold bg-blue-50"
+                  : "text-[#6E675D] hover:text-[#1C1A17] hover:bg-slate-50"
+              }`}
+            >
+              Settlements
+            </button>
+            <button
+              onClick={() => setActiveTab("escrow")}
+              className={`px-3 py-1.5 rounded-lg transition cursor-pointer ${
+                activeTab === "escrow"
+                  ? "text-blue-600 font-bold bg-blue-50"
+                  : "text-[#6E675D] hover:text-[#1C1A17] hover:bg-slate-50"
+              }`}
+            >
+              Escrow
+            </button>
+            <a
+              href="https://github.com/aiverisett/verisett"
+              target="_blank"
+              rel="noreferrer"
+              className="px-3 py-1.5 rounded-lg text-[#6E675D] hover:text-[#1C1A17] hover:bg-slate-50 transition"
+            >
+              Docs
+            </a>
+          </nav>
+
           {/* Right: User Avatar Circle, Tier Pass Badge, Primary Actions */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 z-10">
             {/* Tier Pass Badge ("PRO" / "FOUNDER") */}
             {hasFounderPass ? (
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs font-bold font-mono shadow-2xs">
