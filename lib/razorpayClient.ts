@@ -92,8 +92,21 @@ export async function openRazorpayCheckout({
   }
 
   // 3. Configure standard Razorpay options
+  // Ensure public key ID is resolved cleanly from order response or environment fallback
+  const clientPublicKey =
+    orderData.key_id ||
+    process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID ||
+    process.env.RAZORPAY_KEY_ID;
+
+  if (!clientPublicKey) {
+    const errorMsg = "Razorpay public key ID is missing. Please check your environment configuration.";
+    console.error("[RAZORPAY_PUBLIC_KEY_MISSING]:", errorMsg);
+    onFailure?.({ description: errorMsg });
+    return;
+  }
+
   const options: RazorpayOptions = {
-    key: orderData.key_id,
+    key: clientPublicKey,
     amount: orderData.amount,
     currency: orderData.currency,
     name,

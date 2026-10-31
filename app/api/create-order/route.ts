@@ -4,6 +4,21 @@ import crypto from "crypto";
 
 export async function POST(req: NextRequest) {
   try {
+    // 1. Check for server environment credentials before processing
+    const keyId = process.env.RAZORPAY_KEY_ID?.trim().replace(/^["']|["']$/g, "");
+    const keySecret = process.env.RAZORPAY_KEY_SECRET?.trim().replace(/^["']|["']$/g, "");
+
+    if (!keyId || !keySecret) {
+      console.error("[RAZORPAY_CONFIG_ERROR]: RAZORPAY_KEY_ID or RAZORPAY_KEY_SECRET missing on server.");
+      return NextResponse.json(
+        {
+          error: "Razorpay credentials missing: RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET must be configured in environment variables.",
+          code: "CREDENTIALS_MISSING",
+        },
+        { status: 500 }
+      );
+    }
+
     const body = await req.json().catch(() => null);
 
     if (!body || typeof body !== "object") {
@@ -65,7 +80,7 @@ export async function POST(req: NextRequest) {
       err?.error?.description ||
       err?.message ||
       "Failed to create Razorpay payment order.";
-    const statusCode = err?.statusCode || 500;
+    const statusCode = typeof err?.statusCode === "number" ? err.statusCode : 500;
 
     return NextResponse.json(
       {
