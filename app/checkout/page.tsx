@@ -31,8 +31,11 @@ export interface LightPricingTier {
   badge?: string;
   tagline: string;
   basePrice: number;
+  gstRate?: number;
   gstAmount: number;
   totalPrice: number;
+  totalPayable?: number;
+  amountInPaise?: number;
   totalPaise: number;
 }
 
@@ -41,10 +44,13 @@ export const LIGHT_TIERS: LightPricingTier[] = [
     id: "builder",
     name: "Builder Protocol",
     tagline: "Essential execution capacity for modern autonomous agents.",
-    basePrice: 10,
-    gstAmount: 1.8,
-    totalPrice: 11.8,
-    totalPaise: 1180,
+    basePrice: 2500,
+    gstRate: 0.18,
+    gstAmount: 450,
+    totalPrice: 2950,
+    totalPayable: 2950,
+    amountInPaise: 295000,
+    totalPaise: 295000,
   },
   {
     id: "growth",
@@ -52,8 +58,11 @@ export const LIGHT_TIERS: LightPricingTier[] = [
     badge: "Most Popular",
     tagline: "High-throughput production infrastructure with dedicated routing.",
     basePrice: 7999,
+    gstRate: 0.18,
     gstAmount: 1440,
     totalPrice: 9439,
+    totalPayable: 9439,
+    amountInPaise: 943900,
     totalPaise: 943900,
   },
   {
@@ -61,8 +70,11 @@ export const LIGHT_TIERS: LightPricingTier[] = [
     name: "Enterprise Scale",
     tagline: "Full-scale dedicated cluster with enterprise SLA and direct rails.",
     basePrice: 29999,
+    gstRate: 0.18,
     gstAmount: 5400,
     totalPrice: 35399,
+    totalPayable: 35399,
+    amountInPaise: 3539900,
     totalPaise: 3539900,
   },
 ];
@@ -415,13 +427,13 @@ function CheckoutInner() {
                           {tier.name}
                         </div>
                         <div className="text-3xl font-bold text-slate-900 font-mono tracking-tight">
-                          ₹{tier.basePrice.toFixed(2)}
+                          ₹{tier.basePrice.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                           <span className="text-xs font-normal text-slate-500 ml-1">/ mo</span>
                         </div>
                         <div className="text-xs font-mono text-slate-600">
                           Total with 18% GST:{" "}
                           <span className="font-semibold text-slate-900">
-                            ₹{tier.totalPrice.toFixed(2)}
+                            ₹{tier.totalPrice.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                           </span>
                         </div>
                       </div>
@@ -559,26 +571,26 @@ function CheckoutInner() {
                     <div className="flex justify-between text-slate-700">
                       <span className="text-slate-500">Base Allocation:</span>
                       <span className="font-mono font-medium text-slate-900">
-                        ₹{activeTier.basePrice.toFixed(2)}
+                        ₹{activeTier.basePrice.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </span>
                     </div>
                     <div className="flex justify-between text-slate-700">
                       <span className="text-slate-500">18% Statutory GST:</span>
                       <span className="font-mono font-medium text-slate-900">
-                        ₹{activeTier.gstAmount.toFixed(2)}
+                        ₹{activeTier.gstAmount.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </span>
                     </div>
                     <div className="pt-4 border-t border-slate-200 flex justify-between items-baseline">
                       <div>
                         <span className="text-xs font-bold text-slate-900 uppercase tracking-wider block">
-                          Total Payable:
+                          TOTAL PAYABLE:
                         </span>
                         <span className="text-[11px] text-slate-500">
                           (Inclusive of 18% GST)
                         </span>
                       </div>
                       <span className="text-3xl font-extrabold text-blue-600 font-mono tracking-tight">
-                        ₹{activeTier.totalPrice.toFixed(2)}
+                        ₹{activeTier.totalPrice.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </span>
                     </div>
                   </div>
@@ -659,7 +671,7 @@ function CheckoutInner() {
                       <div className="flex items-center justify-center gap-2">
                         <span className="text-xs text-slate-500">Total Payable:</span>
                         <span className="text-lg font-bold font-mono text-blue-600">
-                          ₹{activeTier.totalPrice.toFixed(2)}
+                          ₹{activeTier.totalPrice.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </span>
                       </div>
 

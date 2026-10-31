@@ -22,9 +22,21 @@ export async function POST(req: NextRequest) {
 
     const { planId, amount, currency = "INR", receipt, notes } = body;
 
+    let targetAmount = Number(amount);
+
+    // Map or validate tier pricing
+    const normalizedPlanId = typeof planId === "string" ? planId.toLowerCase().trim() : "";
+    if (normalizedPlanId === "builder" || normalizedPlanId.includes("builder")) {
+      // Builder Protocol: ₹2,500 base + 18% GST (₹450) = ₹2,950 = 295000 paise
+      targetAmount = 295000;
+    } else if (normalizedPlanId === "growth" || normalizedPlanId.includes("growth")) {
+      targetAmount = 943900;
+    } else if (normalizedPlanId === "enterprise" || normalizedPlanId.includes("enterprise")) {
+      targetAmount = 3539900;
+    }
+
     // Validate amount: must be a valid integer/number and at least 100 paise (₹1)
-    const numericAmount = Number(amount);
-    if (!Number.isFinite(numericAmount) || numericAmount < 100) {
+    if (!Number.isFinite(targetAmount) || targetAmount < 100) {
       return NextResponse.json(
         {
           error: "Invalid amount. Minimum allowable order amount is 100 paise (₹1).",
@@ -33,7 +45,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const sanitizedAmount = parseInt(String(Math.round(numericAmount)), 10);
+    const sanitizedAmount = parseInt(String(Math.round(targetAmount)), 10);
     const sanitizedCurrency =
       typeof currency === "string" && currency.trim().length > 0
         ? currency.toUpperCase().trim()

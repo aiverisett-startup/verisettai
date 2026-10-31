@@ -42,7 +42,7 @@ export const PLAN_TIERS: PlanTier[] = [
     id: "builder",
     name: "Builder Protocol",
     tagline: "Essential execution capacity for modern autonomous agents.",
-    price: 10,
+    price: 2500,
     apiOps: "250,000 Ops",
     features: [
       "Uncapped monthly API execution volume",
@@ -204,7 +204,7 @@ export default function BillingPage() {
               setCurrentUserTier({
                 tierId: "builder",
                 name: "Builder Protocol",
-                basePrice: 10,
+                basePrice: 2500,
                 opsRemaining: 195000,
                 opsTotal: 250000,
               });
@@ -511,7 +511,7 @@ export default function BillingPage() {
                     setCurrentUserTier({
                       tierId: "builder",
                       name: "Builder Protocol",
-                      basePrice: 10,
+                      basePrice: 2500,
                       opsRemaining: 195000,
                       opsTotal: 250000,
                     });
@@ -538,7 +538,7 @@ export default function BillingPage() {
                 className="bg-white border border-slate-200 text-slate-700 text-xs font-mono rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-blue-600 shadow-xs"
               >
                 <option value="free">Free Community (₹0)</option>
-                <option value="builder">Builder Protocol (₹10)</option>
+                <option value="builder">Builder Protocol (₹2,500)</option>
                 <option value="growth">Settlement Node (₹7,999)</option>
                 <option value="enterprise">Enterprise Scale (₹29,999)</option>
               </select>
