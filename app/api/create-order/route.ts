@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { amount, currency = "INR", receipt, notes } = body;
+    const { planId, amount, currency = "INR", receipt, notes } = body;
 
     // Validate amount: must be a valid integer/number and at least 100 paise (₹1)
     const numericAmount = Number(amount);
@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
     const sanitizedReceipt =
       typeof receipt === "string" && receipt.trim().length > 0
         ? receipt.trim().slice(0, 40)
-        : `rcpt_${crypto.randomUUID().replace(/-/g, "").slice(0, 14)}`;
+        : `receipt_${Date.now()}`;
 
     const razorpay = getRazorpayClient();
     const publicKeyId = getRazorpayPublicKey();
@@ -52,15 +52,16 @@ export async function POST(req: NextRequest) {
       currency: sanitizedCurrency,
       receipt: sanitizedReceipt,
       payment_capture: 1,
+      notes: {
+        ...(notes && typeof notes === "object" ? notes : {}),
+        ...(planId ? { planId: String(planId) } : {}),
+      },
     };
-
-    if (notes && typeof notes === "object") {
-      orderOptions.notes = notes;
-    }
 
     const order = await razorpay.orders.create(orderOptions);
 
     return NextResponse.json({
+      orderId: order.id,
       order_id: order.id,
       amount: order.amount,
       currency: order.currency,

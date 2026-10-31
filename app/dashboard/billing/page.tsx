@@ -327,76 +327,87 @@ export default function BillingPage() {
 
     setErrorMessage(null);
 
-    // Check if SDK is available
+    // 1. Check if Razorpay SDK is available
     if (!(window as any).Razorpay) {
       await new Promise((res) => setTimeout(res, 500));
     }
 
     if (!(window as any).Razorpay) {
-      setErrorMessage("Razorpay script was blocked by browser. Please disable ad-blocker/Brave Shields and refresh.");
-      alert("Razorpay script was blocked by browser. Please disable ad-blocker/Brave Shields and refresh.");
+      const err = "Razorpay script was blocked by browser. Please disable ad-blocker/Brave Shields and refresh.";
+      setErrorMessage(err);
+      alert(err);
       return;
     }
 
     setIsProcessing(true);
 
     try {
-      await openRazorpayCheckout({
-        amount: calculation.totalPayablePaise,
+      // 1. Call POST /api/create-order with calculated total payable in paise
+      const orderRes = await fetch("/api/create-order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          planId: activeSelectedPlan.id,
+          amount: calculation.totalPayablePaise,
+          currency: "INR",
+          notes: {
+            tier_id: activeSelectedPlan.id,
+            tier_name: activeSelectedPlan.name,
+            email: userEmail,
+          },
+        }),
+      });
+
+      const orderData = await orderRes.json();
+      if (!orderRes.ok || (!orderData.orderId && !orderData.order_id)) {
+        throw new Error(orderData.error || "Failed to create Razorpay payment order.");
+      }
+
+      const orderId = orderData.orderId || orderData.order_id;
+      const publicKey =
+        process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID ||
+        orderData.key_id ||
+        "rzp_live_TuVilsV1O3QDBS";
+
+      // 2. Instantiate Razorpay modal with options
+      const options = {
+        key: publicKey,
+        order_id: orderId,
+        amount: orderData.amount,
         currency: "INR",
-        name: "Verisett Platform",
+        name: "Verisett AI",
         description: `${activeSelectedPlan.name} Subscription`,
         prefill: {
           email: userEmail,
         },
-        notes: {
-          tier_id: activeSelectedPlan.id,
-          tier_name: activeSelectedPlan.name,
-          plan_name: activeSelectedPlan.name,
-          user_email: userEmail,
+        theme: {
+          color: "#2563EB",
         },
-        themeColor: "#2563eb",
-        onSuccess: (result) => {
+        handler: (response: any) => {
           setIsProcessing(false);
-          setVerifiedPayment({
-            payment_id: result.payment_id,
-            order_id: result.order_id,
-            tier_name: activeSelectedPlan.name,
-            amount: calculation.totalPayable,
-          });
+          const redirectUrl = `/billing/success?order_id=${encodeURIComponent(
+            response.razorpay_order_id || orderId
+          )}&payment_id=${encodeURIComponent(response.razorpay_payment_id || "")}`;
+          window.location.href = redirectUrl;
+        },
+        modal: {
+          ondismiss: () => {
+            setIsProcessing(false);
+          },
+        },
+      };
 
-          // Update active subscription to the upgraded tier
-          setCurrentUserTier({
-            tierId: activeSelectedPlan.id,
-            name: activeSelectedPlan.name,
-            basePrice: activeSelectedPlan.price,
-            opsRemaining: 1500000,
-            opsTotal: 1500000,
-          });
-
-          try {
-            confetti({
-              particleCount: 100,
-              spread: 70,
-              origin: { y: 0.6 },
-            });
-          } catch {
-            // Non-fatal
-          }
-        },
-        onFailure: (err) => {
-          setIsProcessing(false);
-          if (err.description && !err.description.toLowerCase().includes("cancel")) {
-            setErrorMessage(err.description);
-          }
-        },
-        onDismiss: () => {
-          setIsProcessing(false);
-        },
+      const rzp = new (window as any).Razorpay(options);
+      rzp.on("payment.failed", (resp: any) => {
+        setIsProcessing(false);
+        setErrorMessage(resp.error?.description || "Payment failed. Please try again.");
       });
+
+      // 3. Open modal
+      rzp.open();
     } catch (err: any) {
       setIsProcessing(false);
-      setErrorMessage(err?.message || "Failed to initialize payment gateway. Please try again.");
+      setErrorMessage(err?.message || "Payment initiation failed.");
     }
   };
 
