@@ -54,6 +54,19 @@ export async function POST(req: NextRequest) {
       throw new Error("Razorpay returned an empty QR code response.");
     }
 
+    // Convert to Base64 data URL so it never fails or gets blocked by CSP/ad-blockers
+    let resolvedImageUrl = qr.image_url;
+    try {
+      const imgRes = await fetch(qr.image_url);
+      if (imgRes.ok) {
+        const buffer = await imgRes.arrayBuffer();
+        const base64 = Buffer.from(buffer).toString("base64");
+        resolvedImageUrl = `data:image/png;base64,${base64}`;
+      }
+    } catch (fetchErr) {
+      console.warn("[QR_IMAGE_CONVERT_NOTICE]:", fetchErr);
+    }
+
     // Cache the record for polling & webhook matching
     saveQrRecord({
       qr_id: qr.id,
@@ -67,7 +80,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       qr_id: qr.id,
-      image_url: qr.image_url,
+      image_url: resolvedImageUrl,
       amount: qr.payment_amount || sanitizedAmount,
     });
   } catch (err: any) {
