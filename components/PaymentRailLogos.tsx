@@ -2,7 +2,7 @@
 
 import React from "react";
 
-export function UpiLogo({ className = "h-4.5 w-auto" }: { className?: string }) {
+export function UpiLogo({ className = "h-6 w-auto" }: { className?: string }) {
   return (
     <svg viewBox="0 0 120 40" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
       {/* UPI Dual Arrows */}
@@ -16,7 +16,7 @@ export function UpiLogo({ className = "h-4.5 w-auto" }: { className?: string }) 
   );
 }
 
-export function GPayLogo({ className = "h-4.5 w-auto" }: { className?: string }) {
+export function GPayLogo({ className = "h-6 w-auto" }: { className?: string }) {
   return (
     <svg viewBox="0 0 100 40" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
       {/* Google G */}
@@ -32,7 +32,7 @@ export function GPayLogo({ className = "h-4.5 w-auto" }: { className?: string })
   );
 }
 
-export function PhonePeLogo({ className = "h-4.5 w-auto" }: { className?: string }) {
+export function PhonePeLogo({ className = "h-6 w-auto" }: { className?: string }) {
   return (
     <svg viewBox="0 0 100 40" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
       <circle cx="20" cy="20" r="14" fill="#6739B7" />
@@ -43,7 +43,7 @@ export function PhonePeLogo({ className = "h-4.5 w-auto" }: { className?: string
   );
 }
 
-export function PaytmLogo({ className = "h-4.5 w-auto" }: { className?: string }) {
+export function PaytmLogo({ className = "h-6 w-auto" }: { className?: string }) {
   return (
     <svg viewBox="0 0 90 32" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
       <path d="M12 7H5V25H9V18.5H12C15.5 18.5 18 16 18 12.75C18 9.5 15.5 7 12 7ZM12 15H9V10.5H12C13.5 10.5 14.5 11.25 14.5 12.75C14.5 14.25 13.5 15 12 15Z" fill="#002970" />
@@ -55,7 +55,7 @@ export function PaytmLogo({ className = "h-4.5 w-auto" }: { className?: string }
   );
 }
 
-export function VisaLogo({ className = "h-4.5 w-auto" }: { className?: string }) {
+export function VisaLogo({ className = "h-6 w-auto" }: { className?: string }) {
   return (
     <svg viewBox="0 0 70 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
       <path d="M28.4 2.8L18.6 21.2H12.2L7.4 6.8C7.1 5.7 6.9 5.3 6 4.8C4.5 4 2.1 3.3 0 2.8L0.2 2H10.6C12 2 13.2 2.9 13.5 4.5L16.1 16.5L22.2 2.8H28.4ZM53.4 15.2C53.4 9.4 45.4 9.1 45.4 6.5C45.4 5.6 46.3 4.6 48.2 4.4C49.1 4.3 51.7 4.2 54.5 5.5L55.6 1.1C54.1 0.5 52.2 0 49.8 0C43.7 0 39.4 3.2 39.4 7.8C39.4 14.8 49.2 15.2 49.2 19.3C49.2 20.6 48 21.6 45.7 21.6C42.8 21.6 39.9 20.3 38.3 19.5L37.1 24.1C38.8 24.9 42 25.6 45.2 25.6C51.6 25.6 56 22.4 56 17.5C56 16.7 54.8 15.8 53.4 15.2ZM69.5 21.2H74.8L70.2 2.8H65.3C64.2 2.8 63.3 3.4 62.9 4.4L53.8 21.2H59.8L61 17.8H68.3L69.5 21.2ZM62.7 13.2L65.6 5.3L67.3 13.2H62.7ZM38.4 2.8L33.7 21.2H28.1L32.8 2.8H38.4Z" fill="#1434CB" />
@@ -63,7 +63,7 @@ export function VisaLogo({ className = "h-4.5 w-auto" }: { className?: string })
   );
 }
 
-export function MastercardLogo({ className = "h-4.5 w-auto" }: { className?: string }) {
+export function MastercardLogo({ className = "h-6 w-auto" }: { className?: string }) {
   return (
     <svg viewBox="0 0 50 32" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
       <circle cx="17" cy="16" r="14" fill="#EB001B" />
@@ -72,7 +72,7 @@ export function MastercardLogo({ className = "h-4.5 w-auto" }: { className?: str
   );
 }
 
-export function RupayLogo({ className = "h-4.5 w-auto" }: { className?: string }) {
+export function RupayLogo({ className = "h-6 w-auto" }: { className?: string }) {
   return (
     <svg viewBox="0 0 90 28" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
       <path d="M12 22L19 4H13L6 22H12Z" fill="#097939" />
@@ -86,43 +86,43 @@ export function RupayLogo({ className = "h-4.5 w-auto" }: { className?: string }
 export function AcceptedPaymentRailsStrip({ variant = "light" }: { variant?: "light" | "dark" }) {
   const containerClass =
     variant === "light"
-      ? "bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 flex items-center justify-center hover:bg-white hover:border-slate-300 transition-all shadow-2xs"
-      : "bg-zinc-900/80 border border-zinc-800 rounded-lg px-2.5 py-2 flex items-center justify-center grayscale hover:grayscale-0 transition-all duration-200 hover:border-zinc-700 hover:bg-zinc-850";
+      ? "bg-white border border-slate-200 shadow-sm rounded-lg h-11 sm:h-12 px-3 py-2 flex items-center justify-center hover:border-slate-300 transition-all"
+      : "bg-zinc-900/80 border border-zinc-800 rounded-lg h-11 sm:h-12 px-3 py-2 flex items-center justify-center grayscale hover:grayscale-0 transition-all duration-200 hover:border-zinc-700 hover:bg-zinc-850";
 
   return (
-    <div className="space-y-2">
-      <span className="text-[11px] font-mono uppercase tracking-wider text-slate-500 font-semibold block">
+    <div className="space-y-2.5">
+      <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 block">
         Accepted Payment Rails
       </span>
-      <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+      <div className="grid grid-cols-3 sm:grid-cols-6 gap-2.5">
         {/* UPI */}
         <div title="UPI" className={containerClass}>
-          <UpiLogo className="h-4 w-auto" />
+          <UpiLogo className="h-6 w-auto" />
         </div>
 
         {/* Google Pay */}
         <div title="Google Pay" className={containerClass}>
-          <GPayLogo className="h-4 w-auto" />
+          <GPayLogo className="h-6 w-auto" />
         </div>
 
         {/* PhonePe */}
         <div title="PhonePe" className={containerClass}>
-          <PhonePeLogo className="h-4 w-auto" />
+          <PhonePeLogo className="h-6 w-auto" />
         </div>
 
         {/* Paytm */}
         <div title="Paytm" className={containerClass}>
-          <PaytmLogo className="h-4 w-auto" />
+          <PaytmLogo className="h-6 w-auto" />
         </div>
 
         {/* Visa */}
         <div title="Visa" className={containerClass}>
-          <VisaLogo className="h-4 w-auto" />
+          <VisaLogo className="h-6 w-auto" />
         </div>
 
         {/* Mastercard */}
         <div title="Mastercard" className={containerClass}>
-          <MastercardLogo className="h-4 w-auto" />
+          <MastercardLogo className="h-6 w-auto" />
         </div>
       </div>
     </div>

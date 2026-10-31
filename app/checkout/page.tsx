@@ -78,7 +78,7 @@ function CheckoutInner() {
   // Map incoming param to one of the 3 tiers
   const initialTierId = useMemo<"builder" | "growth" | "enterprise">(() => {
     const p = rawPlanParam.toLowerCase();
-    if (p.includes("builder") || p.includes("pro") || p.includes("tier_1") || p.includes("2499") || p.includes("2500")) {
+    if (p.includes("builder") || p.includes("pro") || p.includes("tier_1") || p.includes("10") || p.includes("2499") || p.includes("2500")) {
       return "builder";
     }
     if (p.includes("scale") || p.includes("founder") || p.includes("tier_3") || p.includes("enterprise") || p.includes("29999") || p.includes("30000")) {
@@ -102,7 +102,7 @@ function CheckoutInner() {
   useEffect(() => {
     if (rawPlanParam) {
       const p = rawPlanParam.toLowerCase();
-      if (p.includes("builder") || p.includes("pro") || p.includes("tier_1") || p.includes("2499") || p.includes("2500")) {
+      if (p.includes("builder") || p.includes("pro") || p.includes("tier_1") || p.includes("10") || p.includes("2499") || p.includes("2500")) {
         setSelectedTierId("builder");
       } else if (p.includes("scale") || p.includes("founder") || p.includes("tier_3") || p.includes("enterprise") || p.includes("29999") || p.includes("30000")) {
         setSelectedTierId("enterprise");
@@ -133,10 +133,21 @@ function CheckoutInner() {
     return LIGHT_TIERS.find((t) => t.id === selectedTierId) || LIGHT_TIERS[1];
   }, [selectedTierId]);
 
-  // 1-Click Automated Razorpay Checkout
+  // 1-Click Automated Razorpay Checkout with Timeout Protection
   const handleProceedToCheckout = async () => {
     setErrorMessage(null);
     setIsProcessing(true);
+
+    // Timeout safety fallback: never stay stuck on loading state
+    const safetyTimer = setTimeout(() => {
+      setIsProcessing((prev) => {
+        if (prev) {
+          setErrorMessage("Gateway connection timeout. Please check ad-blockers or try again.");
+          return false;
+        }
+        return false;
+      });
+    }, 5000);
 
     try {
       await openRazorpayCheckout({
@@ -154,6 +165,7 @@ function CheckoutInner() {
         },
         themeColor: "#2563eb",
         onSuccess: (result) => {
+          clearTimeout(safetyTimer);
           setIsProcessing(false);
           setVerifiedPayment({
             payment_id: result.payment_id,
@@ -173,18 +185,21 @@ function CheckoutInner() {
           }
         },
         onFailure: (err) => {
+          clearTimeout(safetyTimer);
           setIsProcessing(false);
           if (err.description && !err.description.toLowerCase().includes("cancel")) {
             setErrorMessage(err.description);
           }
         },
         onDismiss: () => {
+          clearTimeout(safetyTimer);
           setIsProcessing(false);
         },
       });
     } catch (err: any) {
+      clearTimeout(safetyTimer);
       setIsProcessing(false);
-      setErrorMessage(err?.message || "Failed to initialize payment gateway. Please try again.");
+      setErrorMessage(err?.message || "Gateway connection timeout. Please check ad-blockers or try again.");
     }
   };
 
@@ -192,7 +207,7 @@ function CheckoutInner() {
     <div className="min-h-screen bg-[#F8FAFC] text-slate-900 font-sans selection:bg-blue-600 selection:text-white">
       {/* Top Header */}
       <header className="sticky top-0 z-40 w-full border-b border-slate-200 bg-white/90 backdrop-blur-md shadow-xs">
-        <div className="mx-auto max-w-5xl px-6 h-16 flex items-center justify-between">
+        <div className="mx-auto max-w-7xl px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link
               href="/pricing"
@@ -222,8 +237,8 @@ function CheckoutInner() {
         </div>
       </header>
 
-      {/* Main Centered Container */}
-      <main className="mx-auto max-w-5xl px-6 py-10 space-y-8">
+      {/* Main Centered Container with max-w-7xl for Ample Breathing Room */}
+      <main className="mx-auto max-w-7xl px-6 py-10 space-y-8">
         {/* Page Title & Breadcrumb */}
         <div className="space-y-1">
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">
@@ -238,19 +253,19 @@ function CheckoutInner() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
           {/* ======================================================== */}
-          {/* LEFT COLUMN: 3 LIGHT TIER CARDS + SPECIFICATIONS (60%)   */}
+          {/* LEFT COLUMN: ENLARGED 3 LIGHT TIER CARDS + SPECIFICATIONS */}
           {/* ======================================================== */}
           <div className="lg:col-span-7 space-y-6">
             
             {/* Tier Selector Section */}
-            <div className="space-y-3">
+            <div className="space-y-4">
               <div className="flex items-center justify-between text-xs font-semibold text-slate-500 uppercase tracking-wider">
                 <span>Select Subscription Tier</span>
                 <span className="text-blue-600 normal-case font-medium">Monthly Active Cycle</span>
               </div>
 
-              {/* 3 Clean Interactive Light-Mode Tier Cards */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              {/* 3 Enlarged Interactive Light-Mode Tier Cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
                 {LIGHT_TIERS.map((tier) => {
                   const isSelected = tier.id === selectedTierId;
 
@@ -262,24 +277,25 @@ function CheckoutInner() {
                         setErrorMessage(null);
                         setVerifiedPayment(null);
                       }}
-                      className={`p-4 rounded-xl border transition-all cursor-pointer relative flex flex-col justify-between ${
+                      className={`p-6 rounded-2xl border transition-all cursor-pointer relative flex flex-col justify-between ${
                         isSelected
-                          ? "border-2 border-blue-600 bg-blue-50/40 shadow-sm ring-1 ring-blue-600/20"
-                          : "border-slate-200 bg-white hover:border-blue-300 hover:shadow-xs"
+                          ? "border-2 border-blue-600 bg-blue-50/40 shadow-md ring-2 ring-blue-600/20"
+                          : "border-slate-200 bg-white hover:border-blue-300 hover:shadow-sm"
                       }`}
                     >
                       {tier.badge && (
-                        <span className="absolute -top-2.5 right-3 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-blue-600 text-white shadow-xs">
+                        <span className="absolute -top-3 right-4 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-blue-600 text-white shadow-xs">
                           {tier.badge}
                         </span>
                       )}
 
-                      <div className="space-y-2">
-                        {/* Title with break-words to avoid truncation */}
-                        <div className="text-sm font-bold text-slate-900 break-words leading-tight">
+                      <div className="space-y-3">
+                        {/* Enlarge plan title */}
+                        <div className="text-lg font-semibold text-slate-900 break-words leading-tight">
                           {tier.name}
                         </div>
-                        <div className="text-xl font-extrabold text-slate-900 font-mono tracking-tight">
+                        {/* Enlarge price display to text-3xl font-bold font-mono */}
+                        <div className="text-3xl font-bold text-slate-900 font-mono tracking-tight">
                           ₹{tier.basePrice.toFixed(2)}
                           <span className="text-xs font-normal text-slate-500 ml-1">/ mo</span>
                         </div>
@@ -291,14 +307,14 @@ function CheckoutInner() {
                         </div>
                       </div>
 
-                      <div className="pt-3 mt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                      <div className="pt-4 mt-4 border-t border-slate-100 flex items-center justify-between text-xs">
                         <span
-                          className={`text-xs font-semibold flex items-center gap-1 ${
+                          className={`text-xs font-semibold flex items-center gap-1.5 ${
                             isSelected ? "text-blue-600" : "text-slate-400"
                           }`}
                         >
                           <span
-                            className={`w-2 h-2 rounded-full ${
+                            className={`w-2.5 h-2.5 rounded-full ${
                               isSelected ? "bg-blue-600" : "bg-slate-300"
                             }`}
                           />
@@ -311,8 +327,8 @@ function CheckoutInner() {
               </div>
             </div>
 
-            {/* Plan Specifications Card (Clean White Surface, Slate Checkmarks, Authentic SaaS deliverables) */}
-            <div className="rounded-2xl border border-slate-200 bg-white p-6 space-y-4 shadow-sm">
+            {/* Plan Specifications Card */}
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-7 space-y-4 shadow-sm">
               <div className="flex items-center justify-between pb-3 border-b border-slate-100 flex-wrap gap-2">
                 <div className="flex items-center gap-2">
                   <div className="p-1.5 rounded-lg bg-blue-50 text-blue-600">
@@ -328,11 +344,11 @@ function CheckoutInner() {
                 </span>
               </div>
 
-              <ul className="space-y-3 text-xs text-slate-700">
+              <ul className="space-y-3 text-xs sm:text-sm text-slate-700">
                 {SPECIFICATION_DELIVERABLES.map((feature, idx) => (
                   <li key={idx} className="flex items-start gap-3">
                     <div className="p-0.5 rounded-full bg-emerald-50 text-emerald-600 shrink-0 mt-0.5">
-                      <Check className="w-3.5 h-3.5" />
+                      <Check className="w-4 h-4" />
                     </div>
                     <span className="font-medium text-slate-800">{feature}</span>
                   </li>
@@ -343,10 +359,10 @@ function CheckoutInner() {
           </div>
 
           {/* ======================================================== */}
-          {/* RIGHT COLUMN: CLEAN WHITE ELEVATED CHECKOUT CARD (40%)    */}
+          {/* RIGHT COLUMN: SCALED UP ORDER SUMMARY CARD (p-8, shadow-xl) */}
           {/* ======================================================== */}
           <div className="lg:col-span-5 space-y-6">
-            <div className="rounded-2xl border border-slate-200 bg-white p-6 space-y-6 shadow-lg relative">
+            <div className="rounded-2xl border border-slate-200 bg-white p-8 space-y-6 shadow-xl relative">
               
               {/* Card Header */}
               <div className="flex items-start justify-between pb-4 border-b border-slate-100">
@@ -354,11 +370,11 @@ function CheckoutInner() {
                   <span className="text-xs uppercase tracking-wider text-slate-500 font-bold block mb-1">
                     Direct Payment Terminal
                   </span>
-                  <h3 className="text-lg font-bold text-slate-900">
+                  <h3 className="text-xl font-bold text-slate-900">
                     Order Summary
                   </h3>
                 </div>
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                   Ready
                 </div>
@@ -366,12 +382,12 @@ function CheckoutInner() {
 
               {/* Payment Confirmed State */}
               {verifiedPayment ? (
-                <div className="p-5 rounded-xl border border-emerald-200 bg-emerald-50/70 text-center space-y-4 animate-in fade-in zoom-in-95">
-                  <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 border border-emerald-200">
-                    <CheckCircle2 className="w-7 h-7" />
+                <div className="p-6 rounded-2xl border border-emerald-200 bg-emerald-50/70 text-center space-y-4 animate-in fade-in zoom-in-95">
+                  <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 border border-emerald-200">
+                    <CheckCircle2 className="w-8 h-8" />
                   </div>
                   <div className="space-y-1">
-                    <h4 className="text-base font-bold text-slate-900">
+                    <h4 className="text-lg font-bold text-slate-900">
                       Payment Confirmed!
                     </h4>
                     <p className="text-xs text-slate-600">
@@ -379,7 +395,7 @@ function CheckoutInner() {
                     </p>
                   </div>
 
-                  <div className="p-3.5 bg-white rounded-xl border border-slate-200 text-xs font-mono space-y-2 text-left shadow-xs">
+                  <div className="p-4 bg-white rounded-xl border border-slate-200 text-xs font-mono space-y-2 text-left shadow-xs">
                     <div className="flex justify-between">
                       <span className="text-slate-500">PAYMENT ID:</span>
                       <span className="font-bold text-emerald-600 break-all">{verifiedPayment.payment_id}</span>
@@ -397,7 +413,7 @@ function CheckoutInner() {
                   <div className="pt-2 flex flex-col gap-2">
                     <Link
                       href="/dashboard"
-                      className="w-full py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold transition flex items-center justify-center gap-2 shadow-sm"
+                      className="w-full py-3.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold transition flex items-center justify-center gap-2 shadow-sm"
                     >
                       <span>Enter Developer Dashboard</span>
                       <ArrowRight className="w-4 h-4" />
@@ -405,7 +421,7 @@ function CheckoutInner() {
                     <button
                       type="button"
                       onClick={() => setVerifiedPayment(null)}
-                      className="w-full py-2 px-4 rounded-lg border border-slate-200 bg-white text-slate-600 hover:text-slate-900 text-xs font-medium transition cursor-pointer"
+                      className="w-full py-2.5 px-4 rounded-lg border border-slate-200 bg-white text-slate-600 hover:text-slate-900 text-xs font-medium transition cursor-pointer"
                     >
                       Dismiss
                     </button>
@@ -413,10 +429,10 @@ function CheckoutInner() {
                 </div>
               ) : (
                 /* 1-Click Checkout Ingress */
-                <div className="space-y-5">
+                <div className="space-y-6">
                   
                   {/* Cost Itemization Breakdown Box */}
-                  <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/70 space-y-3 text-xs">
+                  <div className="p-5 rounded-xl border border-slate-200 bg-slate-50/70 space-y-3.5 text-xs sm:text-sm">
                     <div className="flex justify-between text-slate-700">
                       <span className="text-slate-500">Target Tier:</span>
                       <span className="font-bold text-slate-900">{activeTier.name}</span>
@@ -433,7 +449,7 @@ function CheckoutInner() {
                         ₹{activeTier.gstAmount.toFixed(2)}
                       </span>
                     </div>
-                    <div className="pt-3 border-t border-slate-200 flex justify-between items-baseline">
+                    <div className="pt-4 border-t border-slate-200 flex justify-between items-baseline">
                       <div>
                         <span className="text-xs font-bold text-slate-900 uppercase tracking-wider block">
                           Total Payable:
@@ -442,47 +458,48 @@ function CheckoutInner() {
                           (Inclusive of 18% GST)
                         </span>
                       </div>
-                      <span className="text-2xl font-extrabold text-blue-600 font-mono tracking-tight">
+                      {/* Prominent Large Total Payable */}
+                      <span className="text-3xl font-extrabold text-blue-600 font-mono tracking-tight">
                         ₹{activeTier.totalPrice.toFixed(2)}
                       </span>
                     </div>
                   </div>
 
-                  {/* Clean Authentic Accepted Payment Rails Strip (Light Mode Pill Badges) */}
+                  {/* Clean Authentic Accepted Payment Rails Strip with Big Logos */}
                   <AcceptedPaymentRailsStrip variant="light" />
 
                   {/* Error Notification */}
                   {errorMessage && (
-                    <div className="p-3 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-start gap-2">
+                    <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-start gap-2.5 animate-in fade-in">
                       <AlertCircle className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
-                      <span>{errorMessage}</span>
+                      <span className="font-medium">{errorMessage}</span>
                     </div>
                   )}
 
-                  {/* Primary 1-Click Button: Proceed to Checkout */}
+                  {/* Primary 1-Click Button: Proceed to Checkout (py-4 text-base font-semibold) */}
                   <button
                     type="button"
                     onClick={handleProceedToCheckout}
                     disabled={isProcessing}
-                    className="w-full py-3.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm transition cursor-pointer flex items-center justify-center gap-2 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full py-4 px-6 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-base transition cursor-pointer flex items-center justify-center gap-2.5 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isProcessing ? (
                       <>
-                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <Loader2 className="w-5 h-5 animate-spin" />
                         <span>Opening Razorpay Gateway...</span>
                       </>
                     ) : (
                       <>
-                        <CreditCard className="w-4 h-4" />
+                        <CreditCard className="w-5 h-5" />
                         <span>Proceed to Checkout</span>
-                        <ArrowRight className="w-4 h-4" />
+                        <ArrowRight className="w-5 h-5" />
                       </>
                     )}
                   </button>
 
                   {/* Trust Footer */}
                   <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
-                    <span className="flex items-center gap-1 text-slate-500">
+                    <span className="flex items-center gap-1.5 text-slate-500">
                       <ShieldCheck className="w-4 h-4 text-emerald-600" />
                       256-bit SSL Encrypted
                     </span>

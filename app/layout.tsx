@@ -264,6 +264,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col bg-[#FAFAF8] text-[#111317] selection:bg-[#111317] selection:text-white">
         {children}
+        <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="beforeInteractive" />
         <Script
           src="https://accounts.google.com/gsi/client"
           strategy="afterInteractive"
@@ -272,3 +273,4 @@ export default function RootLayout({
     </html>
   );
 }
+
