@@ -3,31 +3,22 @@
 import React, { useState, useEffect, useMemo, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import QRCode from "qrcode";
 import {
   ShieldCheck,
-  Lock,
-  Building2,
-  Mail,
-  User,
-  MapPin,
-  FileText,
-  Copy,
-  Check,
   Zap,
-  Sparkles,
   ArrowRight,
   ArrowLeft,
-  QrCode,
   AlertCircle,
   CheckCircle2,
   Loader2,
-  Cpu,
-  BadgeCheck,
+  FileText,
   CreditCard,
+  Check,
+  Lock,
 } from "lucide-react";
+import confetti from "canvas-confetti";
 import { VerisettLogo } from "@/components/VerisettLogo";
-import { getPlans, registerAction } from "@/app/actions/register";
+import { getPlans } from "@/app/actions/register";
 import {
   PlanRecord,
   fallbackPlans,
@@ -35,28 +26,37 @@ import {
 } from "@/lib/plans";
 import { supabase } from "@/lib/supabase";
 import { openRazorpayCheckout } from "@/lib/razorpayClient";
-import { DynamicUpiQrModal } from "@/components/DynamicUpiQrModal";
+import { AcceptedPaymentRailsStrip } from "@/components/PaymentRailLogos";
 
-const PROTOCOL_PURPOSES = [
-  "Autonomous Escrow Clearing",
-  "Multi-Agent Arbitrage",
-  "Milestone Task Verification",
-  "Dedicated Node Infrastructure",
-];
-
-const UPI_DESIGNATED_ID = "verisett@icici";
-const UPI_MERCHANT_NAME = "Verisett AI Settlement";
-
-function generateClientAgentId(): string {
-  const chars = "0123456789ABCDEF";
-  let seg1 = "";
-  let seg2 = "";
-  for (let i = 0; i < 4; i++) {
-    seg1 += chars[Math.floor(Math.random() * chars.length)];
-    seg2 += chars[Math.floor(Math.random() * chars.length)];
-  }
-  return `VSET-AGT-${seg1}-${seg2}`;
-}
+const PLAN_FEATURES: Record<string, string[]> = {
+  community: [
+    "Testnet clearinghouse environment",
+    "Up to 10,000 monthly API operations",
+    "Standard rate limits (50 req/min)",
+    "Community Discord developer support",
+  ],
+  tier_1: [
+    "250,000 Monthly API operations",
+    "High concurrency limits (500 req/min)",
+    "Priority API gateway routing",
+    "Dedicated webhook event delivery",
+    "Standard SLA & developer support",
+  ],
+  tier_2: [
+    "1,500,000 Monthly API operations",
+    "Sub-50ms execution SLA guarantee",
+    "Multi-signature vault settlement",
+    "Priority technical account manager",
+    "24/7 dedicated engineering support",
+  ],
+  tier_3: [
+    "Uncapped API clearinghouse volume",
+    "Permanent locked lowest fee rate",
+    "Direct commercial bank payout rails",
+    "Dedicated private VPC infrastructure",
+    "Lifetime sovereign license pass",
+  ],
+};
 
 function CheckoutInner() {
   const router = useRouter();
@@ -69,43 +69,15 @@ function CheckoutInner() {
     normalizePlanId(rawPlanParam)
   );
 
-  // Form State
-  const [agentId, setAgentId] = useState<string>("");
-  const [copiedId, setCopiedId] = useState(false);
-  const [copiedUpi, setCopiedUpi] = useState(false);
-
-  const [operatorName, setOperatorName] = useState("");
-  const [orgName, setOrgName] = useState("");
-  const [email, setEmail] = useState("");
-  const [billingAddress, setBillingAddress] = useState("");
-  const [city, setCity] = useState("Bengaluru");
-  const [pincode, setPincode] = useState("560001");
-  const [countryState, setCountryState] = useState("India — Karnataka");
-  const [gstin, setGstin] = useState("");
-  const [protocolPurpose, setProtocolPurpose] = useState(PROTOCOL_PURPOSES[0]);
-  const [paymentUtr, setPaymentUtr] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState<"razorpay" | "dynamic_qr" | "upi">("razorpay");
-  const [isDynamicQrOpen, setIsDynamicQrOpen] = useState(false);
-  const [isRazorpayProcessing, setIsRazorpayProcessing] = useState(false);
-  const [paymentNotification, setPaymentNotification] = useState<string | null>(null);
-
-  // Processing & Success State
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [userEmail, setUserEmail] = useState("");
+  const [isProcessing, setIsProcessing] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [successData, setSuccessData] = useState<{
-    registration_id?: string;
-    agent_id?: string;
-    plan_id?: string;
-    payment_status?: string;
+  const [verifiedPayment, setVerifiedPayment] = useState<{
+    payment_id: string;
+    order_id: string;
+    plan_name: string;
+    amount: number;
   } | null>(null);
-
-  // QR Code Data URL
-  const [qrDataUrl, setQrDataUrl] = useState<string>("");
-
-  // Mint Auto-Generated Agent ID once on mount
-  useEffect(() => {
-    setAgentId(generateClientAgentId());
-  }, []);
 
   // Update selected plan if URL param changes
   useEffect(() => {
@@ -114,7 +86,7 @@ function CheckoutInner() {
     }
   }, [rawPlanParam]);
 
-  // Load plans & check current session
+  // Load plans & check current session for prefill email
   useEffect(() => {
     async function loadData() {
       try {
@@ -129,11 +101,7 @@ function CheckoutInner() {
       try {
         const { data: { session } } = await supabase.auth.getSession();
         if (session?.user?.email) {
-          setEmail((prev) => prev || session.user.email || "");
-          const nameMeta = session.user.user_metadata?.full_name || session.user.user_metadata?.name;
-          if (nameMeta) {
-            setOperatorName((prev) => prev || nameMeta);
-          }
+          setUserEmail(session.user.email);
         }
       } catch {
         // Non-fatal
@@ -146,1122 +114,419 @@ function CheckoutInner() {
     return plans.find((p) => p.id === selectedPlanId) || fallbackPlans[selectedPlanId] || fallbackPlans.tier_2;
   }, [plans, selectedPlanId]);
 
-  const totalPaidClaimed = useMemo(() => {
-    return plans
-      .filter((p) => p.is_paid)
-      .reduce((sum, p) => sum + (p.claimed_count || 0), 0);
-  }, [plans]);
+  // Tax Invoice Calculations
+  const invoiceCalculation = useMemo(() => {
+    const baseAmount = selectedPlan.price_inr;
+    const gstAmount = Math.round(baseAmount * 0.18);
+    const totalPayable = baseAmount + gstAmount;
+    const totalPayablePaise = totalPayable * 100;
 
-  const isTotalPaidExhausted = totalPaidClaimed >= 1500;
-  const isTierFull =
-    selectedPlan.is_paid &&
-    selectedPlan.max_capacity !== null &&
-    selectedPlan.claimed_count >= selectedPlan.max_capacity;
+    return {
+      baseAmount,
+      gstAmount,
+      totalPayable,
+      totalPayablePaise,
+    };
+  }, [selectedPlan]);
 
-  // Capacity check
-  useEffect(() => {
-    if (isTierFull || (selectedPlan.is_paid && isTotalPaidExhausted)) {
-      const timer = setTimeout(() => {
-        router.push(`/pricing?notice=capacity_exhausted&plan=${selectedPlanId}`);
-      }, 4000);
-      return () => clearTimeout(timer);
-    }
-  }, [isTierFull, isTotalPaidExhausted, selectedPlan.is_paid, selectedPlanId, router]);
-
-  // Generate Authentic UPI Payment URI & QR Code
-  useEffect(() => {
-    if (!agentId) return;
-
-    if (!selectedPlan.is_paid) {
-      setQrDataUrl("");
-      return;
-    }
-
-    const upiUri = `upi://pay?pa=${encodeURIComponent(UPI_DESIGNATED_ID)}&pn=${encodeURIComponent(
-      UPI_MERCHANT_NAME
-    )}&am=${selectedPlan.price_inr}&cu=INR&tn=${encodeURIComponent(agentId)}`;
-
-    QRCode.toDataURL(upiUri, {
-      width: 360,
-      margin: 1,
-      color: {
-        dark: "#0F172A",
-        light: "#FFFFFF",
-      },
-    })
-      .then((url) => setQrDataUrl(url))
-      .catch((err) => console.error("Error generating UPI QR code:", err));
-  }, [selectedPlan, agentId]);
-
-  const handleCopyAgentId = () => {
-    if (!agentId) return;
-    navigator.clipboard.writeText(agentId);
-    setCopiedId(true);
-    setTimeout(() => setCopiedId(false), 2000);
-  };
-
-  const handleCopyUpiId = () => {
-    navigator.clipboard.writeText(UPI_DESIGNATED_ID);
-    setCopiedUpi(true);
-    setTimeout(() => setCopiedUpi(false), 2000);
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // 1-Click Streamlined Razorpay Checkout (Zero Form Blockers)
+  const handleProceedToCheckout = async () => {
     setErrorMessage(null);
-
-    if (isTierFull || (selectedPlan.is_paid && isTotalPaidExhausted)) {
-      setErrorMessage("Selected plan has reached maximum capacity limits. Please select another tier.");
-      return;
-    }
-
-    if (!orgName.trim() || orgName.trim().length < 2) {
-      setErrorMessage("Please enter a valid Legal Entity or Developer Organization Name.");
-      return;
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!email.trim() || !emailRegex.test(email.trim())) {
-      setErrorMessage("Please provide a valid corporate work email address.");
-      return;
-    }
-
-    if (selectedPlan.is_paid && paymentUtr.trim()) {
-      const utrClean = paymentUtr.trim().replace(/\s+/g, "");
-      if (utrClean.length < 8) {
-        setErrorMessage("Please enter a valid 12-digit UPI Transaction Reference (UTR) Number.");
-        return;
-      }
-    }
-
-    setIsSubmitting(true);
+    setIsProcessing(true);
 
     try {
-      const fullLocation = [city.trim(), countryState.trim(), pincode.trim()].filter(Boolean).join(", ");
-      const res = await registerAction(null, {
-        orgName: orgName.trim(),
-        email: email.trim().toLowerCase(),
-        agentId: agentId,
-        planId: selectedPlanId,
-        operatorName: operatorName.trim(),
-        countryState: fullLocation || countryState.trim(),
-        gstin: gstin.trim(),
-        protocolPurpose: protocolPurpose,
-        paymentUtr: paymentUtr.trim(),
-      });
-
-      if (!res.success) {
-        setErrorMessage(res.error || "Unable to complete registration. Please check your details.");
-      } else {
-        setSuccessData({
-          registration_id: res.data?.registration_id,
-          agent_id: res.data?.agent_id || agentId,
-          plan_id: res.data?.plan_id || selectedPlanId,
-          payment_status: res.data?.payment_status,
-        });
-      }
-    } catch (err: any) {
-      setErrorMessage(err?.message || "An unexpected error occurred during node provisioning.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleRazorpayCheckout = async () => {
-    setErrorMessage(null);
-    setPaymentNotification(null);
-
-    if (isTierFull || (selectedPlan.is_paid && isTotalPaidExhausted)) {
-      setErrorMessage("Selected plan has reached maximum capacity limits. Please select another tier.");
-      return;
-    }
-
-    if (!orgName.trim() || orgName.trim().length < 2) {
-      setErrorMessage("Please enter a valid Legal Entity or Developer Organization Name.");
-      return;
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!email.trim() || !emailRegex.test(email.trim())) {
-      setErrorMessage("Please provide a valid corporate work email address.");
-      return;
-    }
-
-    setIsRazorpayProcessing(true);
-
-    try {
-      const fullLocation = [city.trim(), countryState.trim(), pincode.trim()].filter(Boolean).join(", ");
-      const amountInPaise = Math.round(selectedPlan.price_inr * 100);
-
       await openRazorpayCheckout({
-        amount: amountInPaise,
+        amount: invoiceCalculation.totalPayablePaise,
         currency: "INR",
-        name: "Verisett AI",
-        description: `${selectedPlan.name} Settlement Node Provisioning`,
-        receipt: `rcpt_${agentId.replace(/[^a-zA-Z0-9]/g, "").slice(-8)}_${Date.now().toString().slice(-6)}`,
+        name: "Verisett Platform",
+        description: `${selectedPlan.name} Subscription`,
         prefill: {
-          name: operatorName.trim() || orgName.trim(),
-          email: email.trim().toLowerCase(),
+          email: userEmail || "developer@verisett.ai",
         },
         notes: {
-          agent_id: agentId,
-          plan_id: selectedPlanId,
-          organization: orgName.trim(),
+          plan_id: selectedPlan.id,
+          plan_name: selectedPlan.name,
         },
-        onSuccess: async (verifyResult) => {
-          setPaymentNotification("Payment confirmed! Provisioning protocol settlement node...");
-          try {
-            const res = await registerAction(null, {
-              orgName: orgName.trim(),
-              email: email.trim().toLowerCase(),
-              agentId: agentId,
-              planId: selectedPlanId,
-              operatorName: operatorName.trim(),
-              countryState: fullLocation || countryState.trim(),
-              gstin: gstin.trim(),
-              protocolPurpose: protocolPurpose,
-              paymentUtr: verifyResult.payment_id,
-              paymentStatus: "verified",
-            });
+        themeColor: "#2563eb",
+        onSuccess: (result) => {
+          setIsProcessing(false);
+          setVerifiedPayment({
+            payment_id: result.payment_id,
+            order_id: result.order_id,
+            plan_name: selectedPlan.name,
+            amount: invoiceCalculation.totalPayable,
+          });
 
-            if (res.success) {
-              setSuccessData({
-                registration_id: res.data?.registration_id,
-                agent_id: res.data?.agent_id || agentId,
-                plan_id: res.data?.plan_id || selectedPlanId,
-                payment_status: `Verified via Razorpay (${verifyResult.payment_id})`,
-              });
-            } else {
-              setErrorMessage(res.error || "Payment received, but error provisioning node. Please contact support.");
-            }
-          } catch (regErr: any) {
-            setErrorMessage(regErr?.message || "Failed to finalize node registration.");
-          } finally {
-            setIsRazorpayProcessing(false);
+          try {
+            confetti({
+              particleCount: 100,
+              spread: 70,
+              origin: { y: 0.6 },
+            });
+          } catch {
+            // Non-fatal
           }
         },
         onFailure: (err) => {
-          setIsRazorpayProcessing(false);
-          setErrorMessage(err.description || "Payment failed or was declined by bank.");
+          setIsProcessing(false);
+          if (err.description && !err.description.toLowerCase().includes("cancel")) {
+            setErrorMessage(err.description);
+          }
         },
         onDismiss: () => {
-          setIsRazorpayProcessing(false);
-          setPaymentNotification("Checkout window closed without completing payment.");
+          setIsProcessing(false);
         },
       });
     } catch (err: any) {
-      setIsRazorpayProcessing(false);
-      setErrorMessage(err?.message || "Failed to initiate Razorpay checkout.");
+      setIsProcessing(false);
+      setErrorMessage(err?.message || "Failed to initialize payment gateway. Please try again.");
     }
   };
 
-  const handleDynamicQrSuccess = async (paymentData: {
-    qr_id: string;
-    payment_id: string;
-    amount: number;
-  }) => {
-    setPaymentNotification("Payment confirmed via Razorpay Dynamic UPI QR! Provisioning settlement node...");
-    setIsDynamicQrOpen(false);
-
-    try {
-      const fullLocation = [city.trim(), countryState.trim(), pincode.trim()].filter(Boolean).join(", ");
-      const res = await registerAction(null, {
-        orgName: orgName.trim(),
-        email: email.trim().toLowerCase(),
-        agentId: agentId,
-        planId: selectedPlanId,
-        operatorName: operatorName.trim(),
-        countryState: fullLocation || countryState.trim(),
-        gstin: gstin.trim(),
-        protocolPurpose: protocolPurpose,
-        paymentUtr: paymentData.payment_id,
-        paymentStatus: "verified",
-      });
-
-      if (res.success) {
-        setSuccessData({
-          registration_id: res.data?.registration_id,
-          agent_id: res.data?.agent_id || agentId,
-          plan_id: res.data?.plan_id || selectedPlanId,
-          payment_status: `Verified via Dynamic UPI QR (${paymentData.payment_id})`,
-        });
-      } else {
-        setErrorMessage(res.error || "Payment received, but error provisioning node. Please contact support.");
-      }
-    } catch (err: any) {
-      setErrorMessage(err?.message || "Failed to finalize node registration.");
-    }
-  };
+  const currentFeatures = PLAN_FEATURES[selectedPlan.id] || PLAN_FEATURES.tier_2;
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] text-[#0F172A] font-sans selection:bg-[#2563EB] selection:text-white relative">
-      {/* Soft Ambient Radial Blue Gradients behind main container for glass depth */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none fixed inset-0 overflow-hidden select-none -z-10"
-      >
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1100px] h-[650px] bg-[radial-gradient(ellipse_at_top,rgba(37,99,235,0.07)_0%,transparent_70%)] blur-2xl" />
-        <div className="absolute top-[40%] right-[-10%] w-[600px] h-[600px] bg-[radial-gradient(circle,rgba(37,99,235,0.04)_0%,transparent_70%)] blur-3xl" />
-      </div>
-
+    <div className="min-h-screen bg-[#09090b] text-zinc-100 font-sans selection:bg-[#2563eb] selection:text-white">
       {/* Top Header */}
-      <header className="sticky top-0 z-40 w-full border-b border-[#E2E8F0] bg-white/80 backdrop-blur-[20px] [-webkit-backdrop-filter:blur(20px)]">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <header className="sticky top-0 z-40 w-full border-b border-[#27272a] bg-[#09090b]/90 backdrop-blur-md">
+        <div className="mx-auto max-w-5xl px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link
               href="/pricing"
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#475569] hover:text-[#0F172A] transition-colors py-1.5 px-3 rounded-[8px] border border-[#CBD5E1] hover:border-[#94A3B8] bg-white shadow-xs"
+              className="inline-flex items-center gap-1.5 text-xs font-mono text-zinc-400 hover:text-white transition-colors py-1.5 px-3 rounded-lg border border-[#27272a] bg-[#18181b] hover:bg-zinc-800"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               <span>Back to Pricing</span>
             </Link>
-            <div className="h-4 w-px bg-[#CBD5E1] hidden sm:block" />
+            <div className="h-4 w-px bg-[#27272a] hidden sm:block" />
             <Link href="/" className="flex items-center gap-2">
-              <VerisettLogo size={22} />
-              <span className="text-[11px] font-mono text-[#64748B] uppercase px-2 py-0.5 rounded-md bg-[#F1F5F9] border border-[#E2E8F0] hidden md:inline-block">
-                Protocol Billing
+              <VerisettLogo size={24} />
+              <span className="text-xs font-bold text-white tracking-tight hidden sm:inline-block">
+                Verisett Platform
               </span>
             </Link>
           </div>
 
           <div className="flex items-center gap-2.5">
-            <div className="flex items-center gap-1.5 text-[11px] font-mono font-semibold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              <span>256-Bit Encrypted Gateway</span>
+            <div className="flex items-center gap-1.5 text-xs font-mono font-medium text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span>256-Bit Encrypted Checkout</span>
             </div>
           </div>
         </div>
       </header>
 
-      {/* Main Container */}
-      <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10 md:py-14">
-        {/* Breadcrumb & Section Title */}
-        <div className="mb-8">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#E2E8F0] bg-white text-xs font-mono font-semibold text-[#475569] shadow-xs mb-2.5">
-            <ShieldCheck className="w-3.5 h-3.5 text-[#2563EB]" />
-            <span>SECURE CLEARINGHOUSE CHECKOUT &amp; NODE PROVISIONING</span>
-          </div>
-          <h1 className="text-3xl sm:text-4xl font-extrabold tracking-[-0.02em] text-[#0F172A]">
-            Protocol Billing &amp; Node Activation
+      {/* Main Centered Container */}
+      <main className="mx-auto max-w-5xl px-6 py-10 space-y-8">
+        
+        {/* Title */}
+        <div className="space-y-1">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">
+            Checkout &amp; Capacity Activation
           </h1>
-          <p className="text-sm text-[#475569] mt-1.5 leading-[1.6]">
-            Configure your organization credentials, provision your cryptographic settlement node, and activate instant clearinghouse rails.
+          <p className="text-xs text-zinc-400 leading-relaxed">
+            Instant 1-click gateway checkout with zero intermediate registration forms.
           </p>
         </div>
 
-        {/* Capacity Warning Banner if blocked */}
-        {(isTierFull || (selectedPlan.is_paid && isTotalPaidExhausted)) && (
-          <div className="mb-8 p-4 rounded-[12px] border border-rose-300 bg-rose-50 text-rose-800 flex items-start gap-3 text-xs font-mono">
-            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-rose-600" />
-            <div>
-              <div className="font-bold">Capacity Allocation Limit Reached</div>
-              <p className="mt-0.5 text-rose-700">
-                {isTotalPaidExhausted
-                  ? "The global cap of 1,500 paid settlement clearinghouse seats has been completely reached."
-                  : `All ${selectedPlan.max_capacity} slots for ${selectedPlan.name} are claimed.`}{" "}
-                Please select another available tier or contact enterprise allocations.
-              </p>
-            </div>
-          </div>
-        )}
-
-        {/* Split Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
+        {/* 2-Column Balanced Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
-          {/* LEFT COLUMN: Bespoke Form (7 Cols) */}
+          {/* ======================================================== */}
+          {/* LEFT COLUMN: PLAN QUOTA, FEATURES & TAX INVOICE (60%)     */}
+          {/* ======================================================== */}
           <div className="lg:col-span-7 space-y-6">
-            <form onSubmit={handleSubmit} className="space-y-6">
-              
-              {/* Card 1: Minted Agent ID */}
-              <div className="rounded-[16px] bg-[rgba(255,255,255,0.75)] backdrop-blur-[20px] [-webkit-backdrop-filter:blur(20px)] border border-[rgba(255,255,255,0.9)] shadow-[0_20px_50px_-12px_rgba(15,23,42,0.08),0_0_0_1px_rgba(15,23,42,0.06)] p-6 sm:p-7 space-y-4">
-                <div className="flex items-center justify-between pb-3 border-b border-[#E2E8F0] flex-wrap gap-2">
-                  <div className="flex items-center gap-2">
-                    <Cpu className="w-5 h-5 text-[#2563EB]" />
-                    <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#0F172A]">
-                      Step 1: Cryptographic Node Identifier
-                    </span>
-                  </div>
-                  <span className="text-xs font-mono px-2.5 py-0.5 rounded-full bg-blue-50 text-[#2563EB] border border-blue-200 font-semibold uppercase">
-                    Auto-Minted
-                  </span>
-                </div>
-
-                <div>
-                  <label className="block text-[12px] font-semibold text-[#475569] mb-[6px] uppercase tracking-wider">
-                    Node Agent Identifier (Read-Only)
-                  </label>
-                  <div className="relative flex items-center">
-                    <div className="absolute left-3.5 text-[#64748B] pointer-events-none flex items-center">
-                      <Lock className="w-4 h-4" />
-                    </div>
-                    <input
-                      type="text"
-                      readOnly
-                      value={agentId}
-                      className="w-full bg-[rgba(255,255,255,0.85)] border border-[#CBD5E1] text-[#0F172A] text-[14px] font-mono font-bold tracking-wider pl-10 pr-28 py-[11px] rounded-[10px] select-all cursor-not-allowed focus:outline-none"
-                    />
-                    <button
-                      type="button"
-                      onClick={handleCopyAgentId}
-                      className="absolute right-2 px-3 py-1.5 rounded-[8px] bg-white hover:bg-[#F8FAFC] border border-[#CBD5E1] text-xs font-mono font-semibold text-[#0F172A] flex items-center gap-1.5 transition-colors shadow-2xs cursor-pointer"
-                      title="Copy Agent ID"
-                    >
-                      {copiedId ? (
-                        <>
-                          <Check className="w-3.5 h-3.5 text-emerald-600" />
-                          <span className="text-emerald-700 font-bold">Copied</span>
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="w-3.5 h-3.5 text-[#64748B]" />
-                          <span>Copy ID</span>
-                        </>
-                      )}
-                    </button>
-                  </div>
-                  <p className="text-[12px] font-mono text-[#64748B] mt-2 leading-relaxed">
-                    Deterministic cryptographic handle assigned to your node instance.
-                  </p>
-                </div>
-              </div>
-
-              {/* Card 2: Bespoke Structured Form Grid */}
-              <div className="rounded-[16px] bg-[rgba(255,255,255,0.75)] backdrop-blur-[20px] [-webkit-backdrop-filter:blur(20px)] border border-[rgba(255,255,255,0.9)] shadow-[0_20px_50px_-12px_rgba(15,23,42,0.08),0_0_0_1px_rgba(15,23,42,0.06)] p-6 sm:p-7 space-y-5">
-                <div className="flex items-center justify-between pb-3 border-b border-[#E2E8F0] flex-wrap gap-2">
-                  <div className="flex items-center gap-2">
-                    <Building2 className="w-5 h-5 text-[#2563EB]" />
-                    <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#0F172A]">
-                      Step 2: Organization &amp; Billing Coordinates
-                    </span>
-                  </div>
-                  <span className="text-xs font-mono text-[#64748B] font-medium">
-                    Level 9 Security Attestation
-                  </span>
-                </div>
-
-                <div className="space-y-4">
-                  {/* Full-Width Row: Corporate Work Email */}
-                  <div>
-                    <label className="block text-[12px] font-semibold text-[#475569] mb-[6px] uppercase tracking-wider">
-                      Corporate Work Email <span className="text-rose-500">*</span>
-                    </label>
-                    <div className="relative flex items-center">
-                      <div className="absolute left-3.5 text-[#64748B] pointer-events-none flex items-center">
-                        <Mail className="w-4 h-4" />
-                      </div>
-                      <input
-                        type="email"
-                        required
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="operator@company.com"
-                        className="w-full bg-[rgba(255,255,255,0.85)] border border-[#CBD5E1] text-[#0F172A] text-[14px] font-medium pl-10 pr-[14px] py-[11px] rounded-[10px] focus:bg-white focus:border-[#2563EB] focus:ring-[3px] focus:ring-[#2563EB]/12 focus:outline-none transition-all placeholder:text-[#94A3B8]"
-                      />
-                    </div>
-                  </div>
-
-                  {/* 2-Column Grid: Operator Full Name & Organization Legal Name */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-[12px] font-semibold text-[#475569] mb-[6px] uppercase tracking-wider">
-                        Operator Full Name
-                      </label>
-                      <div className="relative flex items-center">
-                        <div className="absolute left-3.5 text-[#64748B] pointer-events-none flex items-center">
-                          <User className="w-4 h-4" />
-                        </div>
-                        <input
-                          type="text"
-                          value={operatorName}
-                          onChange={(e) => setOperatorName(e.target.value)}
-                          placeholder="e.g. Manoj S.M."
-                          className="w-full bg-[rgba(255,255,255,0.85)] border border-[#CBD5E1] text-[#0F172A] text-[14px] font-medium pl-10 pr-[14px] py-[11px] rounded-[10px] focus:bg-white focus:border-[#2563EB] focus:ring-[3px] focus:ring-[#2563EB]/12 focus:outline-none transition-all placeholder:text-[#94A3B8]"
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-[12px] font-semibold text-[#475569] mb-[6px] uppercase tracking-wider">
-                        Legal Entity / Org Name <span className="text-rose-500">*</span>
-                      </label>
-                      <div className="relative flex items-center">
-                        <div className="absolute left-3.5 text-[#64748B] pointer-events-none flex items-center">
-                          <Building2 className="w-4 h-4" />
-                        </div>
-                        <input
-                          type="text"
-                          required
-                          value={orgName}
-                          onChange={(e) => setOrgName(e.target.value)}
-                          placeholder="Apex Autonomous Labs"
-                          className="w-full bg-[rgba(255,255,255,0.85)] border border-[#CBD5E1] text-[#0F172A] text-[14px] font-medium pl-10 pr-[14px] py-[11px] rounded-[10px] focus:bg-white focus:border-[#2563EB] focus:ring-[3px] focus:ring-[#2563EB]/12 focus:outline-none transition-all placeholder:text-[#94A3B8]"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Full-Width Row: Primary Billing Address */}
-                  <div>
-                    <label className="block text-[12px] font-semibold text-[#475569] mb-[6px] uppercase tracking-wider">
-                      Primary Billing Street Address
-                    </label>
-                    <div className="relative flex items-center">
-                      <div className="absolute left-3.5 text-[#64748B] pointer-events-none flex items-center">
-                        <MapPin className="w-4 h-4" />
-                      </div>
-                      <input
-                        type="text"
-                        value={billingAddress}
-                        onChange={(e) => setBillingAddress(e.target.value)}
-                        placeholder="104 Tech Park Boulevard, Suite 500"
-                        className="w-full bg-[rgba(255,255,255,0.85)] border border-[#CBD5E1] text-[#0F172A] text-[14px] font-medium pl-10 pr-[14px] py-[11px] rounded-[10px] focus:bg-white focus:border-[#2563EB] focus:ring-[3px] focus:ring-[#2563EB]/12 focus:outline-none transition-all placeholder:text-[#94A3B8]"
-                      />
-                    </div>
-                  </div>
-
-                  {/* 2-Column Grid: City & Pincode */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-[12px] font-semibold text-[#475569] mb-[6px] uppercase tracking-wider">
-                        City / Municipality
-                      </label>
-                      <input
-                        type="text"
-                        value={city}
-                        onChange={(e) => setCity(e.target.value)}
-                        placeholder="Bengaluru"
-                        className="w-full bg-[rgba(255,255,255,0.85)] border border-[#CBD5E1] text-[#0F172A] text-[14px] font-medium px-[14px] py-[11px] rounded-[10px] focus:bg-white focus:border-[#2563EB] focus:ring-[3px] focus:ring-[#2563EB]/12 focus:outline-none transition-all placeholder:text-[#94A3B8]"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-[12px] font-semibold text-[#475569] mb-[6px] uppercase tracking-wider">
-                        Postal / Pincode
-                      </label>
-                      <input
-                        type="text"
-                        value={pincode}
-                        onChange={(e) => setPincode(e.target.value)}
-                        placeholder="560001"
-                        className="w-full bg-[rgba(255,255,255,0.85)] border border-[#CBD5E1] text-[#0F172A] text-[14px] font-mono font-medium px-[14px] py-[11px] rounded-[10px] focus:bg-white focus:border-[#2563EB] focus:ring-[3px] focus:ring-[#2563EB]/12 focus:outline-none transition-all placeholder:text-[#94A3B8]"
-                      />
-                    </div>
-                  </div>
-
-                  {/* 2-Column Grid: GSTIN/Tax ID & State/Country */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-[12px] font-semibold text-[#475569] mb-[6px] uppercase tracking-wider">
-                        GSTIN / Tax ID <span className="text-[#94A3B8] font-normal normal-case">(Optional)</span>
-                      </label>
-                      <div className="relative flex items-center">
-                        <div className="absolute left-3.5 text-[#64748B] pointer-events-none flex items-center">
-                          <FileText className="w-4 h-4" />
-                        </div>
-                        <input
-                          type="text"
-                          value={gstin}
-                          onChange={(e) => setGstin(e.target.value.toUpperCase())}
-                          placeholder="29AAAAA0000A1Z5"
-                          maxLength={15}
-                          className="w-full bg-[rgba(255,255,255,0.85)] border border-[#CBD5E1] text-[#0F172A] text-[14px] font-mono pl-10 pr-[14px] py-[11px] rounded-[10px] uppercase focus:bg-white focus:border-[#2563EB] focus:ring-[3px] focus:ring-[#2563EB]/12 focus:outline-none transition-all placeholder:text-[#94A3B8]"
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-[12px] font-semibold text-[#475569] mb-[6px] uppercase tracking-wider">
-                        Region &amp; Country
-                      </label>
-                      <input
-                        type="text"
-                        value={countryState}
-                        onChange={(e) => setCountryState(e.target.value)}
-                        placeholder="India — Karnataka"
-                        className="w-full bg-[rgba(255,255,255,0.85)] border border-[#CBD5E1] text-[#0F172A] text-[14px] font-medium px-[14px] py-[11px] rounded-[10px] focus:bg-white focus:border-[#2563EB] focus:ring-[3px] focus:ring-[#2563EB]/12 focus:outline-none transition-all placeholder:text-[#94A3B8]"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Full-Width Row: Settlement Protocol Purpose */}
-                  <div>
-                    <label className="block text-[12px] font-semibold text-[#475569] mb-[6px] uppercase tracking-wider">
-                      Settlement Protocol Purpose
-                    </label>
-                    <select
-                      value={protocolPurpose}
-                      onChange={(e) => setProtocolPurpose(e.target.value)}
-                      className="w-full bg-[rgba(255,255,255,0.85)] border border-[#CBD5E1] text-[#0F172A] text-[14px] font-medium px-[14px] py-[11px] rounded-[10px] focus:bg-white focus:border-[#2563EB] focus:ring-[3px] focus:ring-[#2563EB]/12 focus:outline-none transition-all cursor-pointer"
-                    >
-                      {PROTOCOL_PURPOSES.map((purpose) => (
-                        <option key={purpose} value={purpose}>
-                          {purpose}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-              </div>
-
-              {/* Error Alert */}
-              {errorMessage && (
-                <div className="p-4 rounded-[12px] border border-rose-300 bg-rose-50 text-rose-800 text-xs font-mono flex items-center gap-3">
-                  <AlertCircle className="w-5 h-5 shrink-0 text-rose-600" />
-                  <span className="whitespace-normal leading-relaxed">{errorMessage}</span>
-                </div>
-              )}
-
-              {/* Protocol Footnote */}
-              <div className="text-xs font-mono text-[#475569] flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                <span>Deterministic FastMCP clearinghouse registration under Verisett Protocol v1.4.</span>
-              </div>
-            </form>
-          </div>
-
-          {/* RIGHT COLUMN: Order Summary & Side-by-Side UPI Scanner (5 Cols) */}
-          <div className="lg:col-span-5 space-y-6 lg:sticky lg:top-24">
             
-            {/* Box 3: Plan Selector & Summary */}
-            <div className="rounded-[16px] bg-[rgba(255,255,255,0.75)] backdrop-blur-[20px] [-webkit-backdrop-filter:blur(20px)] border border-[rgba(255,255,255,0.9)] shadow-[0_20px_50px_-12px_rgba(15,23,42,0.08),0_0_0_1px_rgba(15,23,42,0.06)] p-6 sm:p-7 space-y-6">
-              
-              <div className="flex items-center justify-between pb-3 border-b border-[#E2E8F0] flex-wrap gap-2">
-                <div className="flex items-center gap-2">
-                  <Zap className="w-5 h-5 text-[#2563EB]" />
-                  <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#0F172A]">
-                    Order Summary
-                  </span>
-                </div>
-                <span className="text-xs font-mono font-bold text-[#475569]">
-                  {totalPaidClaimed} / 1,500 Paid Claimed
+            {/* Plan Selector Grid */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between text-xs font-mono">
+                <span className="font-bold text-zinc-300 uppercase tracking-wider">
+                  Select Subscription Tier
+                </span>
+                <span className="text-zinc-500 font-mono">
+                  {selectedPlan.is_lifetime ? "Lifetime Pass" : "Monthly Recurring"}
                 </span>
               </div>
 
-              {/* Plan Switcher Pills */}
-              <div>
-                <label className="block text-[12px] font-semibold text-[#475569] mb-[6px] uppercase tracking-wider">
-                  Select Clearing Tier
-                </label>
-                <div className="grid grid-cols-2 gap-2.5 text-xs font-mono">
-                  {plans.map((p) => {
-                    const active = p.id === selectedPlanId;
-                    return (
-                      <button
-                        key={p.id}
-                        type="button"
-                        onClick={() => setSelectedPlanId(p.id)}
-                        className={`p-3 rounded-[12px] border text-left transition-all cursor-pointer ${
-                          active
-                            ? "border-[#2563EB] bg-blue-50/70 ring-1 ring-[#2563EB] text-[#1D4ED8] font-bold"
-                            : "border-[#CBD5E1] hover:border-[#94A3B8] bg-white text-[#334155]"
-                        }`}
-                      >
-                        <div className="flex items-center justify-between gap-1 flex-wrap">
-                          <span className="whitespace-normal break-words leading-snug font-semibold text-xs sm:text-sm">
-                            {p.name.replace(" Node", "").replace(" Settlement", "")}
-                          </span>
-                          {active && <Check className="w-4 h-4 text-[#2563EB] shrink-0" />}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                {plans.filter((p) => p.is_paid).map((p) => {
+                  const isSelected = p.id === selectedPlanId;
+                  const gst = Math.round(p.price_inr * 0.18);
+                  const total = p.price_inr + gst;
+
+                  return (
+                    <div
+                      key={p.id}
+                      onClick={() => {
+                        setSelectedPlanId(p.id as any);
+                        setErrorMessage(null);
+                        setVerifiedPayment(null);
+                      }}
+                      className={`p-4 rounded-xl border transition-all cursor-pointer relative flex flex-col justify-between ${
+                        isSelected
+                          ? "bg-[#1f1f2e] border-[#2563eb] shadow-[0_0_24px_rgba(37,99,235,0.22)]"
+                          : "bg-[#18181b] border-[#27272a] hover:border-zinc-700 hover:bg-[#1f1f23]"
+                      }`}
+                    >
+                      <div className="space-y-2">
+                        <div className="text-xs font-mono text-zinc-400 font-semibold truncate">
+                          {p.name.replace(" Plan", "")}
                         </div>
-                        <div className="text-xs sm:text-sm font-mono text-[#0F172A] font-bold mt-1.5">
-                          {p.price_inr === 0 ? "₹0" : `₹${p.price_inr.toLocaleString()}`}
+                        <div className="text-lg font-extrabold text-white font-mono">
+                          ₹{p.price_inr.toLocaleString()}
                         </div>
-                      </button>
-                    );
-                  })}
+                        <div className="text-[11px] font-mono text-zinc-500">
+                          Total: ₹{total.toLocaleString()}
+                        </div>
+                      </div>
+
+                      <div className="pt-3 mt-3 border-t border-[#27272a] flex items-center justify-between text-xs font-mono">
+                        <span
+                          className={`text-[11px] font-bold ${
+                            isSelected ? "text-[#2563eb]" : "text-zinc-600"
+                          }`}
+                        >
+                          {isSelected ? "● Selected" : "○ Select"}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Plan Quota & Features Summary Card */}
+            <div className="rounded-xl border border-[#27272a] bg-[#18181b] p-5 space-y-4 shadow-sm">
+              <div className="flex items-center justify-between pb-3 border-b border-[#27272a] flex-wrap gap-2">
+                <div className="flex items-center gap-2">
+                  <Zap className="w-4 h-4 text-[#2563eb]" />
+                  <span className="text-xs font-mono font-bold uppercase tracking-wider text-zinc-200">
+                    Plan Specifications ({selectedPlan.name})
+                  </span>
                 </div>
+                <span className="text-xs font-mono px-2.5 py-0.5 rounded bg-zinc-800 text-emerald-400 border border-zinc-700">
+                  {selectedPlan.take_rate_label || "1.0% Rate"}
+                </span>
               </div>
 
-              {/* Selected Plan Details & Pricing Breakdown */}
-              <div className="p-4 sm:p-5 rounded-[12px] border border-[#E2E8F0] bg-[#F8FAFC] space-y-3">
-                <div className="flex items-center justify-between text-sm sm:text-base">
-                  <span className="font-semibold text-[#0F172A]">{selectedPlan.name}</span>
-                  <span className="font-mono font-bold text-[#0F172A]">
-                    ₹{selectedPlan.price_inr.toLocaleString()}
+              <ul className="space-y-2.5 text-xs text-zinc-300 font-mono">
+                {currentFeatures.map((feature, idx) => (
+                  <li key={idx} className="flex items-start gap-2.5">
+                    <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Clean Itemized Tax Invoice */}
+            <div className="rounded-xl border border-[#27272a] bg-[#18181b] p-5 space-y-4 shadow-sm">
+              <div className="flex items-center justify-between pb-3 border-b border-[#27272a] text-xs font-mono">
+                <span className="font-bold text-zinc-200 uppercase tracking-wider flex items-center gap-1.5">
+                  <FileText className="w-4 h-4 text-[#2563eb]" />
+                  Itemized Tax Invoice
+                </span>
+                <span className="text-zinc-500">SAC: 998313</span>
+              </div>
+
+              <div className="space-y-2.5 font-mono text-xs">
+                <div className="flex items-center justify-between text-zinc-300">
+                  <span className="text-zinc-400">
+                    Base Allocation ({selectedPlan.name})
+                  </span>
+                  <span className="font-semibold text-white">
+                    ₹{invoiceCalculation.baseAmount.toLocaleString()}.00
                   </span>
                 </div>
 
-                <div className="flex items-center justify-between text-xs sm:text-sm font-mono text-[#475569]">
-                  <span>Capacity Allocation</span>
-                  <span className="font-semibold text-[#0F172A]">
-                    {selectedPlan.max_capacity ? `${selectedPlan.max_capacity} Seats Pool` : "Unmetered Environment"}
-                  </span>
+                <div className="flex items-center justify-between text-zinc-400 text-[11px]">
+                  <span>Statutory CGST (9.0%)</span>
+                  <span>₹{Math.round(invoiceCalculation.gstAmount / 2).toLocaleString()}.00</span>
                 </div>
 
-                <div className="flex items-center justify-between text-xs sm:text-sm font-mono text-[#475569]">
-                  <span>Settlement Fee</span>
-                  <span className="text-emerald-700 font-semibold font-mono">
-                    {selectedPlanId === "community"
-                      ? "2.0% Protocol Fee"
-                      : selectedPlanId === "tier_1"
-                      ? "1.5% Protocol Fee"
-                      : selectedPlanId === "tier_2"
-                      ? "1.0% Protocol Fee"
-                      : "0.75% Sovereign Fee (Lowest)"}
-                  </span>
+                <div className="flex items-center justify-between text-zinc-400 text-[11px]">
+                  <span>Statutory SGST / IGST (9.0%)</span>
+                  <span>₹{(invoiceCalculation.gstAmount - Math.round(invoiceCalculation.gstAmount / 2)).toLocaleString()}.00</span>
                 </div>
 
-                {selectedPlanId === "tier_3" && (
-                  <div className="mt-2.5 pt-2.5 border-t border-[#E2E8F0] flex items-center gap-2 text-xs font-mono text-amber-900 bg-amber-50/80 p-2.5 rounded-[8px] border border-amber-300">
-                    <Sparkles className="w-4 h-4 text-amber-600 shrink-0" />
-                    <span className="font-semibold leading-normal">
-                      Sovereign Lifetime Access • Pay Once, Keep Forever (Zero Recurring Fees)
+                <div className="border-t border-[#27272a] pt-3 flex items-baseline justify-between">
+                  <div>
+                    <span className="text-sm font-bold text-white uppercase tracking-wider block">
+                      Total Payable
+                    </span>
+                    <span className="text-[10px] text-zinc-500 font-mono">
+                      Inclusive of 18% Goods &amp; Services Tax
                     </span>
                   </div>
-                )}
-
-                <div className="pt-3 border-t border-[#E2E8F0] flex items-baseline justify-between">
-                  <span className="text-sm sm:text-base font-bold text-[#0F172A]">Total Amount Due</span>
-                  <span className="text-3xl sm:text-4xl font-extrabold tracking-tight text-[#2563EB] font-sans">
-                    ₹{selectedPlan.price_inr.toLocaleString()}
-                  </span>
+                  <div className="text-right">
+                    <span className="text-2xl font-extrabold text-[#3b82f6] font-mono">
+                      ₹{invoiceCalculation.totalPayable.toLocaleString()}.00
+                    </span>
+                    <span className="block text-[10px] text-zinc-500 font-mono">
+                      INR (Strictly Fixed)
+                    </span>
+                  </div>
                 </div>
               </div>
 
-              {/* Payment Section (Only for Paid Plans) */}
-              {selectedPlan.is_paid ? (
-                <div className="space-y-4 pt-1">
-                  {/* Payment Method Switcher Tabs */}
-                  <div>
-                    <label className="block text-[12px] font-semibold text-[#475569] mb-2 uppercase tracking-wider">
-                      Payment Settlement Rail
-                    </label>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs font-mono">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setPaymentMethod("dynamic_qr");
-                          setErrorMessage(null);
-                        }}
-                        className={`p-3 rounded-[10px] border flex items-center justify-center gap-2 font-semibold transition-all cursor-pointer ${
-                          paymentMethod === "dynamic_qr"
-                            ? "border-[#2563EB] bg-blue-50/80 text-[#2563EB] shadow-xs"
-                            : "border-[#CBD5E1] bg-white text-[#475569] hover:border-[#94A3B8]"
-                        }`}
-                      >
-                        <QrCode className="w-4 h-4 shrink-0 text-emerald-600" />
-                        <span>Dynamic UPI QR</span>
-                      </button>
+              <div className="p-3 rounded-lg bg-zinc-900 border border-[#27272a] text-[11px] font-mono text-zinc-400 flex items-center justify-between flex-wrap gap-2">
+                <span className="flex items-center gap-1.5 text-emerald-400 font-semibold">
+                  <ShieldCheck className="w-3.5 h-3.5" />
+                  B2B Input Tax Credit Eligible
+                </span>
+                <span className="text-zinc-500">Tax Invoice PDF Generated Automatically</span>
+              </div>
+            </div>
 
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setPaymentMethod("razorpay");
-                          setErrorMessage(null);
-                        }}
-                        className={`p-3 rounded-[10px] border flex items-center justify-center gap-2 font-semibold transition-all cursor-pointer ${
-                          paymentMethod === "razorpay"
-                            ? "border-[#2563EB] bg-blue-50/80 text-[#2563EB] shadow-xs"
-                            : "border-[#CBD5E1] bg-white text-[#475569] hover:border-[#94A3B8]"
-                        }`}
-                      >
-                        <CreditCard className="w-4 h-4 shrink-0" />
-                        <span>Razorpay Modal</span>
-                      </button>
+          </div>
 
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setPaymentMethod("upi");
-                          setErrorMessage(null);
-                        }}
-                        className={`p-3 rounded-[10px] border flex items-center justify-center gap-2 font-semibold transition-all cursor-pointer ${
-                          paymentMethod === "upi"
-                            ? "border-[#2563EB] bg-blue-50/80 text-[#2563EB] shadow-xs"
-                            : "border-[#CBD5E1] bg-white text-[#475569] hover:border-[#94A3B8]"
-                        }`}
-                      >
-                        <FileText className="w-4 h-4 shrink-0" />
-                        <span>Manual UTR</span>
-                      </button>
-                    </div>
-                  </div>
+          {/* ======================================================== */}
+          {/* RIGHT COLUMN: 1-CLICK CHECKOUT CARD & OFFICIAL LOGOS     */}
+          {/* ======================================================== */}
+          <div className="lg:col-span-5 space-y-6">
 
-                  {paymentMethod === "dynamic_qr" ? (
-                    /* Dynamic Razorpay UPI QR Method Box */
-                    <div className="p-5 sm:p-6 rounded-[12px] border border-emerald-300 bg-gradient-to-b from-emerald-50/60 to-white space-y-4 shadow-xs">
-                      <div className="flex items-center justify-between gap-2 flex-wrap pb-3 border-b border-emerald-200">
-                        <div className="flex items-center gap-2">
-                          <QrCode className="w-5 h-5 text-emerald-600" />
-                          <div>
-                            <div className="text-sm font-bold text-[#0F172A]">
-                              Razorpay Dynamic UPI QR
-                            </div>
-                            <div className="text-xs font-mono text-[#64748B]">
-                              Single-use QR • Auto-cleared via Webhook
-                            </div>
-                          </div>
-                        </div>
-                        <span className="text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold border border-emerald-300 flex items-center gap-1.5">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                          REAL-TIME SETTLEMENT
-                        </span>
-                      </div>
-
-                      <div className="text-xs text-[#475569] space-y-2">
-                        <p className="leading-relaxed">
-                          Click below to generate a single-use dynamic UPI QR code linked to your agent ID. Scan with GPay, PhonePe, Paytm, or any UPI app for zero-delay payment settlement.
-                        </p>
-                        <div className="p-3 rounded-[8px] bg-white/90 border border-emerald-200/80 text-xs font-mono text-[#1E293B] flex items-center justify-between">
-                          <span className="text-[#64748B]">Settlement Amount:</span>
-                          <span className="font-bold text-emerald-700 text-sm">
-                            ₹{selectedPlan.price_inr.toLocaleString()} ({(Math.round(selectedPlan.price_inr * 100)).toLocaleString()} paise)
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Pay Via Dynamic UPI QR Button */}
-                      <button
-                        type="button"
-                        disabled={
-                          isTierFull ||
-                          (selectedPlan.is_paid && isTotalPaidExhausted)
-                        }
-                        onClick={() => {
-                          if (!orgName.trim() || orgName.trim().length < 2) {
-                            setErrorMessage("Please enter your Legal Entity or Developer Organization Name first.");
-                            return;
-                          }
-                          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                          if (!email.trim() || !emailRegex.test(email.trim())) {
-                            setErrorMessage("Please provide a valid corporate work email address first.");
-                            return;
-                          }
-                          setErrorMessage(null);
-                          setIsDynamicQrOpen(true);
-                        }}
-                        className="w-full bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3.5 rounded-[12px] font-semibold text-sm shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_4px_14px_rgba(16,185,129,0.25)] flex items-center justify-center gap-2.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                      >
-                        <QrCode className="w-4 h-4" />
-                        <span>Pay via UPI QR (₹{selectedPlan.price_inr.toLocaleString()})</span>
-                        <ArrowRight className="w-4 h-4" />
-                      </button>
-
-                      <div className="flex items-center justify-center gap-2 text-[11px] font-mono text-[#64748B] pt-1">
-                        <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                        <span>Webhook Auto-Detected • No Manual UTR Entry Required</span>
-                      </div>
-                    </div>
-                  ) : paymentMethod === "razorpay" ? (
-                    /* Razorpay Instant Checkout Method Box */
-                    <div className="p-5 sm:p-6 rounded-[12px] border border-blue-200 bg-gradient-to-b from-blue-50/50 to-white space-y-4 shadow-xs">
-                      <div className="flex items-center justify-between gap-2 flex-wrap pb-3 border-b border-blue-100">
-                        <div className="flex items-center gap-2">
-                          <CreditCard className="w-5 h-5 text-[#2563EB]" />
-                          <div>
-                            <div className="text-sm font-bold text-[#0F172A]">
-                              Razorpay Standard Checkout
-                            </div>
-                            <div className="text-xs font-mono text-[#64748B]">
-                              Zero-trust HMAC-SHA256 verified
-                            </div>
-                          </div>
-                        </div>
-                        <span className="text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold border border-emerald-300">
-                          INSTANT CLEARING
-                        </span>
-                      </div>
-
-                      <div className="text-xs text-[#475569] space-y-2">
-                        <p className="leading-relaxed">
-                          Securely provision your node via official Razorpay modal. Accepts all major payment rails:
-                        </p>
-                        <div className="grid grid-cols-2 gap-2 text-[11px] font-mono text-[#334155]">
-                          <div className="p-2 rounded-[8px] bg-white border border-[#E2E8F0]">
-                            💳 Credit &amp; Debit Cards
-                          </div>
-                          <div className="p-2 rounded-[8px] bg-white border border-[#E2E8F0]">
-                            ⚡ UPI (GPay, PhonePe, Paytm)
-                          </div>
-                          <div className="p-2 rounded-[8px] bg-white border border-[#E2E8F0]">
-                            🏦 50+ NetBanking Portals
-                          </div>
-                          <div className="p-2 rounded-[8px] bg-white border border-[#E2E8F0]">
-                            🔒 Corporate Wallets &amp; EMI
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Razorpay CTA Button */}
-                      <button
-                        type="button"
-                        disabled={
-                          isRazorpayProcessing ||
-                          isTierFull ||
-                          (selectedPlan.is_paid && isTotalPaidExhausted)
-                        }
-                        onClick={handleRazorpayCheckout}
-                        className="w-full bg-[#2563EB] hover:bg-[#1D4ED8] text-white px-6 py-3.5 rounded-[12px] font-semibold text-sm shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_4px_14px_rgba(37,99,235,0.25)] flex items-center justify-center gap-2.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                      >
-                        {isRazorpayProcessing ? (
-                          <>
-                            <Loader2 className="w-5 h-5 animate-spin text-white" />
-                            <span>Opening Razorpay Checkout...</span>
-                          </>
-                        ) : (
-                          <>
-                            <CreditCard className="w-4 h-4" />
-                            <span>
-                              Pay ₹{selectedPlan.price_inr.toLocaleString()} via Razorpay
-                            </span>
-                            <ArrowRight className="w-4 h-4" />
-                          </>
-                        )}
-                      </button>
-
-                      <div className="flex items-center justify-center gap-2 text-[11px] font-mono text-[#64748B] pt-1">
-                        <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                        <span>256-bit Bank Grade Encryption • PCI-DSS Certified</span>
-                      </div>
-                    </div>
-                  ) : (
-                    /* Manual UPI QR Scanner Box */
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between text-xs font-mono font-bold uppercase tracking-wider text-[#0F172A]">
-                        <span className="flex items-center gap-1.5">
-                          <QrCode className="w-4 h-4 text-[#2563EB]" />
-                          Dynamic UPI Payment Scanner
-                        </span>
-                        <span className="text-xs text-emerald-700 font-semibold">
-                          Manual Reconciliation
-                        </span>
-                      </div>
-
-                      {/* QR Image Box */}
-                      <div className="p-5 sm:p-6 rounded-[12px] border border-[#CBD5E1] bg-white flex flex-col items-center justify-center text-center shadow-xs">
-                        {qrDataUrl ? (
-                          <div className="relative p-3 bg-white rounded-[10px] border border-[#E2E8F0] shadow-sm inline-block">
-                            <img
-                              src={qrDataUrl}
-                              alt="Verisett UPI QR Code"
-                              className="w-56 h-56 sm:w-64 sm:h-64 object-contain mx-auto"
-                            />
-                          </div>
-                        ) : (
-                          <div className="w-56 h-56 sm:w-64 sm:h-64 flex items-center justify-center bg-[#F8FAFC] rounded-[10px] border border-dashed border-[#CBD5E1] mx-auto">
-                            <Loader2 className="w-8 h-8 text-[#94A3B8] animate-spin" />
-                          </div>
-                        )}
-
-                        {/* Designated UPI ID with Copy Button */}
-                        <div className="mt-4 flex items-center justify-center gap-2 flex-wrap text-sm font-mono">
-                          <span className="text-[#475569] font-semibold">UPI ID:</span>
-                          <span className="font-bold text-[#0F172A] bg-[#F1F5F9] px-3 py-1.5 rounded-[8px] border border-[#CBD5E1] text-sm">
-                            {UPI_DESIGNATED_ID}
-                          </span>
-                          <button
-                            type="button"
-                            onClick={handleCopyUpiId}
-                            className="px-3 py-1.5 rounded-[8px] border border-[#CBD5E1] hover:bg-[#F8FAFC] text-[#0F172A] text-xs font-mono font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
-                            title="Copy UPI ID"
-                          >
-                            {copiedUpi ? (
-                              <>
-                                <Check className="w-4 h-4 text-emerald-600" />
-                                <span className="text-emerald-700 font-bold">Copied</span>
-                              </>
-                            ) : (
-                              <>
-                                <Copy className="w-4 h-4 text-[#64748B]" />
-                                <span>Copy UPI</span>
-                              </>
-                            )}
-                          </button>
-                        </div>
-
-                        <p className="text-xs text-[#64748B] mt-2.5 font-mono leading-normal text-center">
-                          Scan using Google Pay, PhonePe, Paytm, CRED or any BHIM UPI App
-                        </p>
-                      </div>
-
-                      {/* 12-Digit UTR Transaction Input */}
-                      <div>
-                        <label className="block text-[12px] font-semibold text-[#475569] mb-[6px] uppercase tracking-wider">
-                          12-Digit UPI Reference Number (UTR) <span className="text-rose-500">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          value={paymentUtr}
-                          onChange={(e) =>
-                            setPaymentUtr(e.target.value.replace(/[^0-9A-Za-z]/g, ""))
-                          }
-                          placeholder="e.g. 428910284729"
-                          maxLength={16}
-                          className="w-full bg-[rgba(255,255,255,0.85)] border border-[#CBD5E1] text-[#0F172A] text-[14px] font-mono font-bold px-[14px] py-[11px] rounded-[10px] focus:bg-white focus:border-[#2563EB] focus:ring-[3px] focus:ring-[#2563EB]/12 focus:outline-none transition-all placeholder:text-[#94A3B8]"
-                        />
-                        <p className="text-[12px] font-mono text-[#64748B] mt-1.5 leading-normal">
-                          Enter the 12-digit transaction ID / UTR shown in your banking app after payment.
-                        </p>
-                      </div>
-
-                      {/* Manual Submit Button */}
-                      <button
-                        type="button"
-                        disabled={
-                          isSubmitting ||
-                          isTierFull ||
-                          (selectedPlan.is_paid && isTotalPaidExhausted)
-                        }
-                        onClick={handleSubmit}
-                        className="w-full bg-[#0F172A] hover:bg-slate-800 text-white px-[24px] py-[12px] rounded-[10px] font-semibold text-[14px] shadow-sm flex items-center justify-center gap-2.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                      >
-                        {isSubmitting ? (
-                          <>
-                            <Loader2 className="w-5 h-5 animate-spin" />
-                            <span>Verifying UTR &amp; Minting Node...</span>
-                          </>
-                        ) : (
-                          <>
-                            <span>Verify UTR &amp; Provision Node</span>
-                            <ArrowRight className="w-4 h-4" />
-                          </>
-                        )}
-                      </button>
-                    </div>
-                  )}
+            <div className="rounded-xl border border-[#27272a] bg-[#18181b] p-6 space-y-6 shadow-xl relative">
+              
+              {/* Card Header */}
+              <div className="flex items-start justify-between pb-4 border-b border-[#27272a]">
+                <div>
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-zinc-400 font-bold block mb-1">
+                    Instant Gateway Checkout
+                  </span>
+                  <h3 className="text-base font-bold text-white">
+                    Checkout Summary
+                  </h3>
                 </div>
-              ) : (
-                /* Free Community Box */
-                <div className="space-y-4">
-                  <div className="p-4 rounded-[12px] border border-emerald-300 bg-emerald-50/80 text-emerald-950 text-xs sm:text-sm space-y-1 font-mono">
-                    <div className="font-bold flex items-center gap-1.5">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                      <span>Free Community Environment (₹0.00)</span>
-                    </div>
-                    <p className="text-xs text-emerald-800 font-sans leading-normal">
-                      No payment required. Testnet node will be provisioned immediately.
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-bold">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  Terminal Ready
+                </div>
+              </div>
+
+              {/* Payment Confirmed State */}
+              {verifiedPayment ? (
+                <div className="p-5 rounded-xl border border-emerald-500/40 bg-emerald-950/20 text-center space-y-4 animate-in fade-in zoom-in-95">
+                  <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                    <CheckCircle2 className="w-7 h-7" />
+                  </div>
+                  <div className="space-y-1">
+                    <h4 className="text-base font-bold text-white font-mono">
+                      ✓ Payment Confirmed!
+                    </h4>
+                    <p className="text-xs text-emerald-400 font-mono">
+                      Transaction ID: {verifiedPayment.payment_id}. Your capacity is provisioned.
                     </p>
                   </div>
 
+                  <div className="p-3 bg-[#09090b] rounded-lg border border-[#27272a] text-xs font-mono space-y-1.5 text-left">
+                    <div className="flex justify-between">
+                      <span className="text-zinc-500">TRANSACTION ID:</span>
+                      <span className="font-bold text-emerald-400 break-all">{verifiedPayment.payment_id}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-zinc-500">PLAN:</span>
+                      <span className="font-bold text-white">{verifiedPayment.plan_name}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-zinc-500">AMOUNT PAID:</span>
+                      <span className="font-bold text-[#3b82f6]">₹{verifiedPayment.amount.toLocaleString()}.00</span>
+                    </div>
+                  </div>
+
+                  <div className="pt-2 flex flex-col gap-2">
+                    <Link
+                      href="/dashboard"
+                      className="w-full py-2.5 px-4 rounded-lg bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-xs font-mono font-semibold transition flex items-center justify-center gap-1.5"
+                    >
+                      <span>Enter Developer Dashboard</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </Link>
+                    <button
+                      type="button"
+                      onClick={() => setVerifiedPayment(null)}
+                      className="w-full py-2 px-4 rounded-lg border border-[#27272a] bg-[#18181b] text-zinc-400 hover:text-white text-xs font-mono transition cursor-pointer"
+                    >
+                      Dismiss
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                /* 1-Click Checkout Ingress */
+                <div className="space-y-5">
+                  
+                  {/* Summary Breakdown Box */}
+                  <div className="p-4 rounded-xl border border-[#27272a] bg-[#09090b] space-y-3 font-mono text-xs">
+                    <div className="flex justify-between text-zinc-300">
+                      <span className="text-zinc-400">Target Tier:</span>
+                      <span className="font-bold text-white">{selectedPlan.name}</span>
+                    </div>
+                    <div className="flex justify-between text-zinc-300">
+                      <span className="text-zinc-400">Base Allocation:</span>
+                      <span>₹{invoiceCalculation.baseAmount.toLocaleString()}.00</span>
+                    </div>
+                    <div className="flex justify-between text-zinc-400 text-[11px]">
+                      <span>18% Statutory GST:</span>
+                      <span>₹{invoiceCalculation.gstAmount.toLocaleString()}.00</span>
+                    </div>
+                    <div className="pt-2 border-t border-[#27272a] flex justify-between items-baseline">
+                      <span className="text-zinc-300 uppercase font-semibold">Total Payable:</span>
+                      <span className="text-2xl font-extrabold text-[#3b82f6]">
+                        ₹{invoiceCalculation.totalPayable.toLocaleString()}.00
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Clean Authentic Accepted Payment Rails Strip with Official Vector SVGs */}
+                  <AcceptedPaymentRailsStrip />
+
+                  {/* Error Notification */}
+                  {errorMessage && (
+                    <div className="p-3 rounded-lg bg-rose-950/40 border border-rose-900 text-rose-300 text-xs font-mono flex items-start gap-2">
+                      <AlertCircle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+                      <span>{errorMessage}</span>
+                    </div>
+                  )}
+
+                  {/* Primary 1-Click Button: Proceed to Checkout */}
                   <button
                     type="button"
-                    disabled={isSubmitting}
-                    onClick={handleSubmit}
-                    className="w-full bg-[#2563EB] hover:bg-[#1D4ED8] text-white px-[24px] py-[12px] rounded-[10px] font-semibold text-[14px] shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_4px_14px_rgba(37,99,235,0.25)] flex items-center justify-center gap-2.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                    onClick={handleProceedToCheckout}
+                    disabled={isProcessing}
+                    className="w-full py-3.5 px-4 rounded-xl bg-[#2563eb] hover:bg-[#1d4ed8] text-white font-mono font-semibold text-sm transition cursor-pointer flex items-center justify-center gap-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_4px_14px_rgba(37,99,235,0.25)] disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {isSubmitting ? (
+                    {isProcessing ? (
                       <>
-                        <Loader2 className="w-5 h-5 animate-spin" />
-                        <span>Provisioning Community Node...</span>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <span>Launching Razorpay Checkout...</span>
                       </>
                     ) : (
                       <>
-                        <span>Provision Free Community Node</span>
+                        <CreditCard className="w-4 h-4" />
+                        <span>Proceed to Checkout</span>
                         <ArrowRight className="w-4 h-4" />
                       </>
                     )}
                   </button>
+
+                  {/* Security Footer */}
+                  <div className="pt-2 border-t border-[#27272a] flex items-center justify-between text-[11px] font-mono text-zinc-500">
+                    <span className="flex items-center gap-1 text-emerald-400">
+                      <ShieldCheck className="w-3.5 h-3.5" />
+                      256-bit Encrypted
+                    </span>
+                    <span>Verified Razorpay Rail</span>
+                  </div>
+
                 </div>
               )}
 
-              {/* Feedback Notifications & Errors */}
-              {errorMessage && (
-                <div className="p-3.5 rounded-[10px] border border-rose-300 bg-rose-50 text-rose-800 text-xs font-mono flex items-start gap-2.5 animate-in fade-in">
-                  <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
-                  <span>{errorMessage}</span>
-                </div>
-              )}
-
-              {paymentNotification && (
-                <div className="p-3.5 rounded-[10px] border border-blue-200 bg-blue-50 text-blue-800 text-xs font-mono flex items-start gap-2.5 animate-in fade-in">
-                  <ShieldCheck className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
-                  <span>{paymentNotification}</span>
-                </div>
-              )}
-
-              <div className="flex items-center justify-center gap-4 text-xs font-mono text-[#64748B] pt-1 flex-wrap">
-                <span>Instant Provisioning</span>
-                <span>•</span>
-                <span>Sub-20ms SLA</span>
-                <span>•</span>
-                <span>Non-Custodial</span>
-              </div>
             </div>
 
           </div>
 
         </div>
+
       </main>
-
-      {/* SUCCESS MODAL DIALOG - Light Glassmorphism */}
-      {successData && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-md p-4 animate-in fade-in duration-200">
-          <div className="w-full max-w-lg rounded-[16px] bg-white border border-[#E2E8F0] p-6 sm:p-8 text-[#0F172A] shadow-[0_25px_60px_-15px_rgba(15,23,42,0.18)] space-y-6 animate-in zoom-in-95 duration-150">
-            
-            <div className="text-center space-y-2">
-              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
-                <BadgeCheck className="w-8 h-8" />
-              </div>
-              <h3 className="text-2xl font-bold text-[#0F172A]">
-                Settlement Node Minted
-              </h3>
-              <p className="text-sm text-[#475569] leading-normal">
-                Your Verisett clearinghouse node has been provisioned and registered on the protocol.
-              </p>
-            </div>
-
-            {/* Certificate Box */}
-            <div className="rounded-[12px] border border-[#E2E8F0] bg-[#F8FAFC] p-5 space-y-3 text-xs sm:text-sm font-mono">
-              <div className="flex items-center justify-between gap-2 flex-wrap">
-                <span className="text-[#64748B] font-semibold">MINTED AGENT ID:</span>
-                <span className="font-bold text-[#0F172A] bg-white px-2.5 py-1 rounded-[6px] border border-[#CBD5E1]">
-                  {successData.agent_id}
-                </span>
-              </div>
-
-              <div className="flex items-center justify-between gap-2 flex-wrap">
-                <span className="text-[#64748B] font-semibold">PLAN TIER:</span>
-                <span className="font-bold text-[#2563EB] uppercase">
-                  {successData.plan_id}
-                </span>
-              </div>
-
-              <div className="flex items-center justify-between gap-2 flex-wrap">
-                <span className="text-[#64748B] font-semibold">PAYMENT STATUS:</span>
-                <span className="font-bold text-emerald-700 uppercase">
-                  {successData.payment_status || "verified"}
-                </span>
-              </div>
-
-              <div className="flex items-center justify-between gap-2 flex-wrap">
-                <span className="text-[#64748B] font-semibold">ORGANIZATION:</span>
-                <span className="text-[#0F172A] font-bold break-words text-right">
-                  {orgName}
-                </span>
-              </div>
-            </div>
-
-            <div className="flex flex-col sm:flex-row gap-3">
-              <Link
-                href="/dashboard"
-                className="w-full sm:flex-1 py-3 px-4 rounded-[10px] bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold text-sm flex items-center justify-center gap-2 transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]"
-              >
-                <span>Enter Agent Console</span>
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-              <button
-                type="button"
-                onClick={() => setSuccessData(null)}
-                className="w-full sm:w-auto py-3 px-5 rounded-[10px] border border-[#CBD5E1] bg-white hover:bg-[#F8FAFC] text-[#475569] font-semibold text-sm transition-colors cursor-pointer"
-              >
-                Close
-              </button>
-            </div>
-
-          </div>
-        </div>
-      )}
-
-      {/* Razorpay Dynamic UPI QR Modal with Real-Time Webhook Polling */}
-      {selectedPlan.is_paid && (
-        <DynamicUpiQrModal
-          isOpen={isDynamicQrOpen}
-          onClose={() => setIsDynamicQrOpen(false)}
-          amount={Math.round(selectedPlan.price_inr * 100)}
-          customerName={operatorName || orgName || "Verisett Client"}
-          description={`Verisett AI Node Provisioning - ${selectedPlan.name}`}
-          onPaymentSuccess={handleDynamicQrSuccess}
-        />
-      )}
     </div>
   );
 }
@@ -1270,8 +535,8 @@ export default function CheckoutPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center">
-          <Loader2 className="w-8 h-8 text-[#2563EB] animate-spin" />
+        <div className="min-h-screen bg-[#09090b] flex items-center justify-center">
+          <Loader2 className="w-8 h-8 text-[#2563eb] animate-spin" />
         </div>
       }
     >

@@ -22,6 +22,7 @@ import confetti from "canvas-confetti";
 import { VerisettLogo } from "@/components/VerisettLogo";
 import { supabase } from "@/lib/supabase";
 import { openRazorpayCheckout } from "@/lib/razorpayClient";
+import { AcceptedPaymentRailsStrip } from "@/components/PaymentRailLogos";
 
 export interface PlanTier {
   id: "starter" | "growth" | "scale";
@@ -706,26 +707,8 @@ export default function BillingPage() {
                     </div>
                   </div>
 
-                  {/* Payment Rails Accepted Badges */}
-                  <div className="space-y-1.5">
-                    <span className="text-[11px] font-mono uppercase tracking-wider text-zinc-400 font-semibold block">
-                      Accepted Payment Rails
-                    </span>
-                    <div className="grid grid-cols-2 gap-2 text-[11px] font-mono text-zinc-300">
-                      <div className="p-2 rounded bg-[#09090b] border border-[#27272a] flex items-center gap-1.5">
-                        <span>⚡ UPI &amp; Dynamic QR</span>
-                      </div>
-                      <div className="p-2 rounded bg-[#09090b] border border-[#27272a] flex items-center gap-1.5">
-                        <span>💳 Credit &amp; Debit Cards</span>
-                      </div>
-                      <div className="p-2 rounded bg-[#09090b] border border-[#27272a] flex items-center gap-1.5">
-                        <span>🏦 50+ NetBanking</span>
-                      </div>
-                      <div className="p-2 rounded bg-[#09090b] border border-[#27272a] flex items-center gap-1.5">
-                        <span>🔒 Corporate EMI</span>
-                      </div>
-                    </div>
-                  </div>
+                  {/* Clean Authentic Accepted Payment Rails Strip with Official Vector SVGs */}
+                  <AcceptedPaymentRailsStrip />
 
                   {/* Error Notification */}
                   {errorMessage && (
@@ -735,7 +718,7 @@ export default function BillingPage() {
                     </div>
                   )}
 
-                  {/* Proceed to Pay Button (Dynamic Amount Wired directly to Razorpay) */}
+                  {/* Primary 1-Click Button: Proceed to Checkout */}
                   <button
                     type="button"
                     onClick={handleProceedToPay}
@@ -745,12 +728,12 @@ export default function BillingPage() {
                     {isProcessing ? (
                       <>
                         <Loader2 className="w-4 h-4 animate-spin" />
-                        <span>Opening Razorpay Modal...</span>
+                        <span>Launching Razorpay Checkout...</span>
                       </>
                     ) : (
                       <>
                         <CreditCard className="w-4 h-4" />
-                        <span>Proceed to Pay (₹{calculation.totalPayable.toLocaleString()})</span>
+                        <span>Proceed to Checkout</span>
                         <ArrowRight className="w-4 h-4" />
                       </>
                     )}
