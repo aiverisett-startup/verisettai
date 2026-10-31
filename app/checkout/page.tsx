@@ -35,16 +35,16 @@ export interface LightPricingTier {
 export const LIGHT_TIERS: LightPricingTier[] = [
   {
     id: "builder",
-    name: "Builder Tier",
+    name: "Builder Protocol",
     tagline: "Essential execution capacity for modern autonomous agents.",
-    basePrice: 2499,
-    gstAmount: 450,
-    totalPrice: 2949,
-    totalPaise: 294900,
+    basePrice: 10,
+    gstAmount: 1.8,
+    totalPrice: 11.8,
+    totalPaise: 1180,
   },
   {
     id: "growth",
-    name: "Growth Tier",
+    name: "Settlement Node",
     badge: "Most Popular",
     tagline: "High-throughput production infrastructure with dedicated routing.",
     basePrice: 7999,
@@ -280,13 +280,13 @@ function CheckoutInner() {
                           {tier.name}
                         </div>
                         <div className="text-xl font-extrabold text-slate-900 font-mono tracking-tight">
-                          ₹{tier.basePrice.toLocaleString()}
+                          ₹{tier.basePrice.toFixed(2)}
                           <span className="text-xs font-normal text-slate-500 ml-1">/ mo</span>
                         </div>
                         <div className="text-xs font-mono text-slate-600">
                           Total with 18% GST:{" "}
                           <span className="font-semibold text-slate-900">
-                            ₹{tier.totalPrice.toLocaleString()}
+                            ₹{tier.totalPrice.toFixed(2)}
                           </span>
                         </div>
                       </div>
@@ -390,7 +390,7 @@ function CheckoutInner() {
                     </div>
                     <div className="flex justify-between">
                       <span className="text-slate-500">AMOUNT PAID:</span>
-                      <span className="font-bold text-blue-600">₹{verifiedPayment.amount.toLocaleString()}.00</span>
+                      <span className="font-bold text-blue-600">₹{verifiedPayment.amount.toFixed(2)}</span>
                     </div>
                   </div>
 
@@ -424,13 +424,13 @@ function CheckoutInner() {
                     <div className="flex justify-between text-slate-700">
                       <span className="text-slate-500">Base Allocation:</span>
                       <span className="font-mono font-medium text-slate-900">
-                        ₹{activeTier.basePrice.toLocaleString()}.00
+                        ₹{activeTier.basePrice.toFixed(2)}
                       </span>
                     </div>
                     <div className="flex justify-between text-slate-700">
                       <span className="text-slate-500">18% Statutory GST:</span>
                       <span className="font-mono font-medium text-slate-900">
-                        ₹{activeTier.gstAmount.toLocaleString()}.00
+                        ₹{activeTier.gstAmount.toFixed(2)}
                       </span>
                     </div>
                     <div className="pt-3 border-t border-slate-200 flex justify-between items-baseline">
@@ -443,7 +443,7 @@ function CheckoutInner() {
                         </span>
                       </div>
                       <span className="text-2xl font-extrabold text-blue-600 font-mono tracking-tight">
-                        ₹{activeTier.totalPrice.toLocaleString()}.00
+                        ₹{activeTier.totalPrice.toFixed(2)}
                       </span>
                     </div>
                   </div>

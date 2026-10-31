@@ -36,9 +36,9 @@ export interface PlanTier {
 export const PLAN_TIERS: PlanTier[] = [
   {
     id: "builder",
-    name: "Builder Tier",
+    name: "Builder Protocol",
     tagline: "Essential execution capacity for modern autonomous agents.",
-    price: 2499,
+    price: 10,
     apiOps: "250,000 Ops",
     features: [
       "Uncapped monthly API execution volume",
@@ -49,7 +49,7 @@ export const PLAN_TIERS: PlanTier[] = [
   },
   {
     id: "growth",
-    name: "Growth Tier",
+    name: "Settlement Node",
     badge: "Most Popular",
     tagline: "High-throughput production infrastructure with dedicated routing.",
     price: 7999,
@@ -224,9 +224,9 @@ export default function BillingPage() {
       };
     }
     const baseAmount = activeSelectedPlan.price;
-    const gstAmount = Math.round(baseAmount * 0.18); // 18% Statutory GST
-    const totalPayable = baseAmount + gstAmount;
-    const totalPayablePaise = totalPayable * 100; // in paise for Razorpay
+    const gstAmount = Number((baseAmount * 0.18).toFixed(2)); // 18% Statutory GST
+    const totalPayable = Number((baseAmount + gstAmount).toFixed(2));
+    const totalPayablePaise = Math.round(totalPayable * 100); // in paise for Razorpay
     return {
       baseAmount,
       gstAmount,
@@ -494,8 +494,8 @@ export default function BillingPage() {
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 {availableUpgradePlans.map((tier) => {
                   const isSelected = activeSelectedPlan?.id === tier.id;
-                  const gst = Math.round(tier.price * 0.18);
-                  const total = tier.price + gst;
+                  const gst = Number((tier.price * 0.18).toFixed(2));
+                  const total = Number((tier.price + gst).toFixed(2));
 
                   return (
                     <div
@@ -522,13 +522,13 @@ export default function BillingPage() {
                           {tier.name}
                         </div>
                         <div className="text-xl font-extrabold text-slate-900 font-mono tracking-tight">
-                          ₹{tier.price.toLocaleString()}
+                          ₹{tier.price.toFixed(2)}
                           <span className="text-xs font-normal text-slate-500 ml-1">/ mo</span>
                         </div>
                         <div className="text-xs font-mono text-slate-600">
                           Total with 18% GST:{" "}
                           <span className="font-semibold text-slate-900">
-                            ₹{total.toLocaleString()}
+                            ₹{total.toFixed(2)}
                           </span>
                         </div>
                       </div>
@@ -634,7 +634,7 @@ export default function BillingPage() {
                     </div>
                     <div className="flex justify-between">
                       <span className="text-slate-500">AMOUNT PAID:</span>
-                      <span className="font-bold text-blue-600">₹{verifiedPayment.amount.toLocaleString()}.00</span>
+                      <span className="font-bold text-blue-600">₹{verifiedPayment.amount.toFixed(2)}</span>
                     </div>
                   </div>
 
@@ -668,13 +668,13 @@ export default function BillingPage() {
                     <div className="flex justify-between text-slate-700">
                       <span className="text-slate-500">Base Allocation:</span>
                       <span className="font-mono font-medium text-slate-900">
-                        ₹{calculation.baseAmount.toLocaleString()}.00
+                        ₹{calculation.baseAmount.toFixed(2)}
                       </span>
                     </div>
                     <div className="flex justify-between text-slate-700">
                       <span className="text-slate-500">18% Statutory GST:</span>
                       <span className="font-mono font-medium text-slate-900">
-                        ₹{calculation.gstAmount.toLocaleString()}.00
+                        ₹{calculation.gstAmount.toFixed(2)}
                       </span>
                     </div>
                     <div className="pt-3 border-t border-slate-200 flex justify-between items-baseline">
@@ -687,7 +687,7 @@ export default function BillingPage() {
                         </span>
                       </div>
                       <span className="text-2xl font-extrabold text-blue-600 font-mono tracking-tight">
-                        ₹{calculation.totalPayable.toLocaleString()}.00
+                        ₹{calculation.totalPayable.toFixed(2)}
                       </span>
                     </div>
                   </div>
