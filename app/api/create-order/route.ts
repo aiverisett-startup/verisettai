@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getRazorpayClient, getRazorpayPublicKey } from "@/lib/razorpay";
+import { verifyPlanForPurchase } from "@/lib/plans";
 import crypto from "crypto";
 
 export async function POST(req: NextRequest) {
@@ -26,6 +27,16 @@ export async function POST(req: NextRequest) {
 
     // Map or validate tier pricing
     const normalizedPlanId = typeof planId === "string" ? planId.toLowerCase().trim() : "";
+
+    // Route Level Guardrails: Verify plan capacity, sold-out, pause, and archive status
+    const planGuard = await verifyPlanForPurchase(normalizedPlanId);
+    if (!planGuard.allowed) {
+      return NextResponse.json(
+        { error: planGuard.message },
+        { status: planGuard.status }
+      );
+    }
+
     if (normalizedPlanId === "builder" || normalizedPlanId.includes("builder")) {
       // Builder Protocol: ₹2,500 base + 18% GST (₹450) = ₹2,950 = 295000 paise
       targetAmount = 295000;

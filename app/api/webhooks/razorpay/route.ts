@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import { markQrPaid } from "@/lib/qrStore";
+import { incrementSubscribers } from "@/lib/plans";
 
 // Deduplication cache to prevent re-processing identical webhook events
 const processedEvents = new Set<string>();
@@ -155,6 +156,22 @@ export async function POST(req: NextRequest) {
           description: `Razorpay fulfillment for ${tierName} (${order_id})`,
           created_at: new Date().toISOString(),
         });
+
+        // 4. Increment subscriber capacity and enforce automatic 200-seat sunset for Enterprise
+        try {
+          const targetPlanId = tierKey === "ENTERPRISE" ? "enterprise" : "builder";
+          const { plan, autoSunsetTriggered } = await incrementSubscribers(targetPlanId);
+          console.log(
+            `[CAPACITY_ENGINE]: Plan ${plan.id} subscriber count: ${plan.currentSubscribers}/${plan.maxSubscribers ?? "∞"}`
+          );
+          if (autoSunsetTriggered) {
+            console.warn(
+              "[ENTERPRISE_AUTO_SUNSET]: Enterprise 200-seat limit reached. Plan automatically archived and paused from pricing grid."
+            );
+          }
+        } catch (capErr: any) {
+          console.warn("[CAPACITY_INCREMENT_NOTICE]:", capErr?.message || capErr);
+        }
       } catch (dbErr: any) {
         console.warn("[RAZORPAY_WEBHOOK_DB_NOTICE]:", dbErr?.message || dbErr);
       }

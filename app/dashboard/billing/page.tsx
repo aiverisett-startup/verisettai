@@ -19,6 +19,9 @@ import {
   QrCode,
   Copy,
   CheckCheck,
+  AlertTriangle,
+  Ban,
+  PauseCircle,
 } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import confetti from "canvas-confetti";
@@ -27,6 +30,7 @@ import { supabase } from "@/lib/supabase";
 import { openRazorpayCheckout } from "@/lib/razorpayClient";
 import { AcceptedPaymentRailsStrip } from "@/components/PaymentRailLogos";
 import { EnterpriseBanner } from "@/app/components/pricing/EnterpriseBanner";
+import type { PlanConfig } from "@/lib/plans";
 
 export interface PlanTier {
   id: "builder" | "growth" | "enterprise";
@@ -125,6 +129,31 @@ export default function BillingPage() {
 
   const [selectedTierId, setSelectedTierId] = useState<string>("growth");
   const [isTierFiltered, setIsTierFiltered] = useState<boolean>(false);
+  const [livePlanConfigs, setLivePlanConfigs] = useState<Record<string, PlanConfig>>({});
+  const [isPlatformPaused, setIsPlatformPaused] = useState<boolean>(false);
+
+  // Fetch dynamic plan configurations and global pause status
+  useEffect(() => {
+    async function fetchLivePlans() {
+      try {
+        const res = await fetch("/api/plans");
+        if (res.ok) {
+          const data = await res.json();
+          const map: Record<string, PlanConfig> = {};
+          if (data.plans) {
+            for (const p of data.plans) {
+              map[p.id] = p;
+            }
+          }
+          setLivePlanConfigs(map);
+          setIsPlatformPaused(Boolean(data.globalPause));
+        }
+      } catch (err) {
+        console.warn("[LIVE_PLANS_FETCH_NOTE]:", err);
+      }
+    }
+    fetchLivePlans();
+  }, []);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [verifiedPayment, setVerifiedPayment] = useState<{
@@ -221,10 +250,14 @@ export default function BillingPage() {
     loadUserSession();
   }, []);
 
-  // 2. Filter Upgrade-Only Plans: strictly price > currentUserTier.basePrice
+  // 2. Filter Upgrade-Only Plans: strictly price > currentUserTier.basePrice and isArchived !== true
   const availableUpgradePlans = useMemo(() => {
-    return PLAN_TIERS.filter((tier) => tier.price > currentUserTier.basePrice);
-  }, [currentUserTier.basePrice]);
+    return PLAN_TIERS.filter((tier) => {
+      const live = livePlanConfigs[tier.id];
+      if (live?.isArchived) return false;
+      return tier.price > currentUserTier.basePrice;
+    });
+  }, [currentUserTier.basePrice, livePlanConfigs]);
 
   // 3. Resolve Active Selected Plan from visible upgrade tiers
   const activeSelectedPlan = useMemo(() => {
@@ -232,6 +265,14 @@ export default function BillingPage() {
     const match = availableUpgradePlans.find((t) => t.id === selectedTierId);
     return match || availableUpgradePlans[0];
   }, [availableUpgradePlans, selectedTierId]);
+
+  // Active live plan config for capacity / sold-out / pause checks
+  const activeLiveConfig = useMemo(() => {
+    if (!activeSelectedPlan) return null;
+    return livePlanConfigs[activeSelectedPlan.id] || null;
+  }, [activeSelectedPlan, livePlanConfigs]);
+
+  const isEnterpriseArchived = Boolean(livePlanConfigs["enterprise"]?.isArchived);
 
   // 3b. Auto-filtering: when a plan is selected, filter out lower tiers from view
   const visibleUpgradePlans = useMemo(() => {
@@ -564,17 +605,29 @@ export default function BillingPage() {
           </div>
         </div>
 
-        {/* Dynamic Enterprise Promo Banner */}
-        <div className="mb-8">
-          <EnterpriseBanner
-            onSelectEnterprise={() => {
-              setSelectedTierId("enterprise");
-              setIsTierFiltered(true);
-              setErrorMessage(null);
-              setVerifiedPayment(null);
-            }}
-          />
-        </div>
+        {/* Top Platform Pause Notification Banner */}
+        {(isPlatformPaused || activeLiveConfig?.isPaused) && (
+          <div className="mb-6 rounded-2xl border border-amber-500/30 bg-amber-50 p-4 sm:p-5 flex items-start sm:items-center gap-3 text-amber-900 shadow-sm animate-in fade-in">
+            <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5 sm:mt-0" />
+            <div className="text-xs sm:text-sm font-medium leading-relaxed">
+              Protocol tier subscriptions are temporarily paused for scheduled capacity upgrades. Existing agent runtimes remain unaffected.
+            </div>
+          </div>
+        )}
+
+        {/* Dynamic Enterprise Promo Banner (Hidden if Enterprise tier is archived / sunset) */}
+        {!isEnterpriseArchived && (
+          <div className="mb-8">
+            <EnterpriseBanner
+              onSelectEnterprise={() => {
+                setSelectedTierId("enterprise");
+                setIsTierFiltered(true);
+                setErrorMessage(null);
+                setVerifiedPayment(null);
+              }}
+            />
+          </div>
+        )}
 
         {/* 2-COLUMN BALANCED DASHBOARD */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
@@ -657,6 +710,9 @@ export default function BillingPage() {
                   const isSelected = activeSelectedPlan?.id === tier.id;
                   const gst = Number((tier.price * 0.18).toFixed(2));
                   const total = Number((tier.price + gst).toFixed(2));
+                  const live = livePlanConfigs[tier.id];
+                  const isSoldOut = Boolean(live?.isSoldOut);
+                  const isPaused = Boolean(live?.isPaused || isPlatformPaused);
 
                   return (
                     <div
@@ -671,13 +727,21 @@ export default function BillingPage() {
                         isSelected
                           ? "border-2 border-blue-600 bg-blue-50/40 shadow-md ring-2 ring-blue-600/20"
                           : "border-slate-200 bg-white hover:border-blue-300 hover:shadow-sm"
-                      }`}
+                      } ${isSoldOut ? "opacity-90" : ""}`}
                     >
-                      {tier.badge && (
+                      {isSoldOut ? (
+                        <span className="absolute -top-3 right-4 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-[#09090B] text-rose-300 border border-rose-500/30 shadow-md">
+                          SOLD OUT // {live?.maxSubscribers || 200}/200 SLOTS
+                        </span>
+                      ) : isPaused ? (
+                        <span className="absolute -top-3 right-4 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-amber-100 text-amber-800 border border-amber-300 shadow-xs">
+                          PAUSED
+                        </span>
+                      ) : tier.badge ? (
                         <span className="absolute -top-3 right-4 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-blue-600 text-white shadow-xs">
                           {tier.badge}
                         </span>
-                      )}
+                      ) : null}
 
                       <div className="space-y-3">
                         <div className="text-lg font-semibold text-slate-900 break-words leading-tight">
@@ -693,6 +757,11 @@ export default function BillingPage() {
                             ₹{total.toFixed(2)}
                           </span>
                         </div>
+                        {live?.maxSubscribers && (
+                          <div className="text-[11px] font-mono text-slate-500 pt-1">
+                            Allocation: {live.currentSubscribers} / {live.maxSubscribers} Nodes
+                          </div>
+                        )}
                       </div>
 
                       <div className="pt-4 mt-4 border-t border-slate-100 flex items-center justify-between text-xs">
@@ -941,14 +1010,26 @@ export default function BillingPage() {
 
                       {/* Payment Action Confirm */}
                       <div className="pt-1 flex flex-col gap-2">
-                        <button
-                          type="button"
-                          onClick={handleSimulateQrSuccess}
-                          className="w-full py-3.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs transition cursor-pointer shadow-md hover:shadow-lg flex items-center justify-center gap-2"
-                        >
-                          <Check className="w-4 h-4" />
-                          <span>✓ I have completed the payment</span>
-                        </button>
+                        {activeLiveConfig?.isSoldOut ? (
+                          <div className="w-full py-3.5 px-4 rounded-xl bg-[#09090B] text-rose-300 font-mono font-bold text-xs tracking-wider uppercase flex items-center justify-center gap-2 border border-rose-500/30 shadow-md backdrop-blur-md">
+                            <Ban className="w-4 h-4 text-rose-400" />
+                            <span>SOLD OUT // {activeLiveConfig.maxSubscribers || 200}/{activeLiveConfig.maxSubscribers || 200} SLOTS ALLOCATED</span>
+                          </div>
+                        ) : activeLiveConfig?.isPaused || isPlatformPaused ? (
+                          <div className="w-full py-3.5 px-4 rounded-xl bg-amber-50 text-amber-800 font-mono font-bold text-xs tracking-wider uppercase flex items-center justify-center gap-2 border border-amber-300 shadow-sm">
+                            <PauseCircle className="w-4 h-4 text-amber-600" />
+                            <span>CHECKOUT TEMPORARILY PAUSED</span>
+                          </div>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={handleSimulateQrSuccess}
+                            className="w-full py-3.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs transition cursor-pointer shadow-md hover:shadow-lg flex items-center justify-center gap-2"
+                          >
+                            <Check className="w-4 h-4" />
+                            <span>✓ I have completed the payment</span>
+                          </button>
+                        )}
                       </div>
                     </div>
                   ) : (
@@ -965,25 +1046,37 @@ export default function BillingPage() {
                         </div>
                       )}
 
-                      <button
-                        type="button"
-                        onClick={handleProceedToPay}
-                        disabled={isProcessing}
-                        className="w-full py-4 px-6 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-base transition cursor-pointer flex items-center justify-center gap-2.5 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        {isProcessing ? (
-                          <>
-                            <Loader2 className="w-5 h-5 animate-spin" />
-                            <span>Opening Razorpay Gateway...</span>
-                          </>
-                        ) : (
-                          <>
-                            <CreditCard className="w-5 h-5" />
-                            <span>Pay with Card / Netbanking</span>
-                            <ArrowRight className="w-5 h-5" />
-                          </>
-                        )}
-                      </button>
+                      {activeLiveConfig?.isSoldOut ? (
+                        <div className="w-full py-4 px-6 rounded-xl bg-[#09090B] text-rose-300 font-mono font-bold text-xs sm:text-sm tracking-wider uppercase flex items-center justify-center gap-2 border border-rose-500/30 shadow-md backdrop-blur-md">
+                          <Ban className="w-4 h-4 text-rose-400" />
+                          <span>SOLD OUT // {activeLiveConfig.maxSubscribers || 200}/{activeLiveConfig.maxSubscribers || 200} SLOTS ALLOCATED</span>
+                        </div>
+                      ) : activeLiveConfig?.isPaused || isPlatformPaused ? (
+                        <div className="w-full py-4 px-6 rounded-xl bg-amber-50 text-amber-800 font-mono font-bold text-xs sm:text-sm tracking-wider uppercase flex items-center justify-center gap-2 border border-amber-300 shadow-sm">
+                          <PauseCircle className="w-4 h-4 text-amber-600" />
+                          <span>CHECKOUT TEMPORARILY PAUSED</span>
+                        </div>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={handleProceedToPay}
+                          disabled={isProcessing}
+                          className="w-full py-4 px-6 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-base transition cursor-pointer flex items-center justify-center gap-2.5 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {isProcessing ? (
+                            <>
+                              <Loader2 className="w-5 h-5 animate-spin" />
+                              <span>Opening Razorpay Gateway...</span>
+                            </>
+                          ) : (
+                            <>
+                              <CreditCard className="w-5 h-5" />
+                              <span>Pay with Card / Netbanking</span>
+                              <ArrowRight className="w-5 h-5" />
+                            </>
+                          )}
+                        </button>
+                      )}
                     </div>
                   )}
 

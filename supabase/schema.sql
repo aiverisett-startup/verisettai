@@ -321,5 +321,33 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
+-- =========================================================================
+-- PLAN CONFIGS & ADMIN CAPACITY ENGINE
+-- =========================================================================
+CREATE TABLE IF NOT EXISTS public.plan_configs (
+  id TEXT PRIMARY KEY,
+  display_name TEXT NOT NULL,
+  base_price INTEGER NOT NULL,
+  gst_amount INTEGER NOT NULL,
+  total_price INTEGER NOT NULL,
+  max_subscribers INTEGER,
+  current_subscribers INTEGER NOT NULL DEFAULT 0,
+  is_paused BOOLEAN NOT NULL DEFAULT false,
+  is_archived BOOLEAN NOT NULL DEFAULT false,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+INSERT INTO public.plan_configs (id, display_name, base_price, gst_amount, total_price, max_subscribers, current_subscribers, is_paused, is_archived)
+VALUES 
+  ('builder', 'Builder Protocol', 2500, 450, 2950, NULL, 0, false, false),
+  ('enterprise', 'Enterprise Protocol', 30000, 5400, 35400, 200, 0, false, false)
+ON CONFLICT (id) DO UPDATE SET
+  display_name = EXCLUDED.display_name,
+  base_price = EXCLUDED.base_price,
+  gst_amount = EXCLUDED.gst_amount,
+  total_price = EXCLUDED.total_price;
+
+
 
 
