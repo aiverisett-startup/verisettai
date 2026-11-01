@@ -54,12 +54,22 @@ function AgentRegisterInner() {
   const tierParam = searchParams.get("tier") || "enterprise";
 
   // Form State
+  const [registerTab, setRegisterTab] = useState<"identity" | "guardrails">("identity");
   const [agentName, setAgentName] = useState("Nexus-Orchestrator-01");
   const [objective, setObjective] = useState(
     "Execute programmatic escrow contracts, verify task receipts, and settle cross-agent milestones."
   );
   const [modelProvider, setModelProvider] = useState("fastmcp");
   const [concurrency, setConcurrency] = useState("8 Concurrency Bare-Metal Pipeline (Enterprise)");
+
+  // Economic Guardrails State
+  const [maxSingleSpend, setMaxSingleSpend] = useState<number>(5000);
+  const [dailyCap, setDailyCap] = useState<number>(50000);
+  const [whitelistTags, setWhitelistTags] = useState<string[]>([
+    "agent-deepseek-code-v3",
+    "subcontractor-vector-search",
+  ]);
+  const [nodeTagInput, setNodeTagInput] = useState<string>("");
 
   // Deployment Sequence State
   const [isDeploying, setIsDeploying] = useState(false);
@@ -171,6 +181,19 @@ function AgentRegisterInner() {
           ping_latency_ms: 18,
           api_key: apiKey,
         });
+
+        // Persist economic policy guardrails
+        await fetch("/api/agent/policy", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            agentId: nodeUid,
+            maxPerTxSpend: Math.round(maxSingleSpend * 100),
+            dailySpendLimit: Math.round(dailyCap * 100),
+            allowedNodes: whitelistTags,
+            requireProof: true,
+          }),
+        });
       }
     } catch (dbErr) {
       console.warn("[AGENT_REGISTRATION_NOTE]:", dbErr);
@@ -253,79 +276,237 @@ function AgentRegisterInner() {
         {/* ========================================================================= */}
         {!isDeploying && !isCardRevealed && (
           <div className="bg-slate-900/70 border border-slate-800 rounded-3xl p-6 sm:p-10 shadow-2xl backdrop-blur-xl relative overflow-hidden space-y-6">
+            {/* Tab Navigation */}
+            <div className="flex items-center gap-2 border-b border-slate-800 pb-3 font-mono text-xs">
+              <button
+                type="button"
+                onClick={() => setRegisterTab("identity")}
+                className={`px-4 py-2 rounded-xl transition-all ${
+                  registerTab === "identity"
+                    ? "bg-blue-600 text-white font-bold shadow-[0_0_15px_rgba(37,99,235,0.3)]"
+                    : "text-slate-400 hover:text-white bg-slate-950/60 border border-slate-800"
+                }`}
+              >
+                1. Agent Identity &amp; Framework
+              </button>
+              <button
+                type="button"
+                onClick={() => setRegisterTab("guardrails")}
+                className={`px-4 py-2 rounded-xl transition-all flex items-center gap-2 ${
+                  registerTab === "guardrails"
+                    ? "bg-blue-600 text-white font-bold shadow-[0_0_15px_rgba(37,99,235,0.3)]"
+                    : "text-slate-400 hover:text-white bg-slate-950/60 border border-slate-800"
+                }`}
+              >
+                <span>2. Economic Guardrails</span>
+                <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
+              </button>
+            </div>
+
             <form onSubmit={handleDeployAgent} className="space-y-6">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                {/* Agent System Name */}
-                <div className="space-y-1.5">
-                  <label className="block text-xs font-mono font-bold uppercase tracking-wider text-slate-300">
-                    Agent System Name <span className="text-cyan-400">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={agentName}
-                    onChange={(e) => setAgentName(e.target.value)}
-                    placeholder="e.g. Swarm-Alpha-Escrow"
-                    className="w-full min-h-[46px] px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 focus:border-cyan-400 focus:outline-none text-sm text-white transition font-mono"
-                  />
-                  <p className="text-[11px] text-slate-500">
-                    Global human-readable identifier for multi-agent telemetry and vault locks.
-                  </p>
+              {registerTab === "identity" ? (
+                <>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                    {/* Agent System Name */}
+                    <div className="space-y-1.5">
+                      <label className="block text-xs font-mono font-bold uppercase tracking-wider text-slate-300">
+                        Agent System Name <span className="text-cyan-400">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={agentName}
+                        onChange={(e) => setAgentName(e.target.value)}
+                        placeholder="e.g. Swarm-Alpha-Escrow"
+                        className="w-full min-h-[46px] px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 focus:border-cyan-400 focus:outline-none text-sm text-white transition font-mono"
+                      />
+                      <p className="text-[11px] text-slate-500">
+                        Global human-readable identifier for multi-agent telemetry and vault locks.
+                      </p>
+                    </div>
+
+                    {/* Model Provider / Gateway Rail */}
+                    <div className="space-y-1.5">
+                      <label className="block text-xs font-mono font-bold uppercase tracking-wider text-slate-300">
+                        Model Provider / Gateway Rail <span className="text-cyan-400">*</span>
+                      </label>
+                      <select
+                        value={modelProvider}
+                        onChange={(e) => setModelProvider(e.target.value)}
+                        className="w-full min-h-[46px] px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 focus:border-cyan-400 focus:outline-none text-sm text-white transition cursor-pointer font-sans"
+                      >
+                        {MODEL_PROVIDERS.map((m) => (
+                          <option key={m.id} value={m.id}>
+                            {m.label}
+                          </option>
+                        ))}
+                      </select>
+                      <p className="text-[11px] text-slate-500">
+                        Deterministic rail interface for agent context streaming.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Primary Objective / Directive */}
+                  <div className="space-y-1.5">
+                    <label className="block text-xs font-mono font-bold uppercase tracking-wider text-slate-300">
+                      Primary Objective / Directive
+                    </label>
+                    <textarea
+                      rows={3}
+                      value={objective}
+                      onChange={(e) => setObjective(e.target.value)}
+                      placeholder="Define the autonomous operational boundary..."
+                      className="w-full p-4 rounded-xl bg-slate-950 border border-slate-700 focus:border-cyan-400 focus:outline-none text-sm text-white transition resize-y font-sans leading-relaxed"
+                    />
+                  </div>
+
+                  {/* Concurrency Node Allocation */}
+                  <div className="space-y-1.5">
+                    <label className="block text-xs font-mono font-bold uppercase tracking-wider text-slate-300">
+                      Max Concurrency Node Allocation
+                    </label>
+                    <select
+                      value={concurrency}
+                      onChange={(e) => setConcurrency(e.target.value)}
+                      className="w-full min-h-[46px] px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 focus:border-cyan-400 focus:outline-none text-sm text-white transition cursor-pointer font-sans"
+                    >
+                      {CONCURRENCY_OPTIONS.map((c) => (
+                        <option key={c} value={c}>
+                          {c}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </>
+              ) : (
+                /* ECONOMIC GUARDRAILS TAB */
+                <div className="space-y-6 font-mono text-xs">
+                  <div className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.08] space-y-1">
+                    <div className="text-cyan-400 font-bold flex items-center gap-1.5">
+                      <ShieldCheck className="w-4 h-4" />
+                      <span>AUTONOMOUS ECONOMIC POLICY &amp; SPEND CONTROLS</span>
+                    </div>
+                    <p className="text-[11px] text-slate-400 leading-relaxed font-sans">
+                      Enforce deterministic financial guardrails. Escrow contracts exceeding these thresholds are blocked by the settlement state machine before funds lock.
+                    </p>
+                  </div>
+
+                  {/* Max Single Task Spend */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <label className="text-slate-300 font-bold uppercase tracking-wider">
+                        Max Single Task Spend (₹):
+                      </label>
+                      <span className="text-cyan-400 font-bold">
+                        ₹{maxSingleSpend.toLocaleString("en-IN")}
+                      </span>
+                    </div>
+                    <input
+                      type="range"
+                      min="500"
+                      max="25000"
+                      step="500"
+                      value={maxSingleSpend}
+                      onChange={(e) => setMaxSingleSpend(Number(e.target.value))}
+                      className="w-full accent-blue-600 cursor-pointer"
+                    />
+                    <div className="flex items-center gap-2">
+                      <span className="text-slate-500">Exact Threshold (₹):</span>
+                      <input
+                        type="number"
+                        value={maxSingleSpend}
+                        onChange={(e) => setMaxSingleSpend(Math.max(0, Number(e.target.value)))}
+                        className="bg-white/[0.02] border border-white/[0.08] focus:border-blue-500/50 text-slate-100 font-mono text-xs rounded-lg px-3 py-2 w-36 focus:outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  {/* 24h Daily Cumulative Cap */}
+                  <div className="space-y-2 pt-3 border-t border-white/[0.06]">
+                    <div className="flex items-center justify-between">
+                      <label className="text-slate-300 font-bold uppercase tracking-wider">
+                        24h Daily Cumulative Cap (₹):
+                      </label>
+                      <span className="text-emerald-400 font-bold">
+                        ₹{dailyCap.toLocaleString("en-IN")}
+                      </span>
+                    </div>
+                    <input
+                      type="range"
+                      min="2000"
+                      max="150000"
+                      step="2000"
+                      value={dailyCap}
+                      onChange={(e) => setDailyCap(Number(e.target.value))}
+                      className="w-full accent-emerald-500 cursor-pointer"
+                    />
+                    <div className="flex items-center gap-2">
+                      <span className="text-slate-500">Exact Threshold (₹):</span>
+                      <input
+                        type="number"
+                        value={dailyCap}
+                        onChange={(e) => setDailyCap(Math.max(0, Number(e.target.value)))}
+                        className="bg-white/[0.02] border border-white/[0.08] focus:border-blue-500/50 text-slate-100 font-mono text-xs rounded-lg px-3 py-2 w-36 focus:outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Node Whitelist Multi-select Tags */}
+                  <div className="space-y-2 pt-3 border-t border-white/[0.06]">
+                    <label className="text-slate-300 font-bold uppercase tracking-wider block">
+                      Node Whitelist (Authorized Counterparties):
+                    </label>
+                    <div className="flex flex-wrap gap-1.5 mb-2">
+                      {whitelistTags.map((tag) => (
+                        <span
+                          key={tag}
+                          className="inline-flex items-center gap-1.5 bg-cyan-950/40 border border-cyan-800/40 text-cyan-300 px-2.5 py-1 rounded-md text-[11px]"
+                        >
+                          <span>{tag}</span>
+                          <button
+                            type="button"
+                            onClick={() => setWhitelistTags(whitelistTags.filter((t) => t !== tag))}
+                            className="text-slate-400 hover:text-white"
+                          >
+                            ×
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        placeholder="Add node ID (e.g., subcontractor-safety-guard)"
+                        value={nodeTagInput}
+                        onChange={(e) => setNodeTagInput(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            e.preventDefault();
+                            if (nodeTagInput.trim() && !whitelistTags.includes(nodeTagInput.trim())) {
+                              setWhitelistTags([...whitelistTags, nodeTagInput.trim()]);
+                              setNodeTagInput("");
+                            }
+                          }
+                        }}
+                        className="bg-white/[0.02] border border-white/[0.08] focus:border-blue-500/50 text-slate-100 font-mono text-xs rounded-lg px-3 py-2 flex-1 focus:outline-none"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (nodeTagInput.trim() && !whitelistTags.includes(nodeTagInput.trim())) {
+                            setWhitelistTags([...whitelistTags, nodeTagInput.trim()]);
+                            setNodeTagInput("");
+                          }
+                        }}
+                        className="bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-slate-200 px-4 py-2 rounded-lg transition-colors"
+                      >
+                        Add Tag
+                      </button>
+                    </div>
+                  </div>
                 </div>
-
-                {/* Model Provider / Gateway Rail */}
-                <div className="space-y-1.5">
-                  <label className="block text-xs font-mono font-bold uppercase tracking-wider text-slate-300">
-                    Model Provider / Gateway Rail <span className="text-cyan-400">*</span>
-                  </label>
-                  <select
-                    value={modelProvider}
-                    onChange={(e) => setModelProvider(e.target.value)}
-                    className="w-full min-h-[46px] px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 focus:border-cyan-400 focus:outline-none text-sm text-white transition cursor-pointer font-sans"
-                  >
-                    {MODEL_PROVIDERS.map((m) => (
-                      <option key={m.id} value={m.id}>
-                        {m.label}
-                      </option>
-                    ))}
-                  </select>
-                  <p className="text-[11px] text-slate-500">
-                    Deterministic rail interface for agent context streaming.
-                  </p>
-                </div>
-              </div>
-
-              {/* Primary Objective / Directive */}
-              <div className="space-y-1.5">
-                <label className="block text-xs font-mono font-bold uppercase tracking-wider text-slate-300">
-                  Primary Objective / Directive
-                </label>
-                <textarea
-                  rows={3}
-                  value={objective}
-                  onChange={(e) => setObjective(e.target.value)}
-                  placeholder="Define the autonomous operational boundary..."
-                  className="w-full p-4 rounded-xl bg-slate-950 border border-slate-700 focus:border-cyan-400 focus:outline-none text-sm text-white transition resize-y font-sans leading-relaxed"
-                />
-              </div>
-
-              {/* Concurrency Node Allocation */}
-              <div className="space-y-1.5">
-                <label className="block text-xs font-mono font-bold uppercase tracking-wider text-slate-300">
-                  Max Concurrency Node Allocation
-                </label>
-                <select
-                  value={concurrency}
-                  onChange={(e) => setConcurrency(e.target.value)}
-                  className="w-full min-h-[46px] px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 focus:border-cyan-400 focus:outline-none text-sm text-white transition cursor-pointer font-sans"
-                >
-                  {CONCURRENCY_OPTIONS.map((c) => (
-                    <option key={c} value={c}>
-                      {c}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              )}
 
               {/* Deploy CTA Button */}
               <div className="pt-2">

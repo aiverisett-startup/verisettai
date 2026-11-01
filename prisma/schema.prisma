@@ -1,0 +1,64 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum SettlementState {
+  INITIALIZED
+  ESCROW_LOCKED
+  DELIVERABLE_SUBMITTED
+  VERIFYING
+  SETTLED
+  CHALLENGED
+  REFUNDED
+}
+
+enum VerificationMethod {
+  CONTENT_HASH_COMMITMENT
+  INDEPENDENT_TEST_RUNNER
+  ATTESTATION_QUORUM
+}
+
+model AgentPolicy {
+  id                String   @id @default(uuid())
+  agentId           String   @unique
+  maxPerTxSpend     Int      // Max single task spend in paise
+  dailySpendLimit   Int      // 24h cumulative spend limit in paise
+  currentDailySpend Int      @default(0) // Accumulated spend in paise
+  allowedNodes      String[] @default([])
+  requireProof      Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@map("agent_policies")
+}
+
+model SettlementAgreement {
+  id                  String                @id @default(uuid())
+  agreementHash       String                @unique
+  buyerAgentId        String
+  workerAgentId       String
+  parentAgreementId   String?
+  parentAgreement     SettlementAgreement?  @relation("SubcontractorDAG", fields: [parentAgreementId], references: [id], onDelete: SetNull)
+  subAgreements       SettlementAgreement[] @relation("SubcontractorDAG")
+  escrowAmountPaise   Int
+  platformTakeRate    Float                 @default(0.02)
+  state               SettlementState       @default(INITIALIZED)
+  verificationMethod  VerificationMethod    @default(CONTENT_HASH_COMMITMENT)
+  acceptanceRules     Json                  @default("{}")
+  deliverablePayload  Json?
+  proofAttestation    Json?
+  challengeWindowEnds DateTime?
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime              @updatedAt
+
+  @@index([buyerAgentId])
+  @@index([workerAgentId])
+  @@index([parentAgreementId])
+  @@index([state])
+  @@map("settlement_agreements")
+}

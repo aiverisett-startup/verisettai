@@ -97,3 +97,4 @@ export async function GET(req: NextRequest) {
     timestamp: new Date().toISOString(),
   });
 }
+

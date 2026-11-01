@@ -136,6 +136,9 @@ export function MinimalNav({
           <a href="#pricing" className="shrink-0 whitespace-nowrap hover:text-blue-600 transition-colors">
             Pricing
           </a>
+          <Link href="/settlement" className="shrink-0 whitespace-nowrap hover:text-blue-600 transition-colors">
+            Settlements
+          </Link>
           <Link href="/docs" className="shrink-0 whitespace-nowrap hover:text-blue-600 transition-colors">
             Docs
           </Link>

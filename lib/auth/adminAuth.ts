@@ -58,3 +58,4 @@ export async function verifyAdminRequest(req: NextRequest): Promise<{
 
   return { authorized: false, reason: "Unauthorized: Admin privileges required." };
 }
+

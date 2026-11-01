@@ -59,3 +59,4 @@ CREATE POLICY "Service role full access on plan_configs"
   TO service_role
   USING (true)
   WITH CHECK (true);
+

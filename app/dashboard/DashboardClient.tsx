@@ -40,6 +40,8 @@ import { RegisterAgentModal } from "@/components/dashboard/RegisterAgentModal";
 import { TranslucentTelemetryChart } from "@/components/dashboard/TranslucentTelemetryChart";
 import { AgentFleetTable } from "@/components/dashboard/AgentFleetTable";
 import { CommandPaletteModal } from "@/components/dashboard/CommandPaletteModal";
+import { TaskDAGVisualizer } from "@/components/dashboard/TaskDAGVisualizer";
+import { AgentPolicyControlsModal } from "@/components/dashboard/AgentPolicyControlsModal";
 import { supabase } from "@/lib/supabase";
 import { dispatchAuthChange } from "@/lib/useAuthUser";
 import { TransactionItem } from "@/lib/agentTransactionStorage";
@@ -159,6 +161,7 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
   // Modals state
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState<boolean>(false);
   const [isRegisterAgentModalOpen, setIsRegisterAgentModalOpen] = useState<boolean>(false);
+  const [isPolicyModalOpen, setIsPolicyModalOpen] = useState<boolean>(false);
   const [isDepositModalOpen, setIsDepositModalOpen] = useState<boolean>(false);
   const [depositAmount, setDepositAmount] = useState<string>("10000");
   const [isDepositing, setIsDepositing] = useState<boolean>(false);
@@ -1128,16 +1131,26 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
                   </button>
 
                   {selectedAgent && (
-                    <button
-                      onClick={() => handleSimulateHeartbeat(selectedAgent.id)}
-                      disabled={isPinging}
-                      className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-[#CBD5E1] hover:border-[#2563EB] text-xs font-semibold text-[#0F172A] shadow-2xs transition-all duration-200 hover:bg-blue-50/50 cursor-pointer disabled:opacity-60 font-sans"
-                    >
-                      <Activity className={`text-[#2563EB] w-3.5 h-3.5 ${isPinging ? "animate-spin" : ""}`} />
-                      <span>
-                        {isPinging ? "Transmitting..." : `Transmit Heartbeat for ${selectedAgent.name}`}
-                      </span>
-                    </button>
+                    <>
+                      <button
+                        onClick={() => handleSimulateHeartbeat(selectedAgent.id)}
+                        disabled={isPinging}
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-[#CBD5E1] hover:border-[#2563EB] text-xs font-semibold text-[#0F172A] shadow-2xs transition-all duration-200 hover:bg-blue-50/50 cursor-pointer disabled:opacity-60 font-sans"
+                      >
+                        <Activity className={`text-[#2563EB] w-3.5 h-3.5 ${isPinging ? "animate-spin" : ""}`} />
+                        <span>
+                          {isPinging ? "Transmitting..." : `Transmit Heartbeat for ${selectedAgent.name}`}
+                        </span>
+                      </button>
+
+                      <button
+                        onClick={() => setIsPolicyModalOpen(true)}
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-[#CBD5E1] hover:border-[#2563EB] text-xs font-semibold text-[#0F172A] shadow-2xs transition-all duration-200 hover:bg-blue-50/50 cursor-pointer font-sans"
+                      >
+                        <Sliders className="text-[#2563EB] w-3.5 h-3.5" />
+                        <span>Economic Guardrails</span>
+                      </button>
+                    </>
                   )}
                 </div>
               </div>
@@ -1164,6 +1177,7 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
             {/* TAB CONTENT VIEWS */}
             {activeTab === "overview" && (
               <div className="space-y-6">
+                <TaskDAGVisualizer />
                 <AgentFleetTable
                   agents={agents}
                   selectedAgentId={selectedAgentId}
@@ -1614,6 +1628,16 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
           loadTenantData(user.id);
         }}
       />
+
+      {/* MODAL: Agent Economic Policy Guardrails */}
+      {selectedAgent && (
+        <AgentPolicyControlsModal
+          isOpen={isPolicyModalOpen}
+          onClose={() => setIsPolicyModalOpen(false)}
+          agentId={selectedAgent.id}
+          agentName={selectedAgent.name}
+        />
+      )}
 
       {/* MODAL 3: Custody Deposit Modal */}
       {isDepositModalOpen && (
