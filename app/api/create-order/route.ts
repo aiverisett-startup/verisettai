@@ -32,7 +32,13 @@ export async function POST(req: NextRequest) {
     } else if (normalizedPlanId === "growth" || normalizedPlanId.includes("growth")) {
       targetAmount = 943900;
     } else if (normalizedPlanId === "enterprise" || normalizedPlanId.includes("enterprise")) {
-      targetAmount = 3539900;
+      // Enterprise Protocol: ₹30,000 base + 18% GST (₹5,400) = ₹35,400 = 3540000 paise
+      targetAmount = 3540000;
+    } else if (!targetAmount || targetAmount < 100) {
+      return NextResponse.json(
+        { error: "Invalid or unlisted subscription tier." },
+        { status: 400 }
+      );
     }
 
     // Validate amount: must be a valid integer/number and at least 100 paise (₹1)
@@ -66,7 +72,7 @@ export async function POST(req: NextRequest) {
       payment_capture: 1,
       notes: {
         ...(notes && typeof notes === "object" ? notes : {}),
-        ...(planId ? { planId: String(planId) } : {}),
+        ...(planId ? { planId: String(planId), tier: String(planId) } : {}),
       },
     };
 

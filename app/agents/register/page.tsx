@@ -24,6 +24,7 @@ import {
 import confetti from "canvas-confetti";
 import { VerisettLogo } from "@/components/VerisettLogo";
 import { supabase } from "@/lib/supabase";
+import { computeReputation } from "@/lib/reputation";
 
 const MODEL_PROVIDERS = [
   { id: "anthropic", label: "Anthropic Claude (3.7 Sonnet / Opus)" },
@@ -71,6 +72,15 @@ function AgentRegisterInner() {
   const [apiKey, setApiKey] = useState<string>("");
   const [copiedKey, setCopiedKey] = useState(false);
   const [copiedUid, setCopiedUid] = useState(false);
+
+  // Dynamic Reputation Metrics
+  const reputation = computeReputation({
+    totalTasks: 0,
+    successfulTasks: 0,
+    avgLatencyMs: 18,
+    policyViolations: 0,
+    uptimePercent: 100,
+  });
 
   const cardRef = useRef<HTMLDivElement>(null);
 
@@ -382,8 +392,8 @@ function AgentRegisterInner() {
                   <strong>Genesis Deployment Confirmed!</strong> Sovereign Node Identity Passport minted.
                 </span>
               </div>
-              <span className="px-2.5 py-1 rounded-full bg-emerald-900/60 text-emerald-200 text-xs font-mono font-bold border border-emerald-400/40">
-                Score: 99.4
+              <span className={`px-2.5 py-1 rounded-full text-xs font-mono font-bold border ${reputation.badgeColor}`}>
+                Score: {reputation.score}
               </span>
             </div>
 
@@ -504,29 +514,30 @@ function AgentRegisterInner() {
                         d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                       />
                       <path
-                        className="text-emerald-400"
-                        strokeDasharray="99.4, 100"
+                        stroke={reputation.strokeColor}
+                        strokeDasharray={`${reputation.score}, 100`}
                         strokeWidth="3.5"
                         strokeLinecap="round"
-                        stroke="currentColor"
                         fill="none"
                         d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                       />
                     </svg>
-                    <span className="absolute text-[11px] font-mono font-bold text-white">99.4</span>
+                    <span className="absolute text-[11px] font-mono font-bold text-white">{reputation.score}</span>
                   </div>
                   <div>
                     <span className="text-[10px] uppercase font-mono text-slate-400 block">Genesis Score</span>
-                    <span className="text-sm font-bold text-emerald-400 font-mono">99.4 / 100</span>
+                    <span className="text-sm font-bold font-mono" style={{ color: reputation.strokeColor }}>
+                      {reputation.score} / 100
+                    </span>
                   </div>
                 </div>
 
                 {/* Metric 2: Trust Grade */}
                 <div className="p-3 rounded-xl bg-white/5 border border-white/10">
                   <span className="text-[10px] uppercase font-mono text-slate-400 block mb-0.5">Trust Grade</span>
-                  <span className="text-xs font-bold text-cyan-300 font-mono flex items-center gap-1">
-                    <Award className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
-                    Grade AAA Sovereign
+                  <span className="text-xs font-bold font-mono flex items-center gap-1" style={{ color: reputation.strokeColor }}>
+                    <Award className="w-3.5 h-3.5 shrink-0" style={{ color: reputation.strokeColor }} />
+                    {reputation.grade}
                   </span>
                   <span className="text-[10px] text-slate-400 block mt-0.5">Multi-Party Verified</span>
                 </div>
@@ -535,7 +546,7 @@ function AgentRegisterInner() {
                 <div className="p-3 rounded-xl bg-white/5 border border-white/10">
                   <span className="text-[10px] uppercase font-mono text-slate-400 block mb-0.5">Settlement Cap</span>
                   <span className="text-xs font-bold text-white font-mono">
-                    ₹30,000 Verified Escrow
+                    {reputation.escrowCap}
                   </span>
                   <span className="text-[10px] text-emerald-400 block mt-0.5">Instant Clearing Cap</span>
                 </div>

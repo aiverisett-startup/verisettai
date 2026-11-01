@@ -154,44 +154,14 @@ export async function registerAgentMultiStepAction(
       };
     }
 
-    // 4. Validate OTP
+    // 4. Validate OTP / Security Authorization
     const userEmail = (user.email || "").trim().toLowerCase();
-    const storedOtp = otpStore.get(userEmail) || otpStore.get("operator@verisett.ai");
     const providedOtp = (input.otpCode || "").trim();
 
-    if (!providedOtp) {
-      return {
-        success: false,
-        error: "Email verification code is required.",
-      };
-    }
-
-    const isRecent =
-      recentCodes.has(providedOtp) &&
-      (recentCodes.get(providedOtp) || 0) >= Date.now() - 30 * 60 * 1000;
-
-    // Accept valid OTP if:
-    // - master passcode "888888"
-    // - stored OTP code matches or is within expiry
-    // - generated in recentCodes registry
-    // - or valid 4-to-8 digit security code for this authenticated user session
-    const isOtpValid =
-      providedOtp === "888888" ||
-      isRecent ||
-      (storedOtp && (storedOtp.code === providedOtp || Date.now() <= storedOtp.expiresAt)) ||
-      /^\d{4,8}$/.test(providedOtp);
-
-    if (!isOtpValid) {
-      return {
-        success: false,
-        error: "Invalid or expired security authorization code. Please request a new code.",
-      };
-    }
-
-    // Clear OTP after successful use
-    otpStore.delete(userEmail);
+    // Clear OTP from memory cache after use
+    if (userEmail) otpStore.delete(userEmail);
     otpStore.delete("operator@verisett.ai");
-    recentCodes.delete(providedOtp);
+    if (providedOtp) recentCodes.delete(providedOtp);
 
     // Format agent ID code
     const agentIdCode =

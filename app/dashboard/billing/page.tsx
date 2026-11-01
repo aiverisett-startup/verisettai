@@ -26,6 +26,7 @@ import { VerisettLogo } from "@/components/VerisettLogo";
 import { supabase } from "@/lib/supabase";
 import { openRazorpayCheckout } from "@/lib/razorpayClient";
 import { AcceptedPaymentRailsStrip } from "@/components/PaymentRailLogos";
+import { EnterpriseBanner } from "@/app/components/pricing/EnterpriseBanner";
 
 export interface PlanTier {
   id: "builder" | "growth" | "enterprise";
@@ -69,7 +70,7 @@ export const PLAN_TIERS: PlanTier[] = [
     id: "enterprise",
     name: "Enterprise Scale",
     tagline: "Full-scale dedicated cluster with enterprise SLA and direct rails.",
-    price: 29999,
+    price: 30000,
     apiOps: "Uncapped Ops",
     features: [
       "Uncapped monthly API execution volume",
@@ -123,6 +124,7 @@ export default function BillingPage() {
   });
 
   const [selectedTierId, setSelectedTierId] = useState<string>("growth");
+  const [isTierFiltered, setIsTierFiltered] = useState<boolean>(false);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [verifiedPayment, setVerifiedPayment] = useState<{
@@ -179,7 +181,7 @@ export default function BillingPage() {
               setCurrentUserTier({
                 tierId: "enterprise",
                 name: "Enterprise Scale",
-                basePrice: 29999,
+                basePrice: 30000,
                 opsRemaining: 5000000,
                 opsTotal: 5000000,
               });
@@ -230,6 +232,14 @@ export default function BillingPage() {
     const match = availableUpgradePlans.find((t) => t.id === selectedTierId);
     return match || availableUpgradePlans[0];
   }, [availableUpgradePlans, selectedTierId]);
+
+  // 3b. Auto-filtering: when a plan is selected, filter out lower tiers from view
+  const visibleUpgradePlans = useMemo(() => {
+    if (!isTierFiltered || !activeSelectedPlan) {
+      return availableUpgradePlans;
+    }
+    return availableUpgradePlans.filter((tier) => tier.price >= activeSelectedPlan.price);
+  }, [isTierFiltered, activeSelectedPlan, availableUpgradePlans]);
 
   // 4. Exact Dynamic Financial Calculations
   const calculation = useMemo(() => {
@@ -527,7 +537,7 @@ export default function BillingPage() {
                     setCurrentUserTier({
                       tierId: "enterprise",
                       name: "Enterprise Scale",
-                      basePrice: 29999,
+                      basePrice: 30000,
                       opsRemaining: 5000000,
                       opsTotal: 5000000,
                     });
@@ -540,7 +550,7 @@ export default function BillingPage() {
                 <option value="free">Free Community (₹0)</option>
                 <option value="builder">Builder Protocol (₹2,500)</option>
                 <option value="growth">Settlement Node (₹7,999)</option>
-                <option value="enterprise">Enterprise Scale (₹29,999)</option>
+                <option value="enterprise">Enterprise Scale (₹30,000)</option>
               </select>
             </div>
           </div>
@@ -554,6 +564,18 @@ export default function BillingPage() {
           </div>
         </div>
 
+        {/* Dynamic Enterprise Promo Banner */}
+        <div className="mb-8">
+          <EnterpriseBanner
+            onSelectEnterprise={() => {
+              setSelectedTierId("enterprise");
+              setIsTierFiltered(true);
+              setErrorMessage(null);
+              setVerifiedPayment(null);
+            }}
+          />
+        </div>
+
         {/* 2-COLUMN BALANCED DASHBOARD */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
@@ -563,16 +585,27 @@ export default function BillingPage() {
           <div className="lg:col-span-7 space-y-6">
             
             <div className="flex items-center justify-between text-xs font-semibold text-slate-500 uppercase tracking-wider">
-              <span>Available Upgrades</span>
+              <div className="flex items-center gap-3">
+                <span>Available Upgrades</span>
+                {isTierFiltered && visibleUpgradePlans.length < availableUpgradePlans.length && (
+                  <button
+                    type="button"
+                    onClick={() => setIsTierFiltered(false)}
+                    className="text-xs text-blue-600 hover:text-blue-700 underline font-medium lowercase tracking-normal cursor-pointer"
+                  >
+                    View all tiers
+                  </button>
+                )}
+              </div>
               <span className="text-blue-600 normal-case font-medium">
-                {availableUpgradePlans.length > 0
-                  ? `${availableUpgradePlans.length} Tier${availableUpgradePlans.length > 1 ? "s" : ""} Available`
+                {visibleUpgradePlans.length > 0
+                  ? `${visibleUpgradePlans.length} Tier${visibleUpgradePlans.length > 1 ? "s" : ""} Available`
                   : "Highest Tier Active"}
               </span>
             </div>
 
             {/* Case 1: User is already on top tier */}
-            {availableUpgradePlans.length === 0 ? (
+            {visibleUpgradePlans.length === 0 ? (
               <div className="rounded-2xl border border-slate-200 bg-white p-7 space-y-5 shadow-sm">
                 <div className="flex items-center gap-3">
                   <div className="p-3 rounded-xl bg-blue-50 text-blue-600">
@@ -620,7 +653,7 @@ export default function BillingPage() {
             ) : (
               /* Case 2: Available Upgrade Plans Grid (Enlarged Cards) */
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
-                {availableUpgradePlans.map((tier) => {
+                {visibleUpgradePlans.map((tier) => {
                   const isSelected = activeSelectedPlan?.id === tier.id;
                   const gst = Number((tier.price * 0.18).toFixed(2));
                   const total = Number((tier.price + gst).toFixed(2));
@@ -630,6 +663,7 @@ export default function BillingPage() {
                       key={tier.id}
                       onClick={() => {
                         setSelectedTierId(tier.id);
+                        setIsTierFiltered(true);
                         setErrorMessage(null);
                         setVerifiedPayment(null);
                       }}

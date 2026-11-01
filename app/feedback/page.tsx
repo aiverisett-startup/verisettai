@@ -197,27 +197,22 @@ export default function FeedbackPage() {
   }, [reviews]);
 
   return (
-    <div className="min-h-screen bg-[#09090B] text-zinc-100 flex flex-col font-sans selection:bg-blue-600 selection:text-white relative overflow-x-hidden">
-      {/* Background Ambient Glows */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 w-[800px] h-[450px] bg-blue-600/15 blur-[120px] rounded-full -z-10"
-      />
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute top-[600px] right-0 w-[500px] h-[400px] bg-indigo-600/10 blur-[130px] rounded-full -z-10"
-      />
+    <div className="min-h-screen bg-[#09090B] text-slate-100 min-h-screen relative overflow-hidden font-sans flex flex-col selection:bg-blue-600 selection:text-white">
+      {/* Background Ambient Glow Mesh & Grid */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[350px] bg-gradient-to-b from-blue-600/15 via-cyan-500/10 to-transparent blur-3xl pointer-events-none -z-10" />
+      <div className="absolute -top-32 left-1/4 w-[400px] h-[400px] bg-indigo-600/10 blur-[100px] pointer-events-none -z-10" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none -z-10" />
 
       {/* Top Header Navigation */}
-      <header className="sticky top-0 z-40 border-b border-zinc-800/80 bg-[#09090B]/85 backdrop-blur-md">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+      <header className="sticky top-0 z-40 border-b border-white/[0.08] bg-[#09090B]/70 backdrop-blur-xl px-6 py-4 flex items-center justify-between">
+        <div className="mx-auto flex max-w-7xl items-center justify-between w-full">
           <div className="flex items-center gap-3">
             <Link href="/" className="flex items-center gap-2.5 group">
               <VerisettLogo size={28} />
             </Link>
-            <span className="hidden sm:inline-block text-zinc-700">/</span>
-            <span className="hidden sm:inline-flex items-center gap-1.5 rounded-lg bg-zinc-900 px-2.5 py-1 text-[11px] font-mono text-zinc-400 border border-zinc-800">
-              <ShieldCheck className="w-3.5 h-3.5 text-blue-500" />
+            <span className="hidden sm:inline-block text-slate-700">/</span>
+            <span className="hidden sm:inline-flex items-center gap-1.5 font-mono text-[11px] tracking-wider text-cyan-400 bg-cyan-950/40 border border-cyan-800/40 px-2.5 py-1 rounded-md">
+              <ShieldCheck className="w-3.5 h-3.5 text-cyan-400" />
               <span>COMMUNITY TRUST WALL</span>
             </span>
           </div>
@@ -225,15 +220,15 @@ export default function FeedbackPage() {
           <div className="flex items-center gap-3">
             <Link
               href="/"
-              className="inline-flex items-center gap-1.5 rounded-full border border-zinc-800 bg-zinc-900/80 hover:bg-zinc-800 px-3.5 py-1.5 text-xs font-semibold text-zinc-300 hover:text-white transition-all shadow-xs"
+              className="text-xs font-mono text-slate-400 hover:text-white bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.08] px-3.5 py-2 rounded-lg transition-all inline-flex items-center gap-1.5"
             >
-              <ArrowLeft className="h-3.5 w-3.5 text-blue-400" />
+              <ArrowLeft className="h-3.5 w-3.5 text-slate-400" />
               <span>Back to Platform</span>
             </Link>
 
             <button
               onClick={() => setIsModalOpen(true)}
-              className="inline-flex items-center gap-1.5 rounded-full bg-blue-600 hover:bg-blue-500 px-4 py-1.5 text-xs font-semibold text-white transition-all shadow-lg shadow-blue-600/20 cursor-pointer"
+              className="text-xs font-semibold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 border border-blue-400/30 px-4 py-2 rounded-lg shadow-[0_0_20px_rgba(37,99,235,0.35)] transition-all flex items-center gap-2 cursor-pointer"
             >
               <MessageSquarePlus className="h-3.5 w-3.5" />
               <span>Leave a Review</span>
@@ -262,56 +257,56 @@ export default function FeedbackPage() {
 
         {/* Hero Section */}
         <div className="text-center max-w-3xl mx-auto space-y-4">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-xs font-mono font-semibold text-blue-400">
+          <div className="inline-flex items-center gap-2 font-mono text-xs text-blue-400 bg-blue-950/40 border border-blue-500/30 px-3 py-1 rounded-full uppercase tracking-widest">
             <Sparkles className="w-3.5 h-3.5" />
             <span>VERIFIED TESTIMONIALS &amp; REVIEWS</span>
           </div>
 
-          <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-white leading-tight">
+          <h1 className="bg-gradient-to-b from-white via-slate-100 to-slate-400 bg-clip-text text-transparent font-extrabold tracking-tight text-3xl sm:text-5xl">
             Community Feedback &amp; Protocol Trust Wall
           </h1>
 
-          <p className="text-sm sm:text-base text-zinc-400 leading-relaxed max-w-2xl mx-auto">
+          <p className="text-slate-400 max-w-2xl mx-auto text-sm sm:text-base leading-relaxed">
             See what developers, research labs, and teams building autonomous agent workflows are saying about Verisett AI’s deterministic settlement engine.
           </p>
 
           {/* Key Metrics Strip */}
-          <div className="pt-4 flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-xs font-mono">
-            <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-zinc-900/90 border border-zinc-800 text-zinc-300">
+          <div className="pt-4 flex flex-wrap items-center justify-center gap-3 sm:gap-6">
+            <div className="bg-white/[0.02] border border-white/[0.08] backdrop-blur-md px-4 py-2 rounded-xl flex items-center gap-2 font-mono text-xs">
               <span className="flex text-amber-400">
-                <Star className="w-3.5 h-3.5 fill-amber-400" />
+                <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
               </span>
-              <span className="font-bold text-white">{averageRating}</span>
-              <span className="text-zinc-500">/ 5.0 Average</span>
+              <span className="text-amber-400 font-bold">{averageRating}</span>
+              <span className="text-slate-400">/ 5.0 Average</span>
             </div>
 
-            <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-zinc-900/90 border border-zinc-800 text-zinc-300">
-              <ShieldCheck className="w-3.5 h-3.5 text-blue-400" />
-              <span className="font-bold text-white">{reviews.length}+</span>
-              <span className="text-zinc-500">Verified Reviews</span>
+            <div className="bg-white/[0.02] border border-white/[0.08] backdrop-blur-md px-4 py-2 rounded-xl flex items-center gap-2 font-mono text-xs">
+              <ShieldCheck className="w-3.5 h-3.5 text-cyan-400" />
+              <span className="text-cyan-400 font-bold">{reviews.length}+</span>
+              <span className="text-slate-400">Verified Reviews</span>
             </div>
 
-            <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-zinc-900/90 border border-zinc-800 text-zinc-300">
+            <div className="bg-white/[0.02] border border-white/[0.08] backdrop-blur-md px-4 py-2 rounded-xl flex items-center gap-2 font-mono text-xs">
               <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="font-bold text-white">100%</span>
-              <span className="text-zinc-500">Deterministic Settlement</span>
+              <span className="text-emerald-400 font-bold">100%</span>
+              <span className="text-slate-400">Deterministic Settlement</span>
             </div>
           </div>
         </div>
 
         {/* Filter & Search Bar */}
-        <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 pt-4 pb-2 border-b border-zinc-800">
-          {/* Category Filter Pills */}
+        <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 pt-4 pb-2 border-b border-white/[0.08]">
+          {/* Category Filter Pills (Segmented Controls) */}
           <div className="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0 scrollbar-none">
-            <Filter className="w-3.5 h-3.5 text-zinc-500 shrink-0 hidden sm:inline" />
+            <Filter className="w-3.5 h-3.5 text-slate-500 shrink-0 hidden sm:inline" />
             {CATEGORIES.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all cursor-pointer ${
+                className={`transition-all cursor-pointer ${
                   selectedCategory === cat
-                    ? "bg-blue-600 text-white shadow-md shadow-blue-600/30"
-                    : "bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 border border-zinc-800/80"
+                    ? "bg-blue-600/20 text-blue-400 border border-blue-500/40 font-mono text-xs px-3.5 py-1.5 rounded-lg shadow-[0_0_12px_rgba(37,99,235,0.2)]"
+                    : "bg-white/[0.02] text-slate-400 hover:text-slate-200 border border-white/[0.06] hover:border-white/[0.12] font-mono text-xs px-3.5 py-1.5 rounded-lg"
                 }`}
               >
                 {cat}
@@ -320,19 +315,19 @@ export default function FeedbackPage() {
           </div>
 
           {/* Search Box */}
-          <div className="relative min-w-[260px]">
-            <Search className="w-3.5 h-3.5 text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <div className="relative">
+            <Search className="w-3.5 h-3.5 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search by builder, company, text..."
-              className="w-full pl-9 pr-4 py-1.5 rounded-full bg-zinc-900 border border-zinc-800 text-xs text-zinc-200 placeholder-zinc-500 focus:outline-hidden focus:border-blue-500 transition-colors"
+              className="bg-white/[0.02] border border-white/[0.08] focus:border-blue-500/50 rounded-lg pl-9 pr-8 py-1.5 text-xs font-mono text-slate-200 placeholder:text-slate-600 focus:outline-none focus:ring-1 focus:ring-blue-500/30 w-72 transition-all"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery("")}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300"
               >
                 <X className="w-3 h-3" />
               </button>
@@ -344,24 +339,35 @@ export default function FeedbackPage() {
         {isLoading ? (
           <div className="py-24 text-center flex flex-col items-center justify-center space-y-3">
             <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
-            <p className="text-xs font-mono text-zinc-500">Loading verified protocol reviews...</p>
+            <p className="text-xs font-mono text-slate-500">Loading verified protocol reviews...</p>
           </div>
         ) : filteredReviews.length === 0 ? (
-          <div className="py-20 text-center rounded-2xl border border-dashed border-zinc-800 p-8 space-y-3.5 max-w-md mx-auto">
-            <MessageSquarePlus className="w-8 h-8 text-blue-500 mx-auto" />
-            <h3 className="text-base font-bold text-zinc-200">
+          <div className="bg-gradient-to-b from-white/[0.04] to-white/[0.01] border border-white/[0.08] backdrop-blur-xl rounded-2xl p-12 max-w-lg mx-auto text-center shadow-2xl relative overflow-hidden space-y-4">
+            {/* Ambient neon blue spotlight */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-blue-500/10 rounded-full blur-2xl pointer-events-none" />
+            
+            {/* Icon */}
+            <div className="relative inline-block mb-1">
+              <span className="bg-cyan-950/60 border border-cyan-500/30 p-3 rounded-xl text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.3)] inline-flex items-center justify-center">
+                <MessageSquarePlus className="w-7 h-7" />
+              </span>
+            </div>
+
+            <h3 className="text-base font-semibold text-white tracking-wide">
               {reviews.length === 0 ? "No community reviews yet" : "No reviews found"}
             </h3>
-            <p className="text-xs text-zinc-400 leading-relaxed">
+
+            <p className="text-xs text-slate-400 font-mono mt-1 max-w-xs mx-auto leading-relaxed">
               {reviews.length === 0
                 ? "Be the first verified builder to share feedback and testimonials on Verisett AI!"
                 : "No testimonials match your current search or category filter."}
             </p>
+
             {reviews.length === 0 ? (
               <div className="pt-2">
                 <button
                   onClick={() => setIsModalOpen(true)}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-600 hover:bg-blue-500 text-xs font-semibold text-white transition-all shadow-sm cursor-pointer"
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-xs font-semibold text-white transition-all shadow-[0_0_15px_rgba(37,99,235,0.3)] cursor-pointer"
                 >
                   <MessageSquarePlus className="w-3.5 h-3.5" />
                   <span>Submit the First Review</span>
@@ -373,7 +379,7 @@ export default function FeedbackPage() {
                   setSelectedCategory("All");
                   setSearchQuery("");
                 }}
-                className="text-xs font-semibold text-blue-400 hover:underline pt-2 inline-block cursor-pointer"
+                className="text-xs font-mono font-semibold text-blue-400 hover:underline pt-2 inline-block cursor-pointer"
               >
                 Clear filters
               </button>
@@ -384,10 +390,10 @@ export default function FeedbackPage() {
             {filteredReviews.map((item) => (
               <div
                 key={item.id}
-                className={`group relative rounded-2xl border bg-zinc-950/80 hover:bg-black/90 p-6 backdrop-blur-xl flex flex-col justify-between transition-all duration-300 hover:border-blue-500/30 hover:shadow-2xl hover:shadow-blue-500/10 ${
+                className={`group relative rounded-2xl border bg-white/[0.02] hover:bg-white/[0.04] p-6 backdrop-blur-xl flex flex-col justify-between transition-all duration-300 hover:border-blue-500/30 hover:shadow-2xl hover:shadow-blue-500/15 ${
                   item.is_just_posted
-                    ? "border-emerald-500/50 ring-2 ring-emerald-500/20 bg-emerald-950/10"
-                    : "border-white/10"
+                    ? "border-emerald-500/50 ring-2 ring-emerald-500/20 bg-emerald-950/20"
+                    : "border-white/[0.08]"
                 }`}
               >
                 {/* Just Posted Badge */}
@@ -407,30 +413,30 @@ export default function FeedbackPage() {
                           className={`w-3.5 h-3.5 ${
                             i < item.rating
                               ? "text-amber-400 fill-amber-400 drop-shadow-[0_0_6px_rgba(251,191,36,0.3)]"
-                              : "text-zinc-800"
+                              : "text-slate-800"
                           }`}
                         />
                       ))}
                     </div>
 
                     <div className="flex items-center gap-2">
-                      <span className="px-2.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 text-[10px] font-mono font-medium">
+                      <span className="px-2.5 py-0.5 rounded-md bg-cyan-950/40 text-cyan-400 border border-cyan-800/40 text-[10px] font-mono font-medium">
                         {item.category}
                       </span>
-                      <span className="px-2 py-0.5 rounded-full bg-zinc-900 border border-white/5 text-[10px] font-mono text-zinc-500">
+                      <span className="px-2 py-0.5 rounded-md bg-white/[0.03] border border-white/[0.06] text-[10px] font-mono text-slate-500">
                         {formatRelativeTime(item.created_at)}
                       </span>
                     </div>
                   </div>
 
                   {/* Message Quote */}
-                  <blockquote className="text-sm text-zinc-200 leading-relaxed font-sans">
+                  <blockquote className="text-sm text-slate-200 leading-relaxed font-sans">
                     “{item.message}”
                   </blockquote>
                 </div>
 
                 {/* Author Metadata Footer */}
-                <div className="pt-5 mt-6 border-t border-white/5 flex items-center justify-between gap-3">
+                <div className="pt-5 mt-6 border-t border-white/[0.06] flex items-center justify-between gap-3">
                   <div className="flex items-center gap-3 min-w-0">
                     {/* Initials Avatar */}
                     <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center text-xs font-bold text-white shrink-0 shadow-md ring-1 ring-white/20">
@@ -446,16 +452,16 @@ export default function FeedbackPage() {
                         <span className="font-semibold text-xs text-white truncate">
                           {item.name}
                         </span>
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-mono font-medium shrink-0">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-950/40 border border-emerald-500/30 text-emerald-400 text-[10px] font-mono font-medium shrink-0">
                           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                           <span>Verified</span>
                         </span>
                       </div>
-                      <p className="text-[11px] text-zinc-400 truncate font-mono mt-0.5">
+                      <p className="text-[11px] text-slate-400 truncate font-mono mt-0.5">
                         {item.role_title}
                         {item.role_title && item.company && " • "}
                         {item.company && (
-                          <span className="text-zinc-300 font-semibold">{item.company}</span>
+                          <span className="text-slate-300 font-semibold">{item.company}</span>
                         )}
                       </p>
                     </div>
@@ -467,19 +473,19 @@ export default function FeedbackPage() {
         )}
 
         {/* Bottom CTA Banner */}
-        <div className="rounded-3xl border border-white/10 bg-gradient-to-r from-zinc-950 via-zinc-900/90 to-black p-8 sm:p-10 flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left shadow-2xl backdrop-blur-xl">
+        <div className="rounded-2xl border border-white/[0.08] bg-gradient-to-r from-white/[0.03] via-blue-950/20 to-white/[0.01] p-8 sm:p-10 flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left shadow-2xl backdrop-blur-xl">
           <div className="space-y-1.5 max-w-xl">
             <h3 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
               Building on Verisett AI? Share Your Experience
             </h3>
-            <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed">
+            <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
               Join dozens of autonomous agent protocols, AI startups, and systems architects who are shaping the deterministic machine clearinghouse standard.
             </p>
           </div>
 
           <button
             onClick={() => setIsModalOpen(true)}
-            className="px-6 py-3 rounded-full bg-blue-600 hover:bg-blue-500 font-semibold text-xs text-white transition-all shadow-xl shadow-blue-600/25 shrink-0 cursor-pointer"
+            className="px-6 py-3 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 border border-blue-400/30 font-semibold text-xs text-white transition-all shadow-[0_0_20px_rgba(37,99,235,0.35)] shrink-0 cursor-pointer"
           >
             Submit Protocol Review
           </button>
@@ -489,22 +495,22 @@ export default function FeedbackPage() {
       {/* Review Submission Modal with Deep Obsidian Theme */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-in fade-in">
-          <div className="relative w-full max-w-lg rounded-3xl border border-white/10 bg-zinc-950/95 p-6 sm:p-8 shadow-2xl shadow-black/80 backdrop-blur-2xl space-y-6">
+          <div className="relative w-full max-w-lg rounded-2xl border border-white/[0.1] bg-[#0D0D12]/95 p-6 sm:p-8 shadow-2xl shadow-black backdrop-blur-2xl space-y-6">
             {/* Modal Header */}
-            <div className="flex items-center justify-between pb-3 border-b border-white/10">
+            <div className="flex items-center justify-between pb-3 border-b border-white/[0.08]">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-full bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
                   <MessageSquarePlus className="w-4 h-4 text-blue-400" />
                 </div>
                 <div>
                   <h3 className="text-base font-bold text-white">Submit Protocol Feedback</h3>
-                  <p className="text-[11px] text-zinc-400 font-mono">Your review will be verified and published to the Trust Wall.</p>
+                  <p className="text-[11px] text-slate-400 font-mono">Your review will be verified and published to the Trust Wall.</p>
                 </div>
               </div>
 
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="text-zinc-500 hover:text-white transition-colors cursor-pointer"
+                className="text-slate-400 hover:text-white transition-colors cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -521,7 +527,7 @@ export default function FeedbackPage() {
               {/* Name & Role Row */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-zinc-300 block">
+                  <label className="text-xs font-medium text-slate-300 block">
                     Full Name <span className="text-blue-400">*</span>
                   </label>
                   <input
@@ -530,12 +536,12 @@ export default function FeedbackPage() {
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     placeholder="e.g. Alex Chen"
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900/80 border border-white/10 text-white placeholder-zinc-500 focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 text-xs transition-all outline-hidden"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-white/[0.03] border border-white/[0.08] text-white placeholder-slate-600 focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 text-xs transition-all outline-hidden"
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-zinc-300 block">
+                  <label className="text-xs font-medium text-slate-300 block">
                     Role / Title
                   </label>
                   <input
@@ -543,7 +549,7 @@ export default function FeedbackPage() {
                     value={formData.role_title}
                     onChange={(e) => setFormData({ ...formData, role_title: e.target.value })}
                     placeholder="e.g. Lead Agent Architect"
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900/80 border border-white/10 text-white placeholder-zinc-500 focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 text-xs transition-all outline-hidden"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-white/[0.03] border border-white/[0.08] text-white placeholder-slate-600 focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 text-xs transition-all outline-hidden"
                   />
                 </div>
               </div>
@@ -551,7 +557,7 @@ export default function FeedbackPage() {
               {/* Company & Category Row */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-zinc-300 block">
+                  <label className="text-xs font-medium text-slate-300 block">
                     Company / Organization
                   </label>
                   <input
@@ -559,18 +565,18 @@ export default function FeedbackPage() {
                     value={formData.company}
                     onChange={(e) => setFormData({ ...formData, company: e.target.value })}
                     placeholder="e.g. NovaScale AI"
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900/80 border border-white/10 text-white placeholder-zinc-500 focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 text-xs transition-all outline-hidden"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-white/[0.03] border border-white/[0.08] text-white placeholder-slate-600 focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 text-xs transition-all outline-hidden"
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-zinc-300 block">
+                  <label className="text-xs font-medium text-slate-300 block">
                     Category Tag
                   </label>
                   <select
                     value={formData.category}
                     onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900/80 border border-white/10 text-white focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 text-xs transition-all outline-hidden cursor-pointer"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[#14141A] border border-white/[0.08] text-white focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 text-xs transition-all outline-hidden cursor-pointer"
                   >
                     <option value="M2M Escrow">M2M Escrow</option>
                     <option value="Security & Auth">Security &amp; Auth</option>
@@ -582,7 +588,7 @@ export default function FeedbackPage() {
 
               {/* Star Rating Selector */}
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-zinc-300 block">
+                <label className="text-xs font-medium text-slate-300 block">
                   Rating: <span className="font-bold text-amber-400">{formData.rating} / 5 Stars</span>
                 </label>
                 <div className="flex items-center gap-1.5 pt-1">
@@ -597,7 +603,7 @@ export default function FeedbackPage() {
                         className={`w-6 h-6 transition-colors ${
                           star <= formData.rating
                             ? "text-amber-400 fill-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.4)]"
-                            : "text-zinc-700 hover:text-zinc-500"
+                            : "text-slate-700 hover:text-slate-500"
                         }`}
                       />
                     </button>
@@ -607,7 +613,7 @@ export default function FeedbackPage() {
 
               {/* Message Textarea */}
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-zinc-300 block">
+                <label className="text-xs font-medium text-slate-300 block">
                   Review &amp; Testimonial <span className="text-blue-400">*</span>
                 </label>
                 <textarea
@@ -616,7 +622,7 @@ export default function FeedbackPage() {
                   value={formData.message}
                   onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                   placeholder="Share your experience with Verisett AI's deterministic settlement, FastMCP tools, or autonomous vaults..."
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900/80 border border-white/10 text-white placeholder-zinc-500 focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 text-xs transition-all outline-hidden resize-none"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white/[0.03] border border-white/[0.08] text-white placeholder-slate-600 focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 text-xs transition-all outline-hidden resize-none"
                 />
               </div>
 
@@ -625,14 +631,14 @@ export default function FeedbackPage() {
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-xs font-medium text-zinc-400 hover:text-zinc-200 border border-white/5 transition-colors cursor-pointer"
+                  className="px-4 py-2 rounded-lg bg-white/[0.03] hover:bg-white/[0.08] text-xs font-medium text-slate-400 hover:text-white border border-white/[0.08] transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-xs font-semibold text-white transition-all shadow-md shadow-blue-600/30 disabled:opacity-50 cursor-pointer"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 border border-blue-400/30 text-xs font-semibold text-white transition-all shadow-[0_0_20px_rgba(37,99,235,0.35)] disabled:opacity-50 cursor-pointer"
                 >
                   {isSubmitting ? (
                     <>
