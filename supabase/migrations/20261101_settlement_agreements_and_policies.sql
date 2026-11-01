@@ -61,3 +61,4 @@ CREATE INDEX IF NOT EXISTS "idx_settlement_buyer" ON "settlement_agreements"("bu
 CREATE INDEX IF NOT EXISTS "idx_settlement_worker" ON "settlement_agreements"("workerAgentId");
 CREATE INDEX IF NOT EXISTS "idx_settlement_parent" ON "settlement_agreements"("parentAgreementId");
 CREATE INDEX IF NOT EXISTS "idx_settlement_state" ON "settlement_agreements"("state");
+

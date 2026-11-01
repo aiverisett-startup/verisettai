@@ -100,3 +100,4 @@ export interface PolicyEvaluationResult {
   currentDailySpend: number;
   remainingDailyBudget: number;
 }
+

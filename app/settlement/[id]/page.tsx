@@ -23,3 +23,4 @@ export default async function SettlementPage({ params }: PageProps) {
     </Suspense>
   );
 }
+

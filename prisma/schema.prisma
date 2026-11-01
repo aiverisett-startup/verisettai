@@ -62,3 +62,4 @@ model SettlementAgreement {
   @@index([state])
   @@map("settlement_agreements")
 }
+

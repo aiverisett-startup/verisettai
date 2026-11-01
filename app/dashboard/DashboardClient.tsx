@@ -546,15 +546,15 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
       totalResolved > 0
         ? `${(((settledVaults.length + settledSettlements.length) / totalResolved) * 100).toFixed(1)}%`
         : totalDeals > 0 && settledVaults.length > 0
-        ? "100.0%"
-        : "—";
+          ? "100.0%"
+          : "—";
 
     const disputeRateStr =
       totalResolved > 0
         ? `${((totalFailures / totalResolved) * 100).toFixed(1)}%`
         : totalDeals > 0
-        ? "0.0%"
-        : "—";
+          ? "0.0%"
+          : "—";
 
     return {
       totalVolumeUSD,
@@ -645,11 +645,11 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
         prev.map((a) =>
           a.id === targetId
             ? {
-                ...a,
-                last_heartbeat_at: nowIso,
-                status: "Active",
-                ping_latency_ms: measuredLatency,
-              }
+              ...a,
+              last_heartbeat_at: nowIso,
+              status: "Active",
+              ping_latency_ms: measuredLatency,
+            }
             : a
         )
       );
@@ -826,7 +826,7 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
           beneficiary_name: "Verisett Worker Agent",
           milestone_title: "FastMCP Escrow Sandbox Testnet Assertion",
         }),
-      }).catch(() => {});
+      }).catch(() => { });
     } catch (err) {
       console.warn("Failed to generate test escrow:", err);
     }
@@ -871,11 +871,10 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
           <nav className="hidden md:flex items-center gap-1 text-xs font-medium font-sans md:absolute md:left-1/2 md:-translate-x-1/2 z-10">
             <button
               onClick={() => setActiveTab("overview")}
-              className={`px-3 py-1.5 rounded-lg transition cursor-pointer ${
-                activeTab === "overview"
+              className={`px-3 py-1.5 rounded-lg transition cursor-pointer ${activeTab === "overview"
                   ? "text-blue-600 font-bold bg-blue-50"
                   : "text-[#6E675D] hover:text-[#1C1A17] hover:bg-slate-50"
-              }`}
+                }`}
             >
               Agents
             </button>
@@ -887,21 +886,19 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
             </Link>
             <button
               onClick={() => setActiveTab("transactions")}
-              className={`px-3 py-1.5 rounded-lg transition cursor-pointer ${
-                activeTab === "transactions"
+              className={`px-3 py-1.5 rounded-lg transition cursor-pointer ${activeTab === "transactions"
                   ? "text-blue-600 font-bold bg-blue-50"
                   : "text-[#6E675D] hover:text-[#1C1A17] hover:bg-slate-50"
-              }`}
+                }`}
             >
               Settlements
             </button>
             <button
               onClick={() => setActiveTab("escrow")}
-              className={`px-3 py-1.5 rounded-lg transition cursor-pointer ${
-                activeTab === "escrow"
+              className={`px-3 py-1.5 rounded-lg transition cursor-pointer ${activeTab === "escrow"
                   ? "text-blue-600 font-bold bg-blue-50"
                   : "text-[#6E675D] hover:text-[#1C1A17] hover:bg-slate-50"
-              }`}
+                }`}
             >
               Escrow
             </button>
@@ -1092,11 +1089,10 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id as TerminalTab)}
-                    className={`pb-3 border-b-2 font-mono uppercase tracking-wider transition cursor-pointer whitespace-nowrap ${
-                      activeTab === tab.id
+                    className={`pb-3 border-b-2 font-mono uppercase tracking-wider transition cursor-pointer whitespace-nowrap ${activeTab === tab.id
                         ? "border-blue-600 text-blue-600 font-bold"
                         : "border-transparent text-[#8C8275] hover:text-[#1C1A17]"
-                    }`}
+                      }`}
                   >
                     {tab.label}
                   </button>
@@ -1405,11 +1401,10 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
                       <div
                         key={agent.id}
                         onClick={() => setSelectedAgentId(agent.id)}
-                        className={`border-b border-[#E2E8F0] px-4 py-3 transition-colors duration-150 flex items-center justify-between gap-3 group cursor-pointer ${
-                          isSelected
+                        className={`border-b border-[#E2E8F0] px-4 py-3 transition-colors duration-150 flex items-center justify-between gap-3 group cursor-pointer ${isSelected
                             ? "bg-blue-50/80 border-l-2 border-l-[#2563EB] text-[#0F172A]"
                             : "bg-transparent hover:bg-slate-50/80 text-[#334155] hover:text-[#0F172A] hover:border-l-2 hover:border-l-[#2563EB]/40"
-                        }`}
+                          }`}
                       >
                         {/* Agent Avatar / ID / Name (min-w-[180px] preventing line breaks) */}
                         <div className="flex items-center gap-2.5 min-w-[180px] flex-1">
@@ -1467,11 +1462,10 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
                       <div
                         key={agent.id}
                         onClick={() => setSelectedAgentId(agent.id)}
-                        className={`border-b border-[#E2E8F0] px-4 py-3 transition-colors duration-150 flex items-center justify-between gap-3 group cursor-pointer ${
-                          isSelected
+                        className={`border-b border-[#E2E8F0] px-4 py-3 transition-colors duration-150 flex items-center justify-between gap-3 group cursor-pointer ${isSelected
                             ? "bg-slate-100/90 border-l-2 border-l-[#2563EB] text-[#0F172A]"
                             : "bg-transparent hover:bg-slate-50/80 text-[#334155] hover:text-[#0F172A] hover:border-l-2 hover:border-l-[#2563EB]/40"
-                        }`}
+                          }`}
                       >
                         {/* Agent Avatar / ID / Name */}
                         <div className="flex items-center gap-2.5 min-w-[180px] flex-1">

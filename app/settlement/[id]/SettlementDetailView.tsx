@@ -657,3 +657,4 @@ export default function SettlementDetailView({ id }: Props) {
     </div>
   );
 }
+

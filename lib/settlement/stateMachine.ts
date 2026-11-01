@@ -361,3 +361,4 @@ export async function transitionSettlement(params: {
     transitionLog: `Transitioned ${agreement.agreementHash} from ${previousState} -> ${targetState} at ${now}`,
   };
 }
+
