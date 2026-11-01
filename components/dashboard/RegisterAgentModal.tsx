@@ -23,7 +23,7 @@ import {
   registerAgentMultiStepAction,
   generateAgentIdCodeAction,
   sendRegistrationOtpAction,
-  RegisteredAgentRecord,
+  type RegisteredAgentRecord,
 } from "@/app/actions/registerAgentAction";
 
 interface RegisterAgentModalProps {

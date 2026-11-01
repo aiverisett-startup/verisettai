@@ -5,8 +5,7 @@ import Link from "next/link";
 import { Check, ShieldCheck, Zap, Users, ArrowRight, Sparkles, AlertOctagon } from "lucide-react";
 import { RegisterModal } from "@/components/RegisterModal";
 import { EnterpriseAdBanner } from "@/components/landing/EnterpriseAdBanner";
-import { getPlans } from "@/app/actions/register";
-import { PlanRecord, getPlanLevel } from "@/lib/plans";
+import type { PlanRecord } from "@/lib/plans";
 import { getTierLevel, getTierInfoByLevel } from "@/lib/pricingTiers";
 import { supabase } from "@/lib/supabase";
 
@@ -144,9 +143,13 @@ export function PricingSection({ initialPlans }: PricingSectionProps) {
   useEffect(() => {
     async function loadLivePlans() {
       try {
-        const live = await getPlans();
-        if (live && live.length > 0) {
-          setPlans(live);
+        const { data, error } = await supabase
+          .from("plans")
+          .select("id, name, price_inr, is_paid, max_capacity, claimed_count")
+          .order("price_inr", { ascending: true });
+
+        if (!error && data && data.length > 0) {
+          setPlans(data as PlanRecord[]);
         }
       } catch (err) {
         console.warn("[PRICING-UI] Could not fetch live plans:", err);
@@ -261,7 +264,7 @@ export function PricingSection({ initialPlans }: PricingSectionProps) {
       return plans;
     }
     return plans.filter((p) => {
-      const planLvl = p.level ?? getPlanLevel(p.id);
+      const planLvl = p.level ?? getTierLevel(p.id);
       return planLvl > userPlanLevel;
     });
   }, [plans, userPlanLevel]);
@@ -287,9 +290,13 @@ export function PricingSection({ initialPlans }: PricingSectionProps) {
 
   const handleRegistrationSuccess = () => {
     startTransition(async () => {
-      const live = await getPlans();
-      if (live && live.length > 0) {
-        setPlans(live);
+      const { data, error } = await supabase
+        .from("plans")
+        .select("id, name, price_inr, is_paid, max_capacity, claimed_count")
+        .order("price_inr", { ascending: true });
+
+      if (!error && data && data.length > 0) {
+        setPlans(data as PlanRecord[]);
       }
     });
   };

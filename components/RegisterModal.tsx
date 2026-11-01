@@ -3,7 +3,7 @@
 import React, { useActionState, useEffect, useState, useTransition } from "react";
 import { X, CheckCircle2, AlertCircle, Copy, Check, ArrowRight, ShieldCheck, Cpu } from "lucide-react";
 import { registerAction, RegisterActionState } from "@/app/actions/register";
-import { PlanRecord } from "@/lib/plans";
+import type { PlanRecord } from "@/lib/plans";
 
 export interface RegisterModalProps {
   isOpen: boolean;

@@ -1,5 +1,10 @@
-import { supabaseAdmin } from "./supabaseAdmin";
 import { getTierLevel } from "./pricingTiers";
+
+async function getAdminClient() {
+  if (typeof window !== "undefined") return null;
+  const { supabaseAdmin } = await import("./supabaseAdmin");
+  return supabaseAdmin;
+}
 
 export interface PlanConfig {
   id: "builder" | "enterprise" | string;
@@ -122,7 +127,9 @@ export function enrichPlanConfig(plan: PlanConfig): PlanConfig {
  */
 export async function getPlanConfigs(includeArchived = false): Promise<PlanConfig[]> {
   try {
-    const { data, error } = await supabaseAdmin
+    const admin = await getAdminClient();
+    if (!admin) return Array.from(planCache.values()).map(enrichPlanConfig);
+    const { data, error } = await admin
       .from("plan_configs")
       .select("*")
       .order("base_price", { ascending: true });
@@ -193,8 +200,10 @@ export async function updatePlanConfig(
   planCache.set(normalized, updated);
 
   try {
-    await supabaseAdmin
-      .from("plan_configs")
+    const admin = await getAdminClient();
+    if (admin) {
+      await admin
+        .from("plan_configs")
       .upsert({
         id: normalized,
         display_name: updated.displayName,
@@ -207,6 +216,7 @@ export async function updatePlanConfig(
         is_archived: updated.isArchived,
         updated_at: new Date().toISOString(),
       });
+    }
   } catch (err: any) {
     console.warn("[PLAN_CONFIG_UPDATE_DB_NOTE]:", err?.message || err);
   }
