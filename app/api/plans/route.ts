@@ -22,10 +22,37 @@ export async function GET(req: NextRequest) {
     });
   } catch (err: any) {
     console.error("[API_GET_PLANS_ERROR]:", err);
-    return NextResponse.json(
-      { error: "Failed to load plan configurations.", details: err?.message },
-      { status: 500 }
-    );
+    return NextResponse.json({
+      plans: [
+        {
+          id: "builder",
+          displayName: "Builder Protocol",
+          basePrice: 2500,
+          gstAmount: 450,
+          totalPrice: 2950,
+          maxSubscribers: null,
+          currentSubscribers: 0,
+          isPaused: false,
+          isArchived: false,
+          isSoldOut: false,
+        },
+        {
+          id: "enterprise",
+          displayName: "Enterprise Protocol",
+          basePrice: 30000,
+          gstAmount: 5400,
+          totalPrice: 35400,
+          maxSubscribers: 200,
+          currentSubscribers: 0,
+          isPaused: false,
+          isArchived: false,
+          isSoldOut: false,
+        },
+      ],
+      globalPause: false,
+      allPaused: false,
+      serverTime: new Date().toISOString(),
+      fallback: true,
+    });
   }
 }
-

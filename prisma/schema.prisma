@@ -63,3 +63,20 @@ model SettlementAgreement {
   @@map("settlement_agreements")
 }
 
+
+
+model PlanConfig {
+  id                 String   @id
+  displayName        String   @map("display_name")
+  basePrice          Int      @map("base_price")
+  gstAmount          Int      @map("gst_amount")
+  totalPrice         Int      @map("total_price")
+  maxSubscribers     Int?     @map("max_subscribers")
+  currentSubscribers Int      @default(0) @map("current_subscribers")
+  isPaused           Boolean  @default(false) @map("is_paused")
+  isArchived         Boolean  @default(false) @map("is_archived")
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  @@map("plan_configs")
+}

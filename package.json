@@ -13,7 +13,8 @@
     "test:qr": "npx tsx scripts/test-billing-qr-webhook.ts",
     "protocol:verify": "npx tsx scripts/test-settlement.ts",
     "video:preview": "remotion preview remotion/index.ts",
-    "video:render": "remotion render remotion/index.ts VerisettTeaser out/verisett-teaser.mp4"
+    "video:render": "remotion render remotion/index.ts VerisettTeaser out/verisett-teaser.mp4",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@google/genai": "^2.28.0",
@@ -40,10 +41,10 @@
     "remotion": "^4.0.524",
     "tailwind-merge": "^3.6.0",
     "three": "^0.186.0",
-    "zod": "^4.6.7"
+    "zod": "^4.6.7",
+    "@prisma/client": "^5.22.0"
   },
   "devDependencies": {
-    "@prisma/client": "^5.22.0",
     "@tailwindcss/postcss": "^4",
     "@types/canvas-confetti": "^1.9.0",
     "@types/node": "^20",

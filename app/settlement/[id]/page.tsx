@@ -6,7 +6,13 @@ interface PageProps {
 }
 
 export default async function SettlementPage({ params }: PageProps) {
-  const { id } = await params;
+  let id = "default";
+  try {
+    const resolved = await params;
+    id = resolved?.id || "default";
+  } catch (err: any) {
+    console.warn("[SETTLEMENT_PAGE_PARAMS_FALLBACK]:", err?.message || err);
+  }
 
   return (
     <Suspense
@@ -23,4 +29,3 @@ export default async function SettlementPage({ params }: PageProps) {
     </Suspense>
   );
 }
-
