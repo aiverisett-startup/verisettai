@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { DepositModal } from "@/components/vault/DepositModal";
 import {
   ShieldCheck,
   Plus,
@@ -163,8 +164,6 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
   const [isRegisterAgentModalOpen, setIsRegisterAgentModalOpen] = useState<boolean>(false);
   const [isPolicyModalOpen, setIsPolicyModalOpen] = useState<boolean>(false);
   const [isDepositModalOpen, setIsDepositModalOpen] = useState<boolean>(false);
-  const [depositAmount, setDepositAmount] = useState<string>("10000");
-  const [isDepositing, setIsDepositing] = useState<boolean>(false);
 
   // FastMCP Quick Key Modal
   const [isKeyModalOpen, setIsKeyModalOpen] = useState<boolean>(false);
@@ -259,6 +258,17 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
           setVaults([newVault as VaultRecord]);
           setVaultId(newVault.id.slice(0, 8).toUpperCase());
         }
+      }
+
+      // Fetch verified UserVault balance from PostgreSQL
+      try {
+        const balRes = await fetch(`/api/vault/balance?userId=${userId}`, { cache: "no-store" });
+        const balData = await balRes.json();
+        if (balData.success && typeof balData.balancePaise === "number") {
+          verifiedPaise = balData.balancePaise;
+        }
+      } catch (balErr) {
+        console.warn("UserVault balance fetch note:", balErr);
       }
 
       setBalancePaise(verifiedPaise);
@@ -418,6 +428,15 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
     let isMounted = true;
     loadTenantData(user.id);
 
+    const handleVaultUpdated = (e: any) => {
+      if (e?.detail?.newBalancePaise !== undefined) {
+        setBalancePaise(e.detail.newBalancePaise);
+      } else {
+        loadTenantData(user.id);
+      }
+    };
+    window.addEventListener("verisett_vault_updated", handleVaultUpdated);
+
     const checkFounderPass = async () => {
       try {
         const { data: profile } = await supabase
@@ -447,6 +466,7 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
 
     return () => {
       isMounted = false;
+      window.removeEventListener("verisett_vault_updated", handleVaultUpdated);
       subscription.unsubscribe();
     };
   }, [user.id, loadTenantData, router, initialUser.email]);
@@ -762,46 +782,7 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
     }
   };
 
-  // Simulate INR Vault Deposit
-  const handleSimulateDeposit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const amountNumINR = parseFloat(depositAmount);
-    if (isNaN(amountNumINR) || amountNumINR <= 0) return;
-    const depositPaise = Math.round(amountNumINR * 100);
 
-    try {
-      setIsDepositing(true);
-      await supabase.from("ledger_entries").insert({
-        user_id: user.id,
-        transaction_id: crypto.randomUUID(),
-        entry_type: "CREDIT",
-        amount: depositPaise,
-        currency: "INR",
-        description: "Tenant Real-Time Vault Deposit",
-      });
-
-      const newBalPaise = balancePaise + depositPaise;
-      const newBalUSD = newBalPaise / 100 / 84;
-
-      await supabase
-        .from("vaults")
-        .update({
-          balance: newBalUSD,
-          balance_cents: Math.round(newBalUSD * 100),
-          updated_at: new Date().toISOString(),
-        })
-        .eq("user_id", user.id);
-
-      setBalancePaise(newBalPaise);
-      setIsDepositModalOpen(false);
-    } catch (err) {
-      console.warn("Deposit notice:", err);
-      setBalancePaise((prev) => prev + depositPaise);
-      setIsDepositModalOpen(false);
-    } finally {
-      setIsDepositing(false);
-    }
-  };
 
   // Generate sample FastMCP test escrow settlement for sandbox testing
   const handleGenerateTestEscrow = useCallback(async () => {
@@ -1634,60 +1615,13 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
       )}
 
       {/* MODAL 3: Custody Deposit Modal */}
-      {isDepositModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-md animate-in fade-in">
-          <div className="w-full max-w-md rounded-[20px] border border-[rgba(255,255,255,0.9)] bg-white/95 backdrop-blur-xl p-7 shadow-2xl space-y-5 font-sans">
-            <div>
-              <h3 className="text-lg font-bold text-[#0F172A]">Deposit Custody Funds</h3>
-              <p className="text-xs text-[#64748B] mt-1">
-                Add balance to your tenant vault to power autonomous agent escrows.
-              </p>
-            </div>
-
-            <form onSubmit={handleSimulateDeposit} className="space-y-4">
-              <div>
-                <label className="block text-xs font-mono font-bold text-[#334155] mb-1.5 uppercase">
-                  Deposit Amount (INR)
-                </label>
-                <div className="relative">
-                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-bold text-[#64748B]">
-                    ₹
-                  </span>
-                  <input
-                    type="number"
-                    min="500"
-                    step="500"
-                    required
-                    value={depositAmount}
-                    onChange={(e) => setDepositAmount(e.target.value)}
-                    className="w-full pl-8 pr-4 py-2.5 rounded-[10px] bg-slate-50 border border-[#CBD5E1] focus:border-[#2563EB] focus:bg-white focus:outline-none font-mono text-sm font-bold text-[#0F172A]"
-                  />
-                </div>
-                <p className="text-[11px] font-mono text-[#64748B] mt-1.5">
-                  Equivalent: ${((parseFloat(depositAmount) || 0) / 84).toFixed(2)} USD (@ ₹84/$)
-                </p>
-              </div>
-
-              <div className="pt-2 flex items-center justify-end gap-3">
-                <button
-                  type="button"
-                  onClick={() => setIsDepositModalOpen(false)}
-                  className="px-4 py-2 rounded-[10px] text-xs font-semibold text-[#64748B] hover:text-[#0F172A] transition cursor-pointer"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={isDepositing}
-                  className="px-5 py-2.5 rounded-[10px] bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-semibold transition cursor-pointer disabled:opacity-60 shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]"
-                >
-                  {isDepositing ? "Processing..." : "Confirm Deposit"}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      <DepositModal
+        isOpen={isDepositModalOpen}
+        onClose={() => setIsDepositModalOpen(false)}
+        onSuccess={(data) => {
+          setBalancePaise(data.newBalancePaise);
+        }}
+      />
 
       {/* MODAL 4: Quick Re-Key One-Time Token Modal */}
       {isKeyModalOpen && (

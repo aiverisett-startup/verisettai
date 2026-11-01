@@ -8,6 +8,7 @@ import { VerisettLogo } from "../VerisettLogo";
 import { EnvironmentMode, VaultBalance } from "../dashboard/types";
 import { useAuthUser } from "@/lib/useAuthUser";
 import { ProfileSettingsModal } from "@/components/auth/ProfileSettingsModal";
+import { DepositModal } from "@/components/vault/DepositModal";
 import { supabase } from "@/lib/supabase";
 
 interface MinimalNavProps {
@@ -54,6 +55,7 @@ export function MinimalNav({
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [avatarError, setAvatarError] = useState(false);
   const [balance, setBalance] = useState<number | null>(null);
+  const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
 
   useEffect(() => {
     if (!user) {
@@ -63,31 +65,26 @@ export function MinimalNav({
 
     const fetchBalance = async () => {
       try {
+        const res = await fetch("/api/vault/balance", { cache: "no-store" });
+        const data = await res.json();
+        if (data.success && typeof data.balancePaise === "number") {
+          setBalance(data.balancePaise);
+          return;
+        }
+
         const { data: { session } } = await supabase.auth.getSession();
-        const targetUserId = session?.user?.id || user.id;
+        const targetUserId = session?.user?.id || user?.id;
         if (targetUserId) {
-          const { data: rpcBal, error: rpcErr } = await supabase.rpc("get_verified_balance", {
-            p_user_id: targetUserId,
-          });
-
-          if (!rpcErr && rpcBal !== null) {
-            setBalance(Number(rpcBal));
-            return;
-          }
-
-          const { data: vaultRow } = await supabase
-            .from("vaults")
-            .select("balance_cents")
-            .eq("user_id", targetUserId)
-            .maybeSingle();
-
-          if (vaultRow && vaultRow.balance_cents !== null) {
-            setBalance(Number(vaultRow.balance_cents));
+          const directRes = await fetch(`/api/vault/balance?userId=${targetUserId}`, { cache: "no-store" });
+          const directData = await directRes.json();
+          if (directData.success && typeof directData.balancePaise === "number") {
+            setBalance(directData.balancePaise);
             return;
           }
         }
         setBalance(0);
-      } catch {
+      } catch (err) {
+        console.warn("[VAULT_BALANCE_FETCH_NOTE]:", err);
         setBalance(0);
       }
     };
@@ -99,8 +96,17 @@ export function MinimalNav({
     };
 
     window.addEventListener("verisett_auth_change", handleAuthEvent);
+    const handleVaultUpdated = (e: any) => {
+      if (e?.detail?.newBalancePaise !== undefined) {
+        setBalance(e.detail.newBalancePaise);
+      } else {
+        fetchBalance();
+      }
+    };
+    window.addEventListener("verisett_vault_updated", handleVaultUpdated);
     return () => {
       window.removeEventListener("verisett_auth_change", handleAuthEvent);
+      window.removeEventListener("verisett_vault_updated", handleVaultUpdated);
     };
   }, [user]);
 
@@ -151,7 +157,7 @@ export function MinimalNav({
         <div className="flex items-center gap-3 shrink-0">
           {user && (
             <button
-              onClick={onOpenDepositModal}
+              onClick={onOpenDepositModal || (() => setIsDepositModalOpen(true))}
               className="shrink-0 hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-border hover:border-blue-400 transition-colors text-xs whitespace-nowrap shadow-xs cursor-pointer font-mono"
               title="Click to view verified ledger balance & vault deposit"
             >
@@ -384,6 +390,13 @@ export function MinimalNav({
           </div>
         </div>
       )}
+
+      {/* Vault Deposit Modal */}
+      <DepositModal
+        isOpen={isDepositModalOpen}
+        onClose={() => setIsDepositModalOpen(false)}
+        onSuccess={(data) => setBalance(data.newBalancePaise)}
+      />
 
       {/* Profile & Account Settings Modal */}
       {user && (

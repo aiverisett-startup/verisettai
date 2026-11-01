@@ -929,3 +929,33 @@ model PlanConfig {
   @@schema("public")
   @@map("plan_configs")
 }
+
+
+model UserVault {
+  id           String             @id @default(cuid())
+  userId       String             @unique @map("user_id")
+  balancePaise BigInt             @default(0) @map("balance_paise")
+  currency     String             @default("INR")
+  updatedAt    DateTime           @updatedAt @map("updated_at")
+  createdAt    DateTime           @default(now()) @map("created_at")
+
+  transactions VaultTransaction[]
+
+  @@schema("public")
+  @@map("user_vaults")
+}
+
+model VaultTransaction {
+  id                String    @id @default(cuid())
+  vaultId           String    @map("vault_id")
+  vault             UserVault @relation(fields: [vaultId], references: [id], onDelete: Cascade)
+  amountPaise       BigInt    @map("amount_paise")
+  type              String    // "DEPOSIT", "ESCROW_LOCK", "ESCROW_RELEASE", "REFUND"
+  status            String    // "PENDING", "COMPLETED", "FAILED"
+  razorpayOrderId   String?   @unique @map("razorpay_order_id")
+  razorpayPaymentId String?   @unique @map("razorpay_payment_id")
+  createdAt         DateTime  @default(now()) @map("created_at")
+
+  @@schema("public")
+  @@map("vault_transactions")
+}

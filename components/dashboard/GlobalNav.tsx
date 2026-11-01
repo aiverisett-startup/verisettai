@@ -152,7 +152,7 @@ export const GlobalNav: React.FC<GlobalNavProps> = ({
               className="flex items-center gap-1.5 rounded-lg border border-[#10B981]/40 bg-[#10B981]/10 px-3 py-1.5 text-xs font-semibold text-[#10B981] hover:bg-[#10B981]/20 hover:border-[#10B981] transition-all shadow-sm shadow-[#10B981]/10 cursor-pointer"
             >
               <PlusCircle className="h-3.5 w-3.5" />
-              <span>Deposit USDC</span>
+              <span>Deposit Funds</span>
             </button>
 
             {/* API Key Modal Trigger */}
