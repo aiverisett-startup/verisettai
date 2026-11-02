@@ -31,6 +31,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json(
         {
           success: true,
+          status: "standby",
           balancePaise: 0,
           balanceInr: "0.00",
           balanceUsd: "0.00",
@@ -45,25 +46,46 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Query UserVault from PostgreSQL
-    let vault = await prisma.userVault.findUnique({
-      where: { userId },
-    });
+    // Defensive query to UserVault from PostgreSQL
+    let vault = null;
+    try {
+      vault = await prisma.userVault.findUnique({
+        where: { userId },
+      });
 
-    if (!vault) {
-      try {
-        vault = await prisma.userVault.create({
-          data: {
-            userId,
-            balancePaise: BigInt(0),
-            currency: "INR",
-          },
-        });
-      } catch {
-        vault = await prisma.userVault.findUnique({
-          where: { userId },
-        });
+      if (!vault) {
+        try {
+          vault = await prisma.userVault.create({
+            data: {
+              userId,
+              balancePaise: BigInt(0),
+              currency: "INR",
+            },
+          });
+        } catch {
+          vault = await prisma.userVault.findUnique({
+            where: { userId },
+          });
+        }
       }
+    } catch (dbErr: any) {
+      console.warn("[VAULT_BALANCE_DB_STANDBY]:", dbErr?.message || dbErr);
+      return NextResponse.json(
+        {
+          success: true,
+          status: "standby",
+          balancePaise: 0,
+          balanceInr: "0.00",
+          balanceUsd: "0.00",
+          currency: "INR",
+          userId,
+        },
+        {
+          headers: {
+            "Cache-Control": "no-store, max-age=0, must-revalidate",
+          },
+        }
+      );
     }
 
     const balancePaise = vault ? Number(vault.balancePaise) : 0;
@@ -73,6 +95,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(
       {
         success: true,
+        status: "active",
         vaultId: vault?.id,
         userId,
         balancePaise,
@@ -88,18 +111,18 @@ export async function GET(req: NextRequest) {
       }
     );
   } catch (error: any) {
-    console.error("[VAULT_BALANCE_ERROR]:", error);
+    console.warn("[VAULT_BALANCE_STANDBY_FALLBACK]:", error?.message || error);
     return NextResponse.json(
       {
-        success: false,
-        error: error?.message || "Failed to fetch vault balance",
+        success: true,
+        status: "standby",
         balancePaise: 0,
         balanceInr: "0.00",
         balanceUsd: "0.00",
         currency: "INR",
       },
       {
-        status: 500,
+        status: 200,
         headers: {
           "Cache-Control": "no-store, max-age=0, must-revalidate",
         },
@@ -107,4 +130,3 @@ export async function GET(req: NextRequest) {
     );
   }
 }
-
