@@ -3,6 +3,7 @@
 import crypto from "crypto";
 import { createServerSupabaseClient } from "@/lib/supabaseServer";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import prisma from "@/lib/prisma";
 
 export interface RegisterAgentInput {
   agentName: string;
@@ -250,7 +251,25 @@ export async function registerAgentMultiStepAction(
       createdAtIso = insertedData.created_at || createdAtIso;
     }
 
-    // 7. Sync with public.agents table via supabaseAdmin
+    // 7. Sync with PostgreSQL Agent table via Prisma
+    try {
+      await prisma.agent.create({
+        data: {
+          name: trimmedName,
+          endpoint: trimmedWebhook || null,
+          protocol: frameworkValue || "A2A",
+          userId: user.id,
+          status: "ACTIVE",
+          throughputTps: 0.0,
+          totalSettled: BigInt(0),
+          lastSeenAt: new Date(),
+        },
+      });
+    } catch (e: any) {
+      console.warn(`[prisma.agent.create note] ${e?.message || e}`);
+    }
+
+    // Sync with public.agents table via supabaseAdmin
     try {
       await supabaseAdmin.from("agents").insert({
         user_id: user.id,

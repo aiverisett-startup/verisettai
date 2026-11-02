@@ -959,3 +959,20 @@ model VaultTransaction {
   @@schema("public")
   @@map("vault_transactions")
 }
+
+
+model Agent {
+  id            String    @id @default(cuid())
+  userId        String?
+  name          String
+  endpoint      String?
+  protocol      String    @default("A2A")
+  status        String    @default("ACTIVE")
+  throughputTps Float     @default(0.0)
+  totalSettled  BigInt    @default(0)
+  lastSeenAt    DateTime  @default(now())
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@schema("public")
+}

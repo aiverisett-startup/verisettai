@@ -156,9 +156,6 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
   // Active terminal sub-navigation tab
   const [activeTab, setActiveTab] = useState<TerminalTab>("overview");
 
-  // Watchlist filter selector
-  const [watchlistGroup, setWatchlistGroup] = useState<string>("Active Swarm");
-
   // Modals state
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState<boolean>(false);
   const [isRegisterAgentModalOpen, setIsRegisterAgentModalOpen] = useState<boolean>(false);
@@ -518,15 +515,6 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
     const diffMs = Date.now() - new Date(agent.last_heartbeat_at).getTime();
     return diffMs <= 60000;
   }, []);
-
-  // Categorized Watchlist Groups: CONNECTED AGENTS & STANDBY NODES
-  const connectedAgents = useMemo(() => {
-    return agents.filter((a) => isAgentHeartbeatValid(a));
-  }, [agents, isAgentHeartbeatValid]);
-
-  const standbyNodes = useMemo(() => {
-    return agents.filter((a) => !isAgentHeartbeatValid(a));
-  }, [agents, isAgentHeartbeatValid]);
 
   // Terminal Chart Gate: User has registered an agent AND selected agent has valid heartbeat within 60s
   const isTelemetryLive = useMemo(() => {
@@ -1313,10 +1301,9 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
               {/* Watchlist Top Header */}
               <div className="p-4 border-b border-[#E2E8F0] bg-white/60 backdrop-blur-md flex items-center justify-between gap-2">
                 <div className="flex items-center gap-1.5">
-                  <button className="flex items-center gap-1 font-mono font-bold text-xs text-[#0F172A] bg-white px-2.5 py-1.5 rounded-[8px] border border-[#CBD5E1] shadow-2xs hover:border-[#94A3B8] transition cursor-pointer">
-                    <span>{watchlistGroup}</span>
-                    <ChevronDown className="w-3 h-3 text-[#64748B]" />
-                  </button>
+                  <span className="font-mono font-bold text-xs text-[#0F172A] bg-white px-2.5 py-1.5 rounded-[8px] border border-[#CBD5E1] shadow-2xs">
+                    Registered Agents
+                  </span>
                   <span className="text-[11px] font-mono text-[#64748B]">
                     ({agents.length})
                   </span>
@@ -1325,10 +1312,11 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
                 <div className="flex items-center gap-1">
                   <button
                     onClick={() => setIsRegisterAgentModalOpen(true)}
-                    className="p-1.5 rounded-[8px] bg-blue-50 border border-blue-200 hover:bg-blue-100 text-[#2563EB] transition cursor-pointer shadow-2xs"
-                    title="+ Add Agent"
+                    className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-[8px] bg-blue-50 border border-blue-200 hover:bg-blue-100 text-[#2563EB] text-xs font-semibold transition cursor-pointer shadow-2xs"
+                    title="+ Register Agent"
                   >
                     <Plus className="w-3.5 h-3.5" />
+                    <span>Register</span>
                   </button>
 
                   <button
@@ -1342,9 +1330,9 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
                   <button
                     onClick={() => loadTenantData(user.id)}
                     className="p-1.5 rounded-[8px] hover:bg-slate-100 text-[#64748B] hover:text-[#0F172A] transition cursor-pointer"
-                    title="Options Menu"
+                    title="Refresh"
                   >
-                    <MoreVertical className="w-3.5 h-3.5" />
+                    <RefreshCw className="w-3.5 h-3.5" />
                   </button>
                 </div>
               </div>
@@ -1353,27 +1341,30 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
               <div className="text-[11px] font-semibold uppercase tracking-wider text-[#64748B] bg-slate-50/70 px-4 py-2 border-b border-[#E2E8F0] flex items-center justify-between font-sans">
                 <span className="min-w-[180px] flex-1">Agent / Node</span>
                 <span className="w-24 text-right">Throughput</span>
-                <span className="w-20 text-right">24h Chg%</span>
+                <span className="w-20 text-right">Status</span>
               </div>
 
-              {/* Categorized Rows List */}
+              {/* Unified Rows List (Single list without split Connected / Standby sections) */}
               <div className="divide-y divide-[#E2E8F0] max-h-[580px] overflow-y-auto custom-glass-scrollbar bg-white/40">
-                {/* 1. Group: CONNECTED AGENTS */}
-                <div className="text-[10px] font-mono tracking-widest text-[#475569] uppercase py-1.5 px-4 bg-slate-100/70 border-y border-[#E2E8F0] flex items-center justify-between">
-                  <span className="flex items-center gap-1.5 text-emerald-700 font-bold">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                    CONNECTED AGENTS
-                  </span>
-                  <span className="text-[#64748B] font-semibold">({connectedAgents.length})</span>
-                </div>
-
-                {connectedAgents.length === 0 ? (
-                  <div className="p-4 text-center text-xs font-sans text-[#64748B]">
-                    No agents actively streaming.
+                {agents.length === 0 ? (
+                  <div className="py-10 px-4 text-center space-y-2">
+                    <p className="text-xs font-sans text-[#64748B]">
+                      No agents connected yet. Click &apos;+ Register Agent&apos; to deploy your first node.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setIsRegisterAgentModalOpen(true)}
+                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-blue-50 text-blue-600 border border-blue-200 text-xs font-semibold hover:bg-blue-100 transition cursor-pointer"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>+ Register Agent</span>
+                    </button>
                   </div>
                 ) : (
-                  connectedAgents.map((agent) => {
+                  agents.map((agent) => {
                     const isSelected = selectedAgent?.id === agent.id;
+                    const isHeartbeatActive = isAgentHeartbeatValid(agent);
+                    const isRevoked = (agent.status || "").toUpperCase() === "REVOKED";
                     const code =
                       agent.agent_id_code ||
                       `AGT-${agent.id.replace(/-/g, "").slice(0, 8).toUpperCase()}`;
@@ -1382,17 +1373,22 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
                       <div
                         key={agent.id}
                         onClick={() => setSelectedAgentId(agent.id)}
-                        className={`border-b border-[#E2E8F0] px-4 py-3 transition-colors duration-150 flex items-center justify-between gap-3 group cursor-pointer ${isSelected
+                        className={`border-b border-[#E2E8F0] px-4 py-3 transition-colors duration-150 flex items-center justify-between gap-3 group cursor-pointer ${
+                          isSelected
                             ? "bg-blue-50/80 border-l-2 border-l-[#2563EB] text-[#0F172A]"
                             : "bg-transparent hover:bg-slate-50/80 text-[#334155] hover:text-[#0F172A] hover:border-l-2 hover:border-l-[#2563EB]/40"
-                          }`}
+                        }`}
                       >
-                        {/* Agent Avatar / ID / Name (min-w-[180px] preventing line breaks) */}
+                        {/* Agent Avatar / ID / Name */}
                         <div className="flex items-center gap-2.5 min-w-[180px] flex-1">
                           <img
                             src={agent.avatar_url || "/agent-avatar.png"}
                             alt={agent.name}
-                            className="w-7 h-7 rounded-full object-cover shrink-0 border border-blue-500/50"
+                            className={`w-7 h-7 rounded-full object-cover shrink-0 border ${
+                              isHeartbeatActive
+                                ? "border-blue-500/50"
+                                : "grayscale opacity-60 border-[#CBD5E1]"
+                            }`}
                           />
                           <div className="min-w-0 flex-1">
                             <span className="font-mono text-xs font-bold text-[#0F172A] group-hover:text-[#2563EB] block truncate">
@@ -1406,76 +1402,22 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
 
                         {/* Throughput */}
                         <div className="w-24 text-right font-mono text-xs font-semibold text-[#0F172A]">
-                          {agent.throughput_tps ? `${agent.throughput_tps.toFixed(1)} TPS` : "0.0 TPS"}
+                          {agent.throughput_tps
+                            ? `${agent.throughput_tps.toFixed(1)} TPS`
+                            : "0.0 TPS"}
                         </div>
 
-                        {/* Real-time Status / Ping */}
-                        <div className="w-20 text-right font-mono text-xs font-semibold text-emerald-600">
-                          {agent.ping_latency_ms ? `${agent.ping_latency_ms}ms` : "Active"}
-                        </div>
-                      </div>
-                    );
-                  })
-                )}
-
-                {/* 2. Group: STANDBY NODES */}
-                <div className="text-[10px] font-mono tracking-widest text-[#475569] uppercase py-1.5 px-4 bg-slate-100/70 border-y border-[#E2E8F0] flex items-center justify-between">
-                  <span className="flex items-center gap-1.5 text-[#475569] font-bold">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#94A3B8]" />
-                    STANDBY NODES
-                  </span>
-                  <span className="text-[#64748B] font-semibold">({standbyNodes.length})</span>
-                </div>
-
-                {standbyNodes.length === 0 ? (
-                  <div className="p-4 text-center text-xs font-sans text-[#64748B]">
-                    No standby nodes.
-                  </div>
-                ) : (
-                  standbyNodes.map((agent) => {
-                    const isSelected = selectedAgent?.id === agent.id;
-                    const isRevoked = (agent.status || "").toUpperCase() === "REVOKED";
-                    const code =
-                      agent.agent_id_code ||
-                      `AGT-${agent.id.replace(/-/g, "").slice(0, 8).toUpperCase()}`;
-
-                    return (
-                      <div
-                        key={agent.id}
-                        onClick={() => setSelectedAgentId(agent.id)}
-                        className={`border-b border-[#E2E8F0] px-4 py-3 transition-colors duration-150 flex items-center justify-between gap-3 group cursor-pointer ${isSelected
-                            ? "bg-slate-100/90 border-l-2 border-l-[#2563EB] text-[#0F172A]"
-                            : "bg-transparent hover:bg-slate-50/80 text-[#334155] hover:text-[#0F172A] hover:border-l-2 hover:border-l-[#2563EB]/40"
-                          }`}
-                      >
-                        {/* Agent Avatar / ID / Name */}
-                        <div className="flex items-center gap-2.5 min-w-[180px] flex-1">
-                          <img
-                            src={agent.avatar_url || "/agent-avatar.png"}
-                            alt={agent.name}
-                            className="w-7 h-7 rounded-full object-cover shrink-0 grayscale opacity-60 border border-[#CBD5E1]"
-                          />
-                          <div className="min-w-0 flex-1">
-                            <span className="font-mono text-xs font-semibold text-[#1E293B] group-hover:text-[#0F172A] block truncate">
-                              {code}
-                            </span>
-                            <span className="text-xs text-[#64748B] group-hover:text-[#334155] block whitespace-nowrap truncate font-sans">
-                              {agent.name}
-                            </span>
-                          </div>
-                        </div>
-
-                        {/* Throughput */}
-                        <div className="w-24 text-right font-mono text-xs text-[#94A3B8]">
-                          0.0 <span className="text-[10px]">TPS</span>
-                        </div>
-
-                        {/* Rate Indicator / Status */}
+                        {/* Status (Green badge for ACTIVE, Gray for IDLE) */}
                         <div className="w-20 text-right font-mono text-xs">
                           {isRevoked ? (
                             <span className="font-bold text-rose-600">REV</span>
+                          ) : isHeartbeatActive ? (
+                            <span className="inline-flex items-center gap-1 text-emerald-700 font-bold">
+                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                              ACTIVE
+                            </span>
                           ) : (
-                            <span className="text-[#94A3B8]">Idle</span>
+                            <span className="text-[#94A3B8]">IDLE</span>
                           )}
                         </div>
                       </div>
@@ -1599,6 +1541,9 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
               ...prev,
             ]);
             setSelectedAgentId(newAgent.id);
+          }
+          if (typeof window !== "undefined") {
+            window.dispatchEvent(new CustomEvent("verisett_agents_updated"));
           }
           loadTenantData(user.id);
         }}

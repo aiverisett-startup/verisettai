@@ -90,6 +90,9 @@ export function RegisterAgentModal({
   if (!isOpen) return null;
 
   const handleResetAndClose = () => {
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("verisett_agents_updated"));
+    }
     setCurrentStep(1);
     setAgentName("");
     setFramework("FastMCP");
@@ -204,6 +207,26 @@ export function RegisterAgentModal({
       if (!result.success) {
         setErrorMessage(result.error || "Registration failed. Please check inputs.");
       } else {
+        // Direct sync to /api/agents
+        try {
+          await fetch("/api/agents", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              name: agentName.trim(),
+              endpoint: webhookUrl.trim() || undefined,
+              protocol: framework || "A2A",
+            }),
+          });
+        } catch (fetchErr) {
+          console.warn("[RegisterAgentModal] Note posting to /api/agents:", fetchErr);
+        }
+
+        // Real-time mutation refresh
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(new CustomEvent("verisett_agents_updated"));
+        }
+
         setGeneratedApiKey(result.apiKey || null);
         setRegisteredAgent(result.agent || null);
         setCurrentStep(4);

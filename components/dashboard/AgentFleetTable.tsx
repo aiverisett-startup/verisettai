@@ -1,34 +1,39 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import {
   Bot,
-  ShieldCheck,
   Zap,
-  Key,
   Copy,
   Check,
-  Clock,
-  ArrowUpRight,
-  ExternalLink,
   Plus,
   RefreshCw,
-  Activity,
 } from "lucide-react";
 import { AgentRecord } from "@/app/dashboard/DashboardClient";
 
 interface AgentFleetTableProps {
-  agents: AgentRecord[];
-  selectedAgentId: string | null;
-  onSelectAgent: (agentId: string) => void;
+  agents?: AgentRecord[];
+  selectedAgentId?: string | null;
+  onSelectAgent?: (agentId: string) => void;
   onRegisterAgent: () => void;
   onTriggerPing?: (agentId: string) => void;
   isPinging?: boolean;
 }
 
+interface LiveAgentRow {
+  id: string;
+  name: string;
+  endpoint?: string | null;
+  protocol: string;
+  status: string;
+  throughputTps: number;
+  totalSettled: string;
+  createdAt: string;
+}
+
 export function AgentFleetTable({
-  agents,
+  agents: passedAgents,
   selectedAgentId,
   onSelectAgent,
   onRegisterAgent,
@@ -36,6 +41,46 @@ export function AgentFleetTable({
   isPinging = false,
 }: AgentFleetTableProps) {
   const [copiedKeyId, setCopiedKeyId] = useState<string | null>(null);
+  const [dbAgents, setDbAgents] = useState<LiveAgentRow[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
+
+  const fetchLiveAgents = useCallback(async (isManual = false) => {
+    if (isManual) setIsRefreshing(true);
+    try {
+      const res = await fetch("/api/agents", {
+        cache: "no-store",
+        headers: { "Cache-Control": "no-store" },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data.agents)) {
+          setDbAgents(data.agents);
+        }
+      }
+    } catch (err) {
+      console.error("[AgentFleetTable] Fetch error:", err);
+    } finally {
+      setIsLoading(false);
+      if (isManual) setIsRefreshing(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchLiveAgents();
+
+    const handleUpdate = () => {
+      fetchLiveAgents();
+    };
+
+    window.addEventListener("verisett_agents_updated", handleUpdate);
+    window.addEventListener("verisett_data_mutated", handleUpdate);
+
+    return () => {
+      window.removeEventListener("verisett_agents_updated", handleUpdate);
+      window.removeEventListener("verisett_data_mutated", handleUpdate);
+    };
+  }, [fetchLiveAgents]);
 
   const handleCopyAgentId = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -46,17 +91,48 @@ export function AgentFleetTable({
     }
   };
 
+  // Combine live PostgreSQL agents with any passed props
+  const displayAgents: LiveAgentRow[] =
+    dbAgents.length > 0
+      ? dbAgents
+      : (passedAgents || []).map((a) => ({
+          id: a.id,
+          name: a.name,
+          endpoint: a.webhook_url,
+          protocol: a.framework || "A2A",
+          status: a.status || "ACTIVE",
+          throughputTps: a.throughput_tps || 0.0,
+          totalSettled: "0",
+          createdAt: a.created_at || new Date().toISOString(),
+        }));
+
+  const formatDate = (dateStr: string) => {
+    try {
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return "—";
+      return d.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    } catch {
+      return "—";
+    }
+  };
+
   return (
-    <div className="bg-white/80 backdrop-blur-md border border-slate-200 rounded-2xl shadow-sm overflow-hidden transition-all duration-300">
-      {/* Table Section Header */}
+    <div className="bg-white/80 backdrop-blur-md border border-slate-200 rounded-2xl shadow-sm overflow-hidden transition-all duration-300 font-sans">
+      {/* Header bar: Title Registered Agents with count badge and a + Register Agent button */}
       <div className="p-5 sm:p-6 border-b border-slate-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <h3 className="text-base font-bold text-slate-900 tracking-tight font-sans">
-              Autonomous Agent Fleet
+          <div className="flex items-center gap-2.5">
+            <h3 className="text-base sm:text-lg font-bold text-slate-900 tracking-tight font-sans">
+              Registered Agents
             </h3>
-            <span className="px-2 py-0.5 rounded-full text-xs font-mono font-bold bg-blue-50 text-blue-700 border border-blue-200">
-              {agents.length} {agents.length === 1 ? "Node" : "Nodes"}
+            <span className="px-2.5 py-0.5 rounded-full text-xs font-mono font-bold bg-blue-50 text-blue-700 border border-blue-200 shadow-2xs">
+              ({displayAgents.length})
             </span>
           </div>
           <p className="text-xs text-slate-500 font-sans">
@@ -64,28 +140,49 @@ export function AgentFleetTable({
           </p>
         </div>
 
-        <button
-          type="button"
-          onClick={onRegisterAgent}
-          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-sm transition cursor-pointer self-start sm:self-auto"
-        >
-          <Plus className="w-3.5 h-3.5" />
-          <span>Register New Agent</span>
-        </button>
+        <div className="flex items-center gap-2 self-start sm:self-auto">
+          <button
+            type="button"
+            onClick={() => fetchLiveAgents(true)}
+            className="p-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-900 transition cursor-pointer shadow-2xs"
+            title="Refresh from PostgreSQL"
+          >
+            <RefreshCw
+              className={`w-3.5 h-3.5 ${isRefreshing ? "animate-spin text-blue-600" : ""}`}
+            />
+          </button>
+
+          <button
+            type="button"
+            onClick={onRegisterAgent}
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-sm transition cursor-pointer"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            <span>+ Register Agent</span>
+          </button>
+        </div>
       </div>
 
-      {/* Empty State */}
-      {agents.length === 0 ? (
+      {/* Loading Skeleton */}
+      {isLoading && displayAgents.length === 0 ? (
+        <div className="py-14 px-6 text-center space-y-3">
+          <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-blue-50 text-blue-600 animate-pulse">
+            <RefreshCw className="w-5 h-5 animate-spin" />
+          </div>
+          <p className="text-xs text-slate-500 font-mono">Synchronizing agent nodes...</p>
+        </div>
+      ) : displayAgents.length === 0 ? (
+        /* Empty State */
         <div className="py-16 px-6 text-center space-y-4">
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 border border-blue-200/80 shadow-2xs">
             <Bot className="w-7 h-7" />
           </div>
           <div className="space-y-1.5 max-w-md mx-auto">
             <h4 className="text-sm font-bold text-slate-900 font-sans">
-              No active agent nodes registered
+              No agents connected yet
             </h4>
             <p className="text-xs text-slate-500 leading-relaxed font-sans">
-              Generate an API key or trigger an execution to provision your first node. Your agents will automatically synchronize here once registered.
+              No agents connected yet. Click &apos;+ Register Agent&apos; to deploy your first node.
             </p>
           </div>
           <button
@@ -94,61 +191,52 @@ export function AgentFleetTable({
             className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-sm transition cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5" />
-            <span>Provision First Agent</span>
+            <span>+ Register Agent</span>
           </button>
         </div>
       ) : (
-        /* Data Table */
+        /* Unified Single Vertical Table */
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="border-b border-slate-200 bg-slate-50/70 text-[11px] font-mono uppercase tracking-wider text-slate-500">
-                <th className="py-3 px-4 sm:px-6 font-semibold">Agent Name / ID</th>
-                <th className="py-3 px-4 font-semibold">Execution Node</th>
-                <th className="py-3 px-4 font-semibold">Protocol Status</th>
-                <th className="py-3 px-4 font-semibold">Last Execution</th>
-                <th className="py-3 px-4 sm:px-6 font-semibold">API Key Scope</th>
-                <th className="py-3 px-4 text-right font-semibold">Actions</th>
+              <tr className="border-b border-slate-200 bg-slate-50/80 text-[11px] font-mono uppercase tracking-wider text-slate-500">
+                <th className="py-3 px-4 sm:px-6 font-semibold">AGENT NAME &amp; ID</th>
+                <th className="py-3 px-4 font-semibold">PROTOCOL</th>
+                <th className="py-3 px-4 font-semibold">STATUS</th>
+                <th className="py-3 px-4 font-semibold">THROUGHPUT</th>
+                <th className="py-3 px-4 sm:px-6 font-semibold">REGISTERED AT</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {agents.map((agent) => {
+              {displayAgents.map((agent) => {
                 const isSelected = agent.id === selectedAgentId;
-                const statusStr = (agent.status || "Idle").toLowerCase();
-                const isLive = statusStr === "active" || statusStr === "linked";
-                const isDispatched = statusStr === "dispatched";
-
-                const agentCode =
-                  agent.agent_id_code ||
-                  `AGT-${agent.id.replace(/-/g, "").slice(0, 8).toUpperCase()}`;
+                const statusUpper = (agent.status || "IDLE").toUpperCase();
+                const isActive = statusUpper === "ACTIVE" || statusUpper === "LINKED";
+                const agentCode = `AGT-${agent.id.replace(/-/g, "").slice(0, 8).toUpperCase()}`;
 
                 return (
                   <tr
                     key={agent.id}
-                    onClick={() => onSelectAgent(agent.id)}
-                    className={`transition-colors cursor-pointer ${
+                    onClick={() => onSelectAgent && onSelectAgent(agent.id)}
+                    className={`transition-colors ${
+                      onSelectAgent ? "cursor-pointer" : "cursor-default"
+                    } ${
                       isSelected
-                        ? "bg-blue-50/50 hover:bg-blue-50/70"
+                        ? "bg-blue-50/60 hover:bg-blue-50/80"
                         : "hover:bg-slate-50/80"
                     }`}
                   >
-                    {/* Agent Name / ID */}
+                    {/* AGENT NAME & ID */}
                     <td className="py-4 px-4 sm:px-6">
                       <div className="flex items-center gap-3">
-                        <div className="relative w-9 h-9 rounded-full overflow-hidden border border-slate-200 bg-white shrink-0 shadow-2xs">
-                          <Image
-                            src={agent.avatar_url || "/agent-avatar.png"}
-                            alt={agent.name}
-                            width={36}
-                            height={36}
-                            className="w-full h-full object-cover"
-                          />
+                        <div className="relative w-9 h-9 rounded-full overflow-hidden border border-slate-200 bg-white shrink-0 shadow-2xs flex items-center justify-center text-blue-600">
+                          <Bot className="w-5 h-5" />
                         </div>
                         <div className="space-y-0.5 min-w-0">
                           <div className="font-semibold text-slate-900 truncate font-sans text-xs sm:text-sm">
                             {agent.name}
                           </div>
-                          <div className="flex items-center gap-1 font-mono text-[11px] text-slate-500">
+                          <div className="flex items-center gap-1.5 font-mono text-[11px] text-slate-500">
                             <span>{agentCode}</span>
                             <button
                               type="button"
@@ -167,74 +255,39 @@ export function AgentFleetTable({
                       </div>
                     </td>
 
-                    {/* Execution Node / Framework */}
+                    {/* PROTOCOL */}
                     <td className="py-4 px-4 font-mono text-slate-700">
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 text-slate-800 font-medium text-[11px] border border-slate-200/60">
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 text-slate-800 font-semibold text-[11px] border border-slate-200/80 shadow-2xs">
                         <Zap className="w-3 h-3 text-blue-600" />
-                        {agent.framework || "FastMCP"}
+                        {agent.protocol || "A2A"}
                       </span>
                     </td>
 
-                    {/* Protocol Status */}
+                    {/* STATUS (Green badge for ACTIVE, Gray for IDLE) */}
                     <td className="py-4 px-4">
-                      {isLive ? (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                      {isActive ? (
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-2xs">
                           <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                          Active
-                        </span>
-                      ) : isDispatched ? (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-blue-50 text-blue-700 border border-blue-200">
-                          <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
-                          Dispatched
+                          ACTIVE
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-slate-100 text-slate-600 border border-slate-200">
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-slate-100 text-slate-600 border border-slate-200 shadow-2xs">
                           <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
-                          Idle
+                          IDLE
                         </span>
                       )}
                     </td>
 
-                    {/* Last Execution Timestamp */}
-                    <td className="py-4 px-4 text-slate-600 font-mono text-[11px]">
-                      {agent.last_heartbeat_at ? (
-                        <span className="flex items-center gap-1 text-slate-700">
-                          <Clock className="w-3 h-3 text-slate-400" />
-                          {new Date(agent.last_heartbeat_at).toLocaleTimeString([], {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                            second: "2-digit",
-                          })}
-                        </span>
-                      ) : (
-                        <span className="text-slate-400">— Awaiting —</span>
-                      )}
+                    {/* THROUGHPUT */}
+                    <td className="py-4 px-4 font-mono text-xs font-semibold text-slate-900">
+                      {typeof agent.throughputTps === "number"
+                        ? `${agent.throughputTps.toFixed(1)} TPS`
+                        : "0.0 TPS"}
                     </td>
 
-                    {/* API Key Scope */}
+                    {/* REGISTERED AT */}
                     <td className="py-4 px-4 sm:px-6 font-mono text-[11px] text-slate-600">
-                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-slate-50 border border-slate-200 text-slate-700">
-                        <Key className="w-3 h-3 text-blue-600" />
-                        <span>vst_live_••••{agent.id.slice(0, 4)}</span>
-                      </span>
-                    </td>
-
-                    {/* Actions */}
-                    <td className="py-4 px-4 text-right">
-                      {onTriggerPing && (
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onTriggerPing(agent.id);
-                          }}
-                          disabled={isPinging}
-                          className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 hover:text-blue-600 transition cursor-pointer shadow-2xs"
-                          title="Transmit Ping Heartbeat"
-                        >
-                          <RefreshCw className={`w-3.5 h-3.5 ${isPinging ? "animate-spin" : ""}`} />
-                        </button>
-                      )}
+                      {formatDate(agent.createdAt)}
                     </td>
                   </tr>
                 );
@@ -247,3 +300,4 @@ export function AgentFleetTable({
   );
 }
 
+export default AgentFleetTable;
