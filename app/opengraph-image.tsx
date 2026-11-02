@@ -138,7 +138,7 @@ export default function OpenGraphImage() {
               letterSpacing: "0.08em",
             }}
           >
-            NON-CUSTODIAL TESTNET
+            NON-CUSTODIAL ESCROW INFRASTRUCTURE
           </div>
           <div
             style={{

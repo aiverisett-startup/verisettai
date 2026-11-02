@@ -477,9 +477,9 @@ export default function SecurityArchitecturePage() {
                   CURRENT / ACTIVE
                 </span>
               </div>
-              <h4 className="text-sm font-bold text-white">Milestone 1: Live Public TypeScript Testnet Sandbox (Current / Active)</h4>
+              <h4 className="text-sm font-bold text-white">Milestone 1: Live Production TypeScript Settlement Engine (Current / Active)</h4>
               <p className="text-xs text-[#94A3B8] leading-relaxed">
-                Native TypeScript Next.js MCP JSON-RPC 2.0 endpoint (<code className="text-[#C59B5F]">/api/mcp</code>), non-custodial programmatic vaults, SHA-256 payload assertion verification (&lt;50ms), and simulated testnet VRS accounting units with zero monetary fiat liability.
+                Native TypeScript Next.js MCP JSON-RPC 2.0 endpoint (<code className="text-[#C59B5F]">/api/mcp</code>), non-custodial programmatic vaults, SHA-256 payload assertion verification (&lt;50ms), and enterprise clearinghouse transaction settlement and verified deliverable escrow.
               </p>
             </div>
 

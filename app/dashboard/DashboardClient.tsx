@@ -881,8 +881,8 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
             </a>
           </nav>
 
-          {/* Right: User Avatar Circle, Tier Pass Badge, Primary Actions */}
-          <div className="flex items-center gap-3 z-10">
+          {/* Right: Tier Pass Badge, Deposit Action, Sign Out */}
+          <div className="flex items-center gap-3 sm:gap-4 z-10">
             {/* Tier Pass Badge ("PRO" / "FOUNDER") */}
             {hasFounderPass ? (
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs font-bold font-mono shadow-2xs">
@@ -895,30 +895,13 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
               </span>
             )}
 
-            {/* Primary Action Buttons */}
-            <button
-              onClick={() => setIsRegisterAgentModalOpen(true)}
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold shadow-xs transition cursor-pointer"
-            >
-              <Bot className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Register Agent</span>
-            </button>
-
             <button
               onClick={() => setIsDepositModalOpen(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#EAE3D2] bg-white hover:bg-[#FAF8F5] text-[#1C1A17] text-xs font-semibold shadow-2xs transition cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border border-[#EAE3D2] bg-white hover:bg-[#FAF8F5] text-[#1C1A17] text-xs font-semibold shadow-2xs transition cursor-pointer"
             >
               <Plus className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Deposit</span>
             </button>
-
-            {/* User Avatar Circle */}
-            <div
-              className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-500 text-white flex items-center justify-center text-xs font-bold font-mono shadow-xs border border-white"
-              title={user.email}
-            >
-              {user.email.slice(0, 2).toUpperCase()}
-            </div>
 
             {/* Sign Out */}
             <button

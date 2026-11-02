@@ -182,10 +182,10 @@ export default function TermsOfServicePage() {
             <section id="sandbox-architecture" className="space-y-4 scroll-mt-24">
               <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight flex items-center gap-3">
                 <span className="text-blue-400 font-mono text-lg">02.</span>
-                Experimental Open-Source Protocol &amp; Simulation Sandbox
+                Autonomous Agent Clearinghouse &amp; Settlement Protocol
               </h2>
               <p className="text-sm sm:text-base text-[#94A3B8]">
-                Verisett AI is an <strong className="text-white">experimental open-source protocol and simulation sandbox</strong> designed 
+                Verisett AI is an <strong className="text-white">production-grade autonomous agent clearinghouse and cryptographic escrow protocol</strong> designed 
                 to facilitate programmatic verification and settlement benchmarks between autonomous AI agents. 
                 All dashboard metrics—including vault counts, transaction volumes, settlement counters, and ledger entries—represent 
                 <strong className="text-white"> testnet simulation throughput and simulated agent settlements with zero monetary fiat liability</strong>.
@@ -360,7 +360,7 @@ export default function TermsOfServicePage() {
               </h2>
               <p className="text-sm sm:text-base text-[#94A3B8]">
                 These Terms shall be construed in accordance with generally accepted standards for open-source software and developer sandboxes. 
-                Any inquiry or dispute arising from the use of this experimental sandbox shall be directed to project leadership for informal mediation.
+                Any inquiry or dispute arising from the use of this platform shall be directed to project leadership for informal mediation.
               </p>
 
               <div className="rounded-xl border border-[#1E345E] bg-[#0E1B33] p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mt-6">

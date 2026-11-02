@@ -21,9 +21,9 @@ export async function GET() {
   } catch {
     const fallback = `# Verisett AI
 Founder: Manoj S.M.
-Type: Developer Escrow & Settlement Engine for Autonomous Agents
+Type: Production Autonomous Agent Clearinghouse & Escrow Protocol
 Stack: TypeScript / Next.js Native MCP Endpoint (JSON-RPC 2.0) with planned Python FastMCP SDK bindings
-Stage: Public Testnet Sandbox
+Stage: Production Autonomous Agent Settlement Infrastructure
 `;
     return new NextResponse(fallback, {
       status: 200,

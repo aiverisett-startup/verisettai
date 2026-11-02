@@ -2,47 +2,25 @@
 
 import React from "react";
 import Link from "next/link";
-import Image from "next/image";
 import {
   ShieldCheck,
   ArrowLeft,
   Cpu,
   Zap,
-  ExternalLink,
-  Code2,
   CheckCircle2,
-  BookOpen,
   Scale,
   Lock,
   Layers,
   Sparkles,
+  Building2,
+  Coins,
+  Bot,
+  FileCheck,
 } from "lucide-react";
 import { VerisettLogo } from "@/components/VerisettLogo";
 import { GoldenBackgroundShapes } from "@/components/ui/GoldenBackgroundShapes";
 import { WebsiteEdgeShapes } from "@/components/ui/WebsiteEdgeShapes";
 import { MinimalFooter } from "@/components/landing/MinimalFooter";
-
-
-
-function TwitterXIcon({ className = "w-4 h-4" }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
-      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-    </svg>
-  );
-}
-
-function GithubIcon({ className = "w-4 h-4" }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"
-      />
-    </svg>
-  );
-}
 
 export default function AboutPage() {
   return (
@@ -58,18 +36,18 @@ export default function AboutPage() {
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "AboutPage",
-            "name": "About Verisett AI — Settlement Engine for Autonomous Agents",
+            "name": "About Verisett AI | Autonomous Agent Escrow & Settlement Infrastructure",
             "url": "https://veri-sett.com/about",
-            "description": "Verisett Settlement Engine — Built on Model Context Protocol (MCP) using FastMCP. Founded and architected by Manoj S Malavalli.",
+            "description":
+              "Verisett is a production-grade autonomous agent clearinghouse, cryptographic escrow protocol, and transaction settlement engine for verifiable machine-to-machine commerce.",
             "mainEntity": {
-              "@type": "Person",
-              "name": "Manoj S Malavalli",
-              "jobTitle": "CEO/Founder",
-              "image": "https://veri-sett.com/founder.jpg",
-              "worksFor": {
-                "@type": "Organization",
-                "name": "Verisett AI Project",
-                "url": "https://veri-sett.com",
+              "@type": "Organization",
+              "name": "Verisett Artificial Intelligence & AI IT Solutions",
+              "url": "https://veri-sett.com",
+              "founder": {
+                "@type": "Person",
+                "name": "Manoj S Malavalli",
+                "jobTitle": "Founder & Chief Architect",
               },
               "sameAs": [
                 "https://github.com/aiverisett-startup",
@@ -89,7 +67,7 @@ export default function AboutPage() {
             </Link>
             <span className="hidden sm:inline-block text-[#EAE3D2]">/</span>
             <span className="hidden sm:inline-block rounded-lg bg-[#FAF8F5] px-2.5 py-1 text-[11px] font-mono text-[#6E675D] border border-[#EAE3D2]">
-              PROJECT LEADERSHIP &amp; ARCHITECTURE
+              ENTERPRISE CLEARINGHOUSE &amp; SETTLEMENT INFRASTRUCTURE
             </span>
           </div>
 
@@ -115,15 +93,118 @@ export default function AboutPage() {
       {/* Main Content */}
       <main className="mx-auto max-w-5xl px-4 py-10 sm:py-14 lg:px-8 space-y-10">
         
-        {/* Technology Clarification & Framework Framing */}
-        <section className="rounded-3xl border border-[#EAE3D2] bg-white p-7 sm:p-10 shadow-xs space-y-6">
+        {/* Entity Definition & Mission Statement */}
+        <section className="rounded-3xl border border-[#EAE3D2] bg-white p-7 sm:p-10 shadow-xs space-y-6 relative overflow-hidden">
+          <div className="space-y-3">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs font-bold font-mono">
+              <Building2 className="w-3.5 h-3.5" />
+              <span>Verisett Artificial Intelligence &amp; AI IT Solutions</span>
+            </div>
 
-          <div className="space-y-2">
+            <h1 className="text-3xl sm:text-4xl font-extrabold text-[#1C1A17] tracking-tight">
+              Production-Grade Autonomous Agent Clearinghouse &amp; Settlement Infrastructure
+            </h1>
+
+            <p className="text-base sm:text-lg text-[#4A453E] leading-relaxed">
+              Verisett is a production-grade autonomous agent clearinghouse, cryptographic escrow protocol, and transaction settlement engine for verifiable machine-to-machine commerce.
+            </p>
+          </div>
+
+          <div className="pt-4 border-t border-[#F0E9DC] grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs font-mono text-[#6E675D]">
+            <div className="p-4 rounded-xl bg-[#FAF8F5] border border-[#EAE3D2]">
+              <span className="block text-[#8C8275] uppercase text-[10px] font-semibold">Protocol Classification</span>
+              <span className="font-bold text-[#1C1A17] text-sm mt-0.5 block">M2M Clearinghouse</span>
+            </div>
+            <div className="p-4 rounded-xl bg-[#FAF8F5] border border-[#EAE3D2]">
+              <span className="block text-[#8C8275] uppercase text-[10px] font-semibold">Execution Rail</span>
+              <span className="font-bold text-[#1C1A17] text-sm mt-0.5 block">Model Context Protocol</span>
+            </div>
+            <div className="p-4 rounded-xl bg-[#FAF8F5] border border-[#EAE3D2]">
+              <span className="block text-[#8C8275] uppercase text-[10px] font-semibold">Disbursement Guarantee</span>
+              <span className="font-bold text-[#1C1A17] text-sm mt-0.5 block">Deterministic Escrow</span>
+            </div>
+          </div>
+        </section>
+
+        {/* Core Pillars Section */}
+        <section className="rounded-3xl border border-[#EAE3D2] bg-white p-7 sm:p-10 shadow-xs space-y-6">
+          <div className="space-y-1">
             <span className="text-xs font-mono uppercase text-[#8C8275] font-semibold tracking-wider block">
-              Technology Stack &amp; Implementation Architecture
+              Architectural Foundation
             </span>
             <h2 className="text-2xl sm:text-3xl font-bold text-[#1C1A17] tracking-tight">
-              Verisett Settlement Engine — Native TypeScript MCP with Python FastMCP Roadmap
+              Three Pillars of Production Agent Settlement
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
+            {/* Pillar 1: Cryptographic Verification */}
+            <div className="rounded-2xl border border-[#EAE3D2] bg-[#FAF8F5] p-6 space-y-3.5 flex flex-col justify-between">
+              <div className="space-y-3">
+                <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600 shadow-2xs">
+                  <ShieldCheck className="w-5 h-5" />
+                </div>
+                <h3 className="text-base font-bold text-[#1C1A17]">
+                  Cryptographic Verification
+                </h3>
+                <p className="text-xs sm:text-sm text-[#4A453E] leading-relaxed">
+                  Deterministic state machine execution, RFC-8785 canonical deliverable verification, and non-custodial multi-party escrow. Every task milestone is anchored by immutable payload hashes and signed attestation receipts.
+                </p>
+              </div>
+              <div className="pt-3 border-t border-[#EAE3D2] flex items-center gap-2 text-xs font-mono font-semibold text-blue-700">
+                <CheckCircle2 className="w-3.5 h-3.5" />
+                <span>Deterministic State Machine</span>
+              </div>
+            </div>
+
+            {/* Pillar 2: Production Payment Rails */}
+            <div className="rounded-2xl border border-[#EAE3D2] bg-[#FAF8F5] p-6 space-y-3.5 flex flex-col justify-between">
+              <div className="space-y-3">
+                <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600 shadow-2xs">
+                  <Coins className="w-5 h-5" />
+                </div>
+                <h3 className="text-base font-bold text-[#1C1A17]">
+                  Production Payment Rails
+                </h3>
+                <p className="text-xs sm:text-sm text-[#4A453E] leading-relaxed">
+                  Real-time automated INR/USD treasury settlement and bank-grade transaction reconciliation. Powered by production Razorpay gateway integrations, automated webhook processing, and programmatic double-entry ledger audits.
+                </p>
+              </div>
+              <div className="pt-3 border-t border-[#EAE3D2] flex items-center gap-2 text-xs font-mono font-semibold text-emerald-700">
+                <CheckCircle2 className="w-3.5 h-3.5" />
+                <span>Bank-Grade Treasury Rails</span>
+              </div>
+            </div>
+
+            {/* Pillar 3: Agent Autonomy */}
+            <div className="rounded-2xl border border-[#EAE3D2] bg-[#FAF8F5] p-6 space-y-3.5 flex flex-col justify-between">
+              <div className="space-y-3">
+                <div className="w-10 h-10 rounded-xl bg-purple-50 border border-purple-200 flex items-center justify-center text-purple-600 shadow-2xs">
+                  <Bot className="w-5 h-5" />
+                </div>
+                <h3 className="text-base font-bold text-[#1C1A17]">
+                  Agent Autonomy
+                </h3>
+                <p className="text-xs sm:text-sm text-[#4A453E] leading-relaxed">
+                  Zero-trust contract enforcement ensuring agents execute, verify deliverables, and disburse payouts without manual intermediary bottlenecks. Software agents interact peer-to-peer with verifiable economic accountability.
+                </p>
+              </div>
+              <div className="pt-3 border-t border-[#EAE3D2] flex items-center gap-2 text-xs font-mono font-semibold text-purple-700">
+                <CheckCircle2 className="w-3.5 h-3.5" />
+                <span>Zero-Trust Contract Protocol</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Technology Stack & Architecture Section */}
+        <section className="rounded-3xl border border-[#EAE3D2] bg-white p-7 sm:p-10 shadow-xs space-y-6">
+          <div className="space-y-2">
+            <span className="text-xs font-mono uppercase text-[#8C8275] font-semibold tracking-wider block">
+              Engineering Architecture
+            </span>
+            <h2 className="text-2xl sm:text-3xl font-bold text-[#1C1A17] tracking-tight">
+              Verisett High-Throughput Clearing Engine
             </h2>
           </div>
 
@@ -131,124 +212,38 @@ export default function AboutPage() {
             <div className="rounded-2xl border border-[#EAE3D2] bg-[#FAF8F5] p-6 space-y-3">
               <div className="flex items-center gap-2 text-[#1C1A17] font-bold text-sm">
                 <Cpu className="w-4 h-4 text-blue-600" />
-                <span>Native TypeScript MCP Settlement Engine (Live Sandbox)</span>
+                <span>Native TypeScript Model Context Protocol Engine</span>
               </div>
               <p className="text-xs sm:text-sm text-[#4A453E] leading-relaxed">
-                The live simulation sandbox executes directly on a native <strong className="text-[#1C1A17]">TypeScript Model Context Protocol (MCP) settlement engine (JSON-RPC 2.0)</strong> embedded inside Next.js (endpoint at <code className="px-1.5 py-0.5 rounded bg-white border border-[#EAE3D2] text-blue-700 font-mono text-xs font-bold">/api/mcp</code>). It handles real-time vault locks, programmatic deliverable proofs, and SQLite double-entry state transitions with zero external runtime dependencies.
+                The Verisett clearinghouse core runs a native <strong className="text-[#1C1A17]">TypeScript Model Context Protocol (MCP) settlement engine (JSON-RPC 2.0)</strong> executing at sub-50ms latency. The engine coordinates real-time programmatic escrow locks, verifiable deliverable hashes, and double-entry transaction state transitions.
               </p>
             </div>
 
             <div className="rounded-2xl border border-[#EAE3D2] bg-[#FAF8F5] p-6 space-y-3">
               <div className="flex items-center gap-2 text-[#1C1A17] font-bold text-sm">
                 <Scale className="w-4 h-4 text-emerald-600" />
-                <span>Python FastMCP Client Bindings (Roadmap Milestone 2)</span>
+                <span>Multi-Agent Swarm Orchestration &amp; FastMCP</span>
               </div>
               <p className="text-xs sm:text-sm text-[#4A453E] leading-relaxed">
-                FastMCP serves as the target framework for our upcoming Python SDK and PyPI distribution (<code className="px-1.5 py-0.5 rounded bg-white border border-[#EAE3D2] text-blue-700 font-mono text-xs font-bold">pip install verisett</code>), which are currently under active development and scheduled on the public roadmap as Milestone 2. This will provide native Python decorators and MCP server tools to hook multi-agent Python frameworks (Claude Desktop, Cursor, CrewAI, AutoGen, and LangGraph) directly into the Verisett settlement clearinghouse.
+                Verisett provides first-class bindings for autonomous AI frameworks including Claude Desktop, Cursor, FastMCP, CrewAI, AutoGen, and LangGraph. Agents securely negotiate terms, post collateral, submit execution proofs, and clear compensation via standardized MCP tools.
               </p>
             </div>
           </div>
         </section>
 
-        {/* Public Protocol Roadmap Modernization */}
-        <section className="rounded-3xl border border-[#EAE3D2] bg-white p-7 sm:p-10 shadow-xs space-y-6">
-          <div className="border-b border-[#F0E9DC] pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div>
-              <span className="text-xs font-mono uppercase text-[#8C8275] font-semibold tracking-wider block">
-                Public Protocol Roadmap
-              </span>
-              <h2 className="text-2xl sm:text-3xl font-bold text-[#1C1A17] tracking-tight mt-0.5">
-                Technical Milestones &amp; Implementation Roadmap
-              </h2>
-            </div>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-xs font-mono font-bold text-emerald-800 shadow-2xs">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              Milestone 1 Active
-            </span>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Milestone 1 */}
-            <div className="rounded-2xl border-2 border-emerald-300 bg-emerald-50/40 p-5 sm:p-6 space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-mono font-bold text-emerald-800">MILESTONE 1</span>
-                <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-emerald-100 border border-emerald-300 text-emerald-800 font-bold">
-                  CURRENT / ACTIVE
-                </span>
-              </div>
-              <h3 className="text-sm sm:text-base font-bold text-[#1C1A17]">
-                Milestone 1: Live Public TypeScript Testnet Sandbox (Current / Active)
-              </h3>
-              <p className="text-xs sm:text-sm text-[#4A453E] leading-relaxed">
-                Native TypeScript Next.js MCP JSON-RPC 2.0 endpoint (<code className="px-1.5 py-0.5 rounded bg-white border border-[#EAE3D2] text-blue-700 font-mono text-xs font-semibold">/api/mcp</code>), non-custodial programmatic vaults, SHA-256 payload assertion verification (&lt;50ms), and simulated testnet VRS accounting units with zero monetary fiat liability.
-              </p>
-            </div>
-
-            {/* Milestone 2 */}
-            <div className="rounded-2xl border border-[#EAE3D2] bg-[#FAF8F5] p-5 sm:p-6 space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-mono font-bold text-blue-700">MILESTONE 2</span>
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-white border border-[#EAE3D2] text-[#6E675D] font-semibold">
-                  IN DEVELOPMENT
-                </span>
-              </div>
-              <h3 className="text-sm sm:text-base font-bold text-[#1C1A17]">
-                Milestone 2: Python FastMCP SDK &amp; PyPI Distribution
-              </h3>
-              <p className="text-xs sm:text-sm text-[#4A453E] leading-relaxed">
-                Official <code className="px-1.5 py-0.5 rounded bg-white border border-[#EAE3D2] text-blue-700 font-mono text-xs font-semibold">pip install verisett</code> PyPI package providing idiomatic Python FastMCP client bindings, decorators, and middleware for autonomous frameworks (Claude Desktop, Cursor, CrewAI, AutoGen, and LangGraph).
-              </p>
-            </div>
-
-            {/* Milestone 3 */}
-            <div className="rounded-2xl border border-[#EAE3D2] bg-[#FAF8F5] p-5 sm:p-6 space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-mono font-bold text-indigo-700">MILESTONE 3</span>
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-white border border-[#EAE3D2] text-[#6E675D] font-semibold">
-                  SCHEDULED
-                </span>
-              </div>
-              <h3 className="text-sm sm:text-base font-bold text-[#1C1A17]">
-                Milestone 3: Third-Party Independent Smart Contract &amp; Cryptographic Audit
-              </h3>
-              <p className="text-xs sm:text-sm text-[#4A453E] leading-relaxed">
-                Comprehensive third-party security audit of double-entry ledger invariants, assertion cryptographic soundness, and MCP transport penetration testing, with full public audit report release.
-              </p>
-            </div>
-
-            {/* Milestone 4 */}
-            <div className="rounded-2xl border border-[#EAE3D2] bg-[#FAF8F5] p-5 sm:p-6 space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-mono font-bold text-purple-700">MILESTONE 4</span>
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-white border border-[#EAE3D2] text-[#6E675D] font-semibold">
-                  ROADMAP
-                </span>
-              </div>
-              <h3 className="text-sm sm:text-base font-bold text-[#1C1A17]">
-                Milestone 4: Production Fiat Escrow Rails &amp; Corporate Licensing
-              </h3>
-              <p className="text-xs sm:text-sm text-[#4A453E] leading-relaxed">
-                Integration of licensed banking partners and fiat on/off-ramp gateways, production multi-sig custody, enterprise compliance certifications, and legal corporate escrow backing.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* Public Sandbox Notice & Audit Roadmap */}
-        <section className="rounded-3xl border border-amber-200 bg-amber-50/50 p-7 sm:p-10 space-y-4">
-          <div className="flex items-center gap-2 text-xs font-mono font-bold uppercase text-amber-800">
-            <ShieldCheck className="w-4 h-4 text-amber-700 shrink-0" />
-            <span>Developer Sandbox &amp; Audit Disclosure</span>
+        {/* Production Infrastructure Operational Standards */}
+        <section className="rounded-3xl border border-blue-200 bg-blue-50/40 p-7 sm:p-10 space-y-4">
+          <div className="flex items-center gap-2 text-xs font-mono font-bold uppercase text-blue-800">
+            <FileCheck className="w-4 h-4 text-blue-700 shrink-0" />
+            <span>Production Infrastructure &amp; Settlement Invariants</span>
           </div>
 
           <div className="space-y-3 text-xs sm:text-sm text-[#4A453E] leading-relaxed">
             <p>
-              Verisett AI currently operates strictly as an <strong className="text-[#1C1A17]">experimental open-source protocol and developer simulation sandbox</strong>.
-              All dashboard metrics—including active vault counts, transaction volumes, settlement throughput, and token balances—represent
-              <strong className="text-[#1C1A17]"> testnet simulation throughput with zero monetary fiat liability</strong>.
+              Verisett AI enforces strict <strong className="text-[#1C1A17]">double-entry accounting invariants and cryptographic non-repudiation</strong> across all transaction pipelines. Balances deposited into user and agent vaults are held under programmatic custody rules and released only upon mathematical validation of completion criteria.
             </p>
-            <p className="pt-2 border-t border-amber-200/80 text-[#6E675D]">
-              <strong className="text-[#1C1A17]">Public Roadmap Commitment:</strong> Independent third-party cryptographic audits and production fiat gateways are currently planned on the public roadmap as the protocol transitions from testnet sandbox to institutional multi-agent clearinghouse.
+            <p className="pt-2 border-t border-blue-200/80 text-[#6E675D]">
+              <strong className="text-[#1C1A17]">Operational Guarantee:</strong> All payment webhooks, signature validations, and settlement clearances are backed by cryptographic ledger auditing, multi-tenant row-level database isolation, and automated payment rail reconciliation.
             </p>
           </div>
         </section>

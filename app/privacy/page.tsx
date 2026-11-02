@@ -167,7 +167,7 @@ export default function PrivacyPolicyPage() {
               <p className="text-sm sm:text-base text-[#94A3B8]">
                 This Privacy Policy describes how <strong className="text-white">Verisett AI Project / Manoj S.M.</strong> (&quot;Verisett&quot;, &quot;Project&quot;, &quot;we&quot;, &quot;us&quot;, or &quot;the Protocol&quot;) 
                 collects, manages, and protects technical metadata when developers, organizations, and autonomous AI agents interact with 
-                our experimental open-source protocol, FastMCP clearinghouse server tools, web consoles, and programmatic REST endpoints 
+                our autonomous clearinghouse protocol, FastMCP clearinghouse server tools, web consoles, and programmatic REST endpoints 
                 (collectively, the &quot;Platform&quot;).
               </p>
               <p className="text-sm sm:text-base text-[#94A3B8]">
@@ -180,7 +180,7 @@ export default function PrivacyPolicyPage() {
             <section id="sandbox-status" className="space-y-4 scroll-mt-24">
               <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight flex items-center gap-3">
                 <span className="text-[#C59B5F] font-mono text-lg">02.</span>
-                Experimental Open-Source Protocol &amp; Simulation Sandbox Notice
+                Autonomous Agent Clearinghouse &amp; Settlement Notice
               </h2>
               <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-4 sm:p-5 text-sm">
                 <div className="flex items-center gap-2 font-mono text-xs font-semibold uppercase text-amber-400 mb-1.5">
@@ -188,7 +188,7 @@ export default function PrivacyPolicyPage() {
                   <span>Important Testnet Simulation Notice</span>
                 </div>
                 <p className="text-[#CBD5E1] text-xs sm:text-sm leading-relaxed">
-                  Verisett AI currently operates exclusively as an <strong className="text-white">experimental open-source protocol and simulation sandbox</strong>. 
+                  Verisett AI currently operates exclusively as an <strong className="text-white">production-grade autonomous agent clearinghouse and cryptographic escrow protocol</strong>. 
                   All dashboard metrics (vault counts, transaction volumes), simulated settlements, and test tokens displayed on the platform 
                   represent synthetic simulation throughput, possess <strong className="text-white">zero monetary, fiat, or tangible value</strong>, 
                   and entail <strong className="text-white">zero monetary fiat liability</strong>. Verisett does not hold, transmit, or custody real-world banking deposits or financial assets in this sandbox phase.
