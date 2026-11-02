@@ -23,7 +23,6 @@ import {
   RefreshCw,
   Clock,
   Lock,
-  Bot,
   Trash2,
   Search,
   Sliders,
@@ -38,10 +37,8 @@ import {
 import { VerisettLogo } from "@/components/VerisettLogo";
 import { GoldenBackgroundShapes } from "@/components/ui/GoldenBackgroundShapes";
 import { RegisterAgentModal } from "@/components/dashboard/RegisterAgentModal";
-import { TranslucentTelemetryChart } from "@/components/dashboard/TranslucentTelemetryChart";
-import { AgentFleetTable } from "@/components/dashboard/AgentFleetTable";
+import { TransactionChart } from "@/components/dashboard/TransactionChart";
 import { CommandPaletteModal } from "@/components/dashboard/CommandPaletteModal";
-import { TaskDAGVisualizer } from "@/components/dashboard/TaskDAGVisualizer";
 import { AgentPolicyControlsModal } from "@/components/dashboard/AgentPolicyControlsModal";
 import { supabase } from "@/lib/supabase";
 import { dispatchAuthChange } from "@/lib/useAuthUser";
@@ -1016,6 +1013,15 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
                     </button>
 
                     <button
+                      onClick={() => setIsPolicyModalOpen(true)}
+                      className="inline-flex items-center gap-1.5 px-3 py-2 rounded-full bg-white border border-[#CBD5E1] hover:border-[#2563EB] text-xs font-semibold text-[#0F172A] shadow-2xs transition-all duration-200 hover:bg-blue-50/50 cursor-pointer font-sans"
+                      title="Economic Guardrails"
+                    >
+                      <Sliders className="text-[#2563EB] w-3.5 h-3.5" />
+                      <span className="hidden sm:inline">Guardrails</span>
+                    </button>
+
+                    <button
                       onClick={() => loadTenantData(user.id)}
                       className="w-8 h-8 rounded-full bg-white border border-[#CBD5E1] hover:border-[#94A3B8] text-[#64748B] hover:text-[#0F172A] flex items-center justify-center transition-colors cursor-pointer shadow-2xs"
                       title="Refresh Telemetry"
@@ -1052,87 +1058,12 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
               </div>
             </div>
 
-            {/* Terminal Telemetry Area: GATED LIVE CHART */}
-            {!isTelemetryLive ? (
-              /* UNLINKED STATE WITH PROMINENT CTA (NO LIVE CHART SHOWN) */
-              <div className="rounded-3xl border-2 border-dashed border-[#EAE3D2] bg-white p-10 sm:p-14 text-center space-y-6 shadow-xs">
-                <div className="inline-flex p-4 rounded-2xl bg-amber-50 text-amber-700 border border-amber-200">
-                  <Activity className="w-10 h-10" />
-                </div>
-                <div className="max-w-xl mx-auto space-y-2">
-                  <h3 className="text-xl sm:text-2xl font-bold text-[#1C1A17]">
-                    No Active Agent Telemetry Stream
-                  </h3>
-                  <p className="text-sm text-[#6E675D] leading-relaxed">
-                    No active agent telemetry stream. Register and connect an agent to unlock live
-                    execution charts. An agent must send a verified heartbeat within the last 60 seconds
-                    to feed real-time candlestick charts.
-                  </p>
-                </div>
-                <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-                  <button
-                    onClick={() => setIsRegisterAgentModalOpen(true)}
-                    className="w-full sm:w-auto px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs sm:text-sm shadow-xs transition cursor-pointer flex items-center justify-center gap-2"
-                  >
-                    <Bot className="w-4 h-4" />
-                    <span>Register New Agent</span>
-                  </button>
-
-                  {selectedAgent && (
-                    <>
-                      <button
-                        onClick={() => handleSimulateHeartbeat(selectedAgent.id)}
-                        disabled={isPinging}
-                        className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-[#CBD5E1] hover:border-[#2563EB] text-xs font-semibold text-[#0F172A] shadow-2xs transition-all duration-200 hover:bg-blue-50/50 cursor-pointer disabled:opacity-60 font-sans"
-                      >
-                        <Activity className={`text-[#2563EB] w-3.5 h-3.5 ${isPinging ? "animate-spin" : ""}`} />
-                        <span>
-                          {isPinging ? "Transmitting..." : `Transmit Heartbeat for ${selectedAgent.name}`}
-                        </span>
-                      </button>
-
-                      <button
-                        onClick={() => setIsPolicyModalOpen(true)}
-                        className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-[#CBD5E1] hover:border-[#2563EB] text-xs font-semibold text-[#0F172A] shadow-2xs transition-all duration-200 hover:bg-blue-50/50 cursor-pointer font-sans"
-                      >
-                        <Sliders className="text-[#2563EB] w-3.5 h-3.5" />
-                        <span>Economic Guardrails</span>
-                      </button>
-                    </>
-                  )}
-                </div>
-              </div>
-            ) : (
-              /* ACTIVE AGENT: RENDER TRANSLUCENT / GLASSMORPMIC TELEMETRY CHART */
-              <div className="space-y-4">
-                <TranslucentTelemetryChart
-                  hasActiveApiKey={Boolean(generatedKey || agents.some((a) => Boolean(a.last_heartbeat_at)))}
-                  apiKeyHint={generatedKey ? `vst_live_••••${generatedKey.slice(-4)}` : null}
-                  agentName={selectedAgent.name}
-                  agentId={
-                    selectedAgent.agent_id_code ||
-                    `AGT-${selectedAgent.id.replace(/-/g, "").slice(0, 8).toUpperCase()}`
-                  }
-                  lastExecutionAt={selectedAgent.last_heartbeat_at}
-                  realLatencyMs={selectedAgent.ping_latency_ms}
-                  currentThroughputTps={selectedAgent.throughput_tps}
-                  onTriggerPing={() => handleSimulateHeartbeat(selectedAgent.id)}
-                  isPinging={isPinging}
-                />
-              </div>
-            )}
-
             {/* TAB CONTENT VIEWS */}
             {activeTab === "overview" && (
               <div className="space-y-6">
-                <TaskDAGVisualizer />
-                <AgentFleetTable
-                  agents={agents}
-                  selectedAgentId={selectedAgentId}
-                  onSelectAgent={(id) => setSelectedAgentId(id)}
-                  onRegisterAgent={() => setIsRegisterAgentModalOpen(true)}
-                  onTriggerPing={(id) => handleSimulateHeartbeat(id)}
-                  isPinging={isPinging}
+                <TransactionChart
+                  data={velocityChartData}
+                  onGenerateTestTransaction={handleGenerateTestEscrow}
                 />
               </div>
             )}
