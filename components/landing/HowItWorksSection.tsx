@@ -51,7 +51,7 @@ export function HowItWorksSection({}: HowItWorksSectionProps) {
       stepTag: "Step 02 / Invariant Definition",
       title: "Define Settlement Invariants",
       description:
-        "Specify milestone deliverables, testnet USD amounts, and SHA-256 deliverable commitments. Set automated assertion rules or zero-knowledge cryptographic checks.",
+        "Specify milestone deliverables, settlement amounts, and SHA-256 deliverable commitments. Set automated assertion rules or zero-knowledge cryptographic checks.",
       renderVisual: () => (
         <div className="bg-white rounded-xl p-4 border border-[#E2E8F0] space-y-2.5">
           <div className="flex items-center justify-between">

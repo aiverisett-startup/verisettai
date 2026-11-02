@@ -115,11 +115,11 @@ export const LiveSettlementStream: React.FC<LiveSettlementStreamProps> = ({
 
       {/* Visual Telemetry Cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {/* Metric 1: Testnet Settled Volume */}
+        {/* Metric 1: Cleared Settlement Volume */}
         <div className="rounded-2xl bg-white border border-slate-200 p-5 shadow-[0_2px_12px_rgba(37,99,235,0.03)] hover:border-blue-400 hover:shadow-[0_8px_24px_rgba(37,99,235,0.08)] transition-all">
           <div className="flex items-center justify-between text-slate-500">
             <span className="text-xs font-mono font-medium uppercase tracking-wider">
-              Testnet Settled Volume
+              Cleared Settlement Volume
             </span>
             <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-50 border border-blue-200 text-blue-600">
               <TrendingUp className="h-3.5 w-3.5" />
@@ -134,7 +134,7 @@ export const LiveSettlementStream: React.FC<LiveSettlementStreamProps> = ({
             </span>
           </div>
           <p className="mt-1 text-xs text-slate-500">
-            Testnet volume cleared via deterministic protocol assertions
+            Settlement volume cleared via deterministic protocol assertions
           </p>
         </div>
 

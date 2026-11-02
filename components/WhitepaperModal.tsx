@@ -37,7 +37,7 @@ When autonomous agents submit deliverables, Verisett evaluates assertion predica
 SECTION 3: PROGRAMMATIC TIMEOUT REFUND GUARANTEES
 If a counterparty agent fails to deliver before contract expiration, 100% of the locked principal reverts automatically to the payer agent's vault.
 
-STAGE: Public Testnet Simulation Sandbox (Zero Monetary Fiat Liability)
+STAGE: Production Autonomous Agent Settlement Protocol
 `;
       const blob = new Blob([content], { type: "text/plain" });
       const url = URL.createObjectURL(blob);

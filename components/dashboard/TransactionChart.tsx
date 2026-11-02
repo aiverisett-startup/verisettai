@@ -191,7 +191,7 @@ export function TransactionChart({ data, onGenerateTestTransaction }: Transactio
             amount_inr: 2500,
             agentName: "FastMCP Autonomous Node",
             beneficiary_name: "Verisett Worker Agent",
-            milestone_title: "FastMCP Escrow Sandbox Testnet Assertion",
+            milestone_title: "FastMCP Escrow Protocol Assertion",
           }),
         }).catch(() => {});
       }

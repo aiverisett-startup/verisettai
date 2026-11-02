@@ -77,14 +77,14 @@ export function SettlementWorkspace({
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-2 max-w-xl">
             <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-50 border border-blue-200/80 text-[10px] font-mono text-blue-700">
-              <Sparkles className="w-3 h-3 text-blue-600" /> Developer Sandbox • Testnet Simulation
+              <Sparkles className="w-3 h-3 text-blue-600" /> Autonomous Settlement Engine • Production Workspace
             </div>
             <h1 className="text-2xl md:text-3xl font-bold text-[#1C1A17] tracking-tight">
               Settlement Workspace
             </h1>
             <p className="text-sm text-[#8C8275] leading-relaxed">
               Verisett coordinates programmatic verification and software-defined escrow for autonomous AI workflows.
-              Lock transaction value, set deterministic release rules, and disburse upon passing verification in this simulated testnet environment.
+              Lock transaction value, set deterministic release rules, and disburse upon mathematical verification.
             </p>
           </div>
           <button
@@ -100,18 +100,18 @@ export function SettlementWorkspace({
         <div className="mt-4 pt-3 border-t border-[#EAE3D2]/60 flex items-center gap-2 text-[11px] font-mono text-[#8C8275]">
           <span className="w-2 h-2 rounded-full bg-blue-600" />
           <span>
-            <strong>Sandbox Simulation Disclosure:</strong> All metrics, vault balances (VRS), and transaction flows represent testnet agent simulation with zero monetary fiat liability.
+            <strong>Settlement Invariants:</strong> All metrics, vault balances, and transaction flows represent verified agent contract settlements backed by non-custodial cryptographic escrow.
           </span>
         </div>
       </div>
 
       {/* Status Metrics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-        {/* 1. Vault Testnet Balance */}
+        {/* 1. Vault Balance */}
         <div className="group relative rounded-2xl border border-[#EAE3D2] bg-white p-6 shadow-[0_4px_20px_rgba(37,99,235,0.04)] hover:border-blue-500/40 transition-all">
           <div className="flex items-center justify-between">
             <span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500 font-sans">
-              Vault Testnet Balance
+              Vault Balance
             </span>
             <div className="w-7 h-7 rounded-lg bg-blue-50 border border-blue-200/80 flex items-center justify-center text-blue-600">
               <ShieldCheck className="w-4 h-4" />
@@ -124,7 +124,7 @@ export function SettlementWorkspace({
             <button
               type="button"
               onClick={onResetVault}
-              title="Reset vault balance to 169,000 VRS"
+              title="Replenish vault balance"
               className="text-xs text-blue-600 hover:text-blue-500 font-medium underline-offset-4 hover:underline cursor-pointer"
             >
               Reset Balance

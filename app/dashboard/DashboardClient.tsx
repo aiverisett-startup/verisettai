@@ -782,7 +782,7 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
           entry_type: "CREDIT",
           amount: 250000,
           currency: "INR",
-          description: "FastMCP Deterministic Settlement: Testnet Escrow Cleared",
+          description: "FastMCP Deterministic Settlement: Escrow Cleared",
         });
         await loadTenantData(user.id);
       }
@@ -793,7 +793,7 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
           amount_inr: 2500,
           agentName: "FastMCP Autonomous Node",
           beneficiary_name: "Verisett Worker Agent",
-          milestone_title: "FastMCP Escrow Sandbox Testnet Assertion",
+          milestone_title: "FastMCP Escrow Protocol Assertion",
         }),
       }).catch(() => { });
     } catch (err) {

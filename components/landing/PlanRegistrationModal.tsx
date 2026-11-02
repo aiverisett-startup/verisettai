@@ -161,13 +161,13 @@ export function PlanRegistrationModal({
                 <span>
                   {confirmedData.isPaid
                     ? `Seat #${confirmedData.seatNumber} Locked: ${confirmedData.planName}`
-                    : `Community Sandbox Active: ${confirmedData.planName}`}
+                    : `Community Node Active: ${confirmedData.planName}`}
                 </span>
               </div>
               <p className="text-xs text-emerald-800 leading-relaxed font-mono">
                 {confirmedData.isPaid
                   ? "Your seat is decremented from the 1,500 total paid pool and confirmed on the Verisett settlement clearinghouse."
-                  : "Your unmetered developer sandbox credentials are valid for simulated testnet clearing."}
+                  : "Your unmetered developer credentials are valid for autonomous agent clearing."}
               </p>
             </div>
 

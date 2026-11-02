@@ -416,7 +416,7 @@ export const VerisettPromo: React.FC = () => {
               marginBottom: 24,
             }}
           >
-            Public Testnet Sandbox
+            Autonomous Settlement Clearinghouse
           </div>
 
           <h2

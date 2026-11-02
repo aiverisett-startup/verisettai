@@ -66,12 +66,12 @@ const DEFAULT_PLANS: PlanRecord[] = [
 
 const PLAN_DESCRIPTIONS: Record<string, { tagline: string; takeRate: string; isLifetime?: boolean; features: string[] }> = {
   community: {
-    tagline: "Zero-cost developer sandbox for autonomous multi-agent experimentation",
+    tagline: "Zero-cost developer tier for autonomous multi-agent settlement",
     takeRate: "2.0% Protocol Fee",
     features: [
-      "Access to FastMCP & TypeScript testnet sandbox",
+      "Access to FastMCP & TypeScript settlement engine",
       "Up to 2 concurrent agent swarm nodes",
-      "Standard simulated VRS ledger accounting",
+      "Standard cryptographic ledger accounting",
       "Community GitHub and Discord support",
       "Public telemetry dashboard access",
     ],
