@@ -243,34 +243,34 @@ export default function RegisterAgentPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] text-slate-900 flex flex-col items-center py-10 px-4 sm:px-6 lg:px-8 selection:bg-blue-600 selection:text-white font-sans antialiased">
-      <div className="w-full max-w-2xl mx-auto flex flex-col gap-6">
+    <div className="min-h-screen pb-32 bg-[#F8FAFC] text-slate-900 flex flex-col items-center py-14 sm:py-20 px-6 sm:px-12 selection:bg-blue-600 selection:text-white font-sans antialiased">
+      <div className="w-full max-w-3xl lg:max-w-4xl mx-auto flex flex-col gap-8">
         {/* Top Navigation & Back Link */}
         <div className="flex items-center justify-between">
           <Link
             href="/dashboard"
-            className="inline-flex items-center gap-2 text-xs font-mono font-medium text-slate-600 hover:text-blue-600 transition-colors py-1.5 px-3 rounded-lg hover:bg-slate-100 border border-transparent"
+            className="inline-flex items-center gap-2 text-xs sm:text-sm font-mono font-medium text-slate-600 hover:text-blue-600 transition-colors py-2 px-3.5 rounded-xl hover:bg-slate-100 border border-transparent"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Back to Dashboard</span>
           </Link>
 
           <Link href="/" className="flex items-center gap-2 hover:opacity-85 transition-opacity">
-            <VerisettLogo size={28} />
+            <VerisettLogo size={30} />
           </Link>
         </div>
 
         {/* Title Header */}
-        <div className="space-y-1.5">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600 shrink-0 shadow-xs">
-              <Bot className="w-5 h-5" />
+        <div className="space-y-2">
+          <div className="flex items-center gap-3.5">
+            <div className="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600 shrink-0 shadow-xs">
+              <Bot className="w-6 h-6" />
             </div>
             <div>
-              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">
+              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
                 AI Agent Registration Flow
               </h1>
-              <p className="text-xs text-slate-500 font-sans">
+              <p className="text-xs sm:text-sm text-slate-500 font-sans mt-0.5">
                 {currentStep === 1 && "Step 1: Identity & Protocol Parameters"}
                 {currentStep === 2 && "Step 2: ID Allocation & Email Authorization"}
                 {currentStep === 3 && "Step 3: Protocol Escrow Legal Consents"}
@@ -281,17 +281,17 @@ export default function RegisterAgentPage() {
         </div>
 
         {/* Step Progress Tracker */}
-        <div className="w-full bg-white border border-slate-200 rounded-xl p-4 shadow-xs">
-          <div className="grid grid-cols-4 gap-3">
+        <div className="w-full bg-white border border-slate-200 rounded-2xl p-5 sm:p-6 shadow-xs">
+          <div className="grid grid-cols-4 gap-4">
             {stepItems.map((s) => (
-              <div key={s.num} className="flex flex-col gap-1.5">
+              <div key={s.num} className="flex flex-col gap-2">
                 <div
-                  className={`h-1.5 rounded-full transition-all duration-300 ${
+                  className={`h-2 rounded-full transition-all duration-300 ${
                     currentStep >= s.num ? "bg-blue-600" : "bg-slate-200"
                   }`}
                 />
                 <span
-                  className={`text-[11px] font-mono truncate transition-colors ${
+                  className={`text-xs font-mono truncate transition-colors ${
                     currentStep >= s.num ? "text-blue-600 font-bold" : "text-slate-400"
                   }`}
                 >
@@ -303,10 +303,10 @@ export default function RegisterAgentPage() {
         </div>
 
         {/* Main Card Container */}
-        <div className="w-full bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm space-y-6">
+        <div className="w-full bg-white border border-slate-200 rounded-3xl p-10 sm:p-14 md:p-16 shadow-sm space-y-10">
           {errorMessage && (
-            <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-medium flex items-center gap-3 animate-in fade-in">
-              <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
+            <div className="p-5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-sm font-medium flex items-center gap-3 animate-in fade-in">
+              <AlertTriangle className="w-5 h-5 text-rose-600 shrink-0" />
               <span>{errorMessage}</span>
             </div>
           )}
@@ -315,10 +315,10 @@ export default function RegisterAgentPage() {
           {/* STEP 1: IDENTITY & PROFILE DETAILS */}
           {/* ========================================================================= */}
           {currentStep === 1 && (
-            <form onSubmit={handleStep1Next} className="space-y-5">
+            <form onSubmit={handleStep1Next} className="space-y-9">
               {/* Assigned Agent Avatar Card */}
-              <div className="flex items-center gap-4 p-4 rounded-xl bg-blue-50/60 border border-blue-100">
-                <div className="relative w-16 h-16 rounded-full border-2 border-blue-200 bg-white flex items-center justify-center overflow-hidden shrink-0 shadow-xs">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 p-6 sm:p-7 rounded-2xl bg-blue-50/60 border border-blue-100">
+                <div className="relative w-20 h-20 rounded-2xl border-2 border-blue-200 bg-white flex items-center justify-center overflow-hidden shrink-0 shadow-xs">
                   <img
                     src={avatarUrl}
                     alt="Official Agent Avatar"
@@ -326,24 +326,24 @@ export default function RegisterAgentPage() {
                   />
                 </div>
 
-                <div className="space-y-1 flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <label className="text-xs font-mono font-bold uppercase text-slate-700">
+                <div className="space-y-2 flex-1 min-w-0">
+                  <div className="flex flex-wrap items-center gap-2.5">
+                    <label className="text-sm font-mono font-bold uppercase text-slate-800">
                       Assigned Agent Avatar
                     </label>
-                    <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 border border-blue-200">
+                    <span className="text-xs font-mono font-semibold px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-700 border border-blue-200">
                       Standard Verified
                     </span>
                   </div>
-                  <p className="text-[11px] text-slate-600 leading-relaxed">
-                    Standardized official Verisett node badge automatically assigned to your agent. Custom photo uploads are restricted.
+                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                    Standardized official Verisett node badge automatically assigned to your agent. Custom photo uploads are restricted to preserve cryptographic provenance.
                   </p>
                 </div>
               </div>
 
               {/* Agent Name / Handle */}
-              <div className="space-y-1.5">
-                <label className="block text-xs font-mono font-bold uppercase tracking-wider text-slate-700">
+              <div className="space-y-2">
+                <label className="block text-xs sm:text-sm font-mono font-bold uppercase tracking-wider text-slate-700 mb-3">
                   Agent Name / Handle <span className="text-rose-500">*</span>
                 </label>
                 <input
@@ -352,20 +352,20 @@ export default function RegisterAgentPage() {
                   placeholder="e.g. Swarm-Alpha-Trader"
                   value={agentName}
                   onChange={(e) => setAgentName(e.target.value)}
-                  className="w-full min-h-[46px] px-4 py-2.5 rounded-xl bg-white border border-slate-300 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 focus:outline-none text-sm font-semibold text-slate-900 placeholder:text-slate-400 transition shadow-xs"
+                  className="w-full py-4 px-5 text-base rounded-xl bg-white border border-slate-300 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 focus:outline-none font-semibold text-slate-900 placeholder:text-slate-400 transition shadow-xs"
                 />
               </div>
 
               {/* Protocol / Framework Architecture Dropdown */}
-              <div className="space-y-1.5">
-                <label className="block text-xs font-mono font-bold uppercase tracking-wider text-slate-700">
+              <div className="space-y-2">
+                <label className="block text-xs sm:text-sm font-mono font-bold uppercase tracking-wider text-slate-700 mb-3">
                   Protocol / Framework Architecture <span className="text-rose-500">*</span>
                 </label>
                 <div className="relative">
                   <select
                     value={framework}
                     onChange={(e) => setFramework(e.target.value)}
-                    className="w-full min-h-[46px] px-4 py-2.5 rounded-xl bg-white border border-slate-300 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 focus:outline-none text-sm font-semibold text-slate-900 transition appearance-none cursor-pointer shadow-xs pr-10"
+                    className="w-full py-4 px-5 pr-12 text-base rounded-xl bg-white border border-slate-300 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 focus:outline-none font-semibold text-slate-900 transition appearance-none cursor-pointer shadow-xs"
                   >
                     {PROTOCOL_OPTIONS.map((opt) => (
                       <option key={opt.value} value={opt.value} className="bg-white text-slate-900">
@@ -373,19 +373,19 @@ export default function RegisterAgentPage() {
                       </option>
                     ))}
                   </select>
-                  <div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 text-xs">
+                  <div className="pointer-events-none absolute right-5 top-1/2 -translate-y-1/2 text-slate-500 text-sm">
                     ▼
                   </div>
                 </div>
               </div>
 
               {/* Spending Limit / Escrow Lock Cap (INR) */}
-              <div className="space-y-1.5">
-                <label className="block text-xs font-mono font-bold uppercase tracking-wider text-slate-700">
+              <div className="space-y-2">
+                <label className="block text-xs sm:text-sm font-mono font-bold uppercase tracking-wider text-slate-700 mb-3">
                   Spending Limit / Escrow Lock Cap (INR) <span className="text-rose-500">*</span>
                 </label>
                 <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 font-mono font-bold text-slate-500">
+                  <span className="absolute left-5 top-1/2 -translate-y-1/2 font-mono font-bold text-slate-500 text-lg">
                     ₹
                   </span>
                   <input
@@ -396,42 +396,42 @@ export default function RegisterAgentPage() {
                     placeholder="50000"
                     value={spendingLimit}
                     onChange={(e) => setSpendingLimit(e.target.value)}
-                    className="w-full min-h-[46px] pl-9 pr-4 py-2.5 rounded-xl bg-white border border-slate-300 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 focus:outline-none text-sm font-mono font-bold text-slate-900 transition shadow-xs"
+                    className="w-full pl-11 pr-5 py-4 text-base rounded-xl bg-white border border-slate-300 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 focus:outline-none font-mono font-bold text-slate-900 transition shadow-xs"
                   />
                 </div>
               </div>
 
               {/* Webhook Callback Endpoint */}
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <label className="block text-xs font-mono font-bold uppercase tracking-wider text-slate-700">
+              <div className="space-y-2">
+                <div className="flex items-center justify-between mb-3">
+                  <label className="block text-xs sm:text-sm font-mono font-bold uppercase tracking-wider text-slate-700">
                     Webhook Callback Endpoint
                   </label>
-                  <span className="text-[10px] font-mono text-slate-500">Optional</span>
+                  <span className="text-xs font-mono text-slate-500">Optional</span>
                 </div>
                 <input
                   type="url"
                   placeholder="https://api.yourdomain.com/v1/agent-webhook"
                   value={webhookUrl}
                   onChange={(e) => setWebhookUrl(e.target.value)}
-                  className="w-full min-h-[46px] px-4 py-2.5 rounded-xl bg-white border border-slate-300 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 focus:outline-none text-sm font-mono text-slate-900 placeholder:text-slate-400 transition shadow-xs"
+                  className="w-full py-4 px-5 text-base rounded-xl bg-white border border-slate-300 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 focus:outline-none font-mono text-slate-900 placeholder:text-slate-400 transition shadow-xs"
                 />
               </div>
 
               {/* Action Bar */}
-              <div className="pt-4 border-t border-slate-200 flex items-center justify-between">
+              <div className="pt-10 mt-10 border-t border-slate-200 flex items-center justify-between">
                 <Link
                   href="/dashboard"
-                  className="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition"
+                  className="px-5 py-3.5 rounded-xl text-sm font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition"
                 >
                   Cancel
                 </Link>
                 <button
                   type="submit"
-                  className="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs sm:text-sm tracking-wide shadow-sm transition flex items-center gap-2 cursor-pointer"
+                  className="py-4 px-8 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-base tracking-wide shadow-sm transition flex items-center gap-2.5 cursor-pointer"
                 >
                   <span>Continue to Security</span>
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowRight className="w-5 h-5" />
                 </button>
               </div>
             </form>
@@ -441,11 +441,11 @@ export default function RegisterAgentPage() {
           {/* STEP 2: CREDENTIAL PROVISIONING & EMAIL OTP */}
           {/* ========================================================================= */}
           {currentStep === 2 && (
-            <form onSubmit={handleStep2Next} className="space-y-5">
+            <form onSubmit={handleStep2Next} className="space-y-9">
               {/* Allocated Unique Agent ID */}
-              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+              <div className="p-6 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
                 <div className="flex items-center justify-between">
-                  <label className="text-[11px] font-mono uppercase tracking-wider text-slate-700 font-bold">
+                  <label className="text-xs font-mono uppercase tracking-wider text-slate-700 font-bold">
                     Allocated Unique Agent ID
                   </label>
                   <button
@@ -455,50 +455,50 @@ export default function RegisterAgentPage() {
                         if (r.success) setAgentIdCode(r.agentIdCode);
                       });
                     }}
-                    className="text-[11px] font-mono text-blue-600 hover:underline flex items-center gap-1 cursor-pointer font-semibold"
+                    className="text-xs font-mono text-blue-600 hover:underline flex items-center gap-1.5 cursor-pointer font-semibold"
                   >
-                    <RefreshCw className="w-3 h-3" />
+                    <RefreshCw className="w-3.5 h-3.5" />
                     <span>Regenerate</span>
                   </button>
                 </div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="font-mono text-base font-bold text-slate-900 bg-white px-3.5 py-2 rounded-lg border border-slate-300 shadow-xs">
+                <div className="flex flex-wrap items-center gap-3">
+                  <span className="font-mono text-lg font-bold text-slate-900 bg-white px-4 py-2.5 rounded-xl border border-slate-300 shadow-xs">
                     {agentIdCode || "Generating..."}
                   </span>
-                  <span className="text-[11px] text-emerald-700 bg-emerald-50 px-2.5 py-1.5 rounded-lg border border-emerald-200 font-mono font-medium">
+                  <span className="text-xs text-emerald-700 bg-emerald-50 px-3 py-2 rounded-xl border border-emerald-200 font-mono font-medium">
                     ✓ Non-Colliding Tenant Unique
                   </span>
                 </div>
-                <p className="text-[11px] text-slate-500">
+                <p className="text-xs text-slate-500">
                   Globally reserved identifier for cross-agent consensus and telemetry routing.
                 </p>
               </div>
 
               {/* Agent Security Passphrase */}
-              <div className="space-y-1.5">
-                <label className="block text-xs font-mono font-bold uppercase tracking-wider text-slate-700">
+              <div className="space-y-2">
+                <label className="block text-xs sm:text-sm font-mono font-bold uppercase tracking-wider text-slate-700 mb-3">
                   Agent Security Passphrase / Secret Password <span className="text-rose-500">*</span>
                 </label>
                 <div className="relative">
-                  <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <Lock className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
                   <input
                     type="password"
                     required
                     placeholder="Enter agent security passphrase (min 6 characters)"
                     value={passphrase}
                     onChange={(e) => setPassphrase(e.target.value)}
-                    className="w-full min-h-[46px] pl-10 pr-4 py-2.5 rounded-xl bg-white border border-slate-300 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 focus:outline-none text-sm font-semibold text-slate-900 transition shadow-xs"
+                    className="w-full pl-12 pr-5 py-4 text-base rounded-xl bg-white border border-slate-300 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 focus:outline-none font-semibold text-slate-900 transition shadow-xs"
                   />
                 </div>
-                <p className="text-[11px] text-slate-500">
+                <p className="text-xs text-slate-500 mt-2">
                   Required for programmatic key rotations and autonomous contract sign-off.
                 </p>
               </div>
 
               {/* Email Security Verification Code */}
-              <div className="space-y-3 p-4 rounded-xl bg-blue-50/70 border border-blue-200">
+              <div className="space-y-4 p-6 rounded-2xl bg-blue-50/70 border border-blue-200">
                 <div className="flex items-center justify-between">
-                  <label className="text-xs font-mono font-bold uppercase tracking-wider text-blue-950 flex items-center gap-1.5">
+                  <label className="text-xs sm:text-sm font-mono font-bold uppercase tracking-wider text-blue-950 flex items-center gap-2">
                     <Mail className="w-4 h-4 text-blue-600" />
                     <span>Email Security Authorization Code</span>
                   </label>
@@ -506,20 +506,20 @@ export default function RegisterAgentPage() {
                     type="button"
                     onClick={handleSendOtp}
                     disabled={isSendingOtp}
-                    className="text-xs font-mono text-blue-600 hover:underline font-semibold cursor-pointer disabled:opacity-60"
+                    className="text-xs sm:text-sm font-mono text-blue-600 hover:underline font-semibold cursor-pointer disabled:opacity-60"
                   >
                     {isSendingOtp ? "Dispatching..." : "Resend Code"}
                   </button>
                 </div>
 
-                <p className="text-xs text-blue-900 leading-relaxed">
+                <p className="text-xs sm:text-sm text-blue-900 leading-relaxed">
                   Verification code dispatched to: <strong className="font-mono text-slate-900">{userEmail}</strong>
                 </p>
 
                 {devOtpHint && (
-                  <div className="px-3 py-1.5 rounded-lg bg-blue-100/90 border border-blue-300 text-blue-900 text-xs font-mono flex items-center justify-between">
+                  <div className="px-4 py-2.5 rounded-xl bg-blue-100/90 border border-blue-300 text-blue-900 text-xs sm:text-sm font-mono flex items-center justify-between">
                     <span>Developer Verification Code:</span>
-                    <strong className="tracking-widest font-bold text-blue-950">{devOtpHint}</strong>
+                    <strong className="tracking-widest font-bold text-blue-950 text-base">{devOtpHint}</strong>
                   </div>
                 )}
 
@@ -531,27 +531,27 @@ export default function RegisterAgentPage() {
                     placeholder="6-digit code (e.g. 888888)"
                     value={otpCode}
                     onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ""))}
-                    className="w-full min-h-[48px] px-4 py-2.5 rounded-xl bg-white border border-blue-300 focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 focus:outline-none text-center font-mono font-bold text-lg tracking-widest text-slate-900 shadow-xs"
+                    className="w-full py-4 px-5 text-xl tracking-widest font-mono font-bold rounded-xl bg-white border border-blue-300 focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 focus:outline-none text-center text-slate-900 shadow-xs"
                   />
                 </div>
               </div>
 
               {/* Action Bar */}
-              <div className="pt-4 border-t border-slate-200 flex items-center justify-between">
+              <div className="pt-10 mt-10 border-t border-slate-200 flex items-center justify-between">
                 <button
                   type="button"
                   onClick={() => setCurrentStep(1)}
-                  className="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition flex items-center gap-1.5 cursor-pointer"
+                  className="px-5 py-3.5 rounded-xl text-sm font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition flex items-center gap-2 cursor-pointer"
                 >
                   <ArrowLeft className="w-4 h-4" />
                   <span>Back</span>
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs sm:text-sm tracking-wide shadow-sm transition flex items-center gap-2 cursor-pointer"
+                  className="py-4 px-8 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-base tracking-wide shadow-sm transition flex items-center gap-2.5 cursor-pointer"
                 >
                   <span>Continue to Consents</span>
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowRight className="w-5 h-5" />
                 </button>
               </div>
             </form>
@@ -561,61 +561,61 @@ export default function RegisterAgentPage() {
           {/* STEP 3: LEGAL & PRIVACY CONSENTS */}
           {/* ========================================================================= */}
           {currentStep === 3 && (
-            <form onSubmit={handleStep3Submit} className="space-y-5">
-              <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs space-y-1">
-                <div className="flex items-center gap-2 font-bold text-amber-950">
-                  <ShieldCheck className="w-4 h-4 text-amber-600" />
+            <form onSubmit={handleStep3Submit} className="space-y-9">
+              <div className="p-6 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-sm space-y-2">
+                <div className="flex items-center gap-2.5 font-bold text-amber-950 text-base">
+                  <ShieldCheck className="w-5 h-5 text-amber-600" />
                   <span>Statutory Node Settlement Compliance</span>
                 </div>
-                <p className="text-amber-800 leading-relaxed text-[11px]">
+                <p className="text-amber-800 leading-relaxed text-xs sm:text-sm">
                   Autonomous agents execute programmatic transactions under cryptographic power of attorney. Verify compliance before signing.
                 </p>
               </div>
 
               {/* Checkbox 1 */}
-              <label className="flex items-start gap-3 p-4 rounded-xl bg-slate-50 border border-slate-200 hover:border-blue-400 transition cursor-pointer">
+              <label className="flex items-start gap-4 p-6 rounded-2xl bg-slate-50 border border-slate-200 hover:border-blue-400 transition cursor-pointer">
                 <input
                   type="checkbox"
                   required
                   checked={consentTerms}
                   onChange={(e) => setConsentTerms(e.target.checked)}
-                  className="mt-1 w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500 cursor-pointer"
+                  className="mt-1 w-5 h-5 text-blue-600 rounded border-slate-300 focus:ring-blue-500 cursor-pointer"
                 />
-                <div className="text-xs space-y-0.5">
-                  <span className="font-bold text-slate-900 block">
+                <div className="text-sm space-y-1">
+                  <span className="font-bold text-slate-900 block text-sm sm:text-base">
                     Protocol Settlement Terms &amp; Spending Cap Verification
                   </span>
-                  <p className="text-slate-600 text-[11px] leading-relaxed">
+                  <p className="text-slate-600 text-xs sm:text-sm leading-relaxed">
                     I agree to the Verisett Protocol Settlement Terms and verify that this agent has authorized spending limits for automated escrow clearing.
                   </p>
                 </div>
               </label>
 
               {/* Checkbox 2 */}
-              <label className="flex items-start gap-3 p-4 rounded-xl bg-slate-50 border border-slate-200 hover:border-blue-400 transition cursor-pointer">
+              <label className="flex items-start gap-4 p-6 rounded-2xl bg-slate-50 border border-slate-200 hover:border-blue-400 transition cursor-pointer">
                 <input
                   type="checkbox"
                   required
                   checked={consentPrivacy}
                   onChange={(e) => setConsentPrivacy(e.target.checked)}
-                  className="mt-1 w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500 cursor-pointer"
+                  className="mt-1 w-5 h-5 text-blue-600 rounded border-slate-300 focus:ring-blue-500 cursor-pointer"
                 />
-                <div className="text-xs space-y-0.5">
-                  <span className="font-bold text-slate-900 block">
+                <div className="text-sm space-y-1">
+                  <span className="font-bold text-slate-900 block text-sm sm:text-base">
                     Telemetry Privacy &amp; Autonomous Processing Agreement
                   </span>
-                  <p className="text-slate-600 text-[11px] leading-relaxed">
+                  <p className="text-slate-600 text-xs sm:text-sm leading-relaxed">
                     I accept the Data Processing &amp; Autonomous Agent Telemetry Privacy Policy for multi-tenant node operations.
                   </p>
                 </div>
               </label>
 
               {/* Action Bar */}
-              <div className="pt-4 border-t border-slate-200 flex items-center justify-between">
+              <div className="pt-10 mt-10 border-t border-slate-200 flex items-center justify-between">
                 <button
                   type="button"
                   onClick={() => setCurrentStep(2)}
-                  className="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition flex items-center gap-1.5 cursor-pointer"
+                  className="px-5 py-3.5 rounded-xl text-sm font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition flex items-center gap-2 cursor-pointer"
                 >
                   <ArrowLeft className="w-4 h-4" />
                   <span>Back</span>
@@ -623,16 +623,16 @@ export default function RegisterAgentPage() {
                 <button
                   type="submit"
                   disabled={isSubmitting || !consentTerms || !consentPrivacy}
-                  className="px-7 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-xs sm:text-sm tracking-wide shadow-sm transition flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                  className="py-4 px-8 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-base tracking-wide shadow-sm transition flex items-center gap-2.5 cursor-pointer disabled:opacity-50"
                 >
                   {isSubmitting ? (
                     <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <Loader2 className="w-5 h-5 animate-spin" />
                       <span>Provisioning Node...</span>
                     </>
                   ) : (
                     <>
-                      <Key className="w-4 h-4" />
+                      <Key className="w-5 h-5" />
                       <span>Authorize &amp; Provision Agent</span>
                     </>
                   )}
@@ -645,42 +645,42 @@ export default function RegisterAgentPage() {
           {/* STEP 4: ONE-TIME SECRET TOKEN REVEAL & ROUTING */}
           {/* ========================================================================= */}
           {currentStep === 4 && generatedApiKey && (
-            <div className="space-y-6 animate-in fade-in">
+            <div className="space-y-9 animate-in fade-in">
               {/* Security Warning Alert */}
-              <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 flex items-start gap-3">
-                <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
-                <div className="text-xs space-y-1">
-                  <p className="font-bold text-amber-950">
+              <div className="p-6 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 flex items-start gap-4">
+                <AlertTriangle className="w-6 h-6 text-amber-600 shrink-0 mt-0.5" />
+                <div className="text-sm space-y-1">
+                  <p className="font-bold text-amber-950 text-base">
                     Important: Copy Your API Secret Key Now
                   </p>
-                  <p className="text-amber-800 leading-relaxed text-[11px]">
+                  <p className="text-amber-800 leading-relaxed text-xs sm:text-sm">
                     This raw secret token is displayed only once. It will not be stored in plaintext and cannot be recovered if lost. Store it in a secure environment variable.
                   </p>
                 </div>
               </div>
 
               {/* Generated API Key Card */}
-              <div className="space-y-1.5">
-                <label className="text-[11px] font-mono uppercase tracking-wider text-slate-700 font-bold block">
+              <div className="space-y-2">
+                <label className="text-xs sm:text-sm font-mono uppercase tracking-wider text-slate-700 font-bold block mb-3">
                   Agent Authentication Key
                 </label>
-                <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 flex flex-wrap sm:flex-nowrap items-center justify-between gap-3 shadow-inner">
-                  <span className="font-mono text-xs sm:text-sm text-emerald-400 select-all break-all">
+                <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 flex flex-wrap sm:flex-nowrap items-center justify-between gap-4 shadow-inner">
+                  <span className="font-mono text-sm sm:text-base text-emerald-400 select-all break-all">
                     {generatedApiKey}
                   </span>
                   <button
                     type="button"
                     onClick={handleCopyKey}
-                    className="shrink-0 px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-white font-mono text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer"
+                    className="shrink-0 px-5 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-mono text-xs sm:text-sm font-semibold flex items-center gap-2 transition cursor-pointer"
                   >
                     {copiedKey ? (
                       <>
-                        <Check className="w-3.5 h-3.5 text-emerald-400" />
+                        <Check className="w-4 h-4 text-emerald-400" />
                         <span className="text-emerald-400">Copied</span>
                       </>
                     ) : (
                       <>
-                        <Copy className="w-3.5 h-3.5 text-slate-300" />
+                        <Copy className="w-4 h-4 text-slate-300" />
                         <span>Copy Key</span>
                       </>
                     )}
@@ -690,33 +690,33 @@ export default function RegisterAgentPage() {
 
               {/* Provisioned Node Specification */}
               {registeredAgent && (
-                <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3 text-xs">
-                  <p className="text-[11px] font-mono uppercase tracking-wider text-slate-500 font-bold">
+                <div className="p-6 rounded-2xl bg-slate-50 border border-slate-200 space-y-4 text-sm">
+                  <p className="text-xs font-mono uppercase tracking-wider text-slate-500 font-bold">
                     Registered Node Specification
                   </p>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <span className="text-slate-500 block text-[11px]">Identifier</span>
-                      <span className="font-bold text-slate-900 font-mono">
+                      <span className="text-slate-500 block text-xs">Identifier</span>
+                      <span className="font-bold text-slate-900 font-mono text-sm sm:text-base">
                         {registeredAgent.agentIdCode} ({registeredAgent.agentName})
                       </span>
                     </div>
                     <div>
-                      <span className="text-slate-500 block text-[11px]">Protocol</span>
-                      <span className="font-semibold text-blue-600 font-mono">
+                      <span className="text-slate-500 block text-xs">Protocol</span>
+                      <span className="font-semibold text-blue-600 font-mono text-sm sm:text-base">
                         {registeredAgent.framework}
                       </span>
                     </div>
                     <div>
-                      <span className="text-slate-500 block text-[11px]">Spending Cap</span>
-                      <span className="font-bold text-slate-900 font-mono">
+                      <span className="text-slate-500 block text-xs">Spending Cap</span>
+                      <span className="font-bold text-slate-900 font-mono text-sm sm:text-base">
                         ₹{registeredAgent.spendingLimit.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                       </span>
                     </div>
                     <div>
-                      <span className="text-slate-500 block text-[11px]">Initial Status</span>
-                      <span className="font-mono text-emerald-700 font-semibold flex items-center gap-1.5">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                      <span className="text-slate-500 block text-xs">Initial Status</span>
+                      <span className="font-mono text-emerald-700 font-semibold flex items-center gap-2 text-sm sm:text-base">
+                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                         ACTIVE
                       </span>
                     </div>
@@ -725,16 +725,16 @@ export default function RegisterAgentPage() {
               )}
 
               {/* Quickstart CLI Snippet */}
-              <div className="space-y-1.5">
-                <label className="text-[11px] font-mono uppercase tracking-wider text-slate-700 font-bold block">
+              <div className="space-y-2">
+                <label className="text-xs sm:text-sm font-mono uppercase tracking-wider text-slate-700 font-bold block mb-3">
                   Quickstart CLI Integration
                 </label>
-                <div className="p-3.5 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between gap-3 text-xs font-mono text-slate-300">
+                <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-between gap-4 text-xs sm:text-sm font-mono text-slate-300">
                   <code className="text-slate-300 break-all">{launchSnippet}</code>
                   <button
                     type="button"
                     onClick={handleCopySnippet}
-                    className="shrink-0 p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-white transition cursor-pointer"
+                    className="shrink-0 p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white transition cursor-pointer"
                     title="Copy command"
                   >
                     {copiedSnippet ? (
@@ -747,15 +747,15 @@ export default function RegisterAgentPage() {
               </div>
 
               {/* Return to Dashboard Button */}
-              <div className="pt-2 flex justify-end">
+              <div className="pt-10 mt-10 border-t border-slate-200 flex justify-end">
                 <button
                   type="button"
                   onClick={() => router.push("/dashboard")}
-                  className="w-full sm:w-auto px-7 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-sm transition cursor-pointer flex items-center justify-center gap-2"
+                  className="w-full sm:w-auto py-4 px-8 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-base shadow-sm transition cursor-pointer flex items-center justify-center gap-2.5"
                 >
-                  <Sparkles className="w-4 h-4" />
+                  <Sparkles className="w-5 h-5" />
                   <span>Enter Terminal Dashboard</span>
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowRight className="w-5 h-5" />
                 </button>
               </div>
             </div>
