@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=61.0"]
+requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -7,7 +7,33 @@ name = "verisett-ai"
 version = "0.1.0"
 description = "Autonomous Agent Escrow & Settlement Gateway"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.10"
+license = "Apache-2.0"
+authors = [
+    { name = "Manoj S.M.", email = "founder@veri-sett.com" },
+    { name = "Verisett AI Project", email = "dev@veri-sett.com" }
+]
+keywords = [
+    "verisett",
+    "mcp",
+    "fastmcp",
+    "model-context-protocol",
+    "escrow",
+    "settlement",
+    "autonomous-agents"
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Security :: Cryptography",
+]
 dependencies = [
     "fastapi>=0.110.0",
     "uvicorn[standard]>=0.28.0",
@@ -18,11 +44,15 @@ dependencies = [
     "pydantic>=2.6.4",
     "pydantic-settings>=2.2.1",
     "mcp>=1.1.0",
+    "fastmcp>=0.1.0",
     "jsonschema>=4.21.1",
     "httpx>=0.27.0",
-    "pytest>=8.1.1",
-    "pytest-asyncio>=0.23.6",
 ]
+
+[project.urls]
+Homepage = "https://veri-sett.com"
+Documentation = "https://veri-sett.com/docs"
+Repository = "https://github.com/aiverisett-startup/verisettai"
 
 [project.scripts]
 verisett-mcp = "verisett.mcp.server:main"
@@ -34,4 +64,3 @@ where = ["src"]
 asyncio_mode = "auto"
 testpaths = ["tests"]
 pythonpath = ["src"]
-
