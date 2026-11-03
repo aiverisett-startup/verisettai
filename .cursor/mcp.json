@@ -1,7 +1,11 @@
 {
   "mcpServers": {
     "arcade": {
-      "url": "https://api.arcade.dev/mcp/gw_3LbPgSvyPmIsLYxiL413FBhL900"
+      "url": "https://api.arcade.dev/mcp/gw_3LbPgSvyPmIsLYxiL413FBhL900",
+      "headers": {
+        "Authorization": "Bearer arc_proj1Y3nymwBgRcDUnpkcP1QMtM4j6AosQgZrhJaMennZqtxY28mbXv",
+        "Arcade-User-Id": "ai.verisett@gmail.com"
+      }
     }
   }
 }
