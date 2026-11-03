@@ -36,7 +36,6 @@ import {
 } from "lucide-react";
 import { VerisettLogo } from "@/components/VerisettLogo";
 import { GoldenBackgroundShapes } from "@/components/ui/GoldenBackgroundShapes";
-import { RegisterAgentModal } from "@/components/dashboard/RegisterAgentModal";
 import { RegisteredAgentsPanel } from "@/components/dashboard/RegisteredAgentsPanel";
 import { AgentTelemetryBarChart } from "@/components/dashboard/AgentTelemetryBarChart";
 import { CommandPaletteModal } from "@/components/dashboard/CommandPaletteModal";
@@ -156,7 +155,6 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
 
   // Modals state
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState<boolean>(false);
-  const [isRegisterAgentModalOpen, setIsRegisterAgentModalOpen] = useState<boolean>(false);
   const [isPolicyModalOpen, setIsPolicyModalOpen] = useState<boolean>(false);
   const [isDepositModalOpen, setIsDepositModalOpen] = useState<boolean>(false);
 
@@ -1063,7 +1061,6 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
                   onSelectAgent={(agent) => {
                     setSelectedAgentId(agent.id);
                   }}
-                  onRegisterAgent={() => setIsRegisterAgentModalOpen(true)}
                   onDeleteAgent={(id, name) => handleDeleteAgent(id, name)}
                 />
                 <AgentTelemetryBarChart
@@ -1226,43 +1223,10 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
       <CommandPaletteModal
         isOpen={isCommandPaletteOpen}
         onClose={() => setIsCommandPaletteOpen(false)}
-        onRegisterAgent={() => setIsRegisterAgentModalOpen(true)}
+        onRegisterAgent={() => router.push("/dashboard/register-agent")}
         onDepositFunds={() => setIsDepositModalOpen(true)}
         onSimulatePing={() => handleSimulateHeartbeat()}
         onSignOut={handleSignOut}
-      />
-
-      {/* MODAL 2: 4-Step AI Agent Registration Flow */}
-      <RegisterAgentModal
-        isOpen={isRegisterAgentModalOpen}
-        onClose={() => setIsRegisterAgentModalOpen(false)}
-        userEmail={user.email}
-        onAgentRegistered={(newAgent) => {
-          if (newAgent) {
-            setAgents((prev) => [
-              {
-                id: newAgent.id,
-                user_id: user.id,
-                name: newAgent.agentName,
-                framework: newAgent.framework,
-                agent_id_code: newAgent.agentIdCode,
-                avatar_url: newAgent.avatarUrl,
-                status: newAgent.status || "Unlinked",
-                spending_limit: newAgent.spendingLimit,
-                webhook_url: newAgent.webhookUrl,
-                ping_latency_ms: null,
-                last_heartbeat_at: null,
-                throughput_tps: null,
-              },
-              ...prev,
-            ]);
-            setSelectedAgentId(newAgent.id);
-          }
-          if (typeof window !== "undefined") {
-            window.dispatchEvent(new CustomEvent("verisett_agents_updated"));
-          }
-          loadTenantData(user.id);
-        }}
       />
 
       {/* MODAL: Agent Economic Policy Guardrails */}

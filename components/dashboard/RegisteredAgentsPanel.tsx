@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect } from "react";
+import Link from "next/link";
 import useSWR from "swr";
 import { Plus, Check, Bot, Activity, Trash2 } from "lucide-react";
 
@@ -21,7 +22,7 @@ export interface AgentApiRecord {
 interface RegisteredAgentsPanelProps {
   selectedAgentId: string | null;
   onSelectAgent: (agent: AgentApiRecord) => void;
-  onRegisterAgent: () => void;
+  onRegisterAgent?: () => void;
   onDeleteAgent?: (agentId: string, agentName: string) => void;
   className?: string;
 }
@@ -88,14 +89,13 @@ export function RegisteredAgentsPanel({
           Registered Agents
         </h2>
 
-        <button
-          type="button"
-          onClick={onRegisterAgent}
+        <Link
+          href="/dashboard/register-agent"
           className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-xs transition cursor-pointer"
         >
           <Plus className="w-3.5 h-3.5" />
           <span>+ Register Agent</span>
-        </button>
+        </Link>
       </div>
 
       {/* Table / Empty State */}
@@ -104,14 +104,13 @@ export function RegisteredAgentsPanel({
           <p className="text-sm font-medium text-[#6E675D]">
             No registered agents.
           </p>
-          <button
-            type="button"
-            onClick={onRegisterAgent}
+          <Link
+            href="/dashboard/register-agent"
             className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-xs transition cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>+ Register Agent</span>
-          </button>
+          </Link>
         </div>
       ) : (
         <div className="w-full overflow-x-auto">
