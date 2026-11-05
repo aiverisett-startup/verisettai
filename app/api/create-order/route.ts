@@ -37,14 +37,26 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (normalizedPlanId === "builder" || normalizedPlanId.includes("builder")) {
-      // Builder Protocol: ₹2,500 base + 18% GST (₹450) = ₹2,950 = 295000 paise
-      targetAmount = 295000;
-    } else if (normalizedPlanId === "growth" || normalizedPlanId.includes("growth")) {
-      targetAmount = 943900;
-    } else if (normalizedPlanId === "enterprise" || normalizedPlanId.includes("enterprise")) {
-      // Enterprise Protocol: ₹30,000 base + 18% GST (₹5,400) = ₹35,400 = 3540000 paise
-      targetAmount = 3540000;
+    if (
+      normalizedPlanId === "builder" ||
+      normalizedPlanId.includes("builder") ||
+      normalizedPlanId === "pro" ||
+      normalizedPlanId.includes("pro")
+    ) {
+      targetAmount = targetAmount && targetAmount >= 100 ? targetAmount : 353882;
+    } else if (
+      normalizedPlanId === "growth" ||
+      normalizedPlanId.includes("growth") ||
+      normalizedPlanId === "team" ||
+      normalizedPlanId.includes("team")
+    ) {
+      targetAmount = targetAmount && targetAmount >= 100 ? targetAmount : 1179882;
+    } else if (
+      normalizedPlanId === "enterprise" ||
+      normalizedPlanId.includes("enterprise") ||
+      normalizedPlanId === "sovereign"
+    ) {
+      targetAmount = targetAmount && targetAmount >= 100 ? targetAmount : 3539882;
     } else if (!targetAmount || targetAmount < 100) {
       return NextResponse.json(
         { error: "Invalid or unlisted subscription tier." },

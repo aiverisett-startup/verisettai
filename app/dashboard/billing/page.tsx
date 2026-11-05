@@ -32,9 +32,26 @@ import { AcceptedPaymentRailsStrip } from "@/components/PaymentRailLogos";
 import { EnterpriseBanner } from "@/app/components/pricing/EnterpriseBanner";
 import type { PlanConfig } from "@/lib/plans";
 
-export interface PlanTier {
-  id: "builder" | "growth" | "enterprise";
+export interface SubscriptionTierDef {
+  id: string;
   name: string;
+  price: number;
+  order: number;
+  opsTotal: number;
+  opsRemaining: number;
+}
+
+export const SUBSCRIPTION_TIERS: SubscriptionTierDef[] = [
+  { id: "free", name: "Free Community", price: 0, order: 0, opsTotal: 10000, opsRemaining: 5000 },
+  { id: "pro", name: "Pro Developer", price: 2999, order: 1, opsTotal: 250000, opsRemaining: 195000 },
+  { id: "team", name: "Team / Studio", price: 9999, order: 2, opsTotal: 1500000, opsRemaining: 1245000 },
+  { id: "enterprise", name: "Enterprise / Sovereign", price: 29999, order: 3, opsTotal: 10000000, opsRemaining: 8800000 },
+];
+
+export interface PlanTier {
+  id: string;
+  name: string;
+  order: number;
   badge?: string;
   tagline: string;
   price: number;
@@ -44,10 +61,11 @@ export interface PlanTier {
 
 export const PLAN_TIERS: PlanTier[] = [
   {
-    id: "builder",
-    name: "Builder Protocol",
+    id: "pro",
+    name: "Pro Developer",
+    order: 1,
     tagline: "Essential execution capacity for modern autonomous agents.",
-    price: 2500,
+    price: 2999,
     apiOps: "250,000 Ops",
     features: [
       "Uncapped monthly API execution volume",
@@ -57,11 +75,12 @@ export const PLAN_TIERS: PlanTier[] = [
     ],
   },
   {
-    id: "growth",
-    name: "Settlement Node",
+    id: "team",
+    name: "Team / Studio",
+    order: 2,
     badge: "Most Popular",
     tagline: "High-throughput production infrastructure with dedicated routing.",
-    price: 7999,
+    price: 9999,
     apiOps: "1,500,000 Ops",
     features: [
       "Uncapped monthly API execution volume",
@@ -72,9 +91,10 @@ export const PLAN_TIERS: PlanTier[] = [
   },
   {
     id: "enterprise",
-    name: "Enterprise Scale",
+    name: "Enterprise / Sovereign",
+    order: 3,
     tagline: "Full-scale dedicated cluster with enterprise SLA and direct rails.",
-    price: 30000,
+    price: 29999,
     apiOps: "Uncapped Ops",
     features: [
       "Uncapped monthly API execution volume",
@@ -86,6 +106,37 @@ export const PLAN_TIERS: PlanTier[] = [
   },
 ];
 
+export function getTierInfo(tierKey?: string | null): SubscriptionTierDef {
+  const normalized = (tierKey || "").toLowerCase().trim();
+  if (
+    normalized.includes("enterprise") ||
+    normalized.includes("sovereign") ||
+    normalized.includes("founder") ||
+    normalized.includes("scale") ||
+    normalized.includes("tier_3")
+  ) {
+    return SUBSCRIPTION_TIERS[3];
+  }
+  if (
+    normalized.includes("team") ||
+    normalized.includes("growth") ||
+    normalized.includes("settlement") ||
+    normalized.includes("institution") ||
+    normalized.includes("tier_2")
+  ) {
+    return SUBSCRIPTION_TIERS[2];
+  }
+  if (
+    normalized.includes("pro") ||
+    normalized.includes("builder") ||
+    normalized.includes("developer") ||
+    normalized.includes("tier_1")
+  ) {
+    return SUBSCRIPTION_TIERS[1];
+  }
+  return SUBSCRIPTION_TIERS[0];
+}
+
 const SPECIFICATION_DELIVERABLES = [
   "Uncapped monthly API execution volume",
   "Guaranteed lowest compute latency",
@@ -94,9 +145,10 @@ const SPECIFICATION_DELIVERABLES = [
   "24/7 Enterprise SLA & Support",
 ];
 
-interface UserSubscription {
+export interface UserSubscription {
   tierId: string;
   name: string;
+  order: number;
   basePrice: number;
   opsRemaining: number;
   opsTotal: number;
@@ -122,13 +174,13 @@ export default function BillingPage() {
   const [currentUserTier, setCurrentUserTier] = useState<UserSubscription>({
     tierId: "free",
     name: "Free Community",
+    order: 0,
     basePrice: 0,
-    opsRemaining: 8500,
+    opsRemaining: 5000,
     opsTotal: 10000,
   });
 
-  const [selectedTierId, setSelectedTierId] = useState<string>("growth");
-  const [isTierFiltered, setIsTierFiltered] = useState<boolean>(false);
+  const [selectedTierId, setSelectedTierId] = useState<string>("pro");
   const [livePlanConfigs, setLivePlanConfigs] = useState<Record<string, PlanConfig>>({});
   const [isPlatformPaused, setIsPlatformPaused] = useState<boolean>(false);
 
@@ -163,7 +215,7 @@ export default function BillingPage() {
     amount: number;
   } | null>(null);
 
-  // 1. Fetch user session and subscription tier from Supabase
+  // 1. Fetch user session and subscription tier from Supabase (strictly automatic tier detection)
   useEffect(() => {
     async function loadUserSession() {
       try {
@@ -177,11 +229,13 @@ export default function BillingPage() {
           let tierKey =
             (session.user.user_metadata?.plan_tier as string) ||
             (session.user.user_metadata?.plan as string) ||
+            (session.user.user_metadata?.subscriptionTier as string) ||
+            (session.user.user_metadata?.tier as string) ||
             "";
 
           const { data: profile } = await supabase
             .from("profiles")
-            .select("plan_tier, founder_pass")
+            .select("plan_tier, founder_pass, subscription_tier, tier")
             .eq("id", session.user.id)
             .maybeSingle();
 
@@ -196,51 +250,22 @@ export default function BillingPage() {
               tierKey = "enterprise";
             } else if (profile.plan_tier) {
               tierKey = profile.plan_tier;
+            } else if ((profile as any).subscription_tier) {
+              tierKey = (profile as any).subscription_tier;
+            } else if ((profile as any).tier) {
+              tierKey = (profile as any).tier;
             }
           }
 
-          if (tierKey) {
-            const normalized = tierKey.toLowerCase();
-            if (
-              normalized.includes("scale") ||
-              normalized.includes("founder") ||
-              normalized.includes("enterprise") ||
-              normalized.includes("tier_3")
-            ) {
-              setCurrentUserTier({
-                tierId: "enterprise",
-                name: "Enterprise Scale",
-                basePrice: 30000,
-                opsRemaining: 5000000,
-                opsTotal: 5000000,
-              });
-            } else if (
-              normalized.includes("growth") ||
-              normalized.includes("settlement") ||
-              normalized.includes("institution") ||
-              normalized.includes("tier_2")
-            ) {
-              setCurrentUserTier({
-                tierId: "growth",
-                name: "Settlement Node",
-                basePrice: 7999,
-                opsRemaining: 1245000,
-                opsTotal: 1500000,
-              });
-            } else if (
-              normalized.includes("builder") ||
-              normalized.includes("pro") ||
-              normalized.includes("tier_1")
-            ) {
-              setCurrentUserTier({
-                tierId: "builder",
-                name: "Builder Protocol",
-                basePrice: 2500,
-                opsRemaining: 195000,
-                opsTotal: 250000,
-              });
-            }
-          }
+          const matchedTier = getTierInfo(tierKey);
+          setCurrentUserTier({
+            tierId: matchedTier.id,
+            name: matchedTier.name,
+            order: matchedTier.order,
+            basePrice: matchedTier.price,
+            opsRemaining: matchedTier.opsRemaining,
+            opsTotal: matchedTier.opsTotal,
+          });
         }
       } catch (err) {
         console.warn("[BILLING_SESSION_NOTICE]:", err);
@@ -250,16 +275,16 @@ export default function BillingPage() {
     loadUserSession();
   }, []);
 
-  // 2. Filter Upgrade-Only Plans: strictly price > currentUserTier.basePrice and isArchived !== true
+  // 2. Filter Upgrade-Only Plans: strictly plan.order > currentUserTier.order and isArchived !== true
   const availableUpgradePlans = useMemo(() => {
     return PLAN_TIERS.filter((tier) => {
       const live = livePlanConfigs[tier.id];
       if (live?.isArchived) return false;
-      return tier.price > currentUserTier.basePrice;
+      return tier.order > currentUserTier.order;
     });
-  }, [currentUserTier.basePrice, livePlanConfigs]);
+  }, [currentUserTier.order, livePlanConfigs]);
 
-  // 3. Resolve Active Selected Plan from visible upgrade tiers
+  // 3. Resolve Active Selected Plan from upgrade tiers
   const activeSelectedPlan = useMemo(() => {
     if (availableUpgradePlans.length === 0) return null;
     const match = availableUpgradePlans.find((t) => t.id === selectedTierId);
@@ -273,14 +298,6 @@ export default function BillingPage() {
   }, [activeSelectedPlan, livePlanConfigs]);
 
   const isEnterpriseArchived = Boolean(livePlanConfigs["enterprise"]?.isArchived);
-
-  // 3b. Auto-filtering: when a plan is selected, filter out lower tiers from view
-  const visibleUpgradePlans = useMemo(() => {
-    if (!isTierFiltered || !activeSelectedPlan) {
-      return availableUpgradePlans;
-    }
-    return availableUpgradePlans.filter((tier) => tier.price >= activeSelectedPlan.price);
-  }, [isTierFiltered, activeSelectedPlan, availableUpgradePlans]);
 
   // 4. Exact Dynamic Financial Calculations
   const calculation = useMemo(() => {
@@ -346,6 +363,15 @@ export default function BillingPage() {
           const data = await res.json();
           if (data.status === "paid") {
             clearInterval(intervalId);
+            const upgraded = getTierInfo(activeSelectedPlan.id);
+            setCurrentUserTier({
+              tierId: upgraded.id,
+              name: upgraded.name,
+              order: upgraded.order,
+              basePrice: upgraded.price,
+              opsRemaining: upgraded.opsRemaining,
+              opsTotal: upgraded.opsTotal,
+            });
             setVerifiedPayment({
               payment_id: data.payment_id || `UPI_${Date.now().toString().slice(-8)}`,
               order_id: liveQr.qr_id,
@@ -464,6 +490,15 @@ export default function BillingPage() {
 
   const handleSimulateQrSuccess = () => {
     if (!activeSelectedPlan) return;
+    const upgraded = getTierInfo(activeSelectedPlan.id);
+    setCurrentUserTier({
+      tierId: upgraded.id,
+      name: upgraded.name,
+      order: upgraded.order,
+      basePrice: upgraded.price,
+      opsRemaining: upgraded.opsRemaining,
+      opsTotal: upgraded.opsTotal,
+    });
     setVerifiedPayment({
       payment_id: `UPI_${Date.now().toString().slice(-8)}`,
       order_id: `ORD_${Date.now().toString().slice(-6)}`,
@@ -544,55 +579,11 @@ export default function BillingPage() {
               </div>
             </div>
 
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-mono text-slate-500 uppercase">Simulate Tier:</span>
-              <select
-                value={currentUserTier.tierId}
-                onChange={(e) => {
-                  const val = e.target.value;
-                  if (val === "free") {
-                    setCurrentUserTier({
-                      tierId: "free",
-                      name: "Free Community",
-                      basePrice: 0,
-                      opsRemaining: 5000,
-                      opsTotal: 10000,
-                    });
-                  } else if (val === "builder") {
-                    setCurrentUserTier({
-                      tierId: "builder",
-                      name: "Builder Protocol",
-                      basePrice: 2500,
-                      opsRemaining: 195000,
-                      opsTotal: 250000,
-                    });
-                  } else if (val === "growth") {
-                    setCurrentUserTier({
-                      tierId: "growth",
-                      name: "Settlement Node",
-                      basePrice: 7999,
-                      opsRemaining: 1245000,
-                      opsTotal: 1500000,
-                    });
-                  } else if (val === "enterprise") {
-                    setCurrentUserTier({
-                      tierId: "enterprise",
-                      name: "Enterprise Scale",
-                      basePrice: 30000,
-                      opsRemaining: 5000000,
-                      opsTotal: 5000000,
-                    });
-                  }
-                  setVerifiedPayment(null);
-                  setErrorMessage(null);
-                }}
-                className="bg-white border border-slate-200 text-slate-700 text-xs font-mono rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-blue-600 shadow-xs"
-              >
-                <option value="free">Free Community (₹0)</option>
-                <option value="builder">Builder Protocol (₹2,500)</option>
-                <option value="growth">Settlement Node (₹7,999)</option>
-                <option value="enterprise">Enterprise Scale (₹30,000)</option>
-              </select>
+            <div className="flex items-center gap-3">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                Active Node (Level {currentUserTier.order})
+              </span>
             </div>
           </div>
 
@@ -615,13 +606,12 @@ export default function BillingPage() {
           </div>
         )}
 
-        {/* Dynamic Enterprise Promo Banner (Hidden if Enterprise tier is archived / sunset) */}
-        {!isEnterpriseArchived && (
+        {/* Dynamic Enterprise Promo Banner (Hidden if Enterprise tier is archived or user already on Enterprise) */}
+        {!isEnterpriseArchived && currentUserTier.order < 3 && (
           <div className="mb-8">
             <EnterpriseBanner
               onSelectEnterprise={() => {
                 setSelectedTierId("enterprise");
-                setIsTierFiltered(true);
                 setErrorMessage(null);
                 setVerifiedPayment(null);
               }}
@@ -640,36 +630,30 @@ export default function BillingPage() {
             <div className="flex items-center justify-between text-xs font-semibold text-slate-500 uppercase tracking-wider">
               <div className="flex items-center gap-3">
                 <span>Available Upgrades</span>
-                {isTierFiltered && visibleUpgradePlans.length < availableUpgradePlans.length && (
-                  <button
-                    type="button"
-                    onClick={() => setIsTierFiltered(false)}
-                    className="text-xs text-blue-600 hover:text-blue-700 underline font-medium lowercase tracking-normal cursor-pointer"
-                  >
-                    View all tiers
-                  </button>
-                )}
               </div>
               <span className="text-blue-600 normal-case font-medium">
-                {visibleUpgradePlans.length > 0
-                  ? `${visibleUpgradePlans.length} Tier${visibleUpgradePlans.length > 1 ? "s" : ""} Available`
+                {availableUpgradePlans.length > 0
+                  ? `${availableUpgradePlans.length} Tier${availableUpgradePlans.length > 1 ? "s" : ""} Available`
                   : "Highest Tier Active"}
               </span>
             </div>
 
             {/* Case 1: User is already on top tier */}
-            {visibleUpgradePlans.length === 0 ? (
+            {availableUpgradePlans.length === 0 ? (
               <div className="rounded-2xl border border-slate-200 bg-white p-7 space-y-5 shadow-sm">
                 <div className="flex items-center gap-3">
                   <div className="p-3 rounded-xl bg-blue-50 text-blue-600">
                     <Building2 className="w-6 h-6" />
                   </div>
                   <div>
+                    <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-300 mb-1">
+                      Enterprise Active — Custom Quota / Contact Support
+                    </div>
                     <h3 className="text-base font-bold text-slate-900">
-                      Enterprise Custom Solutions
+                      Enterprise / Sovereign Node Active
                     </h3>
                     <p className="text-xs text-slate-600 mt-0.5">
-                      You are currently on our highest standard plan ({currentUserTier.name}).
+                      You are currently operating on our highest standard plan ({currentUserTier.name}). Dedicated throughput and priority sovereign settlement routing are enabled.
                     </p>
                   </div>
                 </div>
@@ -699,14 +683,20 @@ export default function BillingPage() {
                     className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs transition cursor-pointer shadow-sm w-full sm:w-auto"
                   >
                     <Mail className="w-4 h-4" />
-                    <span>Contact Enterprise Solutions</span>
+                    <span>Contact Sovereign Solutions</span>
                   </a>
                 </div>
               </div>
             ) : (
               /* Case 2: Available Upgrade Plans Grid (Enlarged Cards) */
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
-                {visibleUpgradePlans.map((tier) => {
+              <div className={`grid grid-cols-1 ${
+                availableUpgradePlans.length === 1
+                  ? "sm:grid-cols-1"
+                  : availableUpgradePlans.length === 2
+                  ? "sm:grid-cols-2"
+                  : "sm:grid-cols-3"
+              } gap-4 sm:gap-5`}>
+                {availableUpgradePlans.map((tier) => {
                   const isSelected = activeSelectedPlan?.id === tier.id;
                   const gst = Number((tier.price * 0.18).toFixed(2));
                   const total = Number((tier.price + gst).toFixed(2));
@@ -719,7 +709,6 @@ export default function BillingPage() {
                       key={tier.id}
                       onClick={() => {
                         setSelectedTierId(tier.id);
-                        setIsTierFiltered(true);
                         setErrorMessage(null);
                         setVerifiedPayment(null);
                       }}
@@ -1089,6 +1078,52 @@ export default function BillingPage() {
                     <span>Verified Payment Rails</span>
                   </div>
 
+                </div>
+              ) : currentUserTier.order >= 3 ? (
+                <div className="space-y-5 animate-in fade-in">
+                  <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-300">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                      Enterprise Active — Custom Quota / Contact Support
+                    </span>
+                  </div>
+
+                  <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="font-semibold text-slate-500 uppercase">Cluster Status:</span>
+                      <span className="font-mono font-bold text-emerald-600">Dedicated Sovereign VPC</span>
+                    </div>
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="font-semibold text-slate-500 uppercase">Settlement SLA:</span>
+                      <span className="font-mono font-bold text-slate-800">99.99% Guaranteed</span>
+                    </div>
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="font-semibold text-slate-500 uppercase">Execution Volume:</span>
+                      <span className="font-mono font-bold text-blue-600">Uncapped (10,000,000+ Ops)</span>
+                    </div>
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="font-semibold text-slate-500 uppercase">Dispute Protocol:</span>
+                      <span className="font-mono font-bold text-slate-800">Autonomous Settlement Vault</span>
+                    </div>
+                  </div>
+
+                  <div className="rounded-xl border border-blue-200 bg-blue-50/50 p-4 text-xs text-slate-700 space-y-2">
+                    <div className="font-bold text-slate-900 flex items-center gap-2">
+                      <ShieldCheck className="w-4 h-4 text-blue-600" />
+                      Sovereign Clearinghouse Rails
+                    </div>
+                    <p className="text-slate-600 leading-relaxed text-[11px]">
+                      Your enterprise node operates with direct machine-to-machine liquidity rails and real-time webhook event streaming.
+                    </p>
+                  </div>
+
+                  <a
+                    href="mailto:support@verisett.ai?subject=Enterprise%20Priority%20Assistance"
+                    className="w-full py-3 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs transition flex items-center justify-center gap-2 shadow-sm"
+                  >
+                    <Mail className="w-4 h-4" />
+                    <span>Contact Dedicated TAM</span>
+                  </a>
                 </div>
               ) : (
                 <div className="p-6 text-center text-xs text-slate-500">
