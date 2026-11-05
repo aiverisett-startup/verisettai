@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import useSWR from "swr";
-import { Plus, Check, Bot, Activity, Trash2 } from "lucide-react";
+import { Plus, Check, Bot, Activity, Trash2, AlertTriangle, Loader2 } from "lucide-react";
 
 export interface AgentApiRecord {
   id: string;
@@ -54,6 +54,10 @@ export function RegisteredAgentsPanel({
 
   const agents = data?.agents || [];
 
+  // Local state for delete interactions and notifications
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [toast, setToast] = useState<{ type: "success" | "error"; message: string } | null>(null);
+
   // Default selection to agents[0]?.id if nothing is selected or current selection is invalid
   useEffect(() => {
     if (agents.length > 0) {
@@ -79,6 +83,73 @@ export function RegisteredAgentsPanel({
     };
   }, [mutate]);
 
+  // Agent Deletion / Deregistration Handler
+  const handleDeregister = async (agentId: string, agentName: string) => {
+    const confirmed = window.confirm(
+      `Are you sure you want to deregister and delete agent "${agentName}"?`
+    );
+    if (!confirmed) return;
+
+    setDeletingId(agentId);
+    setToast(null);
+
+    try {
+      const res = await fetch(`/api/agents?id=${encodeURIComponent(agentId)}`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+      });
+
+      const responseData = await res.json().catch(() => ({}));
+
+      if (!res.ok || responseData.error) {
+        const errorMsg =
+          responseData.error ||
+          "Cannot deregister agent: active locked escrow contracts or server error.";
+        setToast({ type: "error", message: errorMsg });
+        return;
+      }
+
+      // Optimistic update: immediately remove agent from local SWR state
+      mutate(
+        (prev) =>
+          prev
+            ? {
+                ...prev,
+                agents: prev.agents.filter((a) => a.id !== agentId),
+                totalCount: Math.max(0, prev.totalCount - 1),
+              }
+            : prev,
+        false
+      );
+
+      // Trigger parent handler if supplied
+      if (onDeleteAgent) {
+        onDeleteAgent(agentId, agentName);
+      }
+
+      // Broadcast real-time update events
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("verisett_agents_updated"));
+        window.dispatchEvent(new CustomEvent("verisett_data_mutated"));
+      }
+
+      // Show success toast notification
+      setToast({
+        type: "success",
+        message: `Agent "${agentName}" has been successfully deregistered.`,
+      });
+      setTimeout(() => setToast(null), 4500);
+    } catch (err: any) {
+      console.error("[DEREGISTER_AGENT_ERROR]:", err);
+      setToast({
+        type: "error",
+        message: err?.message || "Failed to communicate with agent clearinghouse.",
+      });
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
   return (
     <div
       className={`w-full bg-white border border-[#EAE3D2] rounded-2xl shadow-xs overflow-hidden font-sans ${className}`}
@@ -97,6 +168,33 @@ export function RegisteredAgentsPanel({
           <span>+ Register Agent</span>
         </Link>
       </div>
+
+      {/* Toast Notification Alert */}
+      {toast && (
+        <div
+          className={`px-6 py-3 text-xs font-mono font-medium flex items-center justify-between transition-all ${
+            toast.type === "success"
+              ? "bg-emerald-50 text-emerald-800 border-b border-emerald-200"
+              : "bg-rose-50 text-rose-800 border-b border-rose-200"
+          }`}
+        >
+          <div className="flex items-center gap-2">
+            {toast.type === "success" ? (
+              <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+            ) : (
+              <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
+            )}
+            <span>{toast.message}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setToast(null)}
+            className="text-xs text-slate-400 hover:text-slate-600 ml-4 font-bold cursor-pointer"
+          >
+            ✕
+          </button>
+        </div>
+      )}
 
       {/* Table / Empty State */}
       {agents.length === 0 ? (
@@ -120,7 +218,7 @@ export function RegisteredAgentsPanel({
                 <th className="py-3 px-6">Agent Name / ID</th>
                 <th className="py-3 px-6">Protocol</th>
                 <th className="py-3 px-6">Status</th>
-                <th className="py-3 px-6 text-right">Actions / Select</th>
+                <th className="py-3 px-6 text-right">Actions / Manage</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[#EAE3D2]/70">
@@ -128,6 +226,7 @@ export function RegisteredAgentsPanel({
                 const isSelected = selectedAgentId === agent.id;
                 const formattedId = `AGT-${agent.id.replace(/-/g, "").slice(0, 8).toUpperCase()}`;
                 const isActive = (agent.status || "").toUpperCase() === "ACTIVE";
+                const isDeleting = deletingId === agent.id;
 
                 return (
                   <tr
@@ -189,7 +288,7 @@ export function RegisteredAgentsPanel({
                       </div>
                     </td>
 
-                    {/* ACTIONS / SELECT */}
+                    {/* ACTIONS: SELECT + DEREGISTER */}
                     <td className="py-3.5 px-6 text-right">
                       <div className="inline-flex items-center gap-2 justify-end">
                         <button
@@ -214,19 +313,24 @@ export function RegisteredAgentsPanel({
                           )}
                         </button>
 
-                        {onDeleteAgent && (
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onDeleteAgent(agent.id, agent.name);
-                            }}
-                            className="p-1.5 rounded-lg border border-transparent hover:border-rose-200 hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition cursor-pointer"
-                            title={`Delete ${agent.name}`}
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        )}
+                        {/* Working Destructive Deregister Button */}
+                        <button
+                          type="button"
+                          disabled={isDeleting}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeregister(agent.id, agent.name);
+                          }}
+                          className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-rose-200/80 bg-rose-50/50 hover:bg-rose-100 hover:border-rose-300 text-rose-600 text-xs font-semibold transition cursor-pointer disabled:opacity-50"
+                          title={`Deregister ${agent.name}`}
+                        >
+                          {isDeleting ? (
+                            <Loader2 className="w-3.5 h-3.5 animate-spin text-rose-600" />
+                          ) : (
+                            <Trash2 className="w-3.5 h-3.5 text-rose-600" />
+                          )}
+                          <span className="hidden sm:inline">Deregister</span>
+                        </button>
                       </div>
                     </td>
                   </tr>

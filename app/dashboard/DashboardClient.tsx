@@ -690,9 +690,23 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
   // Delete Agent from Supabase and immediately filter out from local state array
   const handleDeleteAgent = async (agentId: string, agentName?: string) => {
     try {
-      await supabase.from("agents").delete().eq("id", agentId).eq("user_id", user.id);
+      // 1. Call DELETE /api/agents with escrow safety check
+      const res = await fetch(`/api/agents?id=${encodeURIComponent(agentId)}`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+      });
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok || data.error) {
+        const errorMsg =
+          data.error || "Cannot deregister agent with active locked escrow contracts.";
+        alert(errorMsg);
+        return;
+      }
 
       try {
+        await supabase.from("agents").delete().eq("id", agentId).eq("user_id", user.id);
+
         await supabase
           .from("registered_agents")
           .delete()
@@ -716,6 +730,12 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
       if (selectedAgentId === agentId) {
         const remaining = agents.filter((a) => a.id !== agentId);
         setSelectedAgentId(remaining.length > 0 ? remaining[0].id : null);
+      }
+
+      // Dispatch real-time mutation events
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("verisett_agents_updated"));
+        window.dispatchEvent(new CustomEvent("verisett_data_mutated"));
       }
     } catch (err) {
       console.warn("Could not delete agent:", err);

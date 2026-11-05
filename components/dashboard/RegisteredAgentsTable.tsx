@@ -11,6 +11,7 @@ import {
   Zap,
   Activity,
   ArrowUpRight,
+  Trash2,
 } from "lucide-react";
 
 export interface AgentDbRecord {
@@ -111,6 +112,32 @@ export function RegisteredAgentsTable({
     return `AGT-${agent.id.replace(/-/g, "").slice(0, 8).toUpperCase()}`;
   };
 
+  const handleDeregister = async (agentId: string, agentName: string) => {
+    const confirmed = window.confirm(
+      `Are you sure you want to deregister and delete agent "${agentName}"?`
+    );
+    if (!confirmed) return;
+
+    try {
+      const res = await fetch(`/api/agents?id=${encodeURIComponent(agentId)}`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || data.error) {
+        alert(data.error || "Cannot deregister agent: active locked escrow contracts or server error.");
+        return;
+      }
+      setAgents((prev) => prev.filter((a) => a.id !== agentId));
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("verisett_agents_updated"));
+        window.dispatchEvent(new CustomEvent("verisett_data_mutated"));
+      }
+    } catch (err: any) {
+      alert(err?.message || "Failed to communicate with agent clearinghouse.");
+    }
+  };
+
   return (
     <div
       className={`bg-white/80 backdrop-blur-md border border-slate-200 rounded-2xl shadow-sm overflow-hidden transition-all duration-300 font-sans ${className}`}
@@ -195,7 +222,8 @@ export function RegisteredAgentsTable({
                 <th className="py-3 px-4 font-semibold">PROTOCOL</th>
                 <th className="py-3 px-4 font-semibold">STATUS</th>
                 <th className="py-3 px-4 font-semibold">THROUGHPUT</th>
-                <th className="py-3 px-4 sm:px-6 font-semibold">REGISTERED AT</th>
+                <th className="py-3 px-4 font-semibold">REGISTERED AT</th>
+                <th className="py-3 px-4 sm:px-6 font-semibold text-right">ACTIONS</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -277,8 +305,24 @@ export function RegisteredAgentsTable({
                     </td>
 
                     {/* REGISTERED AT */}
-                    <td className="py-4 px-4 sm:px-6 font-mono text-[11px] text-slate-600">
+                    <td className="py-4 px-4 font-mono text-[11px] text-slate-600">
                       {formatDate(agent.createdAt)}
+                    </td>
+
+                    {/* ACTIONS */}
+                    <td className="py-4 px-4 sm:px-6 text-right">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeregister(agent.id, agent.name);
+                        }}
+                        className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-rose-200/80 bg-rose-50/40 hover:bg-rose-100 hover:border-rose-300 text-rose-600 text-xs font-semibold transition cursor-pointer"
+                        title={`Deregister ${agent.name}`}
+                      >
+                        <Trash2 className="w-3.5 h-3.5 text-rose-600" />
+                        <span className="hidden sm:inline">Deregister</span>
+                      </button>
                     </td>
                   </tr>
                 );
