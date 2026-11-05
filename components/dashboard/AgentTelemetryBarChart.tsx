@@ -21,6 +21,10 @@ interface BarDataPoint {
   settledINR: number;
 }
 
+// Modern clean font stack for standard, highly readable numbers and labels
+const CLEAN_NUMBER_FONT =
+  'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif';
+
 export function AgentTelemetryBarChart({
   selectedAgent,
   className = "",
@@ -135,22 +139,22 @@ export function AgentTelemetryBarChart({
         </div>
 
         {/* Right-aligned Metrics: Current TPS & Total Settled */}
-        <div className="flex items-center gap-3 sm:gap-4 shrink-0 font-mono text-xs">
+        <div className="flex items-center gap-3 sm:gap-4 shrink-0 font-sans text-xs">
           <div className="px-3.5 py-2 rounded-xl bg-white/80 border border-slate-200/80 shadow-xs backdrop-blur-md">
-            <span className="text-slate-400 uppercase tracking-wider block text-[10px] font-medium">
+            <span className="text-slate-400 uppercase tracking-wider block text-[10px] font-medium font-sans">
               Current Throughput
             </span>
-            <span className="text-sm sm:text-base font-bold text-slate-900 tracking-tight flex items-center gap-1.5 mt-0.5">
+            <span className="text-sm sm:text-base font-bold text-slate-900 font-sans tabular-nums tracking-tight flex items-center gap-1.5 mt-0.5">
               <Zap className="w-3.5 h-3.5 text-blue-600" />
               {selectedAgent ? `${baseTps.toFixed(1)} TPS` : "0.0 TPS"}
             </span>
           </div>
 
           <div className="px-3.5 py-2 rounded-xl bg-white/80 border border-slate-200/80 shadow-xs backdrop-blur-md">
-            <span className="text-slate-400 uppercase tracking-wider block text-[10px] font-medium">
+            <span className="text-slate-400 uppercase tracking-wider block text-[10px] font-medium font-sans">
               Total Settled
             </span>
-            <span className="text-sm sm:text-base font-bold text-emerald-600 tracking-tight flex items-center gap-1.5 mt-0.5">
+            <span className="text-sm sm:text-base font-bold text-emerald-600 font-sans tabular-nums tracking-tight flex items-center gap-1.5 mt-0.5">
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
               {totalSettledDisplay}
             </span>
@@ -197,15 +201,16 @@ export function AgentTelemetryBarChart({
                   stroke="rgba(203, 213, 225, 0.45)"
                   strokeDasharray="4 4"
                 />
-                {/* Y-Axis Label: dx={-8}, fontSize: 11, fill: #64748b, JetBrains Mono */}
+                {/* Y-Axis Label: Clean modern sans-serif typography */}
                 <text
                   x={chartLeft}
                   dx={-8}
                   y={y + 4}
                   textAnchor="end"
                   style={{
-                    fontFamily: "'JetBrains Mono', 'Inter', monospace",
-                    fontSize: 11,
+                    fontFamily: CLEAN_NUMBER_FONT,
+                    fontSize: 12,
+                    fontWeight: 500,
                     fill: "#64748b",
                   }}
                 >
@@ -239,15 +244,14 @@ export function AgentTelemetryBarChart({
                     strokeWidth="1"
                     className="transition-opacity"
                   />
-                  {/* X-Axis Label in Standby Mode */}
+                  {/* Clean Sans-Serif X-Axis Label in Standby Mode */}
                   <text
                     x={xCenter}
                     y={chartBottom}
                     dy={16}
                     textAnchor="middle"
                     style={{
-                      fontFamily:
-                        "'JetBrains Mono', 'Fira Code', 'Inter', system-ui, monospace",
+                      fontFamily: CLEAN_NUMBER_FONT,
                       fontSize: 12,
                       fontWeight: 500,
                       fill: "#64748b",
@@ -295,15 +299,14 @@ export function AgentTelemetryBarChart({
                   className="transition-all duration-200"
                 />
 
-                {/* Modern X-Axis Label: dy={16}, clean typography, high clarity */}
+                {/* Clean Sans-Serif X-Axis Label: modern, highly legible numbers */}
                 <text
                   x={xCenter}
                   y={chartBottom}
                   dy={16}
                   textAnchor="middle"
                   style={{
-                    fontFamily:
-                      "'JetBrains Mono', 'Fira Code', 'Inter', system-ui, monospace",
+                    fontFamily: CLEAN_NUMBER_FONT,
                     fontSize: 12,
                     fontWeight: 500,
                     fill: isHovered ? "#2563eb" : "#64748b",
@@ -320,7 +323,7 @@ export function AgentTelemetryBarChart({
         {/* Hover Floating Glass Tooltip */}
         {hoveredIndex !== null && selectedAgent && chartData[hoveredIndex] && (
           <div
-            className="absolute top-2 pointer-events-none transition-all duration-150 transform -translate-x-1/2 bg-white/95 border border-slate-200/90 text-slate-800 text-xs px-3.5 py-2.5 rounded-2xl shadow-xl font-mono flex items-center gap-2.5 z-20 backdrop-blur-xl"
+            className="absolute top-2 pointer-events-none transition-all duration-150 transform -translate-x-1/2 bg-white/95 border border-slate-200/90 text-slate-800 text-xs px-3.5 py-2.5 rounded-2xl shadow-xl font-sans tabular-nums flex items-center gap-2.5 z-20 backdrop-blur-xl"
             style={{
               left: `${
                 ((chartLeft + hoveredIndex * slotWidth + slotWidth / 2) /
@@ -332,10 +335,10 @@ export function AgentTelemetryBarChart({
             <span className="text-slate-400 font-sans font-medium">
               {chartData[hoveredIndex].slot}:
             </span>
-            <span className="font-bold text-slate-900">
+            <span className="font-bold text-slate-900 font-sans tabular-nums">
               {chartData[hoveredIndex].tps.toFixed(1)} TPS
             </span>
-            <span className="text-emerald-600 font-semibold">
+            <span className="text-emerald-600 font-semibold font-sans tabular-nums">
               ₹{chartData[hoveredIndex].settledINR.toLocaleString()}
             </span>
           </div>
@@ -345,13 +348,7 @@ export function AgentTelemetryBarChart({
         {!selectedAgent && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none pb-6">
             <div className="px-5 py-3 rounded-2xl bg-white/85 border border-slate-200/90 backdrop-blur-xl text-center shadow-md shadow-blue-500/5">
-              <p
-                className="text-xs font-mono text-slate-600"
-                style={{
-                  fontFamily:
-                    "'JetBrains Mono', 'Fira Code', 'Inter', system-ui, monospace",
-                }}
-              >
+              <p className="text-xs font-sans font-medium text-slate-600">
                 Standby Mode — Select or register an agent above to stream live telemetry.
               </p>
             </div>
