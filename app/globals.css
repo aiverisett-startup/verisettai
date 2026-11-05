@@ -428,3 +428,64 @@ body {
 .marquee-pause-hover:hover .animate-marquee-stream-right {
   animation-play-state: running !important;
 }
+
+/* ==========================================================================
+   Verisett AI — Premium Futuristic Blue Glass & Motion System
+   ========================================================================== */
+
+.glass-blue-premium {
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(191, 219, 254, 0.65);
+  box-shadow: 0 16px 40px -12px rgba(37, 99, 235, 0.08), 0 2px 6px rgba(0, 0, 0, 0.02);
+}
+
+.glass-blue-premium:hover {
+  border-color: rgba(96, 165, 250, 0.85);
+  box-shadow: 0 20px 48px -10px rgba(37, 99, 235, 0.16), 0 4px 12px rgba(0, 0, 0, 0.03);
+}
+
+/* Electric Blue Laser Beam Pulse Keyframe */
+@keyframes laser-flow {
+  0% {
+    stroke-dashoffset: 200;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+.animate-laser-flow {
+  stroke-dasharray: 20, 10;
+  animation: laser-flow 3s linear infinite;
+}
+
+/* Subtle Ambient Blue Pulse Aura */
+@keyframes ambient-blue-glow {
+  0%, 100% {
+    opacity: 0.35;
+    filter: drop-shadow(0 0 12px rgba(37, 99, 235, 0.2));
+  }
+  50% {
+    opacity: 0.75;
+    filter: drop-shadow(0 0 24px rgba(37, 99, 235, 0.45));
+  }
+}
+
+.animate-ambient-blue-glow {
+  animation: ambient-blue-glow 4s ease-in-out infinite;
+}
+
+/* Reduced Motion Safety Override */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+

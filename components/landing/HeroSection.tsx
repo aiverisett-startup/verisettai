@@ -93,27 +93,41 @@ export function HeroSection({
             Lock milestone funds in deterministic non-custodial programmatic vaults. Automatically release payouts only when software deliverables, APIs, and commercial milestones meet verified acceptance criteria.
           </motion.p>
 
-          {/* 4. Single Solid Primary CTA Button */}
+          {/* 4. Single Solid Primary CTA Button with Micro-Interactions */}
           <motion.div
             variants={itemVariants}
             className="flex items-center justify-center pt-2 w-full sm:w-auto relative z-10 will-change-transform"
           >
             {isLoaded && user ? (
-              <Link
-                href="/dashboard"
-                className="w-full sm:w-auto px-8 py-3.5 rounded-[10px] bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold text-sm tracking-wide shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_4px_14px_rgba(37,99,235,0.25)] flex items-center justify-center gap-2.5 transition-all cursor-pointer group"
+              <motion.div
+                whileHover={{ scale: 1.025, y: -1 }}
+                whileTap={{ scale: 0.975, y: 0 }}
+                transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+                className="w-full sm:w-auto"
               >
-                <span>ENTER CONSOLE</span>
-                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-              </Link>
+                <Link
+                  href="/dashboard"
+                  className="w-full sm:w-auto px-8 py-3.5 rounded-[10px] bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold text-sm tracking-wide shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_4px_14px_rgba(37,99,235,0.25)] flex items-center justify-center gap-2.5 transition-all cursor-pointer group"
+                >
+                  <span>ENTER CONSOLE</span>
+                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                </Link>
+              </motion.div>
             ) : (
-              <Link
-                href="/login"
-                className="w-full sm:w-auto px-8 py-3.5 rounded-[10px] bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold text-sm tracking-wide shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_4px_14px_rgba(37,99,235,0.25)] flex items-center justify-center gap-2.5 transition-all cursor-pointer group"
+              <motion.div
+                whileHover={{ scale: 1.025, y: -1 }}
+                whileTap={{ scale: 0.975, y: 0 }}
+                transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+                className="w-full sm:w-auto"
               >
-                <span>GET STARTED</span>
-                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-              </Link>
+                <Link
+                  href="/login"
+                  className="w-full sm:w-auto px-8 py-3.5 rounded-[10px] bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold text-sm tracking-wide shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_4px_14px_rgba(37,99,235,0.25)] flex items-center justify-center gap-2.5 transition-all cursor-pointer group"
+                >
+                  <span>GET STARTED</span>
+                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                </Link>
+              </motion.div>
             )}
           </motion.div>
 

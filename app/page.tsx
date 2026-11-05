@@ -5,6 +5,7 @@ import { MinimalNav } from "@/components/landing/MinimalNav";
 import { HeroSection } from "@/components/landing/HeroSection";
 import { AgentCapabilitiesMarquee } from "@/components/landing/AgentCapabilitiesMarquee";
 import { HowItWorksSection } from "@/components/landing/HowItWorksSection";
+import { EscrowLifecycleVisualizer } from "@/components/motion/EscrowLifecycleVisualizer";
 import { ProtocolArchitecture } from "@/components/landing/ProtocolArchitecture";
 import { DeveloperCodeSection } from "@/components/landing/DeveloperCodeSection";
 import { TrustSecuritySection } from "@/components/landing/TrustSecuritySection";
@@ -123,6 +124,9 @@ export default function Home() {
 
       {/* 5. 3-Step Mechanics Section */}
       <HowItWorksSection />
+
+      {/* 5.5 Animated Escrow Transaction Lifecycle Visualizer */}
+      <EscrowLifecycleVisualizer />
 
       {/* 6. Core Architecture & Condition Verification Engine */}
       <ProtocolArchitecture />

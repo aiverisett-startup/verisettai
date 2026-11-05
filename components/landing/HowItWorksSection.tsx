@@ -139,9 +139,11 @@ export function HowItWorksSection({}: HowItWorksSectionProps) {
         {/* Editorial 3-Step Structural Grid with 1px Dividers */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-0 border border-[#E2E8F0] rounded-2xl bg-white overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.06)] divide-y md:divide-y-0 md:divide-x divide-[#E2E8F0]">
           {steps.map((step, idx) => (
-            <div
+            <motion.div
               key={idx}
-              className="flex flex-col justify-between p-7 sm:p-9 hover:bg-[#F8FAFC]/50 transition-colors"
+              whileHover={{ backgroundColor: "rgba(248, 250, 252, 0.75)" }}
+              transition={{ duration: 0.2 }}
+              className="flex flex-col justify-between p-7 sm:p-9 transition-colors"
             >
               <div>
                 <div className="flex items-center justify-between mb-6">
@@ -164,7 +166,7 @@ export function HowItWorksSection({}: HowItWorksSectionProps) {
 
               {/* Render Visual Preview */}
               <div className="pt-4 border-t border-[#E2E8F0]">{step.renderVisual()}</div>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>

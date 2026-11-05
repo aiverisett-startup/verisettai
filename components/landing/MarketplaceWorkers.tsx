@@ -2,6 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
+import { motion } from "framer-motion";
 import { Search, Code2, FileText, ArrowRight, CheckCircle2 } from "lucide-react";
 
 interface MarketplaceWorkersProps {
@@ -84,9 +85,11 @@ export function MarketplaceWorkers({ onSelectWorkerForTesting }: MarketplaceWork
           {templates.map((tmpl) => {
             const Icon = tmpl.icon;
             return (
-              <div
+              <motion.div
                 key={tmpl.id}
-                className="rounded-2xl bg-[#F8FAFC] border border-[#E2E8F0] p-7 sm:p-8 flex flex-col justify-between shadow-[0_1px_3px_rgba(0,0,0,0.06)] hover:border-[#CBD5E1] transition-all"
+                whileHover={{ y: -5 }}
+                transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+                className="rounded-2xl bg-[#F8FAFC] border border-[#E2E8F0] p-7 sm:p-8 flex flex-col justify-between shadow-[0_1px_3px_rgba(0,0,0,0.06)] hover:border-blue-400/80 hover:shadow-[0_16px_36px_-6px_rgba(37,99,235,0.12)] transition-all group"
               >
                 <div>
                   {/* Category & Price */}
@@ -104,7 +107,7 @@ export function MarketplaceWorkers({ onSelectWorkerForTesting }: MarketplaceWork
 
                   {/* Icon & Title */}
                   <div className="flex items-center gap-3 mb-3">
-                    <div className="h-9 w-9 rounded-lg bg-white border border-[#E2E8F0] flex items-center justify-center text-[#2563EB] shrink-0">
+                    <div className="h-9 w-9 rounded-lg bg-white border border-[#E2E8F0] flex items-center justify-center text-[#2563EB] shrink-0 group-hover:border-blue-300 transition-colors">
                       <Icon className="w-4 h-4" />
                     </div>
                     <h3 className="text-lg font-bold text-[#0F172A] tracking-tight leading-snug">
@@ -143,15 +146,21 @@ export function MarketplaceWorkers({ onSelectWorkerForTesting }: MarketplaceWork
                   </div>
                 </div>
 
-                {/* Card Footer Button */}
-                <Link
-                  href={`/dashboard/create-contract?template=${tmpl.templateKey}&amount=${tmpl.amountDollars}&currency=USD`}
-                  className="w-full py-2.5 px-4 rounded-[10px] bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]"
+                {/* Card Footer Button with Micro-Interaction */}
+                <motion.div
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  transition={{ duration: 0.15 }}
                 >
-                  <span>Deploy Verified Specification</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
-              </div>
+                  <Link
+                    href={`/dashboard/create-contract?template=${tmpl.templateKey}&amount=${tmpl.amountDollars}&currency=USD`}
+                    className="w-full py-2.5 px-4 rounded-[10px] bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_4px_12px_rgba(37,99,235,0.2)]"
+                  >
+                    <span>Deploy Verified Specification</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </Link>
+                </motion.div>
+              </motion.div>
             );
           })}
         </div>
