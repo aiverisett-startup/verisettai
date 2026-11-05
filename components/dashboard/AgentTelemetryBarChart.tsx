@@ -101,47 +101,57 @@ export function AgentTelemetryBarChart({
 
   return (
     <div
-      className={`w-full bg-[#09090B] border border-white/10 rounded-2xl p-6 sm:p-7 pb-6 shadow-xl overflow-hidden font-sans text-white ${className}`}
+      className={`w-full relative overflow-hidden rounded-2xl sm:rounded-3xl p-6 sm:p-7 pb-6 font-sans transition-all duration-300 bg-white/70 backdrop-blur-xl border border-slate-200/80 shadow-lg shadow-blue-500/5 ${className}`}
     >
+      {/* Ambient Glass Glows */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -top-24 -left-24 w-80 h-80 bg-blue-500/8 blur-[90px] rounded-full -z-10"
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -bottom-24 -right-24 w-80 h-80 bg-cyan-500/8 blur-[90px] rounded-full -z-10"
+      />
+
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-white/10">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-200/70">
         <div className="space-y-1">
           <div className="flex items-center gap-2.5">
-            <h3 className="text-base sm:text-lg font-bold tracking-tight text-white font-sans">
+            <h3 className="text-base sm:text-lg font-bold tracking-tight text-slate-900 font-sans">
               {selectedAgent
                 ? `${selectedAgent.name} — Activity & Throughput`
                 : "Agent Throughput"}
             </h3>
             {selectedAgent && (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-white/10 text-zinc-300 border border-white/15">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-xs">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                 LIVE STREAM
               </span>
             )}
           </div>
-          <p className="text-xs text-zinc-400 font-sans">
+          <p className="text-xs text-slate-500 font-sans leading-relaxed">
             Realtime FastMCP packet rate, pipeline execution velocity, and cryptographic settlement proofs.
           </p>
         </div>
 
         {/* Right-aligned Metrics: Current TPS & Total Settled */}
-        <div className="flex items-center gap-4 sm:gap-6 shrink-0 font-mono text-xs">
-          <div className="px-3.5 py-2 rounded-xl bg-white/5 border border-white/10">
-            <span className="text-zinc-500 uppercase tracking-wider block text-[10px]">
+        <div className="flex items-center gap-3 sm:gap-4 shrink-0 font-mono text-xs">
+          <div className="px-3.5 py-2 rounded-xl bg-white/80 border border-slate-200/80 shadow-xs backdrop-blur-md">
+            <span className="text-slate-400 uppercase tracking-wider block text-[10px] font-medium">
               Current Throughput
             </span>
-            <span className="text-sm sm:text-base font-bold text-white tracking-tight flex items-center gap-1.5 mt-0.5">
-              <Zap className="w-3.5 h-3.5 text-blue-400" />
+            <span className="text-sm sm:text-base font-bold text-slate-900 tracking-tight flex items-center gap-1.5 mt-0.5">
+              <Zap className="w-3.5 h-3.5 text-blue-600" />
               {selectedAgent ? `${baseTps.toFixed(1)} TPS` : "0.0 TPS"}
             </span>
           </div>
 
-          <div className="px-3.5 py-2 rounded-xl bg-white/5 border border-white/10">
-            <span className="text-zinc-500 uppercase tracking-wider block text-[10px]">
+          <div className="px-3.5 py-2 rounded-xl bg-white/80 border border-slate-200/80 shadow-xs backdrop-blur-md">
+            <span className="text-slate-400 uppercase tracking-wider block text-[10px] font-medium">
               Total Settled
             </span>
-            <span className="text-sm sm:text-base font-bold text-emerald-400 tracking-tight flex items-center gap-1.5 mt-0.5">
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+            <span className="text-sm sm:text-base font-bold text-emerald-600 tracking-tight flex items-center gap-1.5 mt-0.5">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
               {totalSettledDisplay}
             </span>
           </div>
@@ -155,6 +165,24 @@ export function AgentTelemetryBarChart({
           className="w-full h-[480px] min-h-[460px] overflow-visible select-none"
           preserveAspectRatio="none"
         >
+          <defs>
+            {/* Active Glass Bar Gradient */}
+            <linearGradient id="active-glass-bar" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#2563EB" stopOpacity="0.85" />
+              <stop offset="100%" stopColor="#3B82F6" stopOpacity="0.45" />
+            </linearGradient>
+            {/* Active Hover Glass Bar Gradient */}
+            <linearGradient id="active-glass-bar-hover" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#1D4ED8" stopOpacity="0.95" />
+              <stop offset="100%" stopColor="#2563EB" stopOpacity="0.75" />
+            </linearGradient>
+            {/* Standby Glass Bar Gradient */}
+            <linearGradient id="standby-glass-bar" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#CBD5E1" stopOpacity="0.5" />
+              <stop offset="100%" stopColor="#E2E8F0" stopOpacity="0.25" />
+            </linearGradient>
+          </defs>
+
           {/* Faint Horizontal Gridlines & Y-Axis Labels */}
           {gridLevels.map((lvl, i) => {
             const y = chartBottom - lvl * chartHeight;
@@ -166,10 +194,10 @@ export function AgentTelemetryBarChart({
                   y1={y}
                   x2={chartRight}
                   y2={y}
-                  stroke="rgba(255, 255, 255, 0.05)"
-                  strokeDasharray="3 3"
+                  stroke="rgba(203, 213, 225, 0.45)"
+                  strokeDasharray="4 4"
                 />
-                {/* Y-Axis Label: dx={-8}, fontSize: 11, fill: #71717a, JetBrains Mono */}
+                {/* Y-Axis Label: dx={-8}, fontSize: 11, fill: #64748b, JetBrains Mono */}
                 <text
                   x={chartLeft}
                   dx={-8}
@@ -178,7 +206,7 @@ export function AgentTelemetryBarChart({
                   style={{
                     fontFamily: "'JetBrains Mono', 'Inter', monospace",
                     fontSize: 11,
-                    fill: "#71717a",
+                    fill: "#64748b",
                   }}
                 >
                   {labelVal}
@@ -194,7 +222,7 @@ export function AgentTelemetryBarChart({
             const x = xCenter - barWidth / 2;
 
             if (!selectedAgent) {
-              // Subtle inactive translucent bar placeholders indicating standby mode
+              // Subtle inactive translucent glass bar placeholders indicating standby mode
               const placeholderHeight = 60 + (index % 4) * 16;
               const y = chartBottom - placeholderHeight;
               return (
@@ -204,9 +232,11 @@ export function AgentTelemetryBarChart({
                     y={y}
                     width={barWidth}
                     height={placeholderHeight}
-                    rx="5"
-                    ry="5"
-                    fill="rgba(255, 255, 255, 0.07)"
+                    rx="6"
+                    ry="6"
+                    fill="url(#standby-glass-bar)"
+                    stroke="rgba(203, 213, 225, 0.6)"
+                    strokeWidth="1"
                     className="transition-opacity"
                   />
                   {/* X-Axis Label in Standby Mode */}
@@ -220,7 +250,7 @@ export function AgentTelemetryBarChart({
                         "'JetBrains Mono', 'Fira Code', 'Inter', system-ui, monospace",
                       fontSize: 12,
                       fontWeight: 500,
-                      fill: "#94a3b8",
+                      fill: "#64748b",
                     }}
                   >
                     {d.slot}
@@ -246,28 +276,26 @@ export function AgentTelemetryBarChart({
                     y={chartTop}
                     width={slotWidth - 4}
                     height={chartHeight}
-                    fill="rgba(255, 255, 255, 0.03)"
+                    fill="rgba(37, 99, 235, 0.04)"
                     rx="8"
                   />
                 )}
 
-                {/* The Translucent White Bar */}
+                {/* Translucent Glass Bar */}
                 <rect
                   x={x}
                   y={y}
                   width={barWidth}
                   height={barHeight}
-                  rx="5"
-                  ry="5"
-                  fill={
-                    isHovered
-                      ? "rgba(255, 255, 255, 0.9)"
-                      : "rgba(255, 255, 255, 0.45)"
-                  }
+                  rx="6"
+                  ry="6"
+                  fill={isHovered ? "url(#active-glass-bar-hover)" : "url(#active-glass-bar)"}
+                  stroke={isHovered ? "#1D4ED8" : "rgba(37, 99, 235, 0.4)"}
+                  strokeWidth="1"
                   className="transition-all duration-200"
                 />
 
-                {/* Modern X-Axis Label: dy={16}, clean typography, no pixelation */}
+                {/* Modern X-Axis Label: dy={16}, clean typography, high clarity */}
                 <text
                   x={xCenter}
                   y={chartBottom}
@@ -278,7 +306,7 @@ export function AgentTelemetryBarChart({
                       "'JetBrains Mono', 'Fira Code', 'Inter', system-ui, monospace",
                     fontSize: 12,
                     fontWeight: 500,
-                    fill: isHovered ? "#ffffff" : "#94a3b8",
+                    fill: isHovered ? "#2563eb" : "#64748b",
                   }}
                   className="transition-colors"
                 >
@@ -289,10 +317,10 @@ export function AgentTelemetryBarChart({
           })}
         </svg>
 
-        {/* Hover Floating Tooltip */}
+        {/* Hover Floating Glass Tooltip */}
         {hoveredIndex !== null && selectedAgent && chartData[hoveredIndex] && (
           <div
-            className="absolute top-2 pointer-events-none transition-all duration-150 transform -translate-x-1/2 bg-[#18181B] border border-white/20 text-white text-xs px-3.5 py-2 rounded-xl shadow-xl font-mono flex items-center gap-2.5 z-20"
+            className="absolute top-2 pointer-events-none transition-all duration-150 transform -translate-x-1/2 bg-white/95 border border-slate-200/90 text-slate-800 text-xs px-3.5 py-2.5 rounded-2xl shadow-xl font-mono flex items-center gap-2.5 z-20 backdrop-blur-xl"
             style={{
               left: `${
                 ((chartLeft + hoveredIndex * slotWidth + slotWidth / 2) /
@@ -301,13 +329,13 @@ export function AgentTelemetryBarChart({
               }%`,
             }}
           >
-            <span className="text-zinc-400 font-sans font-medium">
+            <span className="text-slate-400 font-sans font-medium">
               {chartData[hoveredIndex].slot}:
             </span>
-            <span className="font-bold text-white">
+            <span className="font-bold text-slate-900">
               {chartData[hoveredIndex].tps.toFixed(1)} TPS
             </span>
-            <span className="text-emerald-400">
+            <span className="text-emerald-600 font-semibold">
               ₹{chartData[hoveredIndex].settledINR.toLocaleString()}
             </span>
           </div>
@@ -316,9 +344,9 @@ export function AgentTelemetryBarChart({
         {/* Standby State Message Overlay - Vertically & Horizontally Centered */}
         {!selectedAgent && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none pb-6">
-            <div className="px-5 py-3 rounded-xl bg-white/5 border border-white/10 backdrop-blur-md text-center shadow-lg">
+            <div className="px-5 py-3 rounded-2xl bg-white/85 border border-slate-200/90 backdrop-blur-xl text-center shadow-md shadow-blue-500/5">
               <p
-                className="text-xs font-mono text-zinc-400"
+                className="text-xs font-mono text-slate-600"
                 style={{
                   fontFamily:
                     "'JetBrains Mono', 'Fira Code', 'Inter', system-ui, monospace",
