@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   ArrowLeft,
   ArrowRight,
@@ -34,8 +34,11 @@ const PROTOCOL_OPTIONS = [
   { value: "LangChain", label: "LangChain (Agent Workflows)" },
 ];
 
-export default function RegisterAgentPage() {
+function RegisterAgentContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const templateParam = searchParams.get("template");
+  const amountParam = searchParams.get("amount");
 
   // Step State: 1 = Identity, 2 = Security & OTP, 3 = Consents, 4 = Token
   const [currentStep, setCurrentStep] = useState<1 | 2 | 3 | 4>(1);
@@ -46,6 +49,33 @@ export default function RegisterAgentPage() {
   const [framework, setFramework] = useState("FastMCP");
   const [spendingLimit, setSpendingLimit] = useState("50000");
   const [webhookUrl, setWebhookUrl] = useState("");
+
+  // Pre-fill from query parameters if present
+  useEffect(() => {
+    if (templateParam) {
+      if (templateParam.includes("code")) {
+        setAgentName("Swarm-Security-Auditor");
+        setFramework("FastMCP");
+        setSpendingLimit("85000");
+      } else if (templateParam.includes("search") || templateParam.includes("extraction")) {
+        setAgentName("Swarm-Web-Extractor");
+        setFramework("FastMCP");
+        setSpendingLimit("25000");
+      } else if (templateParam.includes("arch") || templateParam.includes("spec")) {
+        setAgentName("Swarm-Architect-Node");
+        setFramework("AegisAgent");
+        setSpendingLimit("210000");
+      }
+    }
+    if (amountParam && !isNaN(Number(amountParam))) {
+      const val = Number(amountParam);
+      if (val < 10000) {
+        setSpendingLimit((val * 85).toString());
+      } else {
+        setSpendingLimit(val.toString());
+      }
+    }
+  }, [templateParam, amountParam]);
 
   // Step 2: Credential Provisioning & Email Verification
   const [userEmail, setUserEmail] = useState("operator@verisett.ai");
@@ -763,5 +793,19 @@ export default function RegisterAgentPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function RegisterAgentPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center">
+          <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
+        </div>
+      }
+    >
+      <RegisterAgentContent />
+    </Suspense>
   );
 }

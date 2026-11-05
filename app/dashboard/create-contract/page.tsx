@@ -89,16 +89,26 @@ const TEMPLATE_PRESETS: Record<string, TemplatePreset> = {
   },
 };
 
+// Resolve template key with aliases
+function resolveTemplateKey(param: string | null): string {
+  if (!param) return "web-extraction";
+  const clean = param.toLowerCase().trim().replace(/_/g, "-");
+  if (clean === "search" || clean === "web-search" || clean === "web-extraction") return "web-extraction";
+  if (clean === "code" || clean === "code-audit" || clean === "security-audit") return "code-audit";
+  if (clean === "doc" || clean === "architecture" || clean === "architecture-spec" || clean === "synthesis-spec") return "architecture-spec";
+  return clean in TEMPLATE_PRESETS ? clean : "web-extraction";
+}
+
 function CreateContractForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const templateParam = searchParams.get("template") || "web-extraction";
+  const templateParam = searchParams.get("template");
   const amountParam = searchParams.get("amount");
   const currencyParam = searchParams.get("currency") || "USD";
 
-  // Resolve matching preset or fallback
-  const initialPreset = TEMPLATE_PRESETS[templateParam] || TEMPLATE_PRESETS["web-extraction"];
+  const resolvedKey = resolveTemplateKey(templateParam);
+  const initialPreset = TEMPLATE_PRESETS[resolvedKey] || TEMPLATE_PRESETS["web-extraction"];
 
   // Form State
   const [selectedTemplateKey, setSelectedTemplateKey] = useState<string>(initialPreset.key);
@@ -131,9 +141,12 @@ function CreateContractForm() {
   } | null>(null);
   const [copiedId, setCopiedId] = useState(false);
 
+  const activePreset = TEMPLATE_PRESETS[selectedTemplateKey] || initialPreset;
+
   // Sync state if template searchParam changes
   useEffect(() => {
-    const preset = TEMPLATE_PRESETS[templateParam];
+    const key = resolveTemplateKey(templateParam);
+    const preset = TEMPLATE_PRESETS[key];
     if (preset) {
       setSelectedTemplateKey(preset.key);
       setContractTitle(preset.name);
@@ -443,7 +456,7 @@ function CreateContractForm() {
                     </label>
                   </div>
                   <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                    {initialPreset.description}
+                    {activePreset.description}
                   </p>
                 </div>
                 <div className="sm:text-right shrink-0">
