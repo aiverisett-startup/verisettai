@@ -208,7 +208,7 @@ export default function FeedbackPage() {
         <div className="mx-auto flex max-w-7xl items-center justify-between w-full">
           <div className="flex items-center gap-3">
             <Link href="/" className="flex items-center gap-2.5 group">
-              <VerisettLogo size={28} />
+              <VerisettLogo size={28} inverted={true} />
             </Link>
             <span className="hidden sm:inline-block text-slate-700">/</span>
             <span className="hidden sm:inline-flex items-center gap-1.5 font-mono text-[11px] tracking-wider text-cyan-400 bg-cyan-950/40 border border-cyan-800/40 px-2.5 py-1 rounded-md">

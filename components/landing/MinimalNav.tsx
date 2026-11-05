@@ -114,11 +114,11 @@ export function MinimalNav({
 
   return (
     <div className="sticky top-0 z-50 w-full">
-      <header className="w-full flex items-center justify-between gap-4 px-6 py-3 border-b border-border bg-background/80 backdrop-blur-md">
+      <header className="w-full flex items-center justify-between gap-4 px-6 py-3 border-b border-slate-200/80 bg-white/90 backdrop-blur-md shadow-xs">
         {/* Group 1 (Left): Logo + Architect Tagline */}
         <div className="flex items-center gap-3 shrink-0">
           <Link href="/" className="shrink-0 flex items-center" aria-label="Verisett AI home">
-            <VerisettLogo size={28} />
+            <VerisettLogo size={30} />
           </Link>
           <span className="hidden md:inline shrink-0 whitespace-nowrap pl-3 border-l border-border text-xs text-muted-foreground font-normal tracking-tight">
             Founded &amp; Architected by{" "}
