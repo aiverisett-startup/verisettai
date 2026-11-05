@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import Image from "next/image";
 import {
   Bot,
   Plus,
@@ -9,9 +8,8 @@ import {
   Copy,
   Check,
   Zap,
-  Activity,
-  ArrowUpRight,
   Trash2,
+  Loader2,
 } from "lucide-react";
 
 export interface AgentDbRecord {
@@ -23,9 +21,9 @@ export interface AgentDbRecord {
   status: string;
   throughputTps: number;
   totalSettled: string;
-  lastSeenAt: string;
-  createdAt: string;
-  updatedAt: string;
+  lastSeenAt?: string | null;
+  createdAt?: string | null;
+  updatedAt?: string | null;
 }
 
 interface RegisteredAgentsTableProps {
@@ -45,6 +43,7 @@ export function RegisteredAgentsTable({
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const fetchAgents = useCallback(async (isManual = false) => {
     if (isManual) setIsRefreshing(true);
@@ -85,14 +84,15 @@ export function RegisteredAgentsTable({
 
   const handleCopyId = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    if (navigator?.clipboard) {
-      navigator.clipboard.writeText(id);
+    if (typeof navigator !== "undefined" && navigator.clipboard) {
+      navigator.clipboard.writeText(id).catch(() => {});
       setCopiedId(id);
       setTimeout(() => setCopiedId(null), 2000);
     }
   };
 
-  const formatDate = (isoStr: string) => {
+  const formatDate = (isoStr?: string | null) => {
+    if (!isoStr) return "—";
     try {
       const d = new Date(isoStr);
       if (isNaN(d.getTime())) return "—";
@@ -109,14 +109,20 @@ export function RegisteredAgentsTable({
   };
 
   const formatCode = (agent: AgentDbRecord) => {
+    if (!agent.id) return "AGT-NODE";
     return `AGT-${agent.id.replace(/-/g, "").slice(0, 8).toUpperCase()}`;
   };
 
   const handleDeregister = async (agentId: string, agentName: string) => {
+    if (typeof window === "undefined") return;
+
+    const displayName = agentName || agentId;
     const confirmed = window.confirm(
-      `Are you sure you want to deregister and delete agent "${agentName}"?`
+      `Are you sure you want to deregister and delete agent "${displayName}"?`
     );
     if (!confirmed) return;
+
+    setDeletingId(agentId);
 
     try {
       const res = await fetch(`/api/agents?id=${encodeURIComponent(agentId)}`, {
@@ -124,17 +130,23 @@ export function RegisteredAgentsTable({
         headers: { "Content-Type": "application/json" },
       });
       const data = await res.json().catch(() => ({}));
+
       if (!res.ok || data.error) {
-        alert(data.error || "Cannot deregister agent: active locked escrow contracts or server error.");
+        alert(
+          data.error ||
+            "Cannot deregister agent: active locked escrow contracts or server error."
+        );
         return;
       }
+
       setAgents((prev) => prev.filter((a) => a.id !== agentId));
-      if (typeof window !== "undefined") {
-        window.dispatchEvent(new CustomEvent("verisett_agents_updated"));
-        window.dispatchEvent(new CustomEvent("verisett_data_mutated"));
-      }
+
+      window.dispatchEvent(new CustomEvent("verisett_agents_updated"));
+      window.dispatchEvent(new CustomEvent("verisett_data_mutated"));
     } catch (err: any) {
       alert(err?.message || "Failed to communicate with agent clearinghouse.");
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -232,6 +244,7 @@ export function RegisteredAgentsTable({
                 const statusUpper = (agent.status || "IDLE").toUpperCase();
                 const isActive = statusUpper === "ACTIVE" || statusUpper === "LINKED";
                 const code = formatCode(agent);
+                const isDeleting = deletingId === agent.id;
 
                 return (
                   <tr
@@ -282,7 +295,7 @@ export function RegisteredAgentsTable({
                       </span>
                     </td>
 
-                    {/* STATUS (Green badge for ACTIVE, Gray for IDLE) */}
+                    {/* STATUS */}
                     <td className="py-4 px-4">
                       {isActive ? (
                         <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-2xs">
@@ -313,14 +326,19 @@ export function RegisteredAgentsTable({
                     <td className="py-4 px-4 sm:px-6 text-right">
                       <button
                         type="button"
+                        disabled={isDeleting}
                         onClick={(e) => {
                           e.stopPropagation();
                           handleDeregister(agent.id, agent.name);
                         }}
-                        className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-rose-200/80 bg-rose-50/40 hover:bg-rose-100 hover:border-rose-300 text-rose-600 text-xs font-semibold transition cursor-pointer"
+                        className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-rose-200/80 bg-rose-50/40 hover:bg-rose-100 hover:border-rose-300 text-rose-600 text-xs font-semibold transition cursor-pointer disabled:opacity-50"
                         title={`Deregister ${agent.name}`}
                       >
-                        <Trash2 className="w-3.5 h-3.5 text-rose-600" />
+                        {isDeleting ? (
+                          <Loader2 className="w-3.5 h-3.5 animate-spin text-rose-600" />
+                        ) : (
+                          <Trash2 className="w-3.5 h-3.5 text-rose-600" />
+                        )}
                         <span className="hidden sm:inline">Deregister</span>
                       </button>
                     </td>
@@ -336,4 +354,3 @@ export function RegisteredAgentsTable({
 }
 
 export default RegisteredAgentsTable;
-
