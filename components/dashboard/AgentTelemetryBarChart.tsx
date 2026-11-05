@@ -83,25 +83,25 @@ export function AgentTelemetryBarChart({
     return Math.ceil(highest * 1.2);
   }, [chartData]);
 
-  // SVG Chart Geometry
+  // SVG Chart Geometry - Expanded to 480px height
   const viewBoxWidth = 1000;
-  const viewBoxHeight = 260;
-  const chartLeft = 50;
+  const viewBoxHeight = 480;
+  const chartLeft = 56;
   const chartRight = 970;
-  const chartTop = 20;
-  const chartBottom = 220;
+  const chartTop = 28;
+  const chartBottom = 420;
   const chartWidth = chartRight - chartLeft;
   const chartHeight = chartBottom - chartTop;
 
   const barCount = chartData.length;
   const slotWidth = chartWidth / barCount;
-  const barWidth = Math.min(42, slotWidth * 0.58);
+  const barWidth = Math.min(46, slotWidth * 0.58);
 
   const gridLevels = [0, 0.25, 0.5, 0.75, 1.0];
 
   return (
     <div
-      className={`w-full bg-[#09090B] border border-white/10 rounded-2xl p-6 sm:p-7 shadow-xl overflow-hidden font-sans text-white ${className}`}
+      className={`w-full bg-[#09090B] border border-white/10 rounded-2xl p-6 sm:p-7 pb-6 shadow-xl overflow-hidden font-sans text-white ${className}`}
     >
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-white/10">
@@ -148,14 +148,14 @@ export function AgentTelemetryBarChart({
         </div>
       </div>
 
-      {/* Bar Chart Area */}
-      <div className="relative pt-6">
+      {/* Bar Chart Area Expanded to h-[480px] */}
+      <div className="relative pt-6 h-[480px] min-h-[460px] w-full">
         <svg
           viewBox={`0 0 ${viewBoxWidth} ${viewBoxHeight}`}
-          className="w-full h-56 sm:h-64 overflow-visible select-none"
+          className="w-full h-[480px] min-h-[460px] overflow-visible select-none"
           preserveAspectRatio="none"
         >
-          {/* Faint Horizontal Gridlines */}
+          {/* Faint Horizontal Gridlines & Y-Axis Labels */}
           {gridLevels.map((lvl, i) => {
             const y = chartBottom - lvl * chartHeight;
             const labelVal = Math.round(lvl * maxTps);
@@ -169,11 +169,17 @@ export function AgentTelemetryBarChart({
                   stroke="rgba(255, 255, 255, 0.05)"
                   strokeDasharray="3 3"
                 />
+                {/* Y-Axis Label: dx={-8}, fontSize: 11, fill: #71717a, JetBrains Mono */}
                 <text
-                  x={chartLeft - 10}
+                  x={chartLeft}
+                  dx={-8}
                   y={y + 4}
                   textAnchor="end"
-                  className="fill-zinc-500 font-mono text-[11px]"
+                  style={{
+                    fontFamily: "'JetBrains Mono', 'Inter', monospace",
+                    fontSize: 11,
+                    fill: "#71717a",
+                  }}
                 >
                   {labelVal}
                 </text>
@@ -181,7 +187,7 @@ export function AgentTelemetryBarChart({
             );
           })}
 
-          {/* SVG Bars */}
+          {/* SVG Bars & X-Axis Labels */}
           {chartData.map((d, index) => {
             const isHovered = hoveredIndex === index;
             const xCenter = chartLeft + index * slotWidth + slotWidth / 2;
@@ -189,7 +195,7 @@ export function AgentTelemetryBarChart({
 
             if (!selectedAgent) {
               // Subtle inactive translucent bar placeholders indicating standby mode
-              const placeholderHeight = 36 + (index % 4) * 8;
+              const placeholderHeight = 60 + (index % 4) * 16;
               const y = chartBottom - placeholderHeight;
               return (
                 <g key={index}>
@@ -198,16 +204,24 @@ export function AgentTelemetryBarChart({
                     y={y}
                     width={barWidth}
                     height={placeholderHeight}
-                    rx="4"
-                    ry="4"
-                    fill="rgba(255, 255, 255, 0.08)"
+                    rx="5"
+                    ry="5"
+                    fill="rgba(255, 255, 255, 0.07)"
                     className="transition-opacity"
                   />
+                  {/* X-Axis Label in Standby Mode */}
                   <text
                     x={xCenter}
-                    y={chartBottom + 18}
+                    y={chartBottom}
+                    dy={16}
                     textAnchor="middle"
-                    className="fill-zinc-600 font-mono text-[11px]"
+                    style={{
+                      fontFamily:
+                        "'JetBrains Mono', 'Fira Code', 'Inter', system-ui, monospace",
+                      fontSize: 12,
+                      fontWeight: 500,
+                      fill: "#94a3b8",
+                    }}
                   >
                     {d.slot}
                   </text>
@@ -215,7 +229,7 @@ export function AgentTelemetryBarChart({
               );
             }
 
-            const barHeight = Math.max(6, (d.tps / maxTps) * chartHeight);
+            const barHeight = Math.max(8, (d.tps / maxTps) * chartHeight);
             const y = chartBottom - barHeight;
 
             return (
@@ -233,7 +247,7 @@ export function AgentTelemetryBarChart({
                     width={slotWidth - 4}
                     height={chartHeight}
                     fill="rgba(255, 255, 255, 0.03)"
-                    rx="6"
+                    rx="8"
                   />
                 )}
 
@@ -243,24 +257,30 @@ export function AgentTelemetryBarChart({
                   y={y}
                   width={barWidth}
                   height={barHeight}
-                  rx="4"
-                  ry="4"
+                  rx="5"
+                  ry="5"
                   fill={
                     isHovered
-                      ? "rgba(255, 255, 255, 0.85)"
+                      ? "rgba(255, 255, 255, 0.9)"
                       : "rgba(255, 255, 255, 0.45)"
                   }
                   className="transition-all duration-200"
                 />
 
-                {/* Monospace X-Axis Label */}
+                {/* Modern X-Axis Label: dy={16}, clean typography, no pixelation */}
                 <text
                   x={xCenter}
-                  y={chartBottom + 18}
+                  y={chartBottom}
+                  dy={16}
                   textAnchor="middle"
-                  className={`font-mono text-[11px] transition-colors ${
-                    isHovered ? "fill-white font-bold" : "fill-zinc-500"
-                  }`}
+                  style={{
+                    fontFamily:
+                      "'JetBrains Mono', 'Fira Code', 'Inter', system-ui, monospace",
+                    fontSize: 12,
+                    fontWeight: 500,
+                    fill: isHovered ? "#ffffff" : "#94a3b8",
+                  }}
+                  className="transition-colors"
                 >
                   {d.slot}
                 </text>
@@ -272,7 +292,7 @@ export function AgentTelemetryBarChart({
         {/* Hover Floating Tooltip */}
         {hoveredIndex !== null && selectedAgent && chartData[hoveredIndex] && (
           <div
-            className="absolute top-2 pointer-events-none transition-all duration-150 transform -translate-x-1/2 bg-[#18181B] border border-white/20 text-white text-xs px-3 py-1.5 rounded-lg shadow-xl font-mono flex items-center gap-2.5 z-20"
+            className="absolute top-2 pointer-events-none transition-all duration-150 transform -translate-x-1/2 bg-[#18181B] border border-white/20 text-white text-xs px-3.5 py-2 rounded-xl shadow-xl font-mono flex items-center gap-2.5 z-20"
             style={{
               left: `${
                 ((chartLeft + hoveredIndex * slotWidth + slotWidth / 2) /
@@ -293,11 +313,17 @@ export function AgentTelemetryBarChart({
           </div>
         )}
 
-        {/* Standby State Message Overlay */}
+        {/* Standby State Message Overlay - Vertically & Horizontally Centered */}
         {!selectedAgent && (
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none pb-4">
-            <div className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 backdrop-blur-sm text-center">
-              <p className="text-xs font-mono text-zinc-400">
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none pb-6">
+            <div className="px-5 py-3 rounded-xl bg-white/5 border border-white/10 backdrop-blur-md text-center shadow-lg">
+              <p
+                className="text-xs font-mono text-zinc-400"
+                style={{
+                  fontFamily:
+                    "'JetBrains Mono', 'Fira Code', 'Inter', system-ui, monospace",
+                }}
+              >
                 Standby Mode — Select or register an agent above to stream live telemetry.
               </p>
             </div>
@@ -309,4 +335,3 @@ export function AgentTelemetryBarChart({
 }
 
 export default AgentTelemetryBarChart;
-
