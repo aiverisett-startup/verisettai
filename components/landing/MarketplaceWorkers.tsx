@@ -17,6 +17,7 @@ export function MarketplaceWorkers({ onSelectWorkerForTesting }: MarketplaceWork
   const templates = [
     {
       id: "search",
+      templateKey: "web-extraction",
       name: "Web Search & Extraction Pipeline",
       category: "Data & Telemetry",
       icon: Search,
@@ -31,6 +32,7 @@ export function MarketplaceWorkers({ onSelectWorkerForTesting }: MarketplaceWork
     },
     {
       id: "code",
+      templateKey: "code-audit",
       name: "Code Audit & Security Deliverable",
       category: "Software Development",
       icon: Code2,
@@ -45,6 +47,7 @@ export function MarketplaceWorkers({ onSelectWorkerForTesting }: MarketplaceWork
     },
     {
       id: "doc",
+      templateKey: "architecture-spec",
       name: "Architecture & Synthesis Spec",
       category: "Technical Architecture",
       icon: FileText,
@@ -142,7 +145,7 @@ export function MarketplaceWorkers({ onSelectWorkerForTesting }: MarketplaceWork
 
                 {/* Card Footer Button */}
                 <Link
-                  href="/billing"
+                  href={`/dashboard/create-contract?template=${tmpl.templateKey}&amount=${tmpl.amountDollars}&currency=USD`}
                   className="w-full py-2.5 px-4 rounded-[10px] bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]"
                 >
                   <span>Deploy Verified Specification</span>
