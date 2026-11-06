@@ -5,22 +5,25 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: 'Googlebot-Image',
-        allow: ['/', '/icon.png', '/favicon.ico', '/apple-icon.png', '/icon*'],
+        allow: ['/', '/images/', '/images/*', '/founder.jpg', '/icon.png', '/favicon.ico', '/apple-icon.png', '/icon*'],
+      },
+      {
+        userAgent: 'GPTBot',
+        allow: ['/', '/images/', '/images/*'],
       },
       {
         userAgent: [
           'Googlebot',
           'Google-Extended', // Gemini live retrieval
-          'GPTBot',          // OpenAI training
           'OAI-SearchBot',   // ChatGPT Search live answers
           'ClaudeBot',       // Anthropic Claude
           'PerplexityBot',   // Perplexity AI
         ],
-        allow: '/',
+        allow: ['/', '/images/', '/images/*'],
       },
       {
         userAgent: '*',
-        allow: '/',
+        allow: ['/', '/images/', '/images/*'],
       },
     ],
     sitemap: 'https://www.veri-sett.com/sitemap.xml',

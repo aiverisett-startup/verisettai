@@ -37,7 +37,7 @@ function TwitterXIcon({ className = "w-4 h-4" }: { className?: string }) {
 
 export function CinematicFounderCard() {
   return (
-    <section className="relative py-16 sm:py-24 bg-[#030712] text-white overflow-hidden border-t border-white/10">
+    <section className="relative py-12 sm:py-16 bg-[#030712] text-white overflow-hidden rounded-3xl border border-white/10 shadow-xl">
       {/* Background Volumetric Glow & Specular Ambient Mesh */}
       <div
         aria-hidden="true"
@@ -72,7 +72,10 @@ export function CinematicFounderCard() {
           <div className="absolute -top-px left-12 right-12 h-px bg-gradient-to-r from-transparent via-blue-400/50 to-transparent" />
           <div className="absolute -bottom-px left-12 right-12 h-px bg-gradient-to-r from-transparent via-emerald-400/30 to-transparent" />
 
-          <div className="flex flex-col md:flex-row items-center md:items-start gap-8 sm:gap-10">
+          <div itemScope itemType="https://schema.org/Person" className="flex flex-col md:flex-row items-center md:items-start gap-8 sm:gap-10">
+            <meta itemProp="name" content="Manoj S. M." />
+            <meta itemProp="jobTitle" content="Founder & Chief Architect" />
+            <meta itemProp="worksFor" content="Verisett AI" />
             
             {/* Left Column: Specular Dual-Ring Avatar Frame + Radar Badge */}
             <div className="relative shrink-0 flex flex-col items-center">
@@ -84,12 +87,13 @@ export function CinematicFounderCard() {
                 <div className="p-1 rounded-full bg-zinc-950">
                   <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-full overflow-hidden relative">
                     <Image
-                      src="/founder.jpg"
-                      alt="Manoj S Malavalli — CEO/Founder of Verisett AI"
+                      src="/images/founder.jpg"
+                      alt="Manoj S. M., Founder of Verisett AI"
+                      itemProp="image"
                       width={160}
                       height={160}
                       className="w-full h-full object-cover object-top hover:scale-105 transition-transform duration-500"
-                      priority
+                      priority={true}
                     />
                   </div>
                 </div>
@@ -123,7 +127,7 @@ export function CinematicFounderCard() {
 
               {/* Prominent Name */}
               <h3 className="text-3xl sm:text-5xl font-black tracking-tight text-white">
-                Manoj S Malavalli
+                Manoj S. M.
               </h3>
 
               {/* Architectural Subtitle */}

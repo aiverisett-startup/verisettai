@@ -166,13 +166,12 @@ export function VerisettLogo({
       {/* Brand Typography */}
       {showText && (
         <span
-          className={`font-bold tracking-tight text-xl font-sans select-none flex items-center gap-1 leading-none ${
-            textClassName
-              ? textClassName
-              : inverted
+          className={`font-bold tracking-tight text-xl font-sans select-none flex items-center gap-1 leading-none ${textClassName
+            ? textClassName
+            : inverted
               ? "text-white"
               : "text-slate-900"
-          }`}
+            }`}
         >
           <span>Verisett</span>
           <span className="text-blue-600 font-semibold">AI</span>

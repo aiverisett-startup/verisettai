@@ -1,0 +1,19 @@
+User-agent: Googlebot-Image
+Allow: /
+Allow: /images/
+Allow: /images/*
+Allow: /founder.jpg
+Allow: /icon.png
+Allow: /logo.png
+
+User-agent: GPTBot
+Allow: /
+Allow: /images/
+Allow: /images/*
+
+User-agent: *
+Allow: /
+Allow: /images/
+Allow: /images/*
+
+Sitemap: https://www.veri-sett.com/sitemap.xml

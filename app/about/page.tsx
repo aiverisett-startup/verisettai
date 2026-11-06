@@ -20,6 +20,7 @@ import {
 import { VerisettLogo } from "@/components/VerisettLogo";
 import { GoldenBackgroundShapes } from "@/components/ui/GoldenBackgroundShapes";
 import { WebsiteEdgeShapes } from "@/components/ui/WebsiteEdgeShapes";
+import { CinematicFounderCard } from "@/components/founder/CinematicFounderCard";
 import { MinimalFooter } from "@/components/landing/MinimalFooter";
 
 export default function AboutPage() {
@@ -46,8 +47,27 @@ export default function AboutPage() {
               "url": "https://veri-sett.com",
               "founder": {
                 "@type": "Person",
-                "name": "Manoj S Malavalli",
+                "@id": "https://veri-sett.com/#founder",
+                "name": "Manoj S. M.",
                 "jobTitle": "Founder & Chief Architect",
+                "worksFor": {
+                  "@type": "Organization",
+                  "@id": "https://veri-sett.com/#organization",
+                  "name": "Verisett AI",
+                  "url": "https://veri-sett.com"
+                },
+                "image": {
+                  "@type": "ImageObject",
+                  "@id": "https://veri-sett.com/#founderImage",
+                  "url": "https://veri-sett.com/images/founder.jpg",
+                  "contentUrl": "https://veri-sett.com/images/founder.jpg",
+                  "caption": "Manoj S. M., Founder of Verisett AI",
+                  "representativeOfPage": true
+                },
+                "sameAs": [
+                  "https://github.com/aiverisett-startup",
+                  "https://x.com/ai_verisett"
+                ]
               },
               "sameAs": [
                 "https://github.com/aiverisett-startup",
@@ -247,6 +267,9 @@ export default function AboutPage() {
             </p>
           </div>
         </section>
+
+        {/* Executive Protocol Leadership & Founder Architecture */}
+        <CinematicFounderCard />
 
         {/* Navigation Quick Links */}
         <section className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 text-xs font-mono">

@@ -208,20 +208,26 @@ export function MinimalFooter() {
           <span className="inline-block w-[0.16em]" />
           <span className="inline-block text-blue-600">AI</span>
 
-          {/* Round image right after Verisett AI */}
+          {/* Round image right after Verisett AI with Schema.org DOM Microdata */}
           <Link
             href="/about"
-            title="Manoj S Malavalli — CEO/Founder"
+            title="Manoj S. M. — Founder & Chief Architect"
+            itemScope
+            itemType="https://schema.org/Person"
             className="relative shrink-0 ml-3 sm:ml-5 md:ml-7 pointer-events-auto group inline-flex"
           >
+            <meta itemProp="name" content="Manoj S. M." />
+            <meta itemProp="jobTitle" content="Founder & Chief Architect" />
+            <meta itemProp="worksFor" content="Verisett AI" />
             <div className="w-[8vw] h-[8vw] min-w-[38px] min-h-[38px] max-w-[100px] max-h-[100px] rounded-full overflow-hidden border-2 sm:border-3 md:border-4 border-zinc-950 shadow-2xl ring-2 sm:ring-4 ring-blue-500/20 group-hover:scale-105 group-hover:ring-blue-500/40 transition-all">
               <Image
-                src="/founder.jpg"
-                alt="Manoj S Malavalli - CEO/Founder of Verisett AI"
+                src="/images/founder.jpg"
+                alt="Manoj S. M., Founder of Verisett AI"
+                itemProp="image"
                 width={100}
                 height={100}
                 className="w-full h-full object-cover object-top"
-                priority
+                priority={true}
               />
             </div>
             <span className="absolute bottom-0 right-0 flex h-2.5 w-2.5 sm:h-3.5 sm:w-3.5">

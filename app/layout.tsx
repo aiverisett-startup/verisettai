@@ -14,9 +14,9 @@ const siteUrl = "https://www.veri-sett.com";
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://veri-sett.com'),
-  title: "Verisett AI | Autonomous Agent Escrow & Settlement Infrastructure",
+  title: "Verisett AI — Founded by Manoj S. M.",
   description:
-    "Verisett is the live cryptographic clearinghouse and escrow settlement protocol enabling trustless payments and verifiable contract execution for autonomous AI agents.",
+    "Autonomous multi-agent cryptographic escrow and task clearinghouse founded by Manoj S. M. Verisett enables trustless payments and verifiable contract execution for autonomous AI agents.",
   applicationName: "Verisett AI",
   icons: {
     icon: [
@@ -26,10 +26,10 @@ export const metadata: Metadata = {
     apple: '/apple-icon.png?v=4',
   },
   authors: [
-    { name: "Manoj S.M.", url: "https://github.com/aiverisett-startup" },
+    { name: "Manoj S. M.", url: "https://github.com/aiverisett-startup" },
     { name: "Verisett AI", url: "https://veri-sett.com" }
   ],
-  creator: "Manoj S.M.",
+  creator: "Manoj S. M.",
   publisher: "Verisett Artificial Intelligence & AI IT Solutions",
   formatDetection: {
     email: false,
@@ -42,35 +42,37 @@ export const metadata: Metadata = {
     "A2A Clearinghouse",
     "Verisett AI",
     "Machine Economy",
+    "Manoj S. M.",
+    "Founder Manoj S. M.",
   ],
   alternates: {
     canonical: "/",
   },
   openGraph: {
-    title: "Verisett AI | Autonomous Agent Escrow & Settlement Protocol",
+    title: "Verisett AI — Founded by Manoj S. M.",
     description:
-      "Enterprise-grade cryptographic clearinghouse and automated payment escrow infrastructure for autonomous AI agents.",
+      "Autonomous multi-agent cryptographic escrow and task clearinghouse founded by Manoj S. M.",
     url: "https://veri-sett.com",
     siteName: "Verisett AI",
     locale: "en_US",
     type: "website",
     images: [
       {
-        url: "/icon.png?v=4",
-        width: 512,
-        height: 512,
-        alt: "Verisett AI Official Logo",
+        url: "/images/founder.jpg",
+        width: 1200,
+        height: 1200,
+        alt: "Manoj S. M. - Founder of Verisett AI",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Verisett AI | Autonomous Agent Escrow & Settlement Protocol",
+    title: "Verisett AI — Founded by Manoj S. M.",
     description:
-      "Enterprise-grade cryptographic clearinghouse and automated payment escrow infrastructure for autonomous AI agents.",
+      "Autonomous multi-agent cryptographic escrow and FastMCP clearinghouse.",
     site: "@ai_verisett",
     creator: "@ai_verisett",
-    images: ["/icon.png?v=4"],
+    images: ["/images/founder.jpg"],
   },
   robots: {
     index: true,
@@ -160,31 +162,41 @@ export default function RootLayout({
         ]
       },
       {
-        "@type": "Person",
-        "@id": "https://veri-sett.com/#founder",
-        "name": "Manoj S.M.",
-        "jobTitle": "Founder & Lead Architect",
-        "worksFor": {
-          "@type": "Organization",
-          "name": "Verisett AI Project",
-          "url": "https://veri-sett.com"
-        },
-        "sameAs": [
-          "https://github.com/aiverisett-startup",
-          "https://x.com/ai_verisett"
-        ]
-      },
-      {
         "@type": "Organization",
         "@id": "https://veri-sett.com/#organization",
         "name": "Verisett AI",
+        "legalName": "Veri Artificial Sett Intelligence & AI IT Solutions",
         "url": "https://veri-sett.com",
-        "logo": "https://veri-sett.com/icon.png",
+        "logo": "https://veri-sett.com/logo.png",
         "founder": {
           "@id": "https://veri-sett.com/#founder"
         },
         "sameAs": [
           "https://github.com/aiverisett-startup/verisettai",
+          "https://github.com/aiverisett-startup",
+          "https://x.com/ai_verisett",
+          "https://www.youtube.com/@VerisettAI",
+          "https://www.instagram.com/ai.verisett/"
+        ]
+      },
+      {
+        "@type": "Person",
+        "@id": "https://veri-sett.com/#founder",
+        "name": "Manoj S. M.",
+        "jobTitle": "Founder & Chief Architect",
+        "worksFor": {
+          "@id": "https://veri-sett.com/#organization"
+        },
+        "image": {
+          "@type": "ImageObject",
+          "@id": "https://veri-sett.com/#founderImage",
+          "url": "https://veri-sett.com/images/founder.jpg",
+          "contentUrl": "https://veri-sett.com/images/founder.jpg",
+          "caption": "Manoj S. M., Founder of Verisett AI",
+          "representativeOfPage": true
+        },
+        "sameAs": [
+          "https://github.com/aiverisett-startup",
           "https://x.com/ai_verisett",
           "https://www.youtube.com/@VerisettAI",
           "https://www.instagram.com/ai.verisett/"
