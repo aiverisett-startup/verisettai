@@ -21,9 +21,9 @@ interface BarDataPoint {
   settledINR: number;
 }
 
-// Modern clean font stack for standard, highly readable numbers and labels
+// Modern clean font stack for standard, highly readable numbers and labels (non-monospace, no dotted zeroes)
 const CLEAN_NUMBER_FONT =
-  'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif';
+  'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 export function AgentTelemetryBarChart({
   selectedAgent,
@@ -105,16 +105,16 @@ export function AgentTelemetryBarChart({
 
   return (
     <div
-      className={`w-full relative overflow-hidden rounded-2xl sm:rounded-3xl p-6 sm:p-7 pb-6 font-sans transition-all duration-300 bg-white/70 backdrop-blur-xl border border-slate-200/80 shadow-lg shadow-blue-500/5 ${className}`}
+      className={`w-full relative overflow-hidden rounded-2xl sm:rounded-3xl p-6 sm:p-7 pb-6 font-sans transition-all duration-300 bg-white/75 backdrop-blur-2xl border border-slate-200/90 shadow-[0_8px_30px_rgb(0,0,0,0.04),0_1px_3px_rgb(0,0,0,0.02)] ${className}`}
     >
       {/* Ambient Glass Glows */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -top-24 -left-24 w-80 h-80 bg-blue-500/8 blur-[90px] rounded-full -z-10"
+        className="pointer-events-none absolute -top-24 -left-24 w-96 h-96 bg-blue-500/10 blur-[100px] rounded-full -z-10"
       />
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -bottom-24 -right-24 w-80 h-80 bg-cyan-500/8 blur-[90px] rounded-full -z-10"
+        className="pointer-events-none absolute -bottom-24 -right-24 w-96 h-96 bg-cyan-400/10 blur-[100px] rounded-full -z-10"
       />
 
       {/* Header */}
@@ -127,7 +127,7 @@ export function AgentTelemetryBarChart({
                 : "Agent Throughput"}
             </h3>
             {selectedAgent && (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-xs">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-sans font-semibold tracking-wide bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-xs">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                 LIVE STREAM
               </span>
@@ -182,8 +182,8 @@ export function AgentTelemetryBarChart({
             </linearGradient>
             {/* Standby Glass Bar Gradient */}
             <linearGradient id="standby-glass-bar" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#CBD5E1" stopOpacity="0.5" />
-              <stop offset="100%" stopColor="#E2E8F0" stopOpacity="0.25" />
+              <stop offset="0%" stopColor="#93C5FD" stopOpacity="0.3" />
+              <stop offset="100%" stopColor="#E2E8F0" stopOpacity="0.2" />
             </linearGradient>
           </defs>
 
@@ -212,6 +212,8 @@ export function AgentTelemetryBarChart({
                     fontSize: 12,
                     fontWeight: 500,
                     fill: "#64748b",
+                    fontVariantNumeric: "normal",
+                    fontFeatureSettings: '"zero" 0, "tnum" 1',
                   }}
                 >
                   {labelVal}
@@ -240,7 +242,7 @@ export function AgentTelemetryBarChart({
                     rx="6"
                     ry="6"
                     fill="url(#standby-glass-bar)"
-                    stroke="rgba(203, 213, 225, 0.6)"
+                    stroke="rgba(147, 197, 253, 0.45)"
                     strokeWidth="1"
                     className="transition-opacity"
                   />
@@ -255,6 +257,8 @@ export function AgentTelemetryBarChart({
                       fontSize: 12,
                       fontWeight: 500,
                       fill: "#64748b",
+                      fontVariantNumeric: "normal",
+                      fontFeatureSettings: '"zero" 0, "tnum" 1',
                     }}
                   >
                     {d.slot}
@@ -310,6 +314,8 @@ export function AgentTelemetryBarChart({
                     fontSize: 12,
                     fontWeight: 500,
                     fill: isHovered ? "#2563eb" : "#64748b",
+                    fontVariantNumeric: "normal",
+                    fontFeatureSettings: '"zero" 0, "tnum" 1',
                   }}
                   className="transition-colors"
                 >
