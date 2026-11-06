@@ -17,3 +17,4 @@ Allow: /images/
 Allow: /images/*
 
 Sitemap: https://www.veri-sett.com/sitemap.xml
+

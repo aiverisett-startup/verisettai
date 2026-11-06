@@ -5,9 +5,9 @@
   "total_volume": 38500,
   "total_commission": 280,
   "is_agent_connected": true,
-  "connected_agent_id": "agt_live_node",
-  "connected_agent_name": "Aiverisett Primary Payer Agent",
-  "connected_agent_model": "Header-Defined Agent",
+  "connected_agent_id": "agt_832886",
+  "connected_agent_name": "Autonomous FastMCP Agent",
+  "connected_agent_model": "Verisett Settlement Engine (MCP / FastMCP)",
   "transactions": [
     {
       "id": "TXN-VRS-2026-174422",
@@ -263,12 +263,26 @@
   ],
   "vault_deployments": [
     {
+      "id": "vlt_1793932832887",
+      "title": "Autonomous Escrow: Autonomous FastMCP Agent -> Agent_Theta_Worker",
+      "amount": 1000,
+      "currency": "VRS",
+      "status": "Active",
+      "allocatedAgent": "Autonomous FastMCP Agent",
+      "payer": "Autonomous FastMCP Agent",
+      "payee": "Agent_Theta_Worker",
+      "ttl": 3600,
+      "expiresAt": "2026-11-06T03:40:32.888Z",
+      "createdAt": "2026-11-06T02:40:32.888Z",
+      "rail": "Verisett Settlement Engine — Built on Model Context Protocol (MCP) using FastMCP"
+    },
+    {
       "id": "VLT-ESC-174422",
       "title": "Escrow: Aiverisett Primary Payer Agent -> Gemini-Flash-Extractor (Worker)",
-      "amount": 4000,
+      "amount": 11500,
       "currency": "VRS",
-      "status": "Settled",
-      "allocatedAgent": "Aiverisett Primary Payer Agent",
+      "status": "Active",
+      "allocatedAgent": "Autonomous FastMCP Agent",
       "createdAt": "2026-09-20T16:30:05.679Z",
       "rail": "Verisett Settlement Engine — Built on Model Context Protocol (MCP) using FastMCP"
     },
@@ -353,5 +367,5 @@
       "rail": "Verisett Settlement Engine — Built on Model Context Protocol (MCP) using FastMCP"
     }
   ],
-  "last_updated": "2026-09-20T16:30:05.683Z"
+  "last_updated": "2026-11-06T02:40:32.888Z"
 }
