@@ -40,6 +40,7 @@ import { RegisteredAgentsPanel } from "@/components/dashboard/RegisteredAgentsPa
 import { AgentTelemetryBarChart } from "@/components/dashboard/AgentTelemetryBarChart";
 import { CommandPaletteModal } from "@/components/dashboard/CommandPaletteModal";
 import { AgentPolicyControlsModal } from "@/components/dashboard/AgentPolicyControlsModal";
+import { EnterpriseMemberCard } from "@/components/dashboard/EnterpriseMemberCard";
 import { supabase } from "@/lib/supabase";
 import { dispatchAuthChange } from "@/lib/useAuthUser";
 import { TransactionItem } from "@/lib/agentTransactionStorage";
@@ -117,7 +118,8 @@ export type TerminalTab =
   | "transactions"
   | "logs"
   | "webhooks"
-  | "escrow";
+  | "escrow"
+  | "card";
 
 export interface DashboardClientProps {
   initialUser: {
@@ -136,6 +138,7 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
     return `TENANT-${shortId}`;
   });
   const [hasFounderPass, setHasFounderPass] = useState<boolean>(true);
+  const [userProfile, setUserProfile] = useState<{ name?: string; plan_tier?: string }>({});
 
   // Balance state in paise
   const [balancePaise, setBalancePaise] = useState<number>(0);
@@ -434,12 +437,17 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
       try {
         const { data: profile } = await supabase
           .from("profiles")
-          .select("founder_pass, plan_tier")
+          .select("name, founder_pass, plan_tier")
           .eq("id", user.id)
           .maybeSingle();
 
         if (profile && isMounted) {
-          setHasFounderPass(Boolean(profile.founder_pass) || profile.plan_tier === "FOUNDER_NODE");
+          setUserProfile({ name: profile.name, plan_tier: profile.plan_tier });
+          setHasFounderPass(
+            Boolean(profile.founder_pass) ||
+            profile.plan_tier === "FOUNDER_NODE" ||
+            profile.plan_tier?.toUpperCase() === "ENTERPRISE"
+          );
         }
       } catch {
         if (isMounted) setHasFounderPass(true);
@@ -1058,6 +1066,7 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
                   { id: "logs", label: "Logs" },
                   { id: "webhooks", label: "Webhooks" },
                   { id: "escrow", label: "Escrow Locks" },
+                  { id: "card", label: "VIP Member Card" },
                 ].map((tab) => (
                   <button
                     key={tab.id}
@@ -1234,6 +1243,21 @@ export default function DashboardClient({ initialUser }: DashboardClientProps) {
                     <span className="text-[11px] text-blue-600">Threshold enforcement enabled</span>
                   </div>
                 </div>
+              </div>
+            )}
+
+            {activeTab === "card" && (
+              <div className="rounded-3xl border border-[#EAE3D2] bg-white p-6 sm:p-10 flex flex-col items-center justify-center shadow-xs">
+                <EnterpriseMemberCard
+                  user={{
+                    id: user.id,
+                    email: user.email,
+                    name: userProfile.name || (initialUser.email ? initialUser.email.split("@")[0].toUpperCase() : "Manoj S. M."),
+                    planTier: userProfile.plan_tier || (hasFounderPass ? "ENTERPRISE" : "FREE"),
+                    planAmount: (userProfile.plan_tier?.toUpperCase() === "ENTERPRISE" || hasFounderPass) ? 30000 : 0,
+                    operatorId: `#${tenantId.replace("TENANT-", "").slice(0, 4)}`,
+                  }}
+                />
               </div>
             )}
         </div>
