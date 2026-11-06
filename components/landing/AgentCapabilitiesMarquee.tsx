@@ -172,24 +172,29 @@ function PillCapsule({ item, spacerIndex }: { item: MarqueePill; spacerIndex: nu
 function MarqueeRow({
   items,
   direction,
+  speed = 36,
 }: {
   items: MarqueePill[];
   direction: "left" | "right";
+  speed?: number;
 }) {
-  // Repeating items within a track ensures one single track comfortably exceeds wide viewport bounds (4K)
-  const trackItems = [...items, ...items];
-
-  const trackAnimationClass =
-    direction === "left"
-      ? "continuous-marquee-track-left"
-      : "continuous-marquee-track-right";
+  // Triple replication ensures seamless coverage across 4K displays and ultra-wide viewports
+  const trackItems = [...items, ...items, ...items];
+  const animationName = direction === "left" ? "vrs-marquee-left" : "vrs-marquee-right";
 
   return (
     <div className="flex overflow-hidden py-1.5 select-none w-full pointer-events-none">
-      <div className="flex w-max shrink-0 select-none pointer-events-none continuous-marquee-content">
+      <div className="flex w-max shrink-0 select-none pointer-events-none">
         {/* Track A: Moves from 0% to -100% (or -100% to 0%) */}
         <div
-          className={`${trackAnimationClass} flex shrink-0 items-center gap-3 pr-3 select-none pointer-events-none`}
+          className="flex shrink-0 items-center gap-3 pr-3 select-none pointer-events-none"
+          style={{
+            animation: `${animationName} ${speed}s linear infinite`,
+            willChange: "transform",
+            transformStyle: "preserve-3d",
+            backfaceVisibility: "hidden",
+            WebkitBackfaceVisibility: "hidden",
+          }}
         >
           {trackItems.map((item, idx) => (
             <PillCapsule key={`track-a-${idx}`} item={item} spacerIndex={idx} />
@@ -198,8 +203,15 @@ function MarqueeRow({
 
         {/* Track B: Identical Duplicate Following in Absolute Lockstep */}
         <div
-          className={`${trackAnimationClass} flex shrink-0 items-center gap-3 pr-3 select-none pointer-events-none`}
+          className="flex shrink-0 items-center gap-3 pr-3 select-none pointer-events-none"
           aria-hidden="true"
+          style={{
+            animation: `${animationName} ${speed}s linear infinite`,
+            willChange: "transform",
+            transformStyle: "preserve-3d",
+            backfaceVisibility: "hidden",
+            WebkitBackfaceVisibility: "hidden",
+          }}
         >
           {trackItems.map((item, idx) => (
             <PillCapsule key={`track-b-${idx}`} item={item} spacerIndex={idx} />
@@ -213,6 +225,26 @@ function MarqueeRow({
 export function AgentCapabilitiesMarquee() {
   return (
     <section className="relative w-full py-12 md:py-16 overflow-hidden bg-[#FAFAFA] dark:bg-[#09090b] border-y border-zinc-200 dark:border-zinc-800/80 transition-colors">
+      {/* Scoped Keyframes for Guaranteed Infinite Hardware-Accelerated Scrolling */}
+      <style>{`
+        @keyframes vrs-marquee-left {
+          0% {
+            transform: translate3d(0, 0, 0);
+          }
+          100% {
+            transform: translate3d(-100%, 0, 0);
+          }
+        }
+        @keyframes vrs-marquee-right {
+          0% {
+            transform: translate3d(-100%, 0, 0);
+          }
+          100% {
+            transform: translate3d(0, 0, 0);
+          }
+        }
+      `}</style>
+
       {/* Background Subtle Gradient Grid Glow */}
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(#2563EB_1px,transparent_1px)] [background-size:24px_24px] opacity-[0.06] dark:opacity-[0.12]" />
 
@@ -233,13 +265,13 @@ export function AgentCapabilitiesMarquee() {
         <div className="pointer-events-none absolute inset-y-0 right-0 w-24 sm:w-40 bg-gradient-to-l from-[#FAFAFA] dark:from-[#09090b] to-transparent z-10" />
 
         {/* Row 1: Left to Right */}
-        <MarqueeRow items={row1Items} direction="right" />
+        <MarqueeRow items={row1Items} direction="right" speed={38} />
 
         {/* Row 2: Right to Left */}
-        <MarqueeRow items={row2Items} direction="left" />
+        <MarqueeRow items={row2Items} direction="left" speed={32} />
 
         {/* Row 3: Left to Right */}
-        <MarqueeRow items={row3Items} direction="right" />
+        <MarqueeRow items={row3Items} direction="right" speed={42} />
       </div>
     </section>
   );

@@ -477,13 +477,10 @@ body {
   animation: ambient-blue-glow 4s ease-in-out infinite;
 }
 
-/* Reduced Motion Safety Override */
+/* Reduced Motion Safety Override (Targeted & Non-Destructive) */
 @media (prefers-reduced-motion: reduce) {
-  *,
-  ::before,
-  ::after {
+  .motion-reduce-safe {
     animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }

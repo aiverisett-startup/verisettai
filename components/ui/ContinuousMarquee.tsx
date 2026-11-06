@@ -52,16 +52,24 @@ export function ContinuousMarquee({
     <React.Fragment key={`repeat-${i}`}>{children}</React.Fragment>
   ));
 
-  const animationClass =
-    direction === "left"
-      ? "continuous-marquee-track-left"
-      : "continuous-marquee-track-right";
+  const animationName =
+    direction === "left" ? "vrs-marquee-left" : "vrs-marquee-right";
 
   return (
     <div
       className={`relative w-full overflow-hidden select-none pointer-events-none ${className}`}
-      style={{ "--marquee-duration": `${duration}s` } as React.CSSProperties}
     >
+      <style>{`
+        @keyframes vrs-marquee-left {
+          0% { transform: translate3d(0, 0, 0); }
+          100% { transform: translate3d(-100%, 0, 0); }
+        }
+        @keyframes vrs-marquee-right {
+          0% { transform: translate3d(-100%, 0, 0); }
+          100% { transform: translate3d(0, 0, 0); }
+        }
+      `}</style>
+
       {/* Optional Left and Right Soft Vignette Fade Masks */}
       {gradientFade && (
         <>
@@ -75,18 +83,32 @@ export function ContinuousMarquee({
       )}
 
       {/* Main Track Frame */}
-      <div className="flex w-max shrink-0 select-none pointer-events-none continuous-marquee-content">
+      <div className="flex w-max shrink-0 select-none pointer-events-none">
         {/* Track A: Moves from 0% -> -100% (or -100% -> 0%) */}
         <div
-          className={`${animationClass} flex shrink-0 items-center ${gap} pr-4 select-none pointer-events-none`}
+          className={`flex shrink-0 items-center ${gap} pr-4 select-none pointer-events-none`}
+          style={{
+            animation: `${animationName} ${duration}s linear infinite`,
+            willChange: "transform",
+            transformStyle: "preserve-3d",
+            backfaceVisibility: "hidden",
+            WebkitBackfaceVisibility: "hidden",
+          }}
         >
           {trackItems}
         </div>
 
         {/* Track B: Exact clone moving in absolute lockstep for 0px visual seam */}
         <div
-          className={`${animationClass} flex shrink-0 items-center ${gap} pr-4 select-none pointer-events-none`}
+          className={`flex shrink-0 items-center ${gap} pr-4 select-none pointer-events-none`}
           aria-hidden="true"
+          style={{
+            animation: `${animationName} ${duration}s linear infinite`,
+            willChange: "transform",
+            transformStyle: "preserve-3d",
+            backfaceVisibility: "hidden",
+            WebkitBackfaceVisibility: "hidden",
+          }}
         >
           {trackItems}
         </div>
